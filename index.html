@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hryvnia Hub — объявления Украины</title>
+  <meta name="description" content="Hryvnia Hub — хаб объявлений: автомобили, недвижимость и бизнес.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container nav">
+      <a class="brand" href="#">
+        <span class="logo">H</span>
+        <span>Hryvnia Hub</span>
+      </a>
+      <button class="btn btn-primary" id="openAdd">+ Добавить объявление</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <p class="eyebrow">Hryvnia Hub</p>
+        <h1>Найди выгодное<br>предложение</h1>
+        <p class="hero-text">Автомобили, недвижимость и готовый бизнес — в одном месте.</p>
+
+        <div class="search-box">
+          <input id="searchInput" type="search" placeholder="Что ищете? Например: Skoda Octavia">
+          <select id="cityFilter">
+            <option value="">Все города</option>
+          </select>
+          <button class="btn btn-dark" id="searchBtn">Найти</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="container section">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Категории</p>
+          <h2>Что ищем?</h2>
+        </div>
+      </div>
+      <div class="categories">
+        <button class="category active" data-category="">
+          <span>Все</span><small>Все объявления</small>
+        </button>
+        <button class="category" data-category="Автомобили">
+          <span>🚗 Автомобили</span><small>Легковые и другие</small>
+        </button>
+        <button class="category" data-category="Недвижимость">
+          <span>🏠 Недвижимость</span><small>Квартиры, дома, земля</small>
+        </button>
+        <button class="category" data-category="Готовый бизнес">
+          <span>💼 Готовый бизнес</span><small>Готовый бизнес и проекты</small>
+        </button>
+        <button class="category" data-category="Инвестиции">
+          <span>📈 Инвестиции</span><small>Инвестиционные возможности</small>
+        </button>
+      </div>
+    </section>
+
+    <section class="container section">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Листинг</p>
+          <h2>Последние объявления</h2>
+        </div>
+        <span id="resultCount" class="muted"></span>
+      </div>
+      <div id="listing" class="listing">
+        <div class="empty">Загрузка объявлений…</div>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal hidden" id="addModal">
+    <div class="modal-card">
+      <button class="modal-close" id="closeAdd">×</button>
+      <p class="eyebrow">Новое объявление</p>
+      <h2>Добавить объявление</h2>
+      <form id="addForm">
+        <label>Категория
+          <select name="category" required>
+            <option value="Автомобили">Автомобили</option>
+            <option value="Недвижимость">Недвижимость</option>
+            <option value="Готовый бизнес">Готовый бизнес</option>
+            <option value="Инвестиции">Инвестиции</option>
+          </select>
+        </label>
+        <label>Название
+          <input name="title" required placeholder="Например: Skoda Octavia 1.6">
+        </label>
+        <label>Город
+          <input name="city" required placeholder="Днепр">
+        </label>
+        <label>Цена, грн
+          <input name="price" type="number" min="0" required placeholder="450000">
+        </label>
+        <label>Описание
+          <textarea name="description" rows="4" placeholder="Коротко опишите предложение"></textarea>
+        </label>
+        <button class="btn btn-primary full" type="submit">Опубликовать</button>
+        <p id="formMessage" class="form-message"></p>
+      </form>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">© 2026 Hryvnia Hub · MVP</div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js"></script>
+</body>
+</html>

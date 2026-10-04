@@ -2,8 +2,8 @@
 // Вставим реальные значения Supabase перед публикацией.
 // ВАЖНО: используем только публичный anon/publishable key, не service_role.
 
-const SUPABASE_URL = "YOUR_SUPABASE_URL";
-const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+const SUPABASE_URL = "https://bxwfnmndxbhrjvcpsffy.supabase.co/rest/v1/";
+const SUPABASE_ANON_KEY = "sb_publishable_KTs3Xo5UIxZ0ArcZV-5oQA_V4wXZog9";
 
 const hasSupabaseConfig =
   !SUPABASE_URL.startsWith("YOUR_") &&

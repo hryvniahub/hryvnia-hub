@@ -2,7 +2,7 @@
 // Вставим реальные значения Supabase перед публикацией.
 // ВАЖНО: используем только публичный anon/publishable key, не service_role.
 
-const SUPABASE_URL = "https://bxwfnmndxbhrjvcpsffy.supabase.co/rest/v1/";
+const SUPABASE_URL = "https://bxwfnmndxbhrjvcpsffy.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_KTs3Xo5UIxZ0ArcZV-5oQA_V4wXZog9";
 
 const hasSupabaseConfig =

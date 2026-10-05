@@ -320,9 +320,6 @@ function translatePage(lang) {
     const original = node.nodeValue.trim();
 
     if (!original) return;
-    const original = node.nodeValue.trim();
-
-if (!original) return;
 
 if (
   original.includes("Гривна Хаб") ||

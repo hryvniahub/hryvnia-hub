@@ -153,3 +153,235 @@ document.getElementById("addForm").addEventListener("submit", async e => {
 });
 
 loadListings();
+// ===============================
+// 🌍 HRYVNIA HUB — ЯЗЫКИ
+// ===============================
+
+const translations = {
+  "Русский": {
+    ru: "Русский",
+    uk: "Українська",
+    en: "English",
+    pl: "Polski"
+  },
+
+  "Українська": {
+    ru: "Російська",
+    uk: "Українська",
+    en: "English",
+    pl: "Polski"
+  },
+
+  "English": {
+    ru: "Russian",
+    uk: "Ukrainian",
+    en: "English",
+    pl: "Polish"
+  },
+
+  "Polski": {
+    ru: "Rosyjski",
+    uk: "Ukraiński",
+    en: "English",
+    pl: "Polski"
+  },
+
+  "+ Добавить объявление": {
+    ru: "+ Добавить объявление",
+    uk: "+ Додати оголошення",
+    en: "+ Add listing",
+    pl: "+ Dodaj ogłoszenie"
+  },
+
+  "Найди выгодное": {
+    ru: "Найди выгодное",
+    uk: "Знайди вигідну",
+    en: "Find a great",
+    pl: "Znajdź korzystną"
+  },
+
+  "предложение": {
+    ru: "предложение",
+    uk: "пропозицію",
+    en: "deal",
+    pl: "ofertę"
+  },
+
+  "Автомобили, недвижимость и готовый бизнес — в одном месте.": {
+    ru: "Автомобили, недвижимость и готовый бизнес — в одном месте.",
+    uk: "Автомобілі, нерухомість і готовий бізнес — в одному місці.",
+    en: "Cars, real estate and ready-made businesses — all in one place.",
+    pl: "Samochody, nieruchomości i gotowy biznes — wszystko w jednym miejscu."
+  },
+
+  "Что ищете? Например: Skoda Octavia": {
+    ru: "Что ищете? Например: Skoda Octavia",
+    uk: "Що шукаєте? Наприклад: Skoda Octavia",
+    en: "What are you looking for? Example: Skoda Octavia",
+    pl: "Czego szukasz? Na przykład: Skoda Octavia"
+  },
+
+  "Все города": {
+    ru: "Все города",
+    uk: "Усі міста",
+    en: "All cities",
+    pl: "Wszystkie miasta"
+  },
+
+  "Найти": {
+    ru: "Найти",
+    uk: "Знайти",
+    en: "Search",
+    pl: "Szukaj"
+  },
+
+  "КАТЕГОРИИ": {
+    ru: "КАТЕГОРИИ",
+    uk: "КАТЕГОРІЇ",
+    en: "CATEGORIES",
+    pl: "KATEGORIE"
+  },
+
+  "Что ищем?": {
+    ru: "Что ищем?",
+    uk: "Що шукаємо?",
+    en: "What are we looking for?",
+    pl: "Czego szukamy?"
+  },
+
+  "Все": {
+    ru: "Все",
+    uk: "Усі",
+    en: "All",
+    pl: "Wszystkie"
+  },
+
+  "Все объявления": {
+    ru: "Все объявления",
+    uk: "Усі оголошення",
+    en: "All listings",
+    pl: "Wszystkie ogłoszenia"
+  },
+
+  "Автомобили": {
+    ru: "Автомобили",
+    uk: "Автомобілі",
+    en: "Cars",
+    pl: "Samochody"
+  },
+
+  "Недвижимость": {
+    ru: "Недвижимость",
+    uk: "Нерухомість",
+    en: "Real estate",
+    pl: "Nieruchomości"
+  },
+
+  "Готовый бизнес": {
+    ru: "Готовый бизнес",
+    uk: "Готовий бізнес",
+    en: "Ready-made business",
+    pl: "Gotowy biznes"
+  },
+
+  "Инвестиции": {
+    ru: "Инвестиции",
+    uk: "Інвестиції",
+    en: "Investments",
+    pl: "Inwestycje"
+  }
+};
+
+function translatePage(lang) {
+  document.documentElement.lang = lang;
+
+  // Запоминаем выбранный язык
+  localStorage.setItem("hryvniaHubLanguage", lang);
+
+  // Перевод обычного текста
+  const walker = document.createTreeWalker(
+    document.body,
+    NodeFilter.SHOW_TEXT
+  );
+
+  const textNodes = [];
+
+  while (walker.nextNode()) {
+    textNodes.push(walker.currentNode);
+  }
+
+  textNodes.forEach(node => {
+    const original = node.nodeValue.trim();
+
+    if (!original) return;
+
+    for (const key in translations) {
+      const item = translations[key];
+
+      if (item.ru === original || item.uk === original ||
+          item.en === original || item.pl === original) {
+
+        const translated = item[lang];
+
+        if (translated) {
+          node.nodeValue = node.nodeValue.replace(
+            original,
+            translated
+          );
+        }
+
+        break;
+      }
+    }
+  });
+
+  // Перевод placeholder
+  const searchInput = document.getElementById("searchInput");
+
+  if (searchInput) {
+    const placeholders = {
+      ru: "Что ищете? Например: Skoda Octavia",
+      uk: "Що шукаєте? Наприклад: Skoda Octavia",
+      en: "What are you looking for? Example: Skoda Octavia",
+      pl: "Czego szukasz? Na przykład: Skoda Octavia"
+    };
+
+    searchInput.placeholder = placeholders[lang];
+  }
+
+  // Перевод пункта "Все города"
+  const cityFilter = document.getElementById("cityFilter");
+
+  if (cityFilter && cityFilter.options.length) {
+    const cityTranslations = {
+      ru: "Все города",
+      uk: "Усі міста",
+      en: "All cities",
+      pl: "Wszystkie miasta"
+    };
+
+    cityFilter.options[0].textContent =
+      cityTranslations[lang];
+  }
+}
+
+
+// Переключатель языка
+const languageSwitcher =
+  document.getElementById("languageSwitcher");
+
+if (languageSwitcher) {
+
+  languageSwitcher.addEventListener("change", function () {
+    translatePage(this.value);
+  });
+
+  // Загружаем сохранённый язык
+  const savedLanguage =
+    localStorage.getItem("hryvniaHubLanguage");
+
+  if (savedLanguage) {
+    languageSwitcher.value = savedLanguage;
+    translatePage(savedLanguage);
+  }
+}

@@ -80,7 +80,12 @@ async function loadListings() {
   }
 
   renderListings(data || []);
-  updateCities(data || []);
+  const { data: cityData, error: cityError } =
+  await db.from("listings").select("city");
+
+if (!cityError) {
+  updateCities(cityData || []);
+}
 }
 
 function updateCities(items) {

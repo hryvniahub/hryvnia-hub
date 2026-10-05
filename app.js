@@ -320,6 +320,24 @@ function translatePage(lang) {
     const original = node.nodeValue.trim();
 
     if (!original) return;
+    const original = node.nodeValue.trim();
+
+if (!original) return;
+
+if (
+  original.includes("Гривна Хаб") ||
+  original.includes("Гривний Хаб") ||
+  original.includes("Хривнийский Хаб") ||
+  original.includes("Хривнийський Хаб")
+) {
+  node.nodeValue = node.nodeValue.replace(
+    original,
+    "Гривна Хаб"
+  );
+  return;
+}
+
+for (const key in translations) {
 
     for (const key in translations) {
       const item = translations[key];

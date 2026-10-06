@@ -295,8 +295,76 @@ const translations = {
     uk: "Інвестиції",
     en: "Investments",
     pl: "Inwestycje"
-  }
-};
+  },
+    "Новое объявление": {
+        ru: "Новое объявление",
+        uk: "Нове оголошення",
+        en: "New listing",
+        pl: "Nowe ogłoszenie"
+    },
+
+    "Добавить объявление": {
+        ru: "Добавить объявление",
+        uk: "Додати оголошення",
+        en: "Add listing",
+        pl: "Dodaj ogłoszenie"
+    },
+
+    "Категория": {
+        ru: "Категория",
+        uk: "Категорія",
+        en: "Category",
+        pl: "Kategoria"
+    },
+
+    "Название": {
+        ru: "Название",
+        uk: "Назва",
+        en: "Title",
+        pl: "Nazwa"
+    },
+
+    "Город": {
+        ru: "Город",
+        uk: "Місто",
+        en: "City",
+        pl: "Miasto"
+    },
+
+    "Цена, грн": {
+        ru: "Цена, грн",
+        uk: "Ціна, грн",
+        en: "Price, UAH",
+        pl: "Cena, UAH"
+    },
+
+    "Описание": {
+        ru: "Описание",
+        uk: "Опис",
+        en: "Description",
+        pl: "Opis"
+    },
+
+    "Опубликовать": {
+        ru: "Опубликовать",
+        uk: "Опублікувати",
+        en: "Publish",
+        pl: "Opublikuj"
+    },
+
+    "Например: Skoda Octavia 1.6": {
+        ru: "Например: Skoda Octavia 1.6",
+        uk: "Наприклад: Skoda Octavia 1.6",
+        en: "Example: Skoda Octavia 1.6",
+        pl: "Na przykład: Skoda Octavia 1.6"
+    },
+
+    "Коротко опишите предложение": {
+        ru: "Коротко опишите предложение",
+        uk: "Коротко опишіть пропозицію",
+        en: "Briefly describe the offer",
+        pl: "Krótko opisz ofertę"
+    }};
 // ===============================
 // Текущий язык
 // ===============================
@@ -556,7 +624,114 @@ function translatePage(selectedLanguage) {
     }
   });
 
+// --------------------------------
+// Модальное окно добавления
+// --------------------------------
 
+const modal = document.getElementById("addModal");
+
+if (modal) {
+    const modalEyebrow = modal.querySelector(".eyebrow");
+    if (modalEyebrow) {
+        translateTextElement(
+            modalEyebrow,
+            "Новое объявление"
+        );
+    }
+
+    const modalTitle = modal.querySelector("h2");
+    if (modalTitle) {
+        translateTextElement(
+            modalTitle,
+            "Добавить объявление"
+        );
+    }
+
+    const labels = modal.querySelectorAll("label");
+
+    const labelKeys = [
+        "Категория",
+        "Название",
+        "Город",
+        "Цена, грн",
+        "Описание"
+    ];
+
+    labels.forEach((label, index) => {
+        const key = labelKeys[index];
+
+        if (!key) return;
+
+        const item = translations[key];
+
+        if (!item || !item[lang]) return;
+
+        const textNode = [...label.childNodes].find(
+            node =>
+                node.nodeType === Node.TEXT_NODE &&
+                node.textContent.trim()
+        );
+
+        if (textNode) {
+            textNode.textContent = item[lang] + "\n";
+        }
+    });
+
+    const categorySelect =
+        modal.querySelector('select[name="category"]');
+
+    if (categorySelect) {
+        const categoryKeys = [
+            "Автомобили",
+            "Недвижимость",
+            "Готовый бизнес",
+            "Инвестиции"
+        ];
+
+        [...categorySelect.options].forEach(
+            (option, index) => {
+                const key = categoryKeys[index];
+                const item = translations[key];
+
+                if (item && item[lang]) {
+                    option.textContent = item[lang];
+                }
+            }
+        );
+    }
+
+    const titleInput =
+        modal.querySelector('input[name="title"]');
+
+    if (titleInput) {
+        titleInput.placeholder =
+            translations[
+                "Например: Skoda Octavia 1.6"
+            ][lang];
+    }
+
+    const descriptionInput =
+        modal.querySelector(
+            'textarea[name="description"]'
+        );
+
+    if (descriptionInput) {
+        descriptionInput.placeholder =
+            translations[
+                "Коротко опишите предложение"
+            ][lang];
+    }
+
+    const publishButton =
+        modal.querySelector('button[type="submit"]');
+
+    if (publishButton) {
+        translateTextElement(
+            publishButton,
+            "Опубликовать"
+        );
+    }
+            }
   // --------------------------------
   // Языковой переключатель
   // --------------------------------

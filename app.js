@@ -50,7 +50,7 @@ function renderListings(items) {
   listing.innerHTML = items.map(item => `
     <article class="card">
       <div class="card-top">
-        <span class="badge">${escapeHtml(item.category)}</span>
+        <span class="badge">${escapeHtml(translations[item.category]?.[lang] || item.category)}</span>
         <span class="city">${escapeHtml(item.city)}</span>
       </div>
       <h3>${escapeHtml(item.title)}</h3>

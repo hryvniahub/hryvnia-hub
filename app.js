@@ -567,7 +567,35 @@ function translatePage(selectedLanguage) {
       uk: "Інвестиційні можливості",
       en: "Investment opportunities",
       pl: "Możliwości inwestycyjne"
-    }
+    },
+
+"Листинг": {
+  ru: "Листинг",
+  uk: "Оголошення",
+  en: "LISTINGS",
+  pl: "OGŁOSZENЯ"
+},
+
+"Последние объявления": {
+  ru: "Последние объявления",
+  uk: "Останні оголошення",
+  en: "Latest listings",
+  pl: "Najnowsze ogłoszenia"
+},
+
+"Объявлений пока нет. Добавьте первое!": {
+  ru: "Объявлений пока нет. Добавьте первое!",
+  uk: "Оголошень поки немає. Додайте перше!",
+  en: "No listings yet. Add the first one!",
+  pl: "Nie ma jeszcze ogłoszeń. Dodaj pierwsze!"
+},
+
+"Загрузка объявлений…": {
+  ru: "Загрузка объявлений…",
+  uk: "Завантаження оголошень…",
+  en: "Loading listings…",
+  pl: "Ładowanie ogłoszeń…"
+}
   };
 
 

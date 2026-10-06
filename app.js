@@ -537,7 +537,7 @@ function translatePage(selectedLanguage) {
                 item[lang];
         }
       }
-    }
+    
 
 
     // Описание категории

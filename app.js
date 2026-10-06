@@ -105,7 +105,7 @@ function updateCities(items) {
   const selected = cityFilter.value;
   const cities = [...new Set(items.map(x => x.city).filter(Boolean))].sort();
   cityFilter.innerHTML = `<option value="">${cityTranslations[lang]}</option>` +
-    cities.map(city => `<option value="${escapeHtml(city)}">${escapeHtml(city)}</option>`).join("");
+    cities.map(city => `<option value="${escapeHtml(city)}">${escapeHtml(translations[city]?.[lang] || city)}</option>`).join("");
   cityFilter.value = selected;
 }
 

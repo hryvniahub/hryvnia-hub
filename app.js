@@ -297,112 +297,340 @@ const translations = {
     pl: "Inwestycje"
   }
 };
+// ===============================
+// Текущий язык
+// ===============================
+let lang =
+  localStorage.getItem("hryvniaHubLanguage") || "ru";
 
-function translatePage(lang) {
-  document.documentElement.lang = lang;
 
-  // Запоминаем выбранный язык
-  localStorage.setItem("hryvniaHubLanguage", lang);
+// ===============================
+// Перевод одного элемента
+// ===============================
+function translateTextElement(element, original) {
+  if (!element) return;
 
-  // Перевод обычного текста
-  const walker = document.createTreeWalker(
-    document.body,
-    NodeFilter.SHOW_TEXT
-  );
+  const item = translations[original];
 
-  const textNodes = [];
-
-  while (walker.nextNode()) {
-    textNodes.push(walker.currentNode);
+  if (item && item[lang]) {
+    element.textContent = item[lang];
   }
-
-  textNodes.forEach(node => {
-    const original = node.nodeValue.trim();
-
-    if (!original) return;
-
-if (
-  original.includes("Гривна Хаб") ||
-  original.includes("Гривний Хаб") ||
-  original.includes("Хривнийский Хаб") ||
-  original.includes("Хривнийський Хаб")
-) {
-  node.nodeValue = node.nodeValue.replace(
-    original,
-    "Гривна Хаб"
-  );
-  return;
 }
 
-for (const key in translations) {
 
-    for (const key in translations) {
-      const item = translations[key];
+// ===============================
+// Перевод только интерфейса
+// ===============================
+function translatePage(selectedLanguage) {
 
-      if (item.ru === original || item.uk === original ||
-          item.en === original || item.pl === original) {
+  lang = selectedLanguage;
 
-        const translated = item[lang];
+  document.documentElement.lang = lang;
 
-        if (translated) {
-          node.nodeValue = node.nodeValue.replace(
-            original,
-            translated
-          );
+  localStorage.setItem(
+    "hryvniaHubLanguage",
+    lang
+  );
+
+
+  // --------------------------------
+  // Кнопка добавления объявления
+  // --------------------------------
+  translateTextElement(
+    document.getElementById("openAdd"),
+    "+ Добавить объявление"
+  );
+
+
+  // --------------------------------
+  // Главный заголовок
+  // --------------------------------
+  const heroTitle =
+    document.querySelector(".hero h1");
+
+  if (heroTitle) {
+    const title =
+      translations["Найди выгодное"];
+
+    const deal =
+      translations["предложение"];
+
+    if (title && deal) {
+      heroTitle.innerHTML =
+        `${title[lang]}<br>${deal[lang]}`;
+    }
+  }
+
+
+  // --------------------------------
+  // Описание главного экрана
+  // --------------------------------
+  translateTextElement(
+    document.querySelector(".hero-text"),
+    "Автомобили, недвижимость и готовый бизнес — в одном месте."
+  );
+
+
+  // --------------------------------
+  // Поиск
+  // --------------------------------
+  if (searchInput) {
+
+    const placeholder =
+      translations[
+        "Что ищете? Например: Skoda Octavia"
+      ];
+
+    if (placeholder) {
+      searchInput.placeholder =
+        placeholder[lang];
+    }
+  }
+
+
+  translateTextElement(
+    document.getElementById("searchBtn"),
+    "Найти"
+  );
+
+
+  // --------------------------------
+  // Города
+  // --------------------------------
+  if (
+    cityFilter &&
+    cityFilter.options.length
+  ) {
+
+    const city =
+      translations["Все города"];
+
+    if (city) {
+      cityFilter.options[0].textContent =
+        city[lang];
+    }
+  }
+
+
+  // --------------------------------
+  // Заголовок категорий
+  // --------------------------------
+  const sectionEyebrow =
+    document.querySelector(".section .eyebrow");
+
+  if (sectionEyebrow) {
+
+    const key =
+      sectionEyebrow.textContent.trim();
+
+    const item =
+      translations[key] ||
+      translations["КАТЕГОРИИ"] ||
+      translations["Категории"];
+
+    if (item && item[lang]) {
+      sectionEyebrow.textContent =
+        item[lang];
+    }
+  }
+
+
+  const categoryTitle =
+    document.querySelector(".section h2");
+
+  if (categoryTitle) {
+
+    const item =
+      translations["Что ищем?"];
+
+    if (item && item[lang]) {
+      categoryTitle.textContent =
+        item[lang];
+    }
+  }
+
+
+  // --------------------------------
+  // Категории
+  // --------------------------------
+  const categoryButtons =
+    document.querySelectorAll(".category");
+
+  const categoryNames = [
+    "Все",
+    "Автомобили",
+    "Недвижимость",
+    "Готовый бизнес",
+    "Инвестиции"
+  ];
+
+  const categoryDescriptions = {
+
+    "Все": {
+      ru: "Все объявления",
+      uk: "Усі оголошення",
+      en: "All listings",
+      pl: "Wszystkie ogłoszenia"
+    },
+
+    "Автомобили": {
+      ru: "Легковые и другие",
+      uk: "Легкові та інші",
+      en: "Cars and more",
+      pl: "Samochody i inne"
+    },
+
+    "Недвижимость": {
+      ru: "Квартиры, дома, земля",
+      uk: "Квартири, будинки, земля",
+      en: "Apartments, houses, land",
+      pl: "Mieszkania, domy, grunty"
+    },
+
+    "Готовый бизнес": {
+      ru: "Готовый бизнес и проекты",
+      uk: "Готовий бізнес і проєкти",
+      en: "Ready-made businesses and projects",
+      pl: "Gotowe firmy i projekty"
+    },
+
+    "Инвестиции": {
+      ru: "Инвестиционные возможности",
+      uk: "Інвестиційні можливості",
+      en: "Investment opportunities",
+      pl: "Możliwości inwestycyjne"
+    }
+  };
+
+
+  categoryButtons.forEach(
+    (button, index) => {
+
+      const name =
+        categoryNames[index];
+
+      if (!name) return;
+
+
+      const span =
+        button.querySelector("span");
+
+      const small =
+        button.querySelector("small");
+
+
+      // Название категории
+      if (span) {
+
+        const item =
+          translations[name];
+
+        if (item && item[lang]) {
+
+          const emoji =
+            span.textContent.match(
+              /^[^\p{L}\p{N}]*/u
+            )?.[0] || "";
+
+          span.textContent =
+            emoji +
+                item[lang];
         }
+      }
+    }
 
-        break;
+
+    // Описание категории
+    if (small) {
+
+      const description =
+        categoryDescriptions[name];
+
+      if (
+        description &&
+        description[lang]
+      ) {
+        small.textContent =
+          description[lang];
       }
     }
   });
 
-  // Перевод placeholder
-  const searchInput = document.getElementById("searchInput");
 
-  if (searchInput) {
-    const placeholders = {
-      ru: "Что ищете? Например: Skoda Octavia",
-      uk: "Що шукаєте? Наприклад: Skoda Octavia",
-      en: "What are you looking for? Example: Skoda Octavia",
-      pl: "Czego szukasz? Na przykład: Skoda Octavia"
-    };
+  // --------------------------------
+  // Языковой переключатель
+  // --------------------------------
+  const languageSwitcher =
+    document.getElementById(
+      "languageSwitcher"
+    );
 
-    searchInput.placeholder = placeholders[lang];
-  }
+  if (languageSwitcher) {
 
-  // Перевод пункта "Все города"
-  const cityFilter = document.getElementById("cityFilter");
+    const names = translations;
 
-  if (cityFilter && cityFilter.options.length) {
-    const cityTranslations = {
-      ru: "Все города",
-      uk: "Усі міста",
-      en: "All cities",
-      pl: "Wszystkie miasta"
-    };
+    if (languageSwitcher.options[0]) {
+      languageSwitcher.options[0].textContent =
+        "🇷🇺 " +
+        names["Русский"][lang];
+    }
 
-    cityFilter.options[0].textContent =
-      cityTranslations[lang];
+    if (languageSwitcher.options[1]) {
+      languageSwitcher.options[1].textContent =
+        "🇺🇦 " +
+        names["Українська"][lang];
+    }
+
+    if (languageSwitcher.options[2]) {
+      languageSwitcher.options[2].textContent =
+        "🇬🇧 " +
+        names["English"][lang];
+    }
+
+    if (languageSwitcher.options[3]) {
+      languageSwitcher.options[3].textContent =
+        "🇵🇱 " +
+        names["Polski"][lang];
+    }
   }
 }
 
 
+// ===============================
 // Переключатель языка
+// ===============================
 const languageSwitcher =
-  document.getElementById("languageSwitcher");
+  document.getElementById(
+    "languageSwitcher"
+  );
 
 if (languageSwitcher) {
 
-  languageSwitcher.addEventListener("change", function () {
-    translatePage(this.value);
-  });
+  languageSwitcher.addEventListener(
+    "change",
+    function () {
+      translatePage(this.value);
+    }
+  );
 
-  // Загружаем сохранённый язык
+
   const savedLanguage =
-    localStorage.getItem("hryvniaHubLanguage");
+    localStorage.getItem(
+      "hryvniaHubLanguage"
+    );
+
 
   if (savedLanguage) {
-    languageSwitcher.value = savedLanguage;
-    translatePage(savedLanguage);
+
+    languageSwitcher.value =
+      savedLanguage;
+
+    translatePage(
+      savedLanguage
+    );
+
+  } else {
+
+    translatePage("ru");
   }
 }

@@ -51,7 +51,7 @@ function renderListings(items) {
     <article class="card">
       <div class="card-top">
         <span class="badge">${escapeHtml(translations[item.category]?.[lang] || item.category)}</span>
-        <span class="city">${escapeHtml(item.city)}</span>
+        <span class="city">${escapeHtml(translations[item.city]?.[lang] || item.city)}</span>
       </div>
       <h3>${escapeHtml(item.title)}</h3>
       <p class="price">${money(item.price)}</p>
@@ -303,6 +303,24 @@ const translations = {
     en: "Investments",
     pl: "Inwestycje"
   },
+  "Днепр": {
+  ru: "Днепр",
+  uk: "Дніпро",
+  en: "Dnipro",
+  pl: "Dniepr"
+},
+"Сумы": {
+  ru: "Сумы",
+  uk: "Суми",
+  en: "Sumy",
+  pl: "Sumy"
+},
+"Славянск": {
+  ru: "Славянск",
+  uk: "Слов'янськ",
+  en: "Sloviansk",
+  pl: "Słowiańsk"
+},
     "Новое объявление": {
         ru: "Новое объявление",
         uk: "Нове оголошення",

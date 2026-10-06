@@ -517,7 +517,31 @@ translateTextElement(
         item[lang];
     }
   }
+  const listingLabel =
+    document.getElementById("listingLabel");
 
+  if (listingLabel) {
+    const item =
+      translations["Листинг"];
+
+    if (item && item[lang]) {
+      listingLabel.textContent =
+        item[lang];
+    }
+  }
+
+  const latestListingsTitle =
+    document.getElementById("latestListingsTitle");
+
+  if (latestListingsTitle) {
+    const item =
+      translations["Последние объявления"];
+
+    if (item && item[lang]) {
+      latestListingsTitle.textContent =
+        item[lang];
+    }
+}
 
   const categoryTitle =
     document.querySelector(".section h2");

@@ -406,6 +406,15 @@ function translatePage(selectedLanguage) {
     "hryvniaHubLanguage",
     lang
   );
+  translateTextElement(
+  document.querySelector(".section-head .eyebrow"),
+  "Листинг"
+);
+
+translateTextElement(
+  document.querySelector(".section-head h2"),
+  "Последние объявления"
+);
 
 
   // --------------------------------

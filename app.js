@@ -33,7 +33,14 @@ function escapeHtml(value = "") {
 }
 
 function renderListings(items) {
-  resultCount.textContent = `${items.length} объявлений`;
+  resultCount.textContent =
+  lang === "uk"
+    ? `${items.length} оголошень`
+    : lang === "en"
+    ? `${items.length} listings`
+    : lang === "pl"
+    ? `${items.length} ogłoszeń`
+    : `${items.length} объявлений`;
 
   if (!items.length) {
     listing.innerHTML = `<div class="empty">Объявлений пока нет. Добавьте первое!</div>`;

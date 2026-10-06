@@ -566,31 +566,24 @@ function translatePage(selectedLanguage) {
     );
 
   if (languageSwitcher) {
-
-    const names = translations;
-
     if (languageSwitcher.options[0]) {
       languageSwitcher.options[0].textContent =
-        "🇷🇺 " +
-        names["Русский"][lang];
+        "🇷🇺 Русский";
     }
 
     if (languageSwitcher.options[1]) {
       languageSwitcher.options[1].textContent =
-        "🇺🇦 " +
-        names["Українська"][lang];
+        "🇺🇦 Українська";
     }
 
     if (languageSwitcher.options[2]) {
       languageSwitcher.options[2].textContent =
-        "🇬🇧 " +
-        names["English"][lang];
+        "🇬🇧 English";
     }
 
     if (languageSwitcher.options[3]) {
       languageSwitcher.options[3].textContent =
-        "🇵🇱 " +
-        names["Polski"][lang];
+        "🇵🇱 Polski";
     }
   }
 }

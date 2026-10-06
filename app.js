@@ -371,7 +371,21 @@ const translations = {
         uk: "Коротко опишіть пропозицію",
         en: "Briefly describe the offer",
         pl: "Krótko opisz ofertę"
-    }};
+    },
+  "Листинг": {
+    ru: "Листинг",
+    uk: "ЛІСТИНГ",
+    en: "LISTINGS",
+    pl: "LISTINGS"
+},
+
+"Последние объявления": {
+    ru: "Последние объявления",
+    uk: "Останні оголошення",
+    en: "Latest listings",
+    pl: "Najnowsze ogłoszenia"
+}
+};
 // ===============================
 // Текущий язык
 // ===============================

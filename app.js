@@ -51,7 +51,8 @@ function renderListings(items) {
     <article class="card">
       <div class="card-top">
         <span class="badge">${escapeHtml(translations[item.category]?.[lang] || item.category)}</span>
-        <span class="city">${escapeHtml(translations[item.city]?.[lang] || item.city)}</span>
+        <span class="city">${escapeHtml(
+  item.cities?.[`name_${lang}`] || item.cities?.name_ru || "")}</span>
       </div>
       <h3>${escapeHtml(item.title)}</h3>
       <p class="price">${money(item.price)}</p>
@@ -149,7 +150,7 @@ document.getElementById("addForm").addEventListener("submit", async e => {
   const payload = {
     category: form.get("category"),
     title: form.get("title"),
-    city: form.get("city"),
+    city_id: Number(form.get("city_id")),
     price: Number(form.get("price")),
     description: form.get("description") || ""
   };

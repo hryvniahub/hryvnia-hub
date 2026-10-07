@@ -71,7 +71,7 @@ async function loadListings() {
     return;
   }
 
-  let query = db.from("listings").select("*").order("created_at", {ascending:false});
+  let query = db.from("listings").select("*, cities(name_ru, name_uk, name_en, name_pl)").order("created_at", {ascending:false});
 
   if (currentCategory) query = query.eq("category", currentCategory);
   if (cityFilter.value) query = query.eq("city", cityFilter.value);

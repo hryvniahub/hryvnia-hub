@@ -88,7 +88,7 @@ async function loadListings() {
 
   renderListings(data || []);
   const { data: cityData, error: cityError } =
-  await db.from("listings").select("city");
+  await db.from("cities").select("id, name_ru, name_uk, name_en, name_pl").order("id");
 
 if (!cityError) {
   updateCities(cityData || []);
@@ -103,10 +103,12 @@ function updateCities(items) {
   pl: "Wszystkie miasta"
 };
   const selected = cityFilter.value;
-  const cities = [...new Set(items.map(x => x.city).filter(Boolean))].sort();
-  cityFilter.innerHTML = `<option value="">${cityTranslations[lang]}</option>` +
-    cities.map(city => `<option value="${escapeHtml(city)}">${escapeHtml(translations[city]?.[lang] || city)}</option>`).join("");
-  cityFilter.value = selected;
+const cities = items || [];
+
+cityFilter.innerHTML = `<option value="">${cityTranslations[lang]}</option>` +
+  cities.map(city => `<option value="${city.id}">${escapeHtml(city[`name_${lang}`] || city.name_ru)}</option>`).join("");
+
+cityFilter.value = selected;
 }
 
 document.querySelectorAll(".category").forEach(button => {

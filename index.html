@@ -98,7 +98,9 @@
           <input name="title" required placeholder="Например: Skoda Octavia 1.6">
         </label>
         <label>Город
-          <input name="city" required placeholder="Днепр">
+    <select name="city_id" id="citySelect" required>
+        <option value="">Выберите город</option>
+    </select>
         </label>
         <label>Цена, грн
           <input name="price" type="number" min="0" required placeholder="450000">

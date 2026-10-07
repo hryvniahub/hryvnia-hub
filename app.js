@@ -74,7 +74,7 @@ async function loadListings() {
   let query = db.from("listings").select("*, cities(name_ru, name_uk, name_en, name_pl)").order("created_at", {ascending:false});
 
   if (currentCategory) query = query.eq("category", currentCategory);
-  if (cityFilter.value) query = query.eq("city", cityFilter.value);
+  if (cityFilter.value) query = query.eq("city_id", cityFilter.value);
 
   const term = searchInput.value.trim();
   if (term) query = query.or(`title.ilike.%${term}%,description.ilike.%${term}%`);

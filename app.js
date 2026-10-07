@@ -861,7 +861,6 @@ if (modal) {
         "🇵🇱 Polski";
     }
   }
-loadListings();
 }
 
 

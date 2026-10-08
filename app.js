@@ -107,9 +107,21 @@ function updateCities(items) {
 const cities = items || [];
 
 cityFilter.innerHTML = `<option value="">${cityTranslations[lang]}</option>` +
-  cities.map(city => `<option value="${city.id}">${escapeHtml(city[`name_${lang}`] || city.name_ru)}</option>`).join("");
+    cities.map(city => `<option value="${city.id}">
+    ${escapeHtml(city[`name_${lang}`] || city.name_ru)}
+    </option>`).join("");
 
 cityFilter.value = selected;
+
+const citySelect = document.getElementById("citySelect");
+
+if (citySelect) {
+    citySelect.innerHTML =
+        `<option value="">Выберите город</option>` +
+        cities.map(city => `<option value="${city.id}">
+        ${escapeHtml(city[`name_${lang}`] || city.name_ru)}
+        </option>`).join("");
+}
 }
 
 document.querySelectorAll(".category").forEach(button => {

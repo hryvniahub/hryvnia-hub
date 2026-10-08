@@ -117,7 +117,7 @@ const citySelect = document.getElementById("citySelect");
 
 if (citySelect) {
     citySelect.innerHTML =
-        `<option value="">Выберите город</option>` +
+        `<option value="">${translations["Выберите город"][lang]}</option>` +
         cities.map(city => `<option value="${city.id}">
         ${escapeHtml(city[`name_${lang}`] || city.name_ru)}
         </option>`).join("");
@@ -369,6 +369,13 @@ const translations = {
         uk: "Місто",
         en: "City",
         pl: "Miasto"
+    },
+
+    "Выберите город": {
+        ru: "Выберите город",
+        uk: "Виберіть місто",
+        en: "Select city",
+        pl: "Wybierz miasto"
     },
 
     "Цена, грн": {
@@ -761,6 +768,11 @@ if (modal) {
             "Добавить объявление"
         );
     }
+
+    translateTextElement(
+        modal.querySelector('#citySelect option[value=""]'),
+        "Выберите город"
+    );
 
     const labels = modal.querySelectorAll("label");
 

@@ -20,7 +20,7 @@ const cityFilter = document.getElementById("cityFilter");
 const addModal = document.getElementById("addModal");
 const formMessage = document.getElementById("formMessage");
 
-// Фотографии объявлений: только автомобили и недвижимость.
+// Фотографии для всех категорий объявлений.
 const PHOTO_BUCKET = "listing-photos";
 const MAX_PHOTOS = 10;
 const MAX_PHOTO_BYTES = 10 * 1024 * 1024;
@@ -30,7 +30,6 @@ const photoInput = document.getElementById("photoInput");
 const photoPreview = document.getElementById("photoPreview");
 const photoMessage = document.getElementById("photoMessage");
 const addForm = document.getElementById("addForm");
-const formCategory = addForm.elements.category;
 let selectedPhotos = [];
 let publishing = false;
 let validatingPhotos = false;
@@ -46,10 +45,6 @@ function photoText(key) {
   return (photoTranslations[lang] || photoTranslations.ru)[key];
 }
 
-function supportsPhotos(category) {
-  return category === "Автомобили" || category === "Недвижимость";
-}
-
 function renderPhotoPreview() {
   photoPreview.innerHTML = selectedPhotos.map((photo, index) => `
     <div class="photo-item">
@@ -63,9 +58,7 @@ function renderPhotoPreview() {
 }
 
 function updatePhotoFields() {
-  const supported = supportsPhotos(formCategory.value);
-  photoFields.classList.toggle("hidden", !supported);
-  photoFields.disabled = !supported || publishing || validatingPhotos;
+  photoFields.disabled = publishing || validatingPhotos;
   document.getElementById("photoLabel").textContent = photoText("label");
   document.getElementById("photoPickerButton").textContent = photoText("add");
   document.getElementById("photoHint").textContent = photoText("hint");
@@ -131,7 +124,6 @@ photoPreview.addEventListener("click", event => {
   photoMessage.textContent = "";
   renderPhotoPreview();
 });
-formCategory.addEventListener("change", updatePhotoFields);
 
 async function uploadListingPhotos() {
   // Verify the schema before uploading, so a missing migration leaves no orphaned files.
@@ -154,7 +146,6 @@ async function uploadListingPhotos() {
 }
 
 function listingCover(item) {
-  if (!supportsPhotos(item.category)) return "";
   const url = item.image_url || item.image_urls?.[0];
   if (typeof url !== "string" || !/^https?:\/\//i.test(url)) return "";
   return `<img class="listing-photo" src="${escapeHtml(url)}" alt="${escapeHtml(item.title)}" loading="lazy">`;
@@ -309,7 +300,7 @@ document.getElementById("addForm").addEventListener("submit", async e => {
     description: form.get("description") || ""
   };
 
-  const withPhotos = supportsPhotos(payload.category) && selectedPhotos.length > 0;
+  const withPhotos = selectedPhotos.length > 0;
   publishing = true;
   const controls = [...addForm.elements].map(control => [control, control.disabled]);
   controls.forEach(([control]) => { control.disabled = true; });

@@ -20,6 +20,137 @@ const cityFilter = document.getElementById("cityFilter");
 const addModal = document.getElementById("addModal");
 const formMessage = document.getElementById("formMessage");
 
+// Фотографии для всех категорий объявлений.
+const PHOTO_BUCKET = "listing-photos";
+const MAX_PHOTOS = 10;
+const MAX_PHOTO_BYTES = 10 * 1024 * 1024;
+const PHOTO_TYPES = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" };
+const photoFields = document.getElementById("photoFields");
+const photoInput = document.getElementById("photoInput");
+const photoPreview = document.getElementById("photoPreview");
+const photoMessage = document.getElementById("photoMessage");
+const addForm = document.getElementById("addForm");
+let selectedPhotos = [];
+let publishing = false;
+let validatingPhotos = false;
+
+const photoTranslations = {
+  ru: { label: "Фотографии", add: "Добавить фотографии", hint: "До 10 фото: JPEG, PNG или WebP, до 10 МБ каждое. Первое фото — главное.", main: "Главное фото", makeMain: "Сделать главным", remove: "Удалить", limit: "Можно добавить не больше 10 фотографий.", invalid: "Выберите изображения JPEG, PNG или WebP размером до 10 МБ каждое.", unreadable: "Не удалось открыть изображение. Выберите другой файл.", saving: "Сохраняем объявление и фотографии…", failed: "Не удалось сохранить объявление с фотографиями. Попробуйте ещё раз.", setup: "Загрузка фотографий пока недоступна. Попробуйте позже." },
+  uk: { label: "Фотографії", add: "Додати фотографії", hint: "До 10 фото: JPEG, PNG або WebP, до 10 МБ кожне. Перше фото — головне.", main: "Головне фото", makeMain: "Зробити головним", remove: "Видалити", limit: "Можна додати не більше 10 фотографій.", invalid: "Виберіть зображення JPEG, PNG або WebP розміром до 10 МБ кожне.", unreadable: "Не вдалося відкрити зображення. Виберіть інший файл.", saving: "Зберігаємо оголошення та фотографії…", failed: "Не вдалося зберегти оголошення з фотографіями. Спробуйте ще раз.", setup: "Завантаження фотографій поки недоступне. Спробуйте пізніше." },
+  en: { label: "Photos", add: "Add photos", hint: "Up to 10 photos: JPEG, PNG or WebP, up to 10 MB each. The first photo is the cover.", main: "Cover photo", makeMain: "Make cover", remove: "Remove", limit: "You can add up to 10 photos.", invalid: "Choose JPEG, PNG or WebP images up to 10 MB each.", unreadable: "This image could not be opened. Choose another file.", saving: "Saving the listing and photos…", failed: "Could not save the listing with photos. Please try again.", setup: "Photo uploads are currently unavailable. Please try later." },
+  pl: { label: "Zdjęcia", add: "Dodaj zdjęcia", hint: "Do 10 zdjęć: JPEG, PNG lub WebP, do 10 MB każde. Pierwsze zdjęcie jest główne.", main: "Zdjęcie główne", makeMain: "Ustaw jako główne", remove: "Usuń", limit: "Możesz dodać maksymalnie 10 zdjęć.", invalid: "Wybierz obrazy JPEG, PNG lub WebP o rozmiarze do 10 MB każdy.", unreadable: "Nie można otworzyć obrazu. Wybierz inny plik.", saving: "Zapisywanie ogłoszenia i zdjęć…", failed: "Nie udało się zapisać ogłoszenia ze zdjęciami. Spróbuj ponownie.", setup: "Przesyłanie zdjęć jest obecnie niedostępne. Spróbuj później." }
+};
+
+function photoText(key) {
+  return (photoTranslations[lang] || photoTranslations.ru)[key];
+}
+
+function renderPhotoPreview() {
+  photoPreview.innerHTML = selectedPhotos.map((photo, index) => `
+    <div class="photo-item">
+      <img src="${photo.previewUrl}" alt="${escapeHtml(photo.file.name)}">
+      <span>${index === 0 ? photoText("main") : index + 1}</span>
+      <div class="photo-actions">
+        ${index > 0 ? `<button type="button" class="btn" data-photo-main="${index}">${photoText("makeMain")}</button>` : ""}
+        <button type="button" class="btn" data-photo-remove="${index}" aria-label="${escapeHtml(photoText("remove") + ': ' + photo.file.name)}">${photoText("remove")}</button>
+      </div>
+    </div>`).join("");
+}
+
+function updatePhotoFields() {
+  photoFields.disabled = publishing || validatingPhotos;
+  document.getElementById("photoLabel").textContent = photoText("label");
+  document.getElementById("photoPickerButton").textContent = photoText("add");
+  document.getElementById("photoHint").textContent = photoText("hint");
+  renderPhotoPreview();
+}
+
+function resetPhotos() {
+  selectedPhotos.forEach(photo => URL.revokeObjectURL(photo.previewUrl));
+  selectedPhotos = [];
+  photoInput.value = "";
+  photoMessage.textContent = "";
+  updatePhotoFields();
+}
+
+document.getElementById("photoPickerButton").addEventListener("click", () => photoInput.click());
+photoInput.addEventListener("change", async () => {
+  if (publishing || validatingPhotos) return;
+  const files = [...photoInput.files];
+  photoInput.value = "";
+  photoMessage.textContent = "";
+  if (files.length + selectedPhotos.length > MAX_PHOTOS) {
+    photoMessage.textContent = photoText("limit");
+    return;
+  }
+  if (files.some(file => !PHOTO_TYPES[file.type] || !file.size || file.size > MAX_PHOTO_BYTES)) {
+    photoMessage.textContent = photoText("invalid");
+    return;
+  }
+  validatingPhotos = true;
+  updatePhotoFields();
+  const additions = [];
+  try {
+    for (const file of files) {
+      const previewUrl = URL.createObjectURL(file);
+      additions.push({ file, previewUrl });
+      await new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = resolve;
+        img.onerror = reject;
+        img.src = previewUrl;
+      });
+    }
+    selectedPhotos.push(...additions);
+  } catch {
+    additions.forEach(photo => URL.revokeObjectURL(photo.previewUrl));
+    photoMessage.textContent = photoText("unreadable");
+  } finally {
+    validatingPhotos = false;
+    updatePhotoFields();
+  }
+});
+
+photoPreview.addEventListener("click", event => {
+  if (publishing || validatingPhotos) return;
+  const button = event.target.closest("button");
+  if (!button) return;
+  if (button.dataset.photoRemove !== undefined) {
+    const [removed] = selectedPhotos.splice(Number(button.dataset.photoRemove), 1);
+    URL.revokeObjectURL(removed.previewUrl);
+  } else if (button.dataset.photoMain !== undefined) {
+    selectedPhotos.unshift(...selectedPhotos.splice(Number(button.dataset.photoMain), 1));
+  }
+  photoMessage.textContent = "";
+  renderPhotoPreview();
+});
+
+async function uploadListingPhotos() {
+  // Verify the schema before uploading, so a missing migration leaves no orphaned files.
+  const { error: schemaError } = await db.from("listings").select("image_urls").limit(0);
+  if (schemaError) throw new Error(photoText("setup"));
+  const bucket = db.storage.from(PHOTO_BUCKET);
+  const urls = [];
+  for (const photo of selectedPhotos) {
+    // Keep successful uploads for a retry after a network/insert failure.
+    if (!photo.uploadedUrl) {
+      // A previous request may have reached Storage even if its response was lost.
+      const path = `${crypto.randomUUID()}.${PHOTO_TYPES[photo.file.type]}`;
+      const { error } = await bucket.upload(path, photo.file, { contentType: photo.file.type, upsert: false });
+      if (error) throw new Error(photoText("failed"));
+      photo.uploadedUrl = bucket.getPublicUrl(path).data.publicUrl;
+    }
+    urls.push(photo.uploadedUrl);
+  }
+  return urls;
+}
+
+function listingCover(item) {
+  const url = item.image_url || item.image_urls?.[0];
+  if (typeof url !== "string" || !/^https?:\/\//i.test(url)) return "";
+  return `<img class="listing-photo" src="${escapeHtml(url)}" alt="${escapeHtml(item.title)}" loading="lazy">`;
+}
+
 let currentCategory = "";
 
 function money(value) {
@@ -49,6 +180,7 @@ function renderListings(items) {
 
   listing.innerHTML = items.map(item => `
     <article class="card">
+      ${listingCover(item)}
       <div class="card-top">
         <span class="badge">${escapeHtml(translations[item.category]?.[lang] || item.category)}</span>
         <span class="city">${escapeHtml(
@@ -151,6 +283,7 @@ addModal.addEventListener("click", e => {
 
 document.getElementById("addForm").addEventListener("submit", async e => {
   e.preventDefault();
+  if (publishing || validatingPhotos) return;
   formMessage.textContent = "";
 
   if (!db) {
@@ -167,17 +300,32 @@ document.getElementById("addForm").addEventListener("submit", async e => {
     description: form.get("description") || ""
   };
 
-  const { error } = await db.from("listings").insert(payload);
-
-  if (error) {
-    formMessage.textContent = `Ошибка: ${error.message}`;
-    return;
+  const withPhotos = selectedPhotos.length > 0;
+  publishing = true;
+  const controls = [...addForm.elements].map(control => [control, control.disabled]);
+  controls.forEach(([control]) => { control.disabled = true; });
+  if (withPhotos) formMessage.textContent = photoText("saving");
+  try {
+    if (withPhotos) {
+      payload.image_urls = await uploadListingPhotos();
+      payload.image_url = payload.image_urls[0];
+    }
+    const { error } = await db.from("listings").insert(payload);
+    if (error) throw error;
+    e.target.reset();
+    resetPhotos();
+    formMessage.textContent = "Объявление опубликовано!";
+    await loadListings();
+    setTimeout(() => addModal.classList.add("hidden"), 700);
+  } catch (error) {
+    formMessage.textContent = withPhotos
+      ? (error.message === photoText("setup") ? error.message : photoText("failed"))
+      : `Ошибка: ${error.message}`;
+  } finally {
+    publishing = false;
+    controls.forEach(([control, disabled]) => { control.disabled = disabled; });
+    updatePhotoFields();
   }
-
-  e.target.reset();
-  formMessage.textContent = "Объявление опубликовано!";
-  await loadListings();
-  setTimeout(() => addModal.classList.add("hidden"), 700);
 });
 
 loadListings();
@@ -446,6 +594,7 @@ function translateTextElement(element, original) {
 function translatePage(selectedLanguage) {
 
   lang = selectedLanguage;
+  updatePhotoFields();
 
   document.documentElement.lang = lang;
 

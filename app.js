@@ -411,7 +411,7 @@ const translations = {
 // Текущий язык
 // ===============================
 let lang =
-  localStorage.getItem("hryvniaHubLanguage") || "ru";
+  localStorage.getItem("hryvniaHubLanguage") || "uk";
 
 
 // ===============================

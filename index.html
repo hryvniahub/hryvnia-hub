@@ -108,6 +108,14 @@
         <label>Описание
           <textarea name="description" rows="4" placeholder="Коротко опишите предложение"></textarea>
         </label>
+        <fieldset id="photoFields" class="photo-fields">
+          <legend id="photoLabel">Фотографии</legend>
+          <button id="photoPickerButton" class="btn" type="button">Добавить фотографии</button>
+          <input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp" multiple hidden aria-labelledby="photoLabel" aria-describedby="photoHint photoMessage">
+          <p id="photoHint" class="muted">До 10 фото: JPEG, PNG или WebP, до 10 МБ каждое. Первое фото — главное.</p>
+          <p id="photoMessage" class="form-message" role="status" aria-live="polite"></p>
+          <div id="photoPreview" class="photo-preview"></div>
+        </fieldset>
         <button class="btn btn-primary full" type="submit">Опубликовать</button>
         <p id="formMessage" class="form-message"></p>
       </form>

@@ -17,6 +17,10 @@ const listing = document.getElementById("listing");
 const resultCount = document.getElementById("resultCount");
 const searchInput = document.getElementById("searchInput");
 const cityFilter = document.getElementById("cityFilter");
+const citySearchInput = document.getElementById("citySearchInput");
+const citySuggestions = document.getElementById("citySuggestions");
+const citySelect = document.getElementById("citySelect");
+let availableCities = [];
 const addModal = document.getElementById("addModal");
 const formMessage = document.getElementById("formMessage");
 
@@ -307,33 +311,103 @@ if (!cityError) {
 }
 }
 
+function cityTranslation(key) {
+  return translations[key]?.[lang] || translations[key]?.ru || key;
+}
+
+function cityName(city) {
+  return String(
+    city[`name_${lang}`] || city.name_ru || city.name_uk || city.name_en || city.name_pl || ""
+  ).trim();
+}
+
+function closeCitySuggestions() {
+  citySuggestions.hidden = true;
+  citySearchInput.setAttribute("aria-expanded", "false");
+}
+
+function renderCitySuggestions() {
+  const term = citySearchInput.value.trim().toLocaleLowerCase();
+  const matches = availableCities
+    .filter(city => cityName(city).toLocaleLowerCase().includes(term))
+    .slice(0, 12);
+
+  citySuggestions.innerHTML = matches.length
+    ? matches.map(city => `<button type="button" class="city-suggestion" role="option" data-city-id="${escapeHtml(city.id)}">${escapeHtml(cityName(city))}</button>`).join("")
+    : `<div class="city-suggestion-empty" role="status">${escapeHtml(cityTranslation("Город не найден"))}</div>`;
+  citySuggestions.hidden = false;
+  citySearchInput.setAttribute("aria-expanded", "true");
+}
+
+function selectCity(city) {
+  citySelect.value = String(city.id);
+  citySearchInput.value = cityName(city);
+  closeCitySuggestions();
+  formMessage.textContent = "";
+}
+
+function updateCitySearchLanguage() {
+  citySearchInput.placeholder = cityTranslation("Введите название города");
+  const selectedCity = availableCities.find(
+    city => String(city.id) === citySelect.value
+  );
+  if (selectedCity) citySearchInput.value = cityName(selectedCity);
+  if (document.activeElement === citySearchInput && !citySuggestions.hidden) {
+    renderCitySuggestions();
+  }
+}
+
 function updateCities(items) {
   const cityTranslations = {
-  ru: "Все города",
-  uk: "Усі міста",
-  en: "All cities",
-  pl: "Wszystkie miasta"
-};
+    ru: "Все города",
+    uk: "Усі міста",
+    en: "All cities",
+    pl: "Wszystkie miasta"
+  };
   const selected = cityFilter.value;
-const cities = items || [];
+  availableCities = items || [];
 
-cityFilter.innerHTML = `<option value="">${cityTranslations[lang]}</option>` +
-    cities.map(city => `<option value="${city.id}">
-    ${escapeHtml(city[`name_${lang}`] || city.name_ru)}
+  cityFilter.innerHTML = `<option value="">${cityTranslations[lang]}</option>` +
+    availableCities.map(city => `<option value="${escapeHtml(city.id)}">
+      ${escapeHtml(city[`name_${lang}`] || city.name_ru)}
     </option>`).join("");
+  cityFilter.value = selected;
 
-cityFilter.value = selected;
-
-const citySelect = document.getElementById("citySelect");
-
-if (citySelect) {
-    citySelect.innerHTML =
-        `<option value="">Выберите город</option>` +
-        cities.map(city => `<option value="${city.id}">
-        ${escapeHtml(city[`name_${lang}`] || city.name_ru)}
-        </option>`).join("");
+  updateCitySearchLanguage();
+  if (document.activeElement === citySearchInput) renderCitySuggestions();
 }
-}
+
+citySearchInput.addEventListener("input", () => {
+  citySelect.value = "";
+  renderCitySuggestions();
+});
+citySearchInput.addEventListener("focus", renderCitySuggestions);
+citySearchInput.addEventListener("keydown", event => {
+  if (event.key === "Escape") closeCitySuggestions();
+  if (event.key === "ArrowDown" && !citySuggestions.hidden) {
+    const firstOption = citySuggestions.querySelector("[data-city-id]");
+    if (firstOption) {
+      event.preventDefault();
+      firstOption.focus();
+    }
+  }
+});
+citySuggestions.addEventListener("mousedown", event => {
+  if (event.target.closest("[data-city-id]")) event.preventDefault();
+});
+citySuggestions.addEventListener("click", event => {
+  const option = event.target.closest("[data-city-id]");
+  if (!option) return;
+  const city = availableCities.find(
+    item => String(item.id) === option.dataset.cityId
+  );
+  if (city) selectCity(city);
+});
+document.addEventListener("click", event => {
+  if (!citySearchInput.parentElement.contains(event.target)) {
+    closeCitySuggestions();
+  }
+});
 
 document.querySelectorAll(".category").forEach(button => {
   button.addEventListener("click", () => {
@@ -371,6 +445,12 @@ document.getElementById("addForm").addEventListener("submit", async e => {
   }
 
   const form = new FormData(e.target);
+  const cityId = form.get("city_id");
+  if (!cityId || !availableCities.some(city => String(city.id) === cityId)) {
+    formMessage.textContent = cityTranslation("Выберите город из списка");
+    citySearchInput.focus();
+    return;
+  }
   const payload = {
     category: form.get("category"),
     title: form.get("title"),
@@ -598,6 +678,27 @@ const translations = {
         pl: "Miasto"
     },
 
+    "Введите название города": {
+        ru: "Введите название города",
+        uk: "Введіть назву міста",
+        en: "Type a city name",
+        pl: "Wpisz nazwę miasta"
+    },
+
+    "Город не найден": {
+        ru: "Город не найден",
+        uk: "Місто не знайдено",
+        en: "No city found",
+        pl: "Nie znaleziono miasta"
+    },
+
+    "Выберите город из списка": {
+        ru: "Выберите город из списка",
+        uk: "Виберіть місто зі списку",
+        en: "Select a city from the list",
+        pl: "Wybierz miasto z listy"
+    },
+
     "Цена, грн": {
         ru: "Цена, грн",
         uk: "Ціна, грн",
@@ -772,6 +873,8 @@ translateTextElement(
 
 
   // --------------------------------
+  updateCitySearchLanguage();
+
   // Заголовок категорий
   // --------------------------------
   const sectionEyebrow =

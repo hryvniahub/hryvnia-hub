@@ -98,9 +98,13 @@
           <input name="title" required placeholder="Например: Skoda Octavia 1.6">
         </label>
         <label>Город
-    <select name="city_id" id="citySelect" required>
-        <option value="">Выберите город</option>
-    </select>
+          <div class="city-search">
+            <input id="citySearchInput" type="search" required autocomplete="off"
+              placeholder="Введите название города" role="combobox" aria-autocomplete="list"
+              aria-expanded="false" aria-controls="citySuggestions">
+            <div id="citySuggestions" class="city-suggestions" role="listbox" hidden></div>
+            <input type="hidden" name="city_id" id="citySelect">
+          </div>
         </label>
         <label>Цена, грн
           <input name="price" type="number" min="0" required placeholder="450000">

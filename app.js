@@ -146,9 +146,9 @@ async function uploadListingPhotos() {
 }
 
 function listingCover(item) {
-  const url = item.image_url || item.image_urls?.[0];
+  const url = listingPhotos(item)[0];
   if (typeof url !== "string" || !/^https?:\/\//i.test(url)) return "";
-  return `<img class="listing-photo" src="${escapeHtml(url)}" alt="${escapeHtml(item.title)}" loading="lazy">`;
+  return `<img class="listing-photo" tabindex="0" role="button" src="${escapeHtml(url)}" alt="${escapeHtml(item.title)}" loading="lazy">`;
 }
 
 let currentCategory = "";
@@ -163,7 +163,86 @@ function escapeHtml(value = "") {
   }[char]));
 }
 
+let visibleListings = [];
+
+function listingPhotos(item) {
+  return [...new Set([item.image_url, ...(Array.isArray(item.image_urls) ? item.image_urls : [])])]
+    .filter(url => typeof url === "string" && /^https?:\/\//i.test(url));
+}
+
+function openListing(item, galleryOnly = false) {
+  if (!item || document.getElementById("listingDialog")) return;
+  const labels = {
+    ru: ["Закрыть", "Предыдущее фото", "Следующее фото", "Фотографии"],
+    uk: ["Закрити", "Попереднє фото", "Наступне фото", "Фотографії"],
+    en: ["Close", "Previous photo", "Next photo", "Photos"],
+    pl: ["Zamknij", "Poprzednie zdjęcie", "Następne zdjęcie", "Zdjęcia"]
+  }[lang] || ["Close", "Previous photo", "Next photo", "Photos"];
+  const photos = listingPhotos(item);
+  const previousFocus = document.activeElement;
+  const dialog = document.createElement("dialog");
+  dialog.id = "listingDialog";
+  dialog.className = "modal-card";
+  dialog.setAttribute("aria-labelledby", "listingDialogTitle");
+  dialog.style.cssText = "border:0;color:var(--text);max-width:calc(100% - 24px);max-height:90dvh;overflow-wrap:anywhere;";
+  dialog.innerHTML = `
+    <button type="button" class="modal-close" aria-label="${labels[0]}" data-close>×</button>
+    <h2 id="listingDialogTitle" style="padding-right:24px">${escapeHtml(item.title)}</h2>
+    ${photos.length ? `<section aria-label="${labels[3]}">
+      <img data-gallery-image alt="${escapeHtml(item.title)}" style="display:block;width:100%;height:auto;max-height:55dvh;object-fit:contain;border-radius:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0">
+        <button type="button" class="btn" data-previous aria-label="${labels[1]}" ${photos.length < 2 ? "disabled" : ""}>←</button>
+        <span data-counter role="status" aria-live="polite"></span>
+        <button type="button" class="btn" data-next aria-label="${labels[2]}" ${photos.length < 2 ? "disabled" : ""}>→</button>
+      </div>
+    </section>` : ""}
+    ${galleryOnly ? "" : `<span class="badge">${escapeHtml(translations[item.category]?.[lang] || item.category)}</span>
+      <p class="city">${escapeHtml(item.cities?.[`name_${lang}`] || item.cities?.name_ru || item.city || "")}</p>
+      <p class="price">${money(item.price)}</p>
+      <p class="desc" style="white-space:pre-wrap">${escapeHtml(item.description || "")}</p>`}`;
+  let photoIndex = 0;
+  const showPhoto = delta => {
+    if (!photos.length) return;
+    photoIndex = (photoIndex + delta + photos.length) % photos.length;
+    dialog.querySelector("[data-gallery-image]").src = photos[photoIndex];
+    dialog.querySelector("[data-counter]").textContent = `${photoIndex + 1} / ${photos.length}`;
+  };
+  dialog.querySelector("[data-close]").addEventListener("click", () => dialog.close());
+  dialog.querySelector("[data-previous]")?.addEventListener("click", () => showPhoto(-1));
+  dialog.querySelector("[data-next]")?.addEventListener("click", () => showPhoto(1));
+  dialog.addEventListener("keydown", event => {
+    if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+      event.preventDefault();
+      showPhoto(event.key === "ArrowLeft" ? -1 : 1);
+    }
+  });
+  const oldOverflow = document.body.style.overflow;
+  dialog.addEventListener("close", () => {
+    document.body.style.overflow = oldOverflow;
+    dialog.remove();
+    if (previousFocus?.isConnected) previousFocus.focus();
+  }, { once: true });
+  document.body.append(dialog);
+  showPhoto(0);
+  dialog.showModal();
+  document.body.style.overflow = "hidden";
+}
+
+listing.addEventListener("click", event => {
+  const card = event.target.closest("[data-listing-index]");
+  if (!card) return;
+  openListing(visibleListings[Number(card.dataset.listingIndex)], !!event.target.closest(".listing-photo"));
+});
+listing.addEventListener("keydown", event => {
+  if (event.key !== "Enter" && event.key !== " ") return;
+  const card = event.target.closest("[data-listing-index]");
+  if (!card) return;
+  event.preventDefault();
+  openListing(visibleListings[Number(card.dataset.listingIndex)], event.target.matches(".listing-photo"));
+});
+
 function renderListings(items) {
+  visibleListings = items;
   resultCount.textContent =
   lang === "uk"
     ? `${items.length} оголошень`
@@ -178,8 +257,8 @@ function renderListings(items) {
     return;
   }
 
-  listing.innerHTML = items.map(item => `
-    <article class="card">
+  listing.innerHTML = items.map((item, index) => `
+    <article class="card" data-listing-index="${index}" tabindex="0" role="button" aria-label="${escapeHtml(item.title)}" style="cursor:pointer">
       ${listingCover(item)}
       <div class="card-top">
         <span class="badge">${escapeHtml(translations[item.category]?.[lang] || item.category)}</span>

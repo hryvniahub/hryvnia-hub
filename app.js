@@ -303,12 +303,38 @@ async function loadListings() {
   }
 
   renderListings(data || []);
-  const { data: cityData, error: cityError } =
-  await db.from("cities").select("id, name_ru, name_uk, name_en, name_pl").order("id");
+  if (!window.hryvniaCitiesLoaded) {
+  const allCities = [];
+  const pageSize = 1000;
+  let from = 0;
+  let cityError = null;
 
-if (!cityError) {
-  updateCities(cityData || []);
-}
+  while (true) {
+    const { data, error } = await db
+      .from("cities")
+      .select("id, name_ru, name_uk, name_en, name_pl")
+      .order("id")
+      .range(from, from + pageSize - 1);
+
+    if (error) {
+      cityError = error;
+      break;
+    }
+
+    allCities.push(...(data || []));
+
+    if (!data || data.length < pageSize) break;
+    from += pageSize;
+  }
+
+  if (cityError) {
+    console.error("Не удалось загрузить города:", cityError);
+  } else {
+    updateCities(allCities);
+    window.hryvniaCitiesLoaded = true;
+    console.log("Загружено городов:", allCities.length);
+  }
+  }
 }
 
 function cityTranslation(key) {

@@ -403,16 +403,8 @@ function closeCitySuggestions() {
 }
 
 const matches = availableCities
-  .filter(city => cityName(city).toLocaleLowerCase().includes(term))
-  .sort((a, b) => {
-    const nameA = cityName(a).toLocaleLowerCase();
-    const nameB = cityName(b).toLocaleLowerCase();
-
-    const rankA = nameA === term ? 0 : nameA.startsWith(term) ? 1 : 2;
-    const rankB = nameB === term ? 0 : nameB.startsWith(term) ? 1 : 2;
-
-    return rankA - rankB;
-  })
+  .filter(city =>
+    cityName(city).toLocaleLowerCase().includes(term))
   .slice(0, 12);
 
   citySuggestions.innerHTML = matches.length

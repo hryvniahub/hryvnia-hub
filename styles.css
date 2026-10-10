@@ -30,7 +30,7 @@ body {
 h1 { font-size: clamp(42px,7vw,76px); line-height:.98; letter-spacing:-.055em; margin:0; max-width:760px; }
 h2 { font-size:30px; margin:0; letter-spacing:-.03em; }
 .hero-text { color:var(--muted); font-size:18px; max-width:620px; margin:20px 0 28px; }
-.search-box { display:grid; grid-template-columns:1fr 220px 120px; gap:10px; max-width:920px; }
+.search-box { display:grid; grid-template-columns:1fr 200px 220px 120px; gap:10px; max-width:920px; }
 input, select, textarea {
   width:100%; border:1px solid var(--line); border-radius:12px; padding:13px 14px;
   background:#fff; color:var(--text); font:inherit; outline:none;

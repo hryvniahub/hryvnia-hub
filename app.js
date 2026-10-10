@@ -366,10 +366,16 @@ function closeCatalogCitySuggestions() {
 function renderCatalogCitySuggestions() {
   const term = normalizeCitySearch(catalogCitySearchInput.value);
   const matches = term
-    ? citySearchIndex
-        .filter(entry => entry.names.some(name => name.includes(term)))
-        .slice(0, 12)
-    : [];
+  ? citySearchIndex
+      .filter(entry => entry.names.some(name => name.includes(term)))
+      .sort((a, b) => {
+        const rank = entry =>
+          entry.names.some(name => name === term) ? 0 :
+          entry.names.some(name => name.startsWith(term)) ? 1 : 2;
+        return rank(a) - rank(b);
+      })
+      .slice(0, 12)
+  : [];
 
   catalogCitySuggestions.innerHTML = matches.length
     ? matches.map(({ city }) => `<button type="button" class="catalog-city-suggestion" role="option" data-city-id="${escapeHtml(city.id)}">${escapeHtml(cityName(city))}</button>`).join("")

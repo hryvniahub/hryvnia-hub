@@ -16,11 +16,14 @@ const db = hasSupabaseConfig
 const listing = document.getElementById("listing");
 const resultCount = document.getElementById("resultCount");
 const searchInput = document.getElementById("searchInput");
-const cityFilter = document.getElementById("cityFilter");
+const catalogCitySearchInput = document.getElementById("catalogCitySearchInput");
+const catalogCitySuggestions = document.getElementById("catalogCitySuggestions");
 const citySearchInput = document.getElementById("citySearchInput");
 const citySuggestions = document.getElementById("citySuggestions");
 const citySelect = document.getElementById("citySelect");
 let availableCities = [];
+let citySearchIndex = [];
+let selectedCatalogCityId = "";
 const addModal = document.getElementById("addModal");
 const formMessage = document.getElementById("formMessage");
 
@@ -290,7 +293,7 @@ async function loadListings() {
   let query = db.from("listings").select("*, cities(name_ru, name_uk, name_en, name_pl)").order("created_at", {ascending:false});
 
   if (currentCategory) query = query.eq("category", currentCategory);
-  if (cityFilter.value) query = query.eq("city_id", cityFilter.value);
+  if (selectedCatalogCityId) query = query.eq("city_id", selectedCatalogCityId);
 
   const term = searchInput.value.trim();
   if (term) query = query.or(`title.ilike.%${term}%,description.ilike.%${term}%`);
@@ -347,6 +350,53 @@ function cityName(city) {
   ).trim();
 }
 
+function normalizeCitySearch(value) {
+  return String(value || "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase()
+    .trim();
+}
+
+function closeCatalogCitySuggestions() {
+  catalogCitySuggestions.hidden = true;
+  catalogCitySearchInput.setAttribute("aria-expanded", "false");
+}
+
+function renderCatalogCitySuggestions() {
+  const term = normalizeCitySearch(catalogCitySearchInput.value);
+  const matches = term
+    ? citySearchIndex
+        .filter(entry => entry.names.some(name => name.includes(term)))
+        .slice(0, 12)
+    : [];
+
+  catalogCitySuggestions.innerHTML = matches.length
+    ? matches.map(({ city }) => `<button type="button" class="catalog-city-suggestion" role="option" data-city-id="${escapeHtml(city.id)}">${escapeHtml(cityName(city))}</button>`).join("")
+    : `<div class="city-suggestion-empty" role="status">${escapeHtml(term ? cityTranslation("Город не найден") : cityTranslation("Введите название города"))}</div>`;
+  catalogCitySuggestions.hidden = false;
+  catalogCitySearchInput.setAttribute("aria-expanded", "true");
+}
+
+function selectCatalogCity(city) {
+  selectedCatalogCityId = String(city.id);
+  catalogCitySearchInput.value = cityName(city);
+  closeCatalogCitySuggestions();
+  loadListings();
+}
+
+function updateCatalogCitySearchLanguage() {
+  catalogCitySearchInput.placeholder = cityTranslation("Введите название города");
+  catalogCitySearchInput.setAttribute("aria-label", cityTranslation("Город"));
+  const selectedCity = availableCities.find(
+    city => String(city.id) === selectedCatalogCityId
+  );
+  if (selectedCity) catalogCitySearchInput.value = cityName(selectedCity);
+  if (document.activeElement === catalogCitySearchInput && !catalogCitySuggestions.hidden) {
+    renderCatalogCitySuggestions();
+  }
+}
+
 function closeCitySuggestions() {
   citySuggestions.hidden = true;
   citySearchInput.setAttribute("aria-expanded", "false");
@@ -384,24 +434,56 @@ function updateCitySearchLanguage() {
 }
 
 function updateCities(items) {
-  const cityTranslations = {
-    ru: "Все города",
-    uk: "Усі міста",
-    en: "All cities",
-    pl: "Wszystkie miasta"
-  };
-  const selected = cityFilter.value;
   availableCities = items || [];
-
-  cityFilter.innerHTML = `<option value="">${cityTranslations[lang]}</option>` +
-    availableCities.map(city => `<option value="${escapeHtml(city.id)}">
-      ${escapeHtml(city[`name_${lang}`] || city.name_ru)}
-    </option>`).join("");
-  cityFilter.value = selected;
+  citySearchIndex = availableCities.map(city => ({
+    city,
+    names: [...new Set(["name_ru", "name_uk", "name_en", "name_pl"]
+      .map(key => normalizeCitySearch(city[key]))
+      .filter(Boolean))]
+  }));
 
   updateCitySearchLanguage();
+  updateCatalogCitySearchLanguage();
   if (document.activeElement === citySearchInput) renderCitySuggestions();
+  if (document.activeElement === catalogCitySearchInput) renderCatalogCitySuggestions();
 }
+
+catalogCitySearchInput.addEventListener("input", () => {
+  selectedCatalogCityId = "";
+  renderCatalogCitySuggestions();
+});
+catalogCitySearchInput.addEventListener("focus", renderCatalogCitySuggestions);
+catalogCitySearchInput.addEventListener("keydown", event => {
+  if (event.key === "Escape") closeCatalogCitySuggestions();
+  if (event.key === "ArrowDown" && !catalogCitySuggestions.hidden) {
+    const firstOption = catalogCitySuggestions.querySelector("[data-city-id]");
+    if (firstOption) {
+      event.preventDefault();
+      firstOption.focus();
+    }
+  }
+  if (event.key === "Enter" && !catalogCitySuggestions.hidden) {
+    const firstOption = catalogCitySuggestions.querySelector("[data-city-id]");
+    const city = availableCities.find(
+      item => String(item.id) === firstOption?.dataset.cityId
+    );
+    if (city) {
+      event.preventDefault();
+      selectCatalogCity(city);
+    }
+  }
+});
+catalogCitySuggestions.addEventListener("mousedown", event => {
+  if (event.target.closest("[data-city-id]")) event.preventDefault();
+});
+catalogCitySuggestions.addEventListener("click", event => {
+  const option = event.target.closest("[data-city-id]");
+  if (!option) return;
+  const city = availableCities.find(
+    item => String(item.id) === option.dataset.cityId
+  );
+  if (city) selectCatalogCity(city);
+});
 
 citySearchInput.addEventListener("input", () => {
   citySelect.value = "";
@@ -433,6 +515,9 @@ document.addEventListener("click", event => {
   if (!citySearchInput.parentElement.contains(event.target)) {
     closeCitySuggestions();
   }
+  if (!catalogCitySearchInput.parentElement.contains(event.target)) {
+    closeCatalogCitySuggestions();
+  }
 });
 
 document.querySelectorAll(".category").forEach(button => {
@@ -448,7 +533,6 @@ document.getElementById("searchBtn").addEventListener("click", loadListings);
 searchInput.addEventListener("keydown", e => {
   if (e.key === "Enter") loadListings();
 });
-cityFilter.addEventListener("change", loadListings);
 
 document.getElementById("openAdd").addEventListener("click", () => {
   addModal.classList.remove("hidden");
@@ -881,25 +965,8 @@ translateTextElement(
 
 
   // --------------------------------
-  // Города
-  // --------------------------------
-  if (
-    cityFilter &&
-    cityFilter.options.length
-  ) {
-
-    const city =
-      translations["Все города"];
-
-    if (city) {
-      cityFilter.options[0].textContent =
-        city[lang];
-    }
-  }
-
-
-  // --------------------------------
   updateCitySearchLanguage();
+  updateCatalogCitySearchLanguage();
 
   // Заголовок категорий
   // --------------------------------

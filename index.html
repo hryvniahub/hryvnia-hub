@@ -32,9 +32,12 @@
 
         <div class="search-box">
           <input id="searchInput" type="search" placeholder="Что ищете? Например: Skoda Octavia">
-          <select id="cityFilter">
-            <option value="">Все города</option>
-          </select>
+          <div class="catalog-city-search">
+            <input id="catalogCitySearchInput" type="search" autocomplete="off"
+              placeholder="Введите название города" role="combobox" aria-autocomplete="list"
+              aria-expanded="false" aria-controls="catalogCitySuggestions">
+            <div id="catalogCitySuggestions" class="catalog-city-suggestions" role="listbox" hidden></div>
+          </div>
           <button class="btn btn-dark" id="searchBtn">Найти</button>
         </div>
       </div>

@@ -402,17 +402,21 @@ function closeCitySuggestions() {
   citySearchInput.setAttribute("aria-expanded", "false");
 }
 
-const matches = availableCities
-  .filter(city =>
-    cityName(city).toLocaleLowerCase().includes(term))
-  .slice(0, 12);
+
+
+  function renderCitySuggestions() {
+  const term = normalizeCitySearch(citySearchInput.value);
+  const matches = availableCities
+    .filter(city => normalizeCitySearch(cityName(city)).includes(term))
+    .slice(0, 12);
 
   citySuggestions.innerHTML = matches.length
     ? matches.map(city => `<button type="button" class="city-suggestion" role="option" data-city-id="${escapeHtml(city.id)}">${escapeHtml(cityName(city))}</button>`).join("")
     : `<div class="city-suggestion-empty" role="status">${escapeHtml(cityTranslation("Город не найден"))}</div>`;
+
   citySuggestions.hidden = false;
   citySearchInput.setAttribute("aria-expanded", "true");
-}
+  }
 
 function selectCity(city) {
   citySelect.value = String(city.id);

@@ -366,10 +366,16 @@ function closeCatalogCitySuggestions() {
 function renderCatalogCitySuggestions() {
   const term = normalizeCitySearch(catalogCitySearchInput.value);
   const matches = term
-    ? citySearchIndex
-        .filter(entry => entry.names.some(name => name.includes(term)))
-        .slice(0, 12)
-    : [];
+  ? citySearchIndex
+      .filter(entry => entry.names.some(name => name.includes(term)))
+      .sort((a, b) => {
+        const rank = entry =>
+          entry.names.some(name => name === term) ? 0 :
+          entry.names.some(name => name.startsWith(term)) ? 1 : 2;
+        return rank(a) - rank(b);
+      })
+      .slice(0, 12)
+  : [];
 
   catalogCitySuggestions.innerHTML = matches.length
     ? matches.map(({ city }) => `<button type="button" class="catalog-city-suggestion" role="option" data-city-id="${escapeHtml(city.id)}">${escapeHtml(cityName(city))}</button>`).join("")
@@ -402,25 +408,21 @@ function closeCitySuggestions() {
   citySearchInput.setAttribute("aria-expanded", "false");
 }
 
-const matches = availableCities
-  .filter(city => cityName(city).toLocaleLowerCase().includes(term))
-  .sort((a, b) => {
-    const nameA = cityName(a).toLocaleLowerCase();
-    const nameB = cityName(b).toLocaleLowerCase();
 
-    const rankA = nameA === term ? 0 : nameA.startsWith(term) ? 1 : 2;
-    const rankB = nameB === term ? 0 : nameB.startsWith(term) ? 1 : 2;
 
-    return rankA - rankB;
-  })
-  .slice(0, 12);
+  function renderCitySuggestions() {
+  const term = normalizeCitySearch(citySearchInput.value);
+  const matches = availableCities
+    .filter(city => normalizeCitySearch(cityName(city)).includes(term))
+    .slice(0, 12);
 
   citySuggestions.innerHTML = matches.length
     ? matches.map(city => `<button type="button" class="city-suggestion" role="option" data-city-id="${escapeHtml(city.id)}">${escapeHtml(cityName(city))}</button>`).join("")
     : `<div class="city-suggestion-empty" role="status">${escapeHtml(cityTranslation("Город не найден"))}</div>`;
+
   citySuggestions.hidden = false;
   citySearchInput.setAttribute("aria-expanded", "true");
-}
+  }
 
 function selectCity(city) {
   citySelect.value = String(city.id);

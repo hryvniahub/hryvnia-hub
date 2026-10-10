@@ -20,3 +20,4 @@
 - `SUPABASE_ANON_KEY`
 
 Не публикуйте `service_role` ключ в браузерном коде.
+Experimental branch test

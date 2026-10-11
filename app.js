@@ -291,10 +291,18 @@ async function loadListings() {
     return;
   }
 
-  let query = db.from("listings").select("*, cities(name_ru, name_uk, name_en, name_pl)").order("created_at", {ascending:false});
+  let query = db
+  .from("listings")
+  .select("*, cities!inner(name_ru, name_uk, name_en, name_pl, region_katottg_code)")
+  .order("created_at", { ascending: false });
 
   if (currentCategory) query = query.eq("category", currentCategory);
-  if (selectedCatalogCityId) query = query.eq("city_id", selectedCatalogCityId);
+  if (selectedCatalogCityId) {
+  query = query.eq("city_id", selectedCatalogCityId);
+} else if (activeRegionCode) {
+  query = query.eq("cities.region_katottg_code", activeRegionCode);
+  }
+  
 
   const term = searchInput.value.trim();
   if (term) query = query.or(`title.ilike.%${term}%,description.ilike.%${term}%`);

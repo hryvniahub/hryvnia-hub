@@ -18,6 +18,7 @@ const resultCount = document.getElementById("resultCount");
 const searchInput = document.getElementById("searchInput");
 const catalogCitySearchInput = document.getElementById("catalogCitySearchInput");
 const catalogCitySuggestions = document.getElementById("catalogCitySuggestions");
+const catalogRegionSelect = document.getElementById("catalogRegionSelect");
 const citySearchInput = document.getElementById("citySearchInput");
 const citySuggestions = document.getElementById("citySuggestions");
 const citySelect = document.getElementById("citySelect");
@@ -365,8 +366,13 @@ function closeCatalogCitySuggestions() {
 
 function renderCatalogCitySuggestions() {
   const term = normalizeCitySearch(catalogCitySearchInput.value);
+    const sourceIndex = activeRegionCode
+    ? citySearchIndex.filter(entry =>
+        entry.city.region_katottg_code === activeRegionCode
+      )
+    : citySearchIndex;
   const matches = term
-  ? citySearchIndex
+  ? sourceIndex
       .filter(entry => entry.names.some(name => name.includes(term)))
       .sort((a, b) => {
         const rank = entry =>

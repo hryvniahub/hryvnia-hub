@@ -19,6 +19,7 @@ const searchInput = document.getElementById("searchInput");
 const catalogCitySearchInput = document.getElementById("catalogCitySearchInput");
 const catalogCitySuggestions = document.getElementById("catalogCitySuggestions");
 const catalogRegionSelect = document.getElementById("catalogRegionSelect");
+const cityRegionSelect = document.getElementById("cityRegionSelect");
 const citySearchInput = document.getElementById("citySearchInput");
 const citySuggestions = document.getElementById("citySuggestions");
 const citySelect = document.getElementById("citySelect");
@@ -26,6 +27,7 @@ let availableCities = [];
 let citySearchIndex = [];
 let selectedCatalogCityId = "";
 let activeRegionCode = "";
+let formRegionCode = "";
 const addModal = document.getElementById("addModal");
 const formMessage = document.getElementById("formMessage");
 
@@ -325,7 +327,7 @@ async function loadListings() {
   while (true) {
     const { data, error } = await db
       .from("cities")
-      .select("id, name_ru, name_uk, name_en, name_pl")
+      .select("id, name_ru, name_uk, name_en, name_pl, region_katottg_code")
       .order("id")
       .range(from, from + pageSize - 1);
 
@@ -428,6 +430,7 @@ function closeCitySuggestions() {
   function renderCitySuggestions() {
   const term = normalizeCitySearch(citySearchInput.value);
   const matches = availableCities
+    .filter(city => !formRegionCode || String(city.region_katottg_code) === formRegionCode)
     .filter(city => normalizeCitySearch(cityName(city)).includes(term))
     .slice(0, 12);
 
@@ -466,11 +469,37 @@ function updateCities(items) {
       .filter(Boolean))]
   }));
 
+  const regionCodes = [...new Set(availableCities
+    .map(city => city.region_katottg_code)
+    .filter(code => code !== null && code !== undefined && code !== ""))]
+    .map(String).sort();
+  [[catalogRegionSelect, activeRegionCode, "Все области"], [cityRegionSelect, formRegionCode, "Все области"]]
+    .forEach(([select, current, label]) => {
+      if (!select) return;
+      select.innerHTML = `<option value="">${label}</option>` +
+        regionCodes.map(code => `<option value="${escapeHtml(code)}">${escapeHtml(code)}</option>`).join("");
+      select.value = regionCodes.includes(current) ? current : "";
+    });
+
   updateCitySearchLanguage();
   updateCatalogCitySearchLanguage();
   if (document.activeElement === citySearchInput) renderCitySuggestions();
   if (document.activeElement === catalogCitySearchInput) renderCatalogCitySuggestions();
 }
+
+catalogRegionSelect.addEventListener("change", () => {
+  activeRegionCode = catalogRegionSelect.value;
+  selectedCatalogCityId = "";
+  catalogCitySearchInput.value = "";
+  loadListings();
+});
+
+cityRegionSelect.addEventListener("change", () => {
+  formRegionCode = cityRegionSelect.value;
+  citySelect.value = "";
+  citySearchInput.value = "";
+  renderCitySuggestions();
+});
 
 catalogCitySearchInput.addEventListener("input", () => {
   selectedCatalogCityId = "";

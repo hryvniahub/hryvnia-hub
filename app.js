@@ -345,7 +345,20 @@ async function loadListings() {
   if (cityError) {
     console.error("Не удалось загрузить города:", cityError);
   } else {
-    updateCities(allCities);
+    let regionNames = {};
+    const { data: regionRows, error: regionError } = await db
+      .from("regions")
+      .select("katottg_code, name_uk");
+    if (regionError) {
+      console.error("Не удалось загрузить области:", regionError);
+    } else {
+      (regionRows || []).forEach(r => {
+        if (r.katottg_code && r.name_uk && String(r.name_uk).trim()) {
+          regionNames[String(r.katottg_code)] = String(r.name_uk).trim();
+        }
+      });
+    }
+    updateCities(allCities, regionNames);
     window.hryvniaCitiesLoaded = true;
     console.log("Загружено городов:", allCities.length);
   }
@@ -460,7 +473,7 @@ function updateCitySearchLanguage() {
   }
 }
 
-function updateCities(items) {
+function updateCities(items, regionNames = {}) {
   availableCities = items || [];
   citySearchIndex = availableCities.map(city => ({
     city,
@@ -477,7 +490,7 @@ function updateCities(items) {
     .forEach(([select, current, label]) => {
       if (!select) return;
       select.innerHTML = `<option value="">${label}</option>` +
-        regionCodes.map(code => `<option value="${escapeHtml(code)}">${escapeHtml(code)}</option>`).join("");
+        regionCodes.map(code => `<option value="${escapeHtml(code)}">${escapeHtml(regionNames[code] || code)}</option>`).join("");
       select.value = regionCodes.includes(current) ? current : "";
     });
 

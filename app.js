@@ -25,6 +25,7 @@ const citySelect = document.getElementById("citySelect");
 let availableCities = [];
 let citySearchIndex = [];
 let selectedCatalogCityId = "";
+let activeRegionCode = "";
 const addModal = document.getElementById("addModal");
 const formMessage = document.getElementById("formMessage");
 

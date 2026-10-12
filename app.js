@@ -28,6 +28,7 @@ let citySearchIndex = [];
 let selectedCatalogCityId = "";
 let activeRegionCode = "";
 let formRegionCode = "";
+let regionNames = {};
 const addModal = document.getElementById("addModal");
 const formMessage = document.getElementById("formMessage");
 
@@ -345,6 +346,19 @@ async function loadListings() {
   if (cityError) {
     console.error("Не удалось загрузить города:", cityError);
   } else {
+    const { data: regionRows, error: regionError } = await db
+      .from("regions")
+      .select("katottg_code, name_uk");
+    if (regionError) {
+      console.error("Не удалось загрузить названия областей:", regionError);
+    } else {
+      regionNames = {};
+      (regionRows || []).forEach(row => {
+        if (row.katottg_code !== null && row.katottg_code !== undefined && row.name_uk) {
+          regionNames[String(row.katottg_code)] = row.name_uk;
+        }
+      });
+    }
     updateCities(allCities);
     window.hryvniaCitiesLoaded = true;
     console.log("Загружено городов:", allCities.length);
@@ -379,7 +393,7 @@ function renderCatalogCitySuggestions() {
   const term = normalizeCitySearch(catalogCitySearchInput.value);
     const sourceIndex = activeRegionCode
     ? citySearchIndex.filter(entry =>
-        entry.city.region_katottg_code === activeRegionCode
+        String(entry.city.region_katottg_code) === activeRegionCode
       )
     : citySearchIndex;
   const matches = term
@@ -472,12 +486,13 @@ function updateCities(items) {
   const regionCodes = [...new Set(availableCities
     .map(city => city.region_katottg_code)
     .filter(code => code !== null && code !== undefined && code !== ""))]
-    .map(String).sort();
+    .map(String)
+    .sort((a, b) => (regionNames[a] || a).localeCompare(regionNames[b] || b, "uk"));
   [[catalogRegionSelect, activeRegionCode, "Все области"], [cityRegionSelect, formRegionCode, "Все области"]]
     .forEach(([select, current, label]) => {
       if (!select) return;
       select.innerHTML = `<option value="">${label}</option>` +
-        regionCodes.map(code => `<option value="${escapeHtml(code)}">${escapeHtml(code)}</option>`).join("");
+        regionCodes.map(code => `<option value="${escapeHtml(code)}">${escapeHtml(regionNames[code] || code)}</option>`).join("");
       select.value = regionCodes.includes(current) ? current : "";
     });
 

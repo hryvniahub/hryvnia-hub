@@ -671,7 +671,7 @@ function updateCities(items, regionNames = {}) {
     .forEach(([select, current, label]) => {
       if (!select) return;
       select.innerHTML = `<option value="">${label}</option>` +
-        regionCodes.map(code => `<option value="${escapeHtml(code)}">${escapeHtml(regionNames[code] || code)}</option>`).join("");
+        regionCodes.map(code => `<option value="${escapeHtml(code)}">${escapeHtml(regionNames[code] || "")}</option>`).join("");
       select.value = regionCodes.includes(current) ? current : "";
     });
 

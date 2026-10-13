@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru">
+<html lang="uk">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,60 +15,68 @@
         <span>Hryvnia Hub</span>
       </a>
       <button class="btn btn-primary" id="openAdd">+ Добавить объявление</button>
-  <select id="languageSwitcher" class="language-switcher">
-  <option value="ru">🇷🇺 Русский</option>
-  <option value="uk">🇺🇦 Українська</option>
-  <option value="en">🇬🇧 English</option>
-  <option value="pl">🇵🇱 Polski</option>
-        </select>  </div>
+      <select id="languageSwitcher" class="language-switcher">
+        <option value="ru">🇷🇺 Русский</option>
+        <option value="uk">🇺🇦 Українська</option>
+        <option value="en">🇬🇧 English</option>
+        <option value="pl">🇵🇱 Polski</option>
+      </select>
+    </div>
   </header>
+
+  <!-- Категории: сразу под шапкой, одна горизонтальная строка, скролл без переноса -->
+  <nav class="categories-bar" aria-label="Категорії">
+    <div class="container">
+      <div class="categories">
+        <button class="category active" data-category="">
+          <span>▦ Усі</span>
+        </button>
+        <button class="category" data-category="Автомобили">
+          <span>🚗 Автомобілі</span>
+        </button>
+        <button class="category" data-category="Недвижимость">
+          <span>🏠 Нерухомість</span>
+        </button>
+        <button class="category" data-category="Готовый бизнес">
+          <span>💼 Готовий бізнес</span>
+        </button>
+        <button class="category" data-category="Инвестиции">
+          <span>📈 Інвестиції</span>
+        </button>
+      </div>
+    </div>
+  </nav>
 
   <main>
     <section class="hero">
       <div class="container">
-        <p class="eyebrow">Hryvnia Hub</p>
-        <h1>Найди выгодное<br>предложение</h1>
+
+        <!-- Главный визуальный блок: SVG-иллюстрация -->
+        <img
+  class="hero-illustration"
+  src="hero-banner.webp"
+  alt="Автомобілі, нерухомість, готовий бізнес та інвестиції"
+  loading="eager"
+  fetchpriority="high"
+/>
         <p class="hero-text">Автомобили, недвижимость и готовый бизнес — в одном месте.</p>
 
-        <div class="search-box">
-          <input id="searchInput" type="search" placeholder="Что ищете? Например: Skoda Octavia">
-          <select id="catalogRegionSelect" aria-label="Область">
-  <option value="">Все области</option>
-          </select>
-          <div class="catalog-city-search">
-            <input id="catalogCitySearchInput" type="search" autocomplete="off"
-              placeholder="Введите название города" role="combobox" aria-autocomplete="list"
-              aria-expanded="false" aria-controls="catalogCitySuggestions">
-            <div id="catalogCitySuggestions" class="catalog-city-suggestions" role="listbox" hidden></div>
+        <!-- Поисковая форма в виде белой карточки -->
+        <div class="search-card">
+          <div class="search-box">
+            <input id="searchInput" type="search" placeholder="Что ищете? Например: Skoda Octavia">
+            <select id="catalogRegionSelect" aria-label="Область">
+              <option value="">Все области</option>
+            </select>
+            <div class="catalog-city-search">
+              <input id="catalogCitySearchInput" type="search" autocomplete="off"
+                placeholder="Введите название города" role="combobox" aria-autocomplete="list"
+                aria-expanded="false" aria-controls="catalogCitySuggestions">
+              <div id="catalogCitySuggestions" class="catalog-city-suggestions" role="listbox" hidden></div>
+            </div>
+            <button class="btn btn-dark" id="searchBtn">Найти</button>
           </div>
-          <button class="btn btn-dark" id="searchBtn">Найти</button>
         </div>
-      </div>
-    </section>
-
-    <section class="container section">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">Категории</p>
-          <h2>Что ищем?</h2>
-        </div>
-      </div>
-      <div class="categories">
-        <button class="category active" data-category="">
-          <span>Все</span><small>Все объявления</small>
-        </button>
-        <button class="category" data-category="Автомобили">
-          <span>🚗 Автомобили</span><small>Легковые и другие</small>
-        </button>
-        <button class="category" data-category="Недвижимость">
-          <span>🏠 Недвижимость</span><small>Квартиры, дома, земля</small>
-        </button>
-        <button class="category" data-category="Готовый бизнес">
-          <span>💼 Готовый бизнес</span><small>Готовый бизнес и проекты</small>
-        </button>
-        <button class="category" data-category="Инвестиции">
-          <span>📈 Инвестиции</span><small>Инвестиционные возможности</small>
-        </button>
       </div>
     </section>
 
@@ -76,7 +84,7 @@
       <div class="section-head">
         <div>
           <p id="listingLabel" class="eyebrow">Листинг</p>
-<h2 id="latestListingsTitle">Последние объявления</h2>
+          <h2 id="latestListingsTitle">Последние объявления</h2>
         </div>
         <span id="resultCount" class="muted"></span>
       </div>

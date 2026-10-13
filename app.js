@@ -49,6 +49,8 @@ const translations = {
   },
 
   "Все города": { ru: "Все города", uk: "Усі міста", en: "All cities", pl: "Wszystkie miasta" },
+  "Все области": { ru: "Все области", uk: "Всі області", en: "All regions", pl: "Wszystkie regiony" },
+
   "Найти": { ru: "Найти", uk: "Знайти", en: "Search", pl: "Szukaj" },
   "КАТЕГОРИИ": { ru: "КАТЕГОРИИ", uk: "КАТЕГОРІЇ", en: "CATEGORIES", pl: "KATEGORIE" },
   "Категории": { ru: "Категории", uk: "Категорії", en: "Categories", pl: "Kategorie" },
@@ -411,9 +413,10 @@ if (listing) {
     const card = event.target.closest("[data-listing-index]");
     if (!card) return;
     event.preventDefault();
-    openListing(visibleListings[Number(card.dataset.listing-index)], event.target.matches(".listing-photo"));
+    openListing(visibleListings[Number(card.dataset.listingIndex)], event.target.matches(".listing-photo"));
   });
 }
+
 
 function renderListings(items) {
   visibleListings = items;
@@ -755,11 +758,13 @@ function updateCities(items, names = {}) {
     .filter(code => code !== null && code !== undefined && code !== ""))]
     .map(String).sort();
 
-  [[catalogRegionSelect, activeRegionCode, "Все области"],
-   [cityRegionSelect, formRegionCode, "Все области"]]
-    .forEach(([select, current, label]) => {
+  const allRegionsLabel = cityTranslation("Все области");
+
+  [[catalogRegionSelect, activeRegionCode],
+   [cityRegionSelect, formRegionCode]]
+    .forEach(([select, current]) => {
       if (!select) return;
-      select.innerHTML = `<option value="">${label}</option>` +
+      select.innerHTML = `<option value="">${escapeHtml(allRegionsLabel)}</option>` +
         regionCodes.map(code =>
           `<option value="${escapeHtml(code)}">${escapeHtml(regionNames[code] || "")}</option>`
         ).join("");
@@ -771,6 +776,7 @@ function updateCities(items, names = {}) {
   if (document.activeElement === citySearchInput) renderCitySuggestions();
   if (document.activeElement === catalogCitySearchInput) renderCatalogCitySuggestions();
 }
+
 
 if (catalogRegionSelect) {
   catalogRegionSelect.addEventListener("change", () => {
@@ -1000,6 +1006,14 @@ function translatePage(selectedLanguage) {
   updateCitySearchLanguage();
   updateCatalogCitySearchLanguage();
 
+  [catalogRegionSelect, cityRegionSelect].forEach(select => {
+    if (!select) return;
+    const first = select.options[0];
+    if (first && first.value === "") {
+      first.textContent = cityTranslation("Все области");
+    }
+  });
+
   const listingLabel = document.getElementById("listingLabel");
   if (listingLabel) {
     const item = translations["Листинг"];
@@ -1010,12 +1024,12 @@ function translatePage(selectedLanguage) {
     const item = translations["Последние объявления"];
     if (item && item[lang]) latestListingsTitle.textContent = item[lang];
   }
-  const categoryTitle = document.querySelector(".section h2");
+  const categoryTitle = document.querySelector(".section h2:not(#latestListingsTitle)");
   if (categoryTitle) {
     const item = translations["Что ищем?"];
     if (item && item[lang]) categoryTitle.textContent = item[lang];
   }
-  const eyebrow = document.querySelector(".section .eyebrow");
+  const eyebrow = document.querySelector(".section .eyebrow:not(#listingLabel)");
   if (eyebrow) {
     const item = translations["КАТЕГОРИИ"] || translations["Категории"];
     if (item && item[lang]) eyebrow.textContent = item[lang];

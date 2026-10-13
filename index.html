@@ -52,97 +52,13 @@
       <div class="container">
 
         <!-- Главный визуальный блок: SVG-иллюстрация -->
-        <svg class="hero-illustration" viewBox="0 0 800 260" preserveAspectRatio="xMidYMid meet"
-             role="img" aria-label="Автомобіль, будинок, бізнес, гривня та зростаючий графік">
-          <defs>
-            <linearGradient id="skyGrad" x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0" stop-color="#eaf6e9"/>
-              <stop offset="1" stop-color="#f7fbef"/>
-            </linearGradient>
-            <linearGradient id="groundGrad" x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0" stop-color="#b8e08a"/>
-              <stop offset="1" stop-color="#8bc34a"/>
-            </linearGradient>
-            <linearGradient id="coinGrad" x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0" stop-color="#ffd54f"/>
-              <stop offset="1" stop-color="#ffa000"/>
-            </linearGradient>
-          </defs>
-
-          <rect width="800" height="260" fill="url(#skyGrad)"/>
-
-          <!-- Солнце -->
-          <circle cx="130" cy="55" r="38" fill="#fff59d" opacity="0.85"/>
-
-          <!-- Дальний город -->
-          <g fill="#cfd8dc" opacity="0.55">
-            <rect x="470" y="70" width="55" height="120"/>
-            <rect x="535" y="40" width="45" height="150"/>
-            <rect x="590" y="85" width="60" height="105"/>
-            <rect x="660" y="60" width="50" height="130"/>
-          </g>
-
-          <!-- Земля -->
-          <path d="M0,190 Q200,170 400,185 T800,190 L800,260 L0,260 Z" fill="url(#groundGrad)"/>
-
-          <!-- Деревья -->
-          <circle cx="55" cy="155" r="28" fill="#81c784"/>
-          <circle cx="100" cy="150" r="32" fill="#66bb6a"/>
-          <rect x="96" y="175" width="8" height="30" fill="#6d4c41"/>
-
-          <!-- Дом -->
-          <g transform="translate(220,110)">
-            <rect x="0" y="50" width="120" height="80" fill="#ffffff" stroke="#cfd8dc" stroke-width="1.5"/>
-            <polygon points="-10,50 60,5 130,50" fill="#8d6e63"/>
-            <rect x="18" y="70" width="28" height="28" fill="#bbdefb" stroke="#90caf9"/>
-            <rect x="74" y="70" width="28" height="28" fill="#bbdefb" stroke="#90caf9"/>
-            <rect x="48" y="95" width="24" height="35" fill="#a1887f"/>
-          </g>
-
-          <!-- Магазин «БІЗНЕС» -->
-          <g transform="translate(400,140)">
-            <rect x="0" y="25" width="105" height="65" fill="#ffe0b2"/>
-            <rect x="0" y="0" width="105" height="28" fill="#ef5350"/>
-            <rect x="-4" y="26" width="113" height="6" fill="#ffffff"/>
-            <text x="52" y="19" text-anchor="middle" font-size="13" font-weight="800"
-                  fill="#ffffff" font-family="Inter,sans-serif">БІЗНЕС</text>
-            <rect x="12" y="45" width="20" height="45" fill="#bbdefb" stroke="#90caf9"/>
-            <rect x="70" y="45" width="20" height="45" fill="#bbdefb" stroke="#90caf9"/>
-          </g>
-
-          <!-- Автомобиль -->
-          <g transform="translate(20,160)">
-            <path d="M0,55 L8,30 Q12,20 24,18 L85,18 Q98,20 104,32 L118,55 L118,72 L0,72 Z" fill="#78909c"/>
-            <path d="M22,22 L82,22 L96,42 L8,42 Z" fill="#e1f5fe" stroke="#78909c"/>
-            <rect x="10" y="46" width="98" height="4" fill="#546e7a"/>
-            <circle cx="28" cy="72" r="11" fill="#37474f"/>
-            <circle cx="28" cy="72" r="4" fill="#90a4ae"/>
-            <circle cx="92" cy="72" r="11" fill="#37474f"/>
-            <circle cx="92" cy="72" r="4" fill="#90a4ae"/>
-          </g>
-
-          <!-- Монеты с гривной -->
-          <g transform="translate(650,175)">
-            <ellipse cx="35" cy="60" rx="45" ry="10" fill="#000" opacity="0.08"/>
-            <rect x="0" y="40" width="70" height="18" rx="9" fill="url(#coinGrad)" stroke="#e65100" stroke-width="1"/>
-            <rect x="0" y="22" width="70" height="18" rx="9" fill="url(#coinGrad)" stroke="#e65100" stroke-width="1"/>
-            <circle cx="35" cy="22" r="16" fill="url(#coinGrad)" stroke="#e65100" stroke-width="1"/>
-            <text x="35" y="29" text-anchor="middle" font-size="20" font-weight="900"
-                  fill="#bf360c" font-family="Inter,sans-serif">₴</text>
-          </g>
-
-          <!-- Растущий график -->
-          <g transform="translate(600,30)">
-            <path d="M0,70 L35,38 L58,52 L110,0" stroke="#43a047" stroke-width="5" fill="none"
-                  stroke-linecap="round" stroke-linejoin="round"/>
-            <polygon points="110,0 88,6 104,22" fill="#2e7d32"/>
-            <path d="M0,70 L28,52 L55,60 L95,22" stroke="#a5d6a7" stroke-width="2" fill="none" opacity="0.7"/>
-            <rect x="0" y="60" width="8" height="20" fill="#a5d6a7" opacity="0.6"/>
-            <rect x="14" y="52" width="8" height="28" fill="#a5d6a7" opacity="0.6"/>
-            <rect x="28" y="44" width="8" height="36" fill="#a5d6a7" opacity="0.6"/>
-          </g>
-        </svg>
-
+        <img
+  class="hero-illustration"
+  src="hero-banner.webp"
+  alt="Автомобілі, нерухомість, готовий бізнес та інвестиції"
+  loading="eager"
+  fetchpriority="high"
+/>
         <p class="hero-text">Автомобили, недвижимость и готовый бизнес — в одном месте.</p>
 
         <!-- Поисковая форма в виде белой карточки -->

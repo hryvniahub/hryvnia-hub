@@ -157,6 +157,7 @@ const citySuggestions = document.getElementById("citySuggestions");
 const citySelect = document.getElementById("citySelect");
 let availableCities = [];
 let citySearchIndex = [];
+let regionNames = {}; // ← используется в подсказках городов (заполняется в loadListings)
 let selectedCatalogCityId = "";
 let activeRegionCode = "";
 let formRegionCode = "";
@@ -410,7 +411,7 @@ if (listing) {
     const card = event.target.closest("[data-listing-index]");
     if (!card) return;
     event.preventDefault();
-    openListing(visibleListings[Number(card.dataset.listingIndex)], event.target.matches(".listing-photo"));
+    openListing(visibleListings[Number(card.dataset.listing-index)], event.target.matches(".listing-photo"));
   });
 }
 
@@ -515,37 +516,41 @@ async function loadListings() {
     if (cityError) {
       console.error("Не удалось загрузить города:", cityError);
     } else {
-      const regionNames = {};
-let regionsLoaded = false;
+      // ВАЖНО: regionNames — модульная переменная (см. DOM refs),
+      // чтобы подсказки городов могли к ней обращаться.
+      regionNames = {};
+      let regionsLoaded = false;
 
-try {
-  const { data: regionsData, error: regionsError } = await db
-    .from("regions")
-    .select("katottg_code, name_uk");
+      try {
+        const { data: regionsData, error: regionsError } = await db
+          .from("regions")
+          .select("katottg_code, name_uk");
 
-  if (regionsError) {
-    console.error("Не удалось загрузить регионы:", regionsError);
-  } else if (regionsData) {
-    regionsData.forEach(region => {
-      if (region && region.katottg_code != null) {
-        const name = String(region.name_uk || "").trim();
-        if (name) {
-          regionNames[String(region.katottg_code)] = name;
+        if (regionsError) {
+          console.error("Не удалось загрузить регионы:", regionsError);
+        } else if (regionsData) {
+          regionsData.forEach(region => {
+            if (region && region.katottg_code != null) {
+              const name = String(region.name_uk || "").trim();
+              if (name) {
+                regionNames[String(region.katottg_code)] = name;
+              }
+            }
+          });
+
+          // Защита от ситуации, когда RLS или что-то ещё вернуло [] без ошибки:
+          // флаг выставляем только если реально получили данные.
+          regionsLoaded = Object.keys(regionNames).length > 0;
         }
+      } catch (err) {
+        console.error("Не удалось загрузить регионы:", err);
       }
-    });
 
-    regionsLoaded = true;
-  }
-} catch (err) {
-  console.error("Не удалось загрузить регионы:", err);
-}
+      updateCities(allCities, regionNames);
+      window.hryvniaCitiesLoaded = regionsLoaded;
 
-updateCities(allCities, regionNames);
-window.hryvniaCitiesLoaded = regionsLoaded;
-
-console.log("Загружено городов:", allCities.length);
-    
+      console.log("Загружено городов:", allCities.length);
+      console.log("Загружено регионов:", Object.keys(regionNames).length);
     }
   }
 }
@@ -571,6 +576,70 @@ function normalizeCitySearch(value) {
     .trim();
 }
 
+// Соответствие клавиш EN ↔ UK (стандартная Windows-раскладка украинского).
+// Позволяет находить город, даже если пользователь забыл переключить раскладку.
+const UK_LAYOUT_MAP = {
+  "q":"й","w":"ц","e":"у","r":"к","t":"е","y":"н","u":"г","i":"ш","o":"щ","p":"з","[":"х","]":"ї",
+  "a":"ф","s":"і","d":"в","f":"а","g":"п","h":"р","j":"о","k":"л","l":"д",";":"ж","'":"є",
+  "z":"я","x":"ч","c":"с","v":"м","b":"и","n":"т","m":"ь",",":"б",".":"ю","/":"."
+};
+const EN_LAYOUT_MAP = Object.fromEntries(
+  Object.entries(UK_LAYOUT_MAP).map(([en, uk]) => [uk, en])
+);
+
+function swapLayout(str, map) {
+  let out = "";
+  for (const ch of String(str || "")) out += map[ch] ?? ch;
+  return out;
+}
+
+// Все варианты запроса, которые имеет смысл проверить:
+// как есть + как будто пользователь промахнулся раскладкой в обе стороны.
+function getQueryVariants(text) {
+  const base = normalizeCitySearch(text);
+  if (!base) return [];
+  const variants = new Set([base]);
+  variants.add(swapLayout(base, UK_LAYOUT_MAP));  // набрано в EN, имелось в виду UK
+  variants.add(swapLayout(base, EN_LAYOUT_MAP));  // набрано в UK, имелось в виду EN
+  return [...variants].filter(Boolean);
+}
+
+// Индексная запись для одного города: отдельно токены названий,
+// отдельно — токен области (для фильтрации и ранжирования).
+function buildCityEntry(city) {
+  const nameTokens = [...new Set(
+    ["name_ru", "name_uk", "name_en", "name_pl"]
+      .map(key => normalizeCitySearch(city[key]))
+      .filter(Boolean)
+  )];
+  const regionNameUk = regionNames[String(city.region_katottg_code)] || "";
+  const regionToken = normalizeCitySearch(regionNameUk);
+  return { city, nameTokens, regionToken, regionNameUk };
+}
+
+// Ранг: 0 — точное имя, 1 — имя с префикса, 2 — имя по подстроке,
+// 3 — совпадение по области, -1 — нет совпадения.
+function rankCityEntry(entry, queryVariants) {
+  if (!queryVariants.length) return 0;
+  const { nameTokens, regionToken } = entry;
+  if (queryVariants.some(q => nameTokens.some(n => n === q))) return 0;
+  if (queryVariants.some(q => nameTokens.some(n => n.startsWith(q)))) return 1;
+  if (queryVariants.some(q => nameTokens.some(n => n.includes(q)))) return 2;
+  if (regionToken && queryVariants.some(q => regionToken.includes(q))) return 3;
+  return -1;
+}
+
+// Универсальный рендер подсказки: имя города + регион мелким серым.
+function renderCitySuggestionButton(entry, className) {
+  const regionLine = entry.regionNameUk
+    ? `<span class="city-suggestion-region">${escapeHtml(entry.regionNameUk)}</span>`
+    : "";
+  return `<button type="button" class="${className}" role="option" data-city-id="${escapeHtml(entry.city.id)}">
+    <span class="city-suggestion-name">${escapeHtml(cityName(entry.city))}</span>
+    ${regionLine}
+  </button>`;
+}
+
 function closeCatalogCitySuggestions() {
   if (!catalogCitySuggestions) return;
   catalogCitySuggestions.hidden = true;
@@ -579,24 +648,27 @@ function closeCatalogCitySuggestions() {
 
 function renderCatalogCitySuggestions() {
   if (!catalogCitySuggestions || !catalogCitySearchInput) return;
-  const term = normalizeCitySearch(catalogCitySearchInput.value);
-  const sourceIndex = activeRegionCode
-    ? citySearchIndex.filter(entry => entry.city.region_katottg_code === activeRegionCode)
+  const term = catalogCitySearchInput.value;
+  const queryVariants = getQueryVariants(term);
+  const base = activeRegionCode
+    ? citySearchIndex.filter(entry =>
+        String(entry.city.region_katottg_code) === activeRegionCode)
     : citySearchIndex;
-  const matches = term
-    ? sourceIndex
-        .filter(entry => entry.names.some(name => name.includes(term)))
-        .sort((a, b) => {
-          const rank = entry =>
-            entry.names.some(name => name === term) ? 0 :
-            entry.names.some(name => name.startsWith(term)) ? 1 : 2;
-          return rank(a) - rank(b);
-        })
+
+  const ranked = term
+    ? base
+        .map(entry => ({ entry, rank: rankCityEntry(entry, queryVariants) }))
+        .filter(item => item.rank >= 0)
+        .sort((a, b) =>
+          a.rank - b.rank ||
+          cityName(a.entry.city).localeCompare(cityName(b.entry.city))
+        )
         .slice(0, 12)
+        .map(item => item.entry)
     : [];
 
-  catalogCitySuggestions.innerHTML = matches.length
-    ? matches.map(({ city }) => `<button type="button" class="catalog-city-suggestion" role="option" data-city-id="${escapeHtml(city.id)}">${escapeHtml(cityName(city))}</button>`).join("")
+  catalogCitySuggestions.innerHTML = ranked.length
+    ? ranked.map(entry => renderCitySuggestionButton(entry, "catalog-city-suggestion")).join("")
     : `<div class="city-suggestion-empty" role="status">${escapeHtml(term ? cityTranslation("Город не найден") : cityTranslation("Введите название города"))}</div>`;
   catalogCitySuggestions.hidden = false;
   catalogCitySearchInput.setAttribute("aria-expanded", "true");
@@ -630,14 +702,24 @@ function closeCitySuggestions() {
 
 function renderCitySuggestions() {
   if (!citySuggestions || !citySearchInput) return;
-  const term = normalizeCitySearch(citySearchInput.value);
-  const matches = availableCities
-    .filter(city => !formRegionCode || String(city.region_katottg_code) === formRegionCode)
-    .filter(city => normalizeCitySearch(cityName(city)).includes(term))
-    .slice(0, 12);
+  const term = citySearchInput.value;
+  const queryVariants = getQueryVariants(term);
+  const base = citySearchIndex.filter(entry =>
+    !formRegionCode || String(entry.city.region_katottg_code) === formRegionCode
+  );
 
-  citySuggestions.innerHTML = matches.length
-    ? matches.map(city => `<button type="button" class="city-suggestion" role="option" data-city-id="${escapeHtml(city.id)}">${escapeHtml(cityName(city))}</button>`).join("")
+  const ranked = base
+    .map(entry => ({ entry, rank: rankCityEntry(entry, queryVariants) }))
+    .filter(item => item.rank >= 0)
+    .sort((a, b) =>
+      a.rank - b.rank ||
+      cityName(a.entry.city).localeCompare(cityName(b.entry.city))
+    )
+    .slice(0, 12)
+    .map(item => item.entry);
+
+  citySuggestions.innerHTML = ranked.length
+    ? ranked.map(entry => renderCitySuggestionButton(entry, "city-suggestion")).join("")
     : `<div class="city-suggestion-empty" role="status">${escapeHtml(cityTranslation("Город не найден"))}</div>`;
 
   citySuggestions.hidden = false;
@@ -663,25 +745,24 @@ function updateCitySearchLanguage() {
   }
 }
 
-function updateCities(items, regionNames = {}) {
+function updateCities(items, names = {}) {
   availableCities = items || [];
-  citySearchIndex = availableCities.map(city => ({
-    city,
-    names: [...new Set(["name_ru", "name_uk", "name_en", "name_pl"]
-      .map(key => normalizeCitySearch(city[key]))
-      .filter(Boolean))]
-  }));
+  regionNames = names || {};
+  citySearchIndex = availableCities.map(buildCityEntry);
 
   const regionCodes = [...new Set(availableCities
     .map(city => city.region_katottg_code)
     .filter(code => code !== null && code !== undefined && code !== ""))]
     .map(String).sort();
 
-  [[catalogRegionSelect, activeRegionCode, "Все области"], [cityRegionSelect, formRegionCode, "Все области"]]
+  [[catalogRegionSelect, activeRegionCode, "Все области"],
+   [cityRegionSelect, formRegionCode, "Все области"]]
     .forEach(([select, current, label]) => {
       if (!select) return;
       select.innerHTML = `<option value="">${label}</option>` +
-        regionCodes.map(code => `<option value="${escapeHtml(code)}">${escapeHtml(regionNames[code] || "")}</option>`).join("");
+        regionCodes.map(code =>
+          `<option value="${escapeHtml(code)}">${escapeHtml(regionNames[code] || "")}</option>`
+        ).join("");
       select.value = regionCodes.includes(current) ? current : "";
     });
 

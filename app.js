@@ -517,11 +517,16 @@ async function loadListings() {
     } else {
       const regionNames = {};
 let regionsLoaded = false;
+let regionsErrorText = null;
+let debugRegionsCount = null;
 
 try {
   const { data: regionsData, error: regionsError } = await db
     .from("regions")
     .select("katottg_code, name_uk");
+  debugRegionsCount = Array.isArray(regionsData)
+    ? regionsData.length : null;
+  regionsErrorText = regionsError ? regionsError.message : null;
 
   if (regionsError) {
     console.error("Не удалось загрузить регионы:", regionsError);
@@ -539,6 +544,37 @@ try {
   }
 } catch (err) {
   console.error("Не удалось загрузить регионы:", err);
+}
+
+// Временная диагностика на странице. Данные приложения не изменяются.
+{
+  const rawCodes = allCities.map(city => city.region_katottg_code);
+  const codes = [...new Set(rawCodes
+    .filter(code => code !== null && code !== undefined && code !== "")
+    .map(String))].sort();
+
+  const diagnostic = {
+    regionsDataCount: debugRegionsCount,
+    regionsError: regionsErrorText,
+    regionNamesKeyCount: Object.keys(regionNames).length,
+    first10CityRegionCodes: rawCodes.slice(0, 10),
+    matching: codes.map(code => ({
+      code,
+      hasKey: Object.prototype.hasOwnProperty.call(regionNames, code),
+      name: regionNames[code] ?? null,
+      hasName: Boolean(regionNames[code])
+    }))
+  };
+
+  let panel = document.getElementById("hryvniaRegionsDebug");
+  if (!panel) {
+    panel = document.createElement("pre");
+    panel.id = "hryvniaRegionsDebug";
+    panel.style.cssText = "white-space:pre-wrap;overflow-wrap:anywhere;padding:16px;background:#fff;color:#111;border:2px solid #c60;";
+    document.body.appendChild(panel);
+  }
+  panel.textContent = "Диагностика областей\n" +
+    JSON.stringify(diagnostic, null, 2);
 }
 
 updateCities(allCities, regionNames);

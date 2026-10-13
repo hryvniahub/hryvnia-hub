@@ -516,26 +516,36 @@ async function loadListings() {
       console.error("Не удалось загрузить города:", cityError);
     } else {
       const regionNames = {};
-      try {
-        const { data: regionsData, error: regionsError } = await db
-          .from("regions")
-          .select("katottg_code, name_uk");
-        if (regionsError) {
-          console.error("Не удалось загрузить регионы:", regionsError);
-        } else if (regionsData) {
-          regionsData.forEach(region => {
-            if (region && region.katottg_code != null) {
-              regionNames[String(region.katottg_code)] = String(region.name_uk || "").trim();
-            }
-          });
-        }
-      } catch (err) {
-        console.error("Не удалось загрузить регионы:", err);
-      }
+let regionsLoaded = false;
 
-      updateCities(allCities, regionNames);
-      window.hryvniaCitiesLoaded = true;
-      console.log("Загружено городов:", allCities.length);
+try {
+  const { data: regionsData, error: regionsError } = await db
+    .from("regions")
+    .select("katottg_code, name_uk");
+
+  if (regionsError) {
+    console.error("Не удалось загрузить регионы:", regionsError);
+  } else if (regionsData) {
+    regionsData.forEach(region => {
+      if (region && region.katottg_code != null) {
+        const name = String(region.name_uk || "").trim();
+        if (name) {
+          regionNames[String(region.katottg_code)] = name;
+        }
+      }
+    });
+
+    regionsLoaded = true;
+  }
+} catch (err) {
+  console.error("Не удалось загрузить регионы:", err);
+}
+
+updateCities(allCities, regionNames);
+window.hryvniaCitiesLoaded = regionsLoaded;
+
+console.log("Загружено городов:", allCities.length);
+    
     }
   }
 }

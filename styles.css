@@ -85,12 +85,12 @@ body {
 .hero-illustration {
   display: block;
   width: 100%;
-  max-width: 900px;
+  max-width: 1400px;
   height: auto;
   margin: 4px auto 0;
   border-radius: 18px;
+  object-fit: contain;
   box-shadow: 0 12px 30px rgba(23,25,28,.06);
-  background: #f7fbef;
 }
 
 .hero-text {

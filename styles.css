@@ -42,11 +42,48 @@ input:focus, select:focus, textarea:focus { border-color:#aeb600; box-shadow:0 0
 .full { width:100%; }
 .section { padding:48px 0 0; }
 .section-head { display:flex; justify-content:space-between; align-items:end; gap:16px; margin-bottom:18px; }
-.categories { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
-.category { text-align:left; border:1px solid var(--line); background:var(--card); border-radius:16px; padding:18px; cursor:pointer; }
+
+/* ============================================================
+   Категории — одна горизонтальная строка.
+   При нехватке места включается горизонтальная прокрутка.
+   Цвета и .active остаются прежними.
+   ============================================================ */
+.categories {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 6px;                 /* место под тонкий скроллбар */
+  -webkit-overflow-scrolling: touch;   /* плавный скролл на iOS */
+  scrollbar-width: thin;               /* Firefox */
+  scrollbar-color: #cfd3d8 transparent;
+}
+.categories::-webkit-scrollbar { height: 6px; }
+.categories::-webkit-scrollbar-thumb { background: #cfd3d8; border-radius: 6px; }
+.categories::-webkit-scrollbar-track { background: transparent; }
+
+.category {
+  flex: 0 0 auto;                /* не сжимается и не растягивается */
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  text-align: left;
+  border: 1px solid var(--line);
+  background: var(--card);
+  border-radius: 12px;
+  padding: 8px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 14px;
+  line-height: 1.15;
+  color: var(--text);
+}
 .category.active { border-color:#abb800; box-shadow:0 0 0 2px rgba(215,230,0,.25); }
-.category span { display:block; font-weight:800; margin-bottom:6px; }
-.category small, .muted { color:var(--muted); }
+.category span { display: block; font-weight: 800; margin-bottom: 0; }
+.category small { color: var(--muted); font-size: 12px; }
+
 .listing { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; padding-bottom:56px; }
 .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px; }
 .card-top { display:flex; justify-content:space-between; gap:10px; }
@@ -67,9 +104,21 @@ input:focus, select:focus, textarea:focus { border-color:#aeb600; box-shadow:0 0
 .footer { border-top:1px solid var(--line); padding:28px 0; color:var(--muted); }
 
 @media (max-width: 800px) {
-  .search-box, .categories, .listing { grid-template-columns:1fr; }
+  .search-box, .listing { grid-template-columns:1fr; }
   .hero { padding-top:48px; }
   .nav .btn { padding:10px 12px; font-size:14px; }
+
+  /* Компактнее на мобильных. Описания <small> скрываем,
+     чтобы 5 кнопок плотнее укладывались в одну строку. */
+  .categories { gap: 6px; padding-bottom: 4px; }
+  .category {
+    padding: 6px 10px;
+    font-size: 13px;
+    border-radius: 10px;
+    gap: 0;
+  }
+  .category span { font-size: 13px; }
+  .category small { display: none; }
 }
 
 .photo-fields { min-width:0; margin:0 0 14px; padding:14px; border:1px solid var(--line); border-radius:12px; }

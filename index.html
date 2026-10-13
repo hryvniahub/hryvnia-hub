@@ -32,6 +32,9 @@
 
         <div class="search-box">
           <input id="searchInput" type="search" placeholder="Что ищете? Например: Skoda Octavia">
+          <select id="catalogRegionSelect" aria-label="Область">
+  <option value="">Все области</option>
+          </select>
           <div class="catalog-city-search">
             <input id="catalogCitySearchInput" type="search" autocomplete="off"
               placeholder="Введите название города" role="combobox" aria-autocomplete="list"
@@ -101,6 +104,9 @@
           <input name="title" required placeholder="Например: Skoda Octavia 1.6">
         </label>
         <label>Город
+          <select id="cityRegionSelect" aria-label="Область">
+            <option value="">Все области</option>
+          </select>
           <div class="city-search">
             <input id="citySearchInput" type="search" required autocomplete="off"
               placeholder="Введите название города" role="combobox" aria-autocomplete="list"

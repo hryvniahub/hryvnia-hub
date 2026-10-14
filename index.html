@@ -1,263 +1,287 @@
-<!doctype html>
-<html lang="uk">
+<!DOCTYPE html>
+<html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hryvnia Hub — объявления Украины</title>
-  <meta name="description" content="Hryvnia Hub — хаб объявлений: автомобили, недвижимость и бизнес.">
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Объявления — купить и продать</title>
+  <meta name="description" content="Доска объявлений: автомобили, недвижимость, готовый бизнес, инвестиции." />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <!-- Чекбокс для CSS-only мобильного меню -->
-  <input type="checkbox" id="menuToggle" class="menu-toggle" hidden aria-hidden="true">
 
+  <!-- ==== HEADER ==== -->
   <header class="header">
-    <div class="container nav">
-      <a class="brand" href="#">
-        <img class="logo" src="hryvnia-hub-logo.png" alt="Hryvnia Hub">
-        <span class="brand-text">HRYVNIA HUB</span>
-      </a>
+    <div class="container">
+      <nav class="nav">
+        <a class="brand" href="#">
+          <img class="logo" src="logo.svg" alt="" width="36" height="36" />
+          <span class="brand-text">Obmen</span>
+        </a>
 
-      <div class="header-actions">
-        <!-- Кнопка языка: флаг + город + электронное время -->
-        <div class="lang-btn" id="langBtn">
-          <button type="button" class="lang-trigger" id="langTrigger"
-                  aria-haspopup="menu" aria-expanded="false" aria-label="Language and time">
-            <span class="lang-flag" id="langFlag" aria-hidden="true">🇬🇧</span>
-            <span class="lang-city" id="langCity">London</span>
-            <span class="lang-clock" id="langClock">--:--</span>
-          </button>
-          <div class="lang-dropdown hidden" id="langDropdown" role="menu" aria-label="Language">
-            <button type="button" class="lang-option" data-lang-value="en" role="menuitem">
-              <span class="flag" aria-hidden="true">🇬🇧</span> English
+        <div class="header-actions">
+          <button type="button" class="header-action all-btn active" data-filter="all">Все</button>
+          <button type="button" class="header-action" data-filter="Автомобили">Авто</button>
+          <button type="button" class="header-action" data-filter="Недвижимость">Недвижимость</button>
+
+          <!-- Язык + часы -->
+          <div class="lang-btn" id="langBtn">
+            <button type="button" class="lang-trigger" id="langTrigger" aria-haspopup="listbox" aria-expanded="false">
+              <span class="lang-flag" id="langFlag"><i class="flag-ru"></i></span>
+              <span class="lang-city" id="langCity">Киев</span>
+              <span class="lang-clock" id="langClock">00:00</span>
             </button>
-            <button type="button" class="lang-option" data-lang-value="uk" role="menuitem">
-              <span class="flag" aria-hidden="true">🇺🇦</span> Українська
-            </button>
-            <button type="button" class="lang-option" data-lang-value="pl" role="menuitem">
-              <span class="flag" aria-hidden="true">🇵🇱</span> Polski
-            </button>
-            <button type="button" class="lang-option" data-lang-value="ru" role="menuitem">
-              <span class="flag-ru" aria-hidden="true"></span> Русский
-            </button>
+
+            <div class="lang-dropdown hidden" id="langDropdown" role="listbox">
+              <button type="button" class="lang-option" data-lang="ru" data-city="Киев">
+                <span class="flag"><i class="flag-ru"></i></span> Русский
+              </button>
+              <button type="button" class="lang-option" data-lang="en" data-city="London">
+                <span class="flag">🇬🇧</span> English
+              </button>
+              <button type="button" class="lang-option" data-lang="de" data-city="Berlin">
+                <span class="flag">🇩🇪</span> Deutsch
+              </button>
+            </div>
           </div>
-          <select id="languageSwitcher" class="sr-only" tabindex="-1" aria-hidden="true">
-            <option value="ru">Русский</option>
-            <option value="uk">Українська</option>
-            <option value="en">English</option>
-            <option value="pl">Polski</option>
-          </select>
+
+          <!-- Кнопка меню -->
+          <input type="checkbox" id="menuToggle" class="menu-toggle" />
+          <label for="menuToggle" class="settings-btn" aria-label="Меню">☰</label>
         </div>
+      </nav>
+    </div>
 
-        <!-- Кнопка All (та же логика .category + data-category="") -->
-        <button class="category header-action all-btn active" data-category="" id="allBtn" type="button">
-          <span>Все</span>
-        </button>
-
-        <!-- Кнопка Add listing -->
-        <button class="header-action btn-add" id="openAdd" type="button">+ Добавить объявление</button>
+    <!-- Полоса курсов -->
+    <div class="container market-bar">
+      <div class="market-ticker">
+        <div class="ticker-scroll">
+          <span class="ticker-item"><span class="ticker-label">USD</span><span class="ticker-value">41.20</span></span>
+          <span class="ticker-item"><span class="ticker-label">EUR</span><span class="ticker-value">44.85</span></span>
+          <span class="ticker-item"><span class="ticker-label">BTC</span><span class="ticker-value">63 400</span></span>
+          <span class="ticker-item"><span class="ticker-label">GOLD</span><span class="ticker-value">2 380</span></span>
+          <span class="ticker-item"><span class="ticker-label">OIL</span><span class="ticker-value">78.40</span></span>
+        </div>
+        <span class="ticker-note">Обновлено сейчас</span>
       </div>
-
-      <!-- Кнопка настроек/меню справа, яркая лаймовая -->
-      <label for="menuToggle" class="settings-btn" aria-label="Settings">☰</label>
     </div>
   </header>
 
-  <!-- Мобильное боковое меню -->
+  <!-- ==== MOBILE MENU ==== -->
   <label for="menuToggle" class="mobile-menu-overlay" aria-hidden="true"></label>
-  <nav class="mobile-menu" aria-label="Mobile menu">
+  <aside class="mobile-menu">
     <div class="mobile-menu-header">
-      <span>Menu</span>
-      <label for="menuToggle" class="icon-btn" aria-label="Close">×</label>
+      <span>Меню</span>
+      <label for="menuToggle" class="icon-btn" aria-label="Закрыть">✕</label>
     </div>
     <ul class="mobile-menu-list">
-      <li><a href="#">♡ Favorites</a></li>
-      <li><a href="#">👤 Profile</a></li>
+      <li><a href="#">Главная</a></li>
+      <li><a href="#listing">Объявления</a></li>
+      <li><a href="#">Избранное</a></li>
+      <li><a href="#">Мои объявления</a></li>
+      <li><a href="#">Помощь</a></li>
     </ul>
-  </nav>
-
-  <!-- Категории: только 4 карточки, кнопка All переехала в шапку -->
-  <section class="categories-section container" aria-label="Categories">
-    <div class="categories-grid">
-      <button class="category category-card" data-category="Автомобили" type="button">
-        <img class="category-card-img" src="assets/images/01_automobiles_no_text.png"
-             alt="" loading="lazy" width="400" height="260">
-        <span class="category-card-label">Автомобили</span>
-      </button>
-      <button class="category category-card" data-category="Недвижимость" type="button">
-        <img class="category-card-img" src="assets/images/02_real_estate_no_text.png"
-             alt="" loading="lazy" width="400" height="260">
-        <span class="category-card-label">Недвижимость</span>
-      </button>
-      <button class="category category-card" data-category="Готовый бизнес" type="button">
-        <img class="category-card-img" src="assets/images/03_ready_business_no_text.png"
-             alt="" loading="lazy" width="400" height="260">
-        <span class="category-card-label">Готовый бизнес</span>
-      </button>
-      <button class="category category-card" data-category="Инвестиции" type="button">
-        <img class="category-card-img" src="assets/images/04_investments_no_text.png"
-             alt="" loading="lazy" width="400" height="260">
-        <span class="category-card-label">Инвестиции</span>
-      </button>
-    </div>
-  </section>
+  </aside>
 
   <main>
-    <!-- Баннер + рыночные показатели -->
-    <section class="hero">
-      <h1 class="sr-only">Найди выгодное предложение</h1>
-      <div class="container">
-        <div class="main-banner">
-          <img class="main-banner-img" src="assets/images/00_hero_banner_no_text.png"
-               alt="" fetchpriority="high" width="1180" height="400">
-          <div class="banner-content">
-            <p class="banner-title">Find the best deals in Ukraine</p>
-            <p class="hero-text">Автомобили, недвижимость и готовый бизнес — в одном месте.</p>
-          </div>
-        </div>
+    <!-- ==== CATEGORIES ==== -->
+    <section class="container categories-section">
+      <div class="categories-grid">
+        <button type="button" class="category-card" data-category="Автомобили">
+          <img class="category-card-img" src="cat-auto.jpg" alt="" loading="lazy" />
+          <span class="category-card-label">Автомобили</span>
+        </button>
+        <button type="button" class="category-card" data-category="Недвижимость">
+          <img class="category-card-img" src="cat-realty.jpg" alt="" loading="lazy" />
+          <span class="category-card-label">Недвижимость</span>
+        </button>
+        <button type="button" class="category-card" data-category="Готовый бизнес">
+          <img class="category-card-img" src="cat-business.jpg" alt="" loading="lazy" />
+          <span class="category-card-label">Готовый бизнес</span>
+        </button>
+        <button type="button" class="category-card" data-category="Инвестиции">
+          <img class="category-card-img" src="cat-invest.jpg" alt="" loading="lazy" />
+          <span class="category-card-label">Инвестиции</span>
+        </button>
+      </div>
+    </section>
 
-        <div class="market-ticker" aria-label="Market overview">
-          <div class="ticker-scroll">
-            <div class="ticker-item"><span class="ticker-label">USD/UAH</span><span class="ticker-value">—</span></div>
-            <div class="ticker-item"><span class="ticker-label">EUR/UAH</span><span class="ticker-value">—</span></div>
-            <div class="ticker-item"><span class="ticker-label">PLN/UAH</span><span class="ticker-value">—</span></div>
-            <div class="ticker-item"><span class="ticker-label">Bitcoin (BTC)</span><span class="ticker-value">—</span></div>
-            <div class="ticker-item"><span class="ticker-label">S&amp;P 500</span><span class="ticker-value">—</span></div>
-            <div class="ticker-item"><span class="ticker-label">Brent Oil</span><span class="ticker-value">—</span></div>
-          </div>
-          <span class="ticker-note">Live data coming soon</span>
+    <!-- ==== HERO / BANNER ==== -->
+    <section class="container hero">
+      <div class="main-banner">
+        <img class="main-banner-img" src="banner.jpg" alt="" />
+        <div class="banner-content">
+          <h1 class="banner-title">Покупайте и продавайте выгодно</h1>
+          <p class="hero-text">Тысячи актуальных объявлений рядом с вами — без посредников и лишних звонков.</p>
         </div>
       </div>
     </section>
 
-    <!-- Поиск + AI Deal Finder -->
-    <section class="search-ai-section container" aria-label="Search and AI">
+    <!-- ==== SEARCH + AI ==== -->
+    <section class="container search-ai-section">
       <div class="search-panel">
         <div class="search-input-row">
-          <input id="searchInput" type="search" placeholder="Что ищете? Например: Skoda Octavia" aria-label="Поиск">
-          <button class="btn btn-primary" id="searchBtn" type="button">Найти</button>
+          <input type="search" id="searchQuery" placeholder="Что ищете?" />
+          <button type="button" class="btn btn-primary" id="searchBtn">Найти</button>
         </div>
         <div class="search-filters-row">
-          <select id="catalogRegionSelect" aria-label="Область">
-            <option value="">Все области</option>
-          </select>
-          <div class="catalog-city-search">
-            <input id="catalogCitySearchInput" type="search" autocomplete="off"
-              placeholder="Введите название города" role="combobox" aria-autocomplete="list"
-              aria-expanded="false" aria-controls="catalogCitySuggestions">
-            <div id="catalogCitySuggestions" class="catalog-city-suggestions" role="listbox" hidden></div>
+          <div class="city-search">
+            <input type="search" id="cityInput" placeholder="Город" autocomplete="off" />
+            <div class="city-suggestions hidden" id="citySuggestions"></div>
           </div>
-          <input type="number" placeholder="Цена (любая)" aria-label="Цена">
-          <select aria-label="Радиус поиска">
-            <option value="30">Радиус: 30 км</option>
-            <option value="50">Радиус: 50 км</option>
-            <option value="100">Радиус: 100 км</option>
-            <option value="200">Радиус: 200 км</option>
+          <select id="filterCategory">
+            <option value="">Категория</option>
+            <option>Автомобили</option>
+            <option>Недвижимость</option>
+            <option>Готовый бизнес</option>
+            <option>Инвестиции</option>
+          </select>
+          <select id="filterPrice">
+            <option value="">Цена</option>
+            <option value="0-10000">до 10 000</option>
+            <option value="10000-50000">10 000 – 50 000</option>
+            <option value="50000-">от 50 000</option>
+          </select>
+          <select id="filterSort">
+            <option value="new">Сначала новые</option>
+            <option value="cheap">Сначала дешёвые</option>
+            <option value="expensive">Сначала дорогие</option>
           </select>
         </div>
       </div>
 
-      <aside class="ai-panel" aria-label="AI Deal Finder">
+      <div class="ai-panel">
         <div class="ai-text">
-          <p class="ai-badge">AI</p>
-          <h3>AI Deal Finder</h3>
-          <p class="ai-subtitle">Find better offers with artificial intelligence</p>
+          <span class="ai-badge">AI</span>
+          <h3>Умный подбор</h3>
+          <p class="ai-subtitle">Опишите, что вам нужно — AI найдёт лучшее предложение.</p>
           <ul class="ai-features">
-            <li>Analyze market prices</li>
-            <li>Find urgent deals</li>
-            <li>Suggest better options</li>
-            <li>Save your search</li>
+            <li>Анализ тысяч объявлений</li>
+            <li>Оценка рыночной цены</li>
+            <li>Скоро</li>
           </ul>
-          <button class="btn-ai" type="button" disabled aria-disabled="true" title="Coming soon">✨ Try AI Search</button>
+          <button type="button" class="btn-ai" disabled>Скоро</button>
         </div>
-        <div class="ai-visual" aria-hidden="true">🤖</div>
-      </aside>
+        <div class="ai-visual">🤖</div>
+      </div>
     </section>
 
-    <!-- Срочные предложения -->
-    <section class="urgent-deals container" aria-label="Urgent deals">
+    <!-- ==== URGENT DEALS ==== -->
+    <section class="container urgent-deals">
       <div class="section-head">
         <div>
-          <p class="eyebrow">⚡ Hot offers</p>
-          <h2>Urgent deals</h2>
+          <p class="eyebrow">Срочно</p>
+          <h2>Горячие предложения</h2>
         </div>
-        <span class="badge-soft">Best offers below market price</span>
+        <span class="badge-soft">Обновляется каждый час</span>
       </div>
       <div class="urgent-deals-grid">
-        <div class="empty">Urgent deals will appear here once listings are flagged as urgent in the database.</div>
+        <article class="card">
+          <div class="card-top">
+            <span class="badge">Авто</span>
+            <span class="city">Киев</span>
+          </div>
+          <h3>Audi Q5, 2019</h3>
+          <p class="price">$28 500</p>
+          <p class="desc">Один владелец, полный пакет, без ДТП.</p>
+        </article>
+        <article class="card">
+          <div class="card-top">
+            <span class="badge">Недвижимость</span>
+            <span class="city">Львов</span>
+          </div>
+          <h3>2-к квартира, 78 м²</h3>
+          <p class="price">$92 000</p>
+          <p class="desc">Новостройка, панорамные окна, паркинг.</p>
+        </article>
+        <article class="card">
+          <div class="card-top">
+            <span class="badge">Бизнес</span>
+            <span class="city">Одесса</span>
+          </div>
+          <h3>Кофейня у моря</h3>
+          <p class="price">$45 000</p>
+          <p class="desc">Окупаемость 18 мес., аренда 3 года.</p>
+        </article>
       </div>
     </section>
 
-    <!-- Список объявлений -->
-    <section class="listing-section container">
+    <!-- ==== LISTING ==== -->
+    <section class="container listing-section" id="listing">
       <div class="section-head">
         <div>
-          <p id="listingLabel" class="eyebrow">Листинг</p>
-          <h2 id="latestListingsTitle">Последние объявления</h2>
+          <p class="eyebrow">Все объявления</p>
+          <h2>Свежие предложения</h2>
+          <p class="muted" id="listingCount">Найдено: 0</p>
         </div>
-        <span id="resultCount" class="muted"></span>
+        <button type="button" class="btn btn-dark" id="openCreate">+ Разместить</button>
       </div>
-      <div id="listing" class="listing">
-        <div class="empty">Загрузка объявлений…</div>
+
+      <div class="listing" id="listingGrid">
+        <!-- Карточки рендерит app.js -->
       </div>
     </section>
   </main>
 
   <footer class="footer">
-    <div class="container">© 2026 Hryvnia Hub · MVP</div>
+    <div class="container">
+      © <span id="year"></span> Obmen. Все права защищены.
+    </div>
   </footer>
 
-  <!-- Модальное окно добавления -->
-  <div class="modal hidden" id="addModal">
+  <!-- ==== MODAL: CREATE LISTING ==== -->
+  <div class="modal hidden" id="createModal" role="dialog" aria-modal="true" aria-labelledby="createTitle">
     <div class="modal-card">
-      <button class="modal-close" id="closeAdd" type="button">×</button>
-      <p class="eyebrow">Новое объявление</p>
-      <h2>Добавить объявление</h2>
-      <form id="addForm">
-        <label>Категория
+      <button type="button" class="modal-close" id="closeModal" aria-label="Закрыть">×</button>
+      <h2 id="createTitle">Новое объявление</h2>
+
+      <form id="createForm" novalidate>
+        <label>
+          Заголовок
+          <input type="text" name="title" required maxlength="120" placeholder="Например: Audi Q5, 2019" />
+        </label>
+
+        <label>
+          Категория
           <select name="category" required>
-            <option value="Автомобили">Автомобили</option>
-            <option value="Недвижимость">Недвижимость</option>
-            <option value="Готовый бизнес">Готовый бизнес</option>
-            <option value="Инвестиции">Инвестиции</option>
+            <option value="">— выберите —</option>
+            <option>Автомобили</option>
+            <option>Недвижимость</option>
+            <option>Готовый бизнес</option>
+            <option>Инвестиции</option>
           </select>
         </label>
-        <label>Название
-          <input name="title" required placeholder="Например: Skoda Octavia 1.6">
+
+        <label>
+          Цена, $
+          <input type="number" name="price" min="0" step="1" required placeholder="0" />
         </label>
-        <label>Город
-          <select id="cityRegionSelect" aria-label="Область">
-            <option value="">Все области</option>
-          </select>
+
+        <label>
+          Город
           <div class="city-search">
-            <input id="citySearchInput" type="search" required autocomplete="off"
-              placeholder="Введите название города" role="combobox" aria-autocomplete="list"
-              aria-expanded="false" aria-controls="citySuggestions">
-            <div id="citySuggestions" class="city-suggestions" role="listbox" hidden></div>
-            <input type="hidden" name="city_id" id="citySelect">
+            <input type="search" name="city" id="formCity" placeholder="Начните вводить город" autocomplete="off" required />
+            <div class="city-suggestions hidden" id="formCitySuggestions"></div>
           </div>
         </label>
-        <label>Цена, грн
-          <input name="price" type="number" min="0" required placeholder="450000">
+
+        <label>
+          Описание
+          <textarea name="description" rows="4" maxlength="2000" placeholder="Расскажите о предложении"></textarea>
         </label>
-        <label>Описание
-          <textarea name="description" rows="4" placeholder="Коротко опишите предложение"></textarea>
-        </label>
-        <fieldset id="photoFields" class="photo-fields">
-          <legend id="photoLabel">Фотографии</legend>
-          <button id="photoPickerButton" class="btn" type="button">Добавить фотографии</button>
-          <input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp" multiple hidden aria-labelledby="photoLabel" aria-describedby="photoHint photoMessage">
-          <p id="photoHint" class="muted">До 10 фото: JPEG, PNG или WebP, до 10 МБ каждое. Первое фото — главное.</p>
-          <p id="photoMessage" class="form-message" role="status" aria-live="polite"></p>
-          <div id="photoPreview" class="photo-preview"></div>
+
+        <fieldset class="photo-fields" id="photoFields">
+          <legend>Фотографии</legend>
+          <input type="file" id="photoInput" accept="image/*" multiple />
+          <p class="muted">До 8 фото. Первое станет главным.</p>
+          <div class="photo-preview" id="photoPreview"></div>
         </fieldset>
-        <button class="btn btn-primary full" type="submit">Опубликовать</button>
-        <p id="formMessage" class="form-message"></p>
+
+        <button type="submit" class="btn btn-primary full">Опубликовать</button>
+        <p class="form-message" id="formMessage"></p>
       </form>
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="app.js"></script>
 </body>
 </html>

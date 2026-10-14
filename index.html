@@ -1,287 +1,245 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Объявления — купить и продать</title>
-  <meta name="description" content="Доска объявлений: автомобили, недвижимость, готовый бизнес, инвестиции." />
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#d4ff00">
+  <title>Hryvnia Hub — оголошення</title>
+  <meta name="description" content="Автомобілі, нерухомість, готовий бізнес та інвестиції — в одному місці.">
+  <style>
+    :root {
+      --bg: #f7f8fa;
+      --card: #fff;
+      --text: #17191c;
+      --muted: #6f7782;
+      --line: #e4e7ec;
+      --accent: #d4ff00;
+      --accent-border: #a8e000;
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    img { max-width: 100%; display: block; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    .container { width: min(1120px, calc(100% - 28px)); margin: 0 auto; }
+    .header {
+      position: sticky; top: 0; z-index: 10; background: rgba(255,255,255,.96);
+      border-bottom: 1px solid var(--line); backdrop-filter: blur(10px);
+    }
+    .nav { min-height: 64px; display: flex; align-items: center; gap: 12px; }
+    .brand { display: flex; align-items: center; gap: 10px; color: var(--text); text-decoration: none; font-weight: 850; font-size: 18px; }
+    .logo-mark {
+      width: 38px; height: 38px; display: grid; place-items: center; border-radius: 12px;
+      background: var(--accent); border: 2px solid var(--accent-border); font-size: 21px; font-weight: 900;
+    }
+    .nav-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+    .lang, .menu-btn {
+      min-height: 42px; border: 2px solid var(--accent-border); border-radius: 11px;
+      background: #eaffb0; padding: 0 12px; font-weight: 750; color: var(--text);
+    }
+    .menu-btn { width: 44px; padding: 0; background: var(--accent); font-size: 20px; }
+    .ticker { padding: 10px 12px; margin: 10px auto 12px; display: flex; gap: 18px; overflow-x: auto;
+      background: var(--card); border: 2px solid var(--accent-border); border-radius: 13px; white-space: nowrap; }
+    .ticker span { font-size: 13px; color: var(--muted); }
+    .ticker b { color: var(--text); }
+    .hero {
+      min-height: 190px; border-radius: 20px; overflow: hidden; padding: 24px;
+      display: flex; align-items: flex-end; color: #fff;
+      background: linear-gradient(115deg, rgba(15,20,28,.88), rgba(15,20,28,.38)),
+                  radial-gradient(ellipse at 80% 20%, #78a4c8, #203a5c);
+    }
+    .hero h1 { max-width: 650px; margin: 0 0 9px; font-size: clamp(28px, 5vw, 44px); line-height: 1.05; letter-spacing: -.035em; }
+    .hero p { max-width: 560px; margin: 0; color: rgba(255,255,255,.9); line-height: 1.5; }
+    .section { margin-top: 22px; }
+    .eyebrow { margin: 0 0 6px; color: #718000; font-size: 11px; font-weight: 850; letter-spacing: .12em; }
+    h2 { margin: 0 0 13px; font-size: 23px; letter-spacing: -.02em; }
+    .categories { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+    .category {
+      min-height: 118px; padding: 14px; border: 0; border-radius: var(--radius); color: white;
+      display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 6px;
+      text-align: left; box-shadow: 0 3px 10px #14161a12;
+    }
+    .category strong { font-size: 18px; line-height: 1.2; }
+    .category small { font-size: 12px; color: #ffffffdb; line-height: 1.35; }
+    .category.active { outline: 3px solid var(--accent-border); outline-offset: 1px; }
+    .all { background: linear-gradient(135deg,#2c5364,#203a43); }
+    .cars { background: linear-gradient(135deg,#1c3a52,#2f6f8b); }
+    .homes { background: linear-gradient(135deg,#1c3b2d,#4a8a5f); }
+    .business { background: linear-gradient(135deg,#2a2c3d,#4d4a72); }
+    .invest { background: linear-gradient(135deg,#4b3900,#c29312); }
+    .search-panel, .ai-panel {
+      background: var(--card); border: 2px solid var(--accent-border); border-radius: var(--radius);
+      padding: 14px; box-shadow: 0 2px 8px #14161a0b;
+    }
+    .search-row { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 8px; }
+    input, select {
+      width: 100%; min-width: 0; border: 2px solid #c8e070; border-radius: 10px; padding: 12px;
+      background: white; color: var(--text); outline: none;
+    }
+    input:focus, select:focus { border-color: var(--accent-border); box-shadow: 0 0 0 3px #d4ff004d; }
+    .btn { border: 0; border-radius: 10px; padding: 12px 16px; font-weight: 800; background: var(--accent); color: #17190c; }
+    .filters { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin-top: 9px; }
+    .ai-panel { margin-top: 12px; background: linear-gradient(135deg,#fbffea,#fff); display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+    .ai-panel h3 { margin: 5px 0; color: #556300; font-size: 19px; }
+    .ai-panel p { margin: 0 0 10px; color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .ai-icon { font-size: 46px; }
+    .soon { opacity: .8; cursor: not-allowed; }
+    .section-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; margin-bottom: 12px; }
+    .muted { color: var(--muted); font-size: 13px; }
+    .listing { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
+    .empty { grid-column: 1/-1; padding: 28px 18px; text-align: center; background: white; border: 1px dashed var(--line); border-radius: var(--radius); color: var(--muted); }
+    .card { padding: 15px; background: white; border: 1px solid var(--line); border-radius: var(--radius); }
+    .card .badge { display: inline-block; padding: 5px 9px; border-radius: 999px; background: #f3ffcc; color: #556000; font-size: 11px; font-weight: 800; }
+    .card h3 { margin: 12px 0 6px; font-size: 17px; }
+    .card p { margin: 0 0 7px; }
+    .price { font-weight: 850; font-size: 20px; }
+    .footer { margin-top: 26px; padding: 22px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+    .drawer-backdrop { display: none; position: fixed; inset: 0; z-index: 20; background: #0008; }
+    .drawer { position: fixed; z-index: 21; top: 0; right: 0; height: 100dvh; width: min(320px,86vw); padding: 18px; background: white; transform: translateX(105%); transition: transform .22s ease; box-shadow: -10px 0 30px #0002; }
+    .drawer.open { transform: translateX(0); }
+    .drawer-backdrop.open { display: block; }
+    .drawer-head { display: flex; align-items: center; justify-content: space-between; font-weight: 800; margin-bottom: 16px; }
+    .drawer a { display: block; padding: 12px; margin: 4px 0; border-radius: 10px; color: var(--text); text-decoration: none; font-weight: 650; }
+    .drawer a:hover { background: #f3f4f7; }
+    @media (max-width: 800px) {
+      .categories { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+      .category { min-height: 108px; padding: 12px; }
+      .listing { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .hero { min-height: 160px; padding: 20px; }
+    }
+    @media (max-width: 520px) {
+      .container { width: calc(100% - 22px); }
+      .brand { font-size: 16px; gap: 7px; }
+      .logo-mark { width: 34px; height: 34px; }
+      .lang { padding: 0 9px; font-size: 12px; }
+      .nav { min-height: 58px; }
+      .ticker { gap: 14px; padding: 9px; }
+      .ticker span { font-size: 12px; }
+      .hero { min-height: 145px; padding: 17px; }
+      .hero h1 { font-size: 29px; }
+      .hero p { font-size: 12px; }
+      .section { margin-top: 18px; }
+      .category strong { font-size: 16px; }
+      .category small { font-size: 11px; }
+      .search-row { grid-template-columns: minmax(0,1fr) auto; gap: 6px; }
+      .search-row input { padding: 11px 9px; font-size: 13px; }
+      .search-row .btn { padding: 11px 12px; }
+      .filters { grid-template-columns: 1fr; }
+      .ai-panel { padding: 13px; }
+      .ai-icon { font-size: 38px; }
+      .section-head { align-items: flex-start; flex-direction: column; }
+      .section-head .btn { width: 100%; }
+      .listing { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-
-  <!-- ==== HEADER ==== -->
   <header class="header">
     <div class="container">
-      <nav class="nav">
-        <a class="brand" href="#">
-          <img class="logo" src="logo.svg" alt="" width="36" height="36" />
-          <span class="brand-text">Obmen</span>
+      <nav class="nav" aria-label="Головна навігація">
+        <a class="brand" href="#" aria-label="Hryvnia Hub — головна">
+          <span class="logo-mark">₴</span><span>Hryvnia Hub</span>
         </a>
-
-        <div class="header-actions">
-          <button type="button" class="header-action all-btn active" data-filter="all">Все</button>
-          <button type="button" class="header-action" data-filter="Автомобили">Авто</button>
-          <button type="button" class="header-action" data-filter="Недвижимость">Недвижимость</button>
-
-          <!-- Язык + часы -->
-          <div class="lang-btn" id="langBtn">
-            <button type="button" class="lang-trigger" id="langTrigger" aria-haspopup="listbox" aria-expanded="false">
-              <span class="lang-flag" id="langFlag"><i class="flag-ru"></i></span>
-              <span class="lang-city" id="langCity">Киев</span>
-              <span class="lang-clock" id="langClock">00:00</span>
-            </button>
-
-            <div class="lang-dropdown hidden" id="langDropdown" role="listbox">
-              <button type="button" class="lang-option" data-lang="ru" data-city="Киев">
-                <span class="flag"><i class="flag-ru"></i></span> Русский
-              </button>
-              <button type="button" class="lang-option" data-lang="en" data-city="London">
-                <span class="flag">🇬🇧</span> English
-              </button>
-              <button type="button" class="lang-option" data-lang="de" data-city="Berlin">
-                <span class="flag">🇩🇪</span> Deutsch
-              </button>
-            </div>
-          </div>
-
-          <!-- Кнопка меню -->
-          <input type="checkbox" id="menuToggle" class="menu-toggle" />
-          <label for="menuToggle" class="settings-btn" aria-label="Меню">☰</label>
+        <div class="nav-actions">
+          <button class="lang" id="languageButton" type="button" aria-label="Змінити мову">🇺🇦 Українська</button>
+          <button class="menu-btn" id="menuButton" type="button" aria-label="Відкрити меню" aria-expanded="false">☰</button>
         </div>
       </nav>
     </div>
-
-    <!-- Полоса курсов -->
-    <div class="container market-bar">
-      <div class="market-ticker">
-        <div class="ticker-scroll">
-          <span class="ticker-item"><span class="ticker-label">USD</span><span class="ticker-value">41.20</span></span>
-          <span class="ticker-item"><span class="ticker-label">EUR</span><span class="ticker-value">44.85</span></span>
-          <span class="ticker-item"><span class="ticker-label">BTC</span><span class="ticker-value">63 400</span></span>
-          <span class="ticker-item"><span class="ticker-label">GOLD</span><span class="ticker-value">2 380</span></span>
-          <span class="ticker-item"><span class="ticker-label">OIL</span><span class="ticker-value">78.40</span></span>
-        </div>
-        <span class="ticker-note">Обновлено сейчас</span>
-      </div>
-    </div>
   </header>
-
-  <!-- ==== MOBILE MENU ==== -->
-  <label for="menuToggle" class="mobile-menu-overlay" aria-hidden="true"></label>
-  <aside class="mobile-menu">
-    <div class="mobile-menu-header">
-      <span>Меню</span>
-      <label for="menuToggle" class="icon-btn" aria-label="Закрыть">✕</label>
-    </div>
-    <ul class="mobile-menu-list">
-      <li><a href="#">Главная</a></li>
-      <li><a href="#listing">Объявления</a></li>
-      <li><a href="#">Избранное</a></li>
-      <li><a href="#">Мои объявления</a></li>
-      <li><a href="#">Помощь</a></li>
-    </ul>
+  <div class="container ticker" aria-label="Ринкові показники">
+    <span><b>USD</b> 41.20</span><span><b>EUR</b> 44.85</span><span><b>BTC</b> 63 400</span><span><b>GOLD</b> 2 380</span>
+  </div>
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="drawer" id="drawer" aria-label="Меню">
+    <div class="drawer-head"><span>Меню</span><button class="lang" id="closeMenu" type="button">✕</button></div>
+    <a href="#" data-close>Головна</a><a href="#listing" data-close>Оголошення</a><a href="#categories" data-close>Категорії</a><a href="#search" data-close>Пошук</a>
   </aside>
-
-  <main>
-    <!-- ==== CATEGORIES ==== -->
-    <section class="container categories-section">
-      <div class="categories-grid">
-        <button type="button" class="category-card" data-category="Автомобили">
-          <img class="category-card-img" src="cat-auto.jpg" alt="" loading="lazy" />
-          <span class="category-card-label">Автомобили</span>
-        </button>
-        <button type="button" class="category-card" data-category="Недвижимость">
-          <img class="category-card-img" src="cat-realty.jpg" alt="" loading="lazy" />
-          <span class="category-card-label">Недвижимость</span>
-        </button>
-        <button type="button" class="category-card" data-category="Готовый бизнес">
-          <img class="category-card-img" src="cat-business.jpg" alt="" loading="lazy" />
-          <span class="category-card-label">Готовый бизнес</span>
-        </button>
-        <button type="button" class="category-card" data-category="Инвестиции">
-          <img class="category-card-img" src="cat-invest.jpg" alt="" loading="lazy" />
-          <span class="category-card-label">Инвестиции</span>
-        </button>
+  <main class="container">
+    <section class="hero">
+      <div><h1>Знайди вигідну<br>пропозицію</h1><p>Автомобілі, нерухомість і готовий бізнес — в одному місці.</p></div>
+    </section>
+    <section class="section" id="categories">
+      <p class="eyebrow">КАТЕГОРІЇ</p><h2>Що шукаємо?</h2>
+      <div class="categories" id="categoryGrid">
+        <button type="button" class="category all active" data-category=""><strong>🎯 Усі</strong><small>Усі оголошення</small></button>
+        <button type="button" class="category cars" data-category="Автомобілі"><strong>🚗 Автомобілі</strong><small>Легкові та інші</small></button>
+        <button type="button" class="category homes" data-category="Нерухомість"><strong>🏠 Нерухомість</strong><small>Квартири, будинки, земля</small></button>
+        <button type="button" class="category business" data-category="Готовий бізнес"><strong>💼 Готовий бізнес</strong><small>Готовий бізнес і проєкти</small></button>
+        <button type="button" class="category invest" data-category="Інвестиції"><strong>📈 Інвестиції</strong><small>Інвестиційні можливості</small></button>
       </div>
     </section>
-
-    <!-- ==== HERO / BANNER ==== -->
-    <section class="container hero">
-      <div class="main-banner">
-        <img class="main-banner-img" src="banner.jpg" alt="" />
-        <div class="banner-content">
-          <h1 class="banner-title">Покупайте и продавайте выгодно</h1>
-          <p class="hero-text">Тысячи актуальных объявлений рядом с вами — без посредников и лишних звонков.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==== SEARCH + AI ==== -->
-    <section class="container search-ai-section">
+    <section class="section" id="search">
       <div class="search-panel">
-        <div class="search-input-row">
-          <input type="search" id="searchQuery" placeholder="Что ищете?" />
-          <button type="button" class="btn btn-primary" id="searchBtn">Найти</button>
-        </div>
-        <div class="search-filters-row">
-          <div class="city-search">
-            <input type="search" id="cityInput" placeholder="Город" autocomplete="off" />
-            <div class="city-suggestions hidden" id="citySuggestions"></div>
-          </div>
-          <select id="filterCategory">
-            <option value="">Категория</option>
-            <option>Автомобили</option>
-            <option>Недвижимость</option>
-            <option>Готовый бизнес</option>
-            <option>Инвестиции</option>
-          </select>
-          <select id="filterPrice">
-            <option value="">Цена</option>
-            <option value="0-10000">до 10 000</option>
-            <option value="10000-50000">10 000 – 50 000</option>
-            <option value="50000-">от 50 000</option>
-          </select>
-          <select id="filterSort">
-            <option value="new">Сначала новые</option>
-            <option value="cheap">Сначала дешёвые</option>
-            <option value="expensive">Сначала дорогие</option>
-          </select>
-        </div>
+        <div class="search-row"><input id="searchInput" type="search" placeholder="Що шукаєте? Наприклад: Skoda Octavia" aria-label="Пошук оголошень"><button class="btn" id="searchButton" type="button">Знайти</button></div>
+        <div class="filters"><input id="cityInput" type="search" placeholder="Назва міста" aria-label="Місто"><select id="regionSelect" aria-label="Область"><option value="">Усі області</option><option>Сумська область</option><option>Київська область</option><option>Львівська область</option><option>Дніпропетровська область</option><option>Одеська область</option></select></div>
       </div>
-
-      <div class="ai-panel">
-        <div class="ai-text">
-          <span class="ai-badge">AI</span>
-          <h3>Умный подбор</h3>
-          <p class="ai-subtitle">Опишите, что вам нужно — AI найдёт лучшее предложение.</p>
-          <ul class="ai-features">
-            <li>Анализ тысяч объявлений</li>
-            <li>Оценка рыночной цены</li>
-            <li>Скоро</li>
-          </ul>
-          <button type="button" class="btn-ai" disabled>Скоро</button>
-        </div>
-        <div class="ai-visual">🤖</div>
-      </div>
+      <div class="ai-panel"><div><p class="eyebrow">AI-ПОМІЧНИК</p><h3>Розумний підбір</h3><p>Опишіть, що вам потрібно — AI допоможе знайти найкращу пропозицію.</p><button class="btn soon" type="button" disabled>Незабаром</button></div><div class="ai-icon" aria-hidden="true">🤖</div></div>
     </section>
-
-    <!-- ==== URGENT DEALS ==== -->
-    <section class="container urgent-deals">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">Срочно</p>
-          <h2>Горячие предложения</h2>
-        </div>
-        <span class="badge-soft">Обновляется каждый час</span>
-      </div>
-      <div class="urgent-deals-grid">
-        <article class="card">
-          <div class="card-top">
-            <span class="badge">Авто</span>
-            <span class="city">Киев</span>
-          </div>
-          <h3>Audi Q5, 2019</h3>
-          <p class="price">$28 500</p>
-          <p class="desc">Один владелец, полный пакет, без ДТП.</p>
-        </article>
-        <article class="card">
-          <div class="card-top">
-            <span class="badge">Недвижимость</span>
-            <span class="city">Львов</span>
-          </div>
-          <h3>2-к квартира, 78 м²</h3>
-          <p class="price">$92 000</p>
-          <p class="desc">Новостройка, панорамные окна, паркинг.</p>
-        </article>
-        <article class="card">
-          <div class="card-top">
-            <span class="badge">Бизнес</span>
-            <span class="city">Одесса</span>
-          </div>
-          <h3>Кофейня у моря</h3>
-          <p class="price">$45 000</p>
-          <p class="desc">Окупаемость 18 мес., аренда 3 года.</p>
-        </article>
-      </div>
-    </section>
-
-    <!-- ==== LISTING ==== -->
-    <section class="container listing-section" id="listing">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">Все объявления</p>
-          <h2>Свежие предложения</h2>
-          <p class="muted" id="listingCount">Найдено: 0</p>
-        </div>
-        <button type="button" class="btn btn-dark" id="openCreate">+ Разместить</button>
-      </div>
-
-      <div class="listing" id="listingGrid">
-        <!-- Карточки рендерит app.js -->
-      </div>
+    <section class="section" id="listing">
+      <div class="section-head"><div><p class="eyebrow">ОГОЛОШЕННЯ</p><h2 id="listingTitle">Останні оголошення</h2><p class="muted" id="resultCount">Демонстраційний режим</p></div><button class="btn" id="addButton" type="button">+ Додати оголошення</button></div>
+      <div class="listing" id="listingGrid"><div class="empty">Це автономна демонстраційна сторінка. Вона не підключена до бази оголошень. Основний сайт і його дані не змінюються.</div></div>
     </section>
   </main>
+  <footer class="footer"><div class="container">© <span id="year"></span> Hryvnia Hub</div></footer>
+  <script>
+    (() => {
+      const drawer = document.getElementById('drawer');
+      const backdrop = document.getElementById('drawerBackdrop');
+      const menuButton = document.getElementById('menuButton');
+      const closeMenu = document.getElementById('closeMenu');
+      function setMenu(open) {
+        drawer.classList.toggle('open', open);
+        backdrop.classList.toggle('open', open);
+        menuButton.setAttribute('aria-expanded', String(open));
+      }
+      menuButton.addEventListener('click', () => setMenu(!drawer.classList.contains('open')));
+      closeMenu.addEventListener('click', () => setMenu(false));
+      backdrop.addEventListener('click', () => setMenu(false));
+      drawer.querySelectorAll('[data-close]').forEach(link => link.addEventListener('click', () => setMenu(false)));
+      document.getElementById('year').textContent = new Date().getFullYear();
 
-  <footer class="footer">
-    <div class="container">
-      © <span id="year"></span> Obmen. Все права защищены.
-    </div>
-  </footer>
-
-  <!-- ==== MODAL: CREATE LISTING ==== -->
-  <div class="modal hidden" id="createModal" role="dialog" aria-modal="true" aria-labelledby="createTitle">
-    <div class="modal-card">
-      <button type="button" class="modal-close" id="closeModal" aria-label="Закрыть">×</button>
-      <h2 id="createTitle">Новое объявление</h2>
-
-      <form id="createForm" novalidate>
-        <label>
-          Заголовок
-          <input type="text" name="title" required maxlength="120" placeholder="Например: Audi Q5, 2019" />
-        </label>
-
-        <label>
-          Категория
-          <select name="category" required>
-            <option value="">— выберите —</option>
-            <option>Автомобили</option>
-            <option>Недвижимость</option>
-            <option>Готовый бизнес</option>
-            <option>Инвестиции</option>
-          </select>
-        </label>
-
-        <label>
-          Цена, $
-          <input type="number" name="price" min="0" step="1" required placeholder="0" />
-        </label>
-
-        <label>
-          Город
-          <div class="city-search">
-            <input type="search" name="city" id="formCity" placeholder="Начните вводить город" autocomplete="off" required />
-            <div class="city-suggestions hidden" id="formCitySuggestions"></div>
-          </div>
-        </label>
-
-        <label>
-          Описание
-          <textarea name="description" rows="4" maxlength="2000" placeholder="Расскажите о предложении"></textarea>
-        </label>
-
-        <fieldset class="photo-fields" id="photoFields">
-          <legend>Фотографии</legend>
-          <input type="file" id="photoInput" accept="image/*" multiple />
-          <p class="muted">До 8 фото. Первое станет главным.</p>
-          <div class="photo-preview" id="photoPreview"></div>
-        </fieldset>
-
-        <button type="submit" class="btn btn-primary full">Опубликовать</button>
-        <p class="form-message" id="formMessage"></p>
-      </form>
-    </div>
-  </div>
-
-  <script src="app.js"></script>
+      let activeCategory = '';
+      const categories = [...document.querySelectorAll('[data-category]')];
+      function filterDemo() {
+        const query = document.getElementById('searchInput').value.trim();
+        const city = document.getElementById('cityInput').value.trim();
+        const region = document.getElementById('regionSelect').value;
+        const grid = document.getElementById('listingGrid');
+        grid.innerHTML = '';
+        const message = document.createElement('div');
+        message.className = 'empty';
+        message.textContent = query || city || region || activeCategory
+          ? 'У демо-режимі немає підключених оголошень для цього пошуку. Дані основного сайту не змінюються.'
+          : 'Це автономна демонстраційна сторінка. Вона не підключена до бази оголошень. Основний сайт і його дані не змінюються.';
+        grid.appendChild(message);
+        document.getElementById('resultCount').textContent = 'Демонстраційний режим';
+        document.getElementById('listingTitle').textContent = activeCategory ? activeCategory : 'Останні оголошення';
+      }
+      categories.forEach(button => button.addEventListener('click', () => {
+        categories.forEach(item => item.classList.remove('active'));
+        button.classList.add('active');
+        activeCategory = button.dataset.category;
+        filterDemo();
+        document.getElementById('listing').scrollIntoView({behavior:'smooth',block:'start'});
+      }));
+      document.getElementById('searchButton').addEventListener('click', filterDemo);
+      document.getElementById('searchInput').addEventListener('keydown', e => { if (e.key === 'Enter') filterDemo(); });
+      document.getElementById('cityInput').addEventListener('keydown', e => { if (e.key === 'Enter') filterDemo(); });
+      document.getElementById('regionSelect').addEventListener('change', filterDemo);
+      document.getElementById('addButton').addEventListener('click', () => {
+        alert('Це демонстраційна сторінка без підключення до бази. Щоб опублікувати оголошення, відкрийте основний сайт.');
+      });
+      document.getElementById('languageButton').addEventListener('click', () => {
+        alert('Ця автономна версія зараз доступна українською мовою.');
+      });
+    })();
+  </script>
 </body>
 </html>

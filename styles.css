@@ -4,12 +4,12 @@
   --text: #17191c;
   --muted: #6f7782;
   --line: #e4e7ec;
-  --accent: #d4ff00;         /* насыщенный лайм (активные элементы) */
+  --accent: #d4ff00;
   --accent-hover: #c0e800;
   --accent-soft: #f3ffcc;
-  --accent-light: #eaffb0;   /* светло-лаймовая заливка верхних кнопок */
-  --accent-border: #a8e000;  /* яркий толстый контур */
-  --accent-input: #c8e070;   /* контур инпутов и селектов */
+  --accent-light: #eaffb0;
+  --accent-border: #a8e000;
+  --accent-input: #c8e070;
   --dark: #14161a;
   --radius: 14px;
   --radius-lg: 20px;
@@ -35,6 +35,9 @@ body {
 img { max-width: 100%; display: block; }
 button { font-family: inherit; }
 
+/* [hidden] всегда прячет — чтобы app.js с hidden=true/false работал поверх display */
+[hidden] { display: none !important; }
+
 .container { width: min(1180px, calc(100% - 32px)); margin: 0 auto; }
 
 .sr-only {
@@ -49,6 +52,8 @@ button { font-family: inherit; }
   backdrop-filter: saturate(160%) blur(10px);
   border-bottom: 1px solid var(--line);
 }
+.market-bar { margin-top: 8px; }
+
 .nav {
   min-height: 68px;
   display: flex;
@@ -94,7 +99,6 @@ button { font-family: inherit; }
 .header-action:active { transform: translateY(1px); }
 .header-action.all-btn.active { background: var(--accent); }
 
-/* Кнопка языка с часами */
 .lang-btn {
   position: relative;
   height: 44px;
@@ -129,7 +133,6 @@ button { font-family: inherit; }
   color: var(--text);
 }
 
-/* Нейтральный серый символ для русского (не флаг РФ) */
 .flag-ru {
   display: inline-block;
   width: 18px;
@@ -172,7 +175,6 @@ button { font-family: inherit; }
 .lang-option:hover { background: var(--accent-light); }
 .lang-option .flag { font-size: 16px; line-height: 1; }
 
-/* Кнопка настроек/меню */
 .settings-btn {
   flex: 0 0 auto;
   width: 44px;
@@ -219,6 +221,9 @@ body:has(.menu-toggle:checked) .mobile-menu-overlay { opacity: 1; pointer-events
   color: var(--text); text-decoration: none; font-weight: 600; font-size: 15px;
 }
 .mobile-menu-list a:hover { background: #f3f4f7; }
+
+/* ==== SECTION (заголовки категорий) ==== */
+.section { margin-bottom: 12px; }
 
 /* ==== CATEGORIES ==== */
 .categories-section { margin-top: 14px; }
@@ -267,8 +272,8 @@ body:has(.menu-toggle:checked) .mobile-menu-overlay { opacity: 1; pointer-events
 .hero { margin-top: 14px; }
 .main-banner {
   position: relative; border-radius: var(--radius-lg); overflow: hidden;
-  min-height: 150px;                 /* уменьшено ~на 25% от 200px */
-  padding: 22px 26px;                /* уменьшены вертикальные отступы */
+  min-height: 150px;
+  padding: 22px 26px;
   color: #fff;
   background:
     linear-gradient(135deg, rgba(15, 20, 28, 0.72), rgba(15, 20, 28, 0.35)),
@@ -290,7 +295,7 @@ body:has(.menu-toggle:checked) .mobile-menu-overlay { opacity: 1; pointer-events
     rgba(15, 20, 28, 0.75) 100%);
 }
 .banner-content { position: relative; z-index: 2; max-width: 620px; }
-.banner-title {
+.banner-title, .main-banner h1 {
   margin: 0 0 6px;
   font-size: clamp(20px, 3vw, 30px);
   font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; color: #fff;
@@ -339,7 +344,9 @@ body:has(.menu-toggle:checked) .mobile-menu-overlay { opacity: 1; pointer-events
 .search-input-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
 .search-input-row input { min-width: 0; }
 .search-filters-row {
-  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
 }
 .search-filters-row > * { min-width: 0; }
 
@@ -416,6 +423,7 @@ input:focus, select:focus, textarea:focus {
   font-size: 56px; line-height: 1; position: relative; z-index: 1;
   flex-shrink: 0; filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.15));
 }
+
 .urgent-deals { padding-top: 24px; }
 .urgent-deals-grid {
   display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px;
@@ -470,6 +478,7 @@ h2 { font-size: 22px; margin: 0; letter-spacing: -0.02em; }
   border-top: 1px solid var(--line);
   padding: 24px 0; color: var(--muted); font-size: 13px; margin-top: 24px;
 }
+
 .modal {
   position: fixed; inset: 0;
   background: rgba(8, 10, 14, 0.56);
@@ -539,9 +548,9 @@ h2 { font-size: 22px; margin: 0; letter-spacing: -0.02em; }
 }
 .icon-btn:hover { background: #f3f4f7; }
 
+/* ==== MEDIA ==== */
 @media (max-width: 1000px) {
   .search-ai-section { grid-template-columns: 1fr; }
-  .search-filters-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .listing { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .urgent-deals-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
@@ -565,18 +574,14 @@ h2 { font-size: 22px; margin: 0; letter-spacing: -0.02em; }
 
   .hero { margin-top: 6px; }
   .main-banner { min-height: 140px; padding: 18px 16px; }
-  .banner-title { font-size: 20px; }
+  .banner-title, .main-banner h1 { font-size: 20px; }
   .hero-text { font-size: 13px; }
 
   .market-ticker { padding: 8px 10px; margin-top: 10px; }
   .ticker-note { display: none; }
 
   .search-ai-section { margin-top: 10px; gap: 10px; }
-  .search-panel {
-    padding: 12px;
-    width: 58%;
-    justify-self: start;
-  }
+  .search-panel { padding: 12px; }
   .search-input-row { grid-template-columns: 1fr; }
   .search-filters-row { grid-template-columns: 1fr; }
 
@@ -599,7 +604,24 @@ h2 { font-size: 22px; margin: 0; letter-spacing: -0.02em; }
 }
 
 @media (max-width: 380px) {
-  .search-panel { width: 100%; }
   .search-filters-row { grid-template-columns: 1fr; }
   .category-card-label { font-size: 16px; }
 }
+
+/* ==== ДОПОЛНЕНИЯ (только эти строки новые) ==== */
+.category-card {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 3px;
+}
+.category-card small {
+  position: relative; z-index: 2;
+  font-size: 11.5px; font-weight: 500;
+  opacity: 0.88;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+  line-height: 1.25;
+}
+/* Фолбэк мобильного меню для браузеров без :has() */
+body.menu-open .mobile-menu { transform: translateX(0); }
+body.menu-open .mobile-menu-overlay { opacity: 1; pointer-events: auto; }

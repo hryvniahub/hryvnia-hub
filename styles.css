@@ -625,3 +625,6 @@ h2 { font-size: 22px; margin: 0; letter-spacing: -0.02em; }
 /* Фолбэк мобильного меню для браузеров без :has() */
 body.menu-open .mobile-menu { transform: translateX(0); }
 body.menu-open .mobile-menu-overlay { opacity: 1; pointer-events: auto; }
+[hidden] {
+  display: none !important;
+}

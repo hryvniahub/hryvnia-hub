@@ -18,24 +18,52 @@
         <span class="brand-text">HRYVNIA HUB</span>
       </a>
 
-      <button class="btn btn-primary btn-add" id="openAdd" type="button">+ Добавить объявление</button>
+      <div class="header-actions">
+        <!-- Кнопка языка: флаг + город + электронное время -->
+        <div class="lang-btn" id="langBtn">
+          <button type="button" class="lang-trigger" id="langTrigger"
+                  aria-haspopup="menu" aria-expanded="false" aria-label="Language and time">
+            <span class="lang-flag" id="langFlag" aria-hidden="true">🇬🇧</span>
+            <span class="lang-city" id="langCity">London</span>
+            <span class="lang-clock" id="langClock">--:--</span>
+          </button>
+          <div class="lang-dropdown hidden" id="langDropdown" role="menu" aria-label="Language">
+            <button type="button" class="lang-option" data-lang-value="en" role="menuitem">
+              <span class="flag" aria-hidden="true">🇬🇧</span> English
+            </button>
+            <button type="button" class="lang-option" data-lang-value="uk" role="menuitem">
+              <span class="flag" aria-hidden="true">🇺🇦</span> Українська
+            </button>
+            <button type="button" class="lang-option" data-lang-value="pl" role="menuitem">
+              <span class="flag" aria-hidden="true">🇵🇱</span> Polski
+            </button>
+            <button type="button" class="lang-option" data-lang-value="ru" role="menuitem">
+              <span class="flag-ru" aria-hidden="true"></span> Русский
+            </button>
+          </div>
+          <select id="languageSwitcher" class="sr-only" tabindex="-1" aria-hidden="true">
+            <option value="ru">Русский</option>
+            <option value="uk">Українська</option>
+            <option value="en">English</option>
+            <option value="pl">Polski</option>
+          </select>
+        </div>
 
-      <div class="header-right">
-        <select id="languageSwitcher" class="language-switcher" aria-label="Language">
-          <option value="ru">🇷🇺 RU</option>
-          <option value="uk">🇺🇦 UK</option>
-          <option value="en">🇬🇧 EN</option>
-          <option value="pl">🇵🇱 PL</option>
-        </select>
-        <span class="header-time desktop-only" aria-hidden="true">15:42</span>
-        <button class="icon-btn desktop-only" type="button" aria-label="Favorites">♡</button>
-        <button class="icon-btn desktop-only" type="button" aria-label="Profile">👤</button>
-        <label for="menuToggle" class="icon-btn mobile-only menu-toggle-label" aria-label="Menu">☰</label>
+        <!-- Кнопка All (та же логика .category + data-category="") -->
+        <button class="category header-action all-btn active" data-category="" id="allBtn" type="button">
+          <span>Все</span>
+        </button>
+
+        <!-- Кнопка Add listing -->
+        <button class="header-action btn-add" id="openAdd" type="button">+ Добавить объявление</button>
       </div>
+
+      <!-- Кнопка настроек/меню справа, яркая лаймовая -->
+      <label for="menuToggle" class="settings-btn" aria-label="Settings">☰</label>
     </div>
   </header>
 
-  <!-- Мобильное боковое меню (открывается CSS-хуком) -->
+  <!-- Мобильное боковое меню -->
   <label for="menuToggle" class="mobile-menu-overlay" aria-hidden="true"></label>
   <nav class="mobile-menu" aria-label="Mobile menu">
     <div class="mobile-menu-header">
@@ -45,17 +73,11 @@
     <ul class="mobile-menu-list">
       <li><a href="#">♡ Favorites</a></li>
       <li><a href="#">👤 Profile</a></li>
-      <li><a href="#">🕒 London 15:42</a></li>
     </ul>
   </nav>
 
-  <!-- Категории: пилюля «Все» (нужна для app.js) + 4 карточки -->
+  <!-- Категории: только 4 карточки, кнопка All переехала в шапку -->
   <section class="categories-section container" aria-label="Categories">
-    <div class="categories-toolbar">
-      <button class="category category-pill active" data-category="" type="button">
-        <span>▦ Все</span>
-      </button>
-    </div>
     <div class="categories-grid">
       <button class="category category-card" data-category="Автомобили" type="button">
         <img class="category-card-img" src="assets/images/01_automobiles_no_text.png"
@@ -152,7 +174,7 @@
       </aside>
     </section>
 
-    <!-- Срочные предложения (заготовка, без фейковых данных) -->
+    <!-- Срочные предложения -->
     <section class="urgent-deals container" aria-label="Urgent deals">
       <div class="section-head">
         <div>
@@ -166,7 +188,7 @@
       </div>
     </section>
 
-    <!-- Список объявлений (без класса .section — важно для app.js) -->
+    <!-- Список объявлений -->
     <section class="listing-section container">
       <div class="section-head">
         <div>
@@ -185,7 +207,7 @@
     <div class="container">© 2026 Hryvnia Hub · MVP</div>
   </footer>
 
-  <!-- Модальное окно добавления объявления -->
+  <!-- Модальное окно добавления -->
   <div class="modal hidden" id="addModal">
     <div class="modal-card">
       <button class="modal-close" id="closeAdd" type="button">×</button>

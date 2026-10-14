@@ -135,27 +135,25 @@ body:has(.menu-toggle:checked) .mobile-menu-overlay { opacity: 1; pointer-events
   background: linear-gradient(135deg, #2c5364, #203a43);
 }
 .category-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
-.category-card::after {
-  content: ''; position: absolute; top: 12px; right: 14px;
-  font-size: 34px; line-height: 1; z-index: 2;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
-}
 .category-card::before {
   content: ''; position: absolute; inset: 0; z-index: 1;
   background: linear-gradient(180deg, rgba(0, 0, 0, 0) 35%, rgba(0, 0, 0, 0.72) 100%);
+}
+.category-card-img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
+  z-index: 0; display: block;
+  pointer-events: none;
 }
 .category-card-label {
   position: relative; z-index: 2; font-weight: 800; font-size: 17px;
   line-height: 1.15; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
 }
 .category-card[data-category="Автомобили"] { background: linear-gradient(135deg, #1c3a52, #2f6f8b); }
-.category-card[data-category="Автомобили"]::after { content: '🚗'; }
 .category-card[data-category="Недвижимость"] { background: linear-gradient(135deg, #1c3b2d, #4a8a5f); }
-.category-card[data-category="Недвижимость"]::after { content: '🏠'; }
 .category-card[data-category="Готовый бизнес"] { background: linear-gradient(135deg, #2a2c3d, #4d4a72); }
-.category-card[data-category="Готовый бизнес"]::after { content: '💼'; }
 .category-card[data-category="Инвестиции"] { background: linear-gradient(135deg, #4b3900, #c29312); }
-.category-card[data-category="Инвестиции"]::after { content: '📈'; }
 .category-card.active {
   box-shadow: 0 0 0 3px var(--accent), 0 8px 24px rgba(20, 22, 26, 0.15);
 }
@@ -170,6 +168,21 @@ body:has(.menu-toggle:checked) .mobile-menu-overlay { opacity: 1; pointer-events
     radial-gradient(ellipse at 70% 40%, #6f9ecb 0%, #41648f 60%, #223a5c 100%);
   background-size: cover; background-position: center;
   display: flex; align-items: flex-end;
+}
+.main-banner-img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
+  z-index: 0; display: block;
+}
+.main-banner::before {
+  content: ''; position: absolute; inset: 0;
+  z-index: 1; pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(15, 20, 28, 0.20) 0%,
+    rgba(15, 20, 28, 0.75) 100%
+  );
 }
 .banner-content { position: relative; z-index: 2; max-width: 620px; }
 .banner-title {
@@ -447,7 +460,6 @@ h2 { font-size: 22px; margin: 0; letter-spacing: -0.02em; }
 
   .categories-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .category-card { min-height: 110px; padding: 12px; }
-  .category-card::after { font-size: 28px; top: 10px; right: 10px; }
   .category-card-label { font-size: 15px; }
 
   .main-banner { padding: 22px 18px; min-height: 170px; }

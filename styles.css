@@ -559,11 +559,11 @@ h2 { font-size: 22px; margin: 0; letter-spacing: -0.02em; }
   .settings-btn { width: 42px; height: 42px; font-size: 18px; border-width: 2.5px; }
 
   .categories-section { margin-top: 12px; }
-  .categories-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .categories-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
   .category-card { min-height: 120px; padding: 12px; }
   .category-card-label { font-size: 18px; }
 
-  .hero { margin-top: 12px; }
+  .hero { margin-top: 6px; }
   .main-banner { min-height: 140px; padding: 18px 16px; }
   .banner-title { font-size: 20px; }
   .hero-text { font-size: 13px; }
@@ -572,7 +572,11 @@ h2 { font-size: 22px; margin: 0; letter-spacing: -0.02em; }
   .ticker-note { display: none; }
 
   .search-ai-section { margin-top: 10px; gap: 10px; }
-  .search-panel { padding: 12px; }
+  .search-panel {
+    padding: 12px;
+    width: 58%;
+    justify-self: start;
+  }
   .search-input-row { grid-template-columns: 1fr; }
   .search-filters-row { grid-template-columns: 1fr; }
 
@@ -595,6 +599,7 @@ h2 { font-size: 22px; margin: 0; letter-spacing: -0.02em; }
 }
 
 @media (max-width: 380px) {
+  .search-panel { width: 100%; }
   .search-filters-row { grid-template-columns: 1fr; }
   .category-card-label { font-size: 16px; }
 }

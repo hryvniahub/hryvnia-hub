@@ -18,6 +18,43 @@ const db = hasSupabaseConfig
 // ===============================
 let lang = localStorage.getItem("hryvniaHubLanguage") || "uk";
 
+// Часовые пояса и символы для кнопки языка в шапке
+const TIME_ZONES = {
+  en: { city: "London",   tz: "Europe/London"  },
+  uk: { city: "Київ",     tz: "Europe/Kyiv"    },
+  pl: { city: "Warszawa", tz: "Europe/Warsaw"  },
+  ru: { city: "Київ",     tz: "Europe/Kyiv"    }
+};
+const LANG_FLAGS = { en: "🇬🇧", uk: "🇺🇦", pl: "🇵🇱" };
+
+function updateLangButton() {
+  const flagEl = document.getElementById("langFlag");
+  const cityEl = document.getElementById("langCity");
+  const meta = TIME_ZONES[lang] || TIME_ZONES.uk;
+  if (flagEl) {
+    if (lang === "ru") {
+      flagEl.innerHTML = '<span class="flag-ru" aria-hidden="true"></span>';
+    } else {
+      flagEl.textContent = LANG_FLAGS[lang] || "";
+    }
+  }
+  if (cityEl) cityEl.textContent = meta.city;
+  updateClock();
+}
+
+function updateClock() {
+  const clockEl = document.getElementById("langClock");
+  if (!clockEl) return;
+  const meta = TIME_ZONES[lang] || TIME_ZONES.uk;
+  try {
+    clockEl.textContent = new Intl.DateTimeFormat("uk-UA", {
+      hour: "2-digit", minute: "2-digit", hour12: false, timeZone: meta.tz
+    }).format(new Date());
+  } catch {
+    clockEl.textContent = "--:--";
+  }
+}
+
 const translations = {
   "Русский": { ru: "Русский", uk: "Українська", en: "English", pl: "Polski" },
   "Українська": { ru: "Російська", uk: "Українська", en: "English", pl: "Polski" },
@@ -496,6 +533,10 @@ async function loadListings() {
   }
 
   renderListings(data || []);
+}
+
+async function loadCities() {
+  if (!db) return;
 
   if (!window.hryvniaCitiesLoaded) {
     const allCities = [];
@@ -977,6 +1018,7 @@ function translatePage(selectedLanguage) {
   lang = selectedLanguage;
   document.documentElement.lang = lang;
   localStorage.setItem("hryvniaHubLanguage", lang);
+  updateLangButton();
 
   document.querySelectorAll("[data-i18n]").forEach(el => {
     translateTextElement(el, el.dataset.i18n);
@@ -1103,10 +1145,10 @@ function translatePage(selectedLanguage) {
 
   const languageSwitcher = document.getElementById("languageSwitcher");
   if (languageSwitcher) {
-    if (languageSwitcher.options[0]) languageSwitcher.options[0].textContent = "🇷🇺 Русский";
-    if (languageSwitcher.options[1]) languageSwitcher.options[1].textContent = "🇺🇦 Українська";
-    if (languageSwitcher.options[2]) languageSwitcher.options[2].textContent = "🇬🇧 English";
-    if (languageSwitcher.options[3]) languageSwitcher.options[3].textContent = "🇵🇱 Polski";
+    if (languageSwitcher.options[0]) languageSwitcher.options[0].textContent = "Русский";
+    if (languageSwitcher.options[1]) languageSwitcher.options[1].textContent = "Українська";
+    if (languageSwitcher.options[2]) languageSwitcher.options[2].textContent = "English";
+    if (languageSwitcher.options[3]) languageSwitcher.options[3].textContent = "Polski";
   }
 
   renderListings(visibleListings);
@@ -1127,6 +1169,52 @@ if (languageSwitcher) {
   translatePage(lang);
 }
 
+// === Кнопка языка: кастомный дропдаун + часы (IANA time zones) ===
+const langTrigger = document.getElementById("langTrigger");
+const langDropdown = document.getElementById("langDropdown");
+
+function closeLangDropdown() {
+  if (!langDropdown) return;
+  langDropdown.classList.add("hidden");
+  langTrigger?.setAttribute("aria-expanded", "false");
+}
+
+if (langTrigger && langDropdown) {
+  langTrigger.addEventListener("click", event => {
+    event.stopPropagation();
+    if (langDropdown.classList.contains("hidden")) {
+      langDropdown.classList.remove("hidden");
+      langTrigger.setAttribute("aria-expanded", "true");
+    } else {
+      closeLangDropdown();
+    }
+  });
+
+  langDropdown.addEventListener("click", event => {
+    const btn = event.target.closest("[data-lang-value]");
+    if (!btn) return;
+    const value = btn.dataset.langValue;
+    if (languageSwitcher) languageSwitcher.value = value;
+    translatePage(value);
+    closeLangDropdown();
+  });
+
+  document.addEventListener("click", event => {
+    if (langDropdown.classList.contains("hidden")) return;
+    if (langTrigger.contains(event.target)) return;
+    if (langDropdown.contains(event.target)) return;
+    closeLangDropdown();
+  });
+
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape") closeLangDropdown();
+  });
+}
+
+setInterval(updateClock, 30000);
+updateClock();
+
 loadListings();
+loadCities();
 
 // === КОНЕЦ ФАЙЛА ===

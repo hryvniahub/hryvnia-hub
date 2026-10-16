@@ -178,7 +178,36 @@ const translations = {
     uk: "Інвестиційні можливості",
     en: "Investment opportunities",
     pl: "Możliwości inwestycyjne"
-  }
+  },
+
+  "Аккаунт": { ru: "Аккаунт", uk: "Акаунт", en: "Account", pl: "Konto" },
+  "Настройки аккаунта": { ru: "Настройки аккаунта", uk: "Налаштування акаунта", en: "Account settings", pl: "Ustawienia konta" },
+  "Вход": { ru: "Вход", uk: "Вхід", en: "Sign in", pl: "Zaloguj się" },
+  "Регистрация": { ru: "Регистрация", uk: "Реєстрація", en: "Sign up", pl: "Zarejestruj się" },
+  "Выход": { ru: "Выход", uk: "Вихід", en: "Sign out", pl: "Wyloguj się" },
+  "Электронная почта": { ru: "Электронная почта", uk: "Електронна пошта", en: "Email", pl: "E-mail" },
+  "Пароль": { ru: "Пароль", uk: "Пароль", en: "Password", pl: "Hasło" },
+  "Новый пароль": { ru: "Новый пароль", uk: "Новий пароль", en: "New password", pl: "Nowe hasło" },
+  "Подтвердите пароль": { ru: "Подтвердите пароль", uk: "Підтвердіть пароль", en: "Confirm password", pl: "Potwierdź hasło" },
+  "Забыли пароль?": { ru: "Забыли пароль?", uk: "Забули пароль?", en: "Forgot password?", pl: "Nie pamiętasz hasła?" },
+  "Восстановление пароля": { ru: "Восстановление пароля", uk: "Відновлення пароля", en: "Password reset", pl: "Reset hasła" },
+  "Отправить ссылку для сброса": { ru: "Отправить ссылку для сброса", uk: "Надіслати посилання для скидання", en: "Send reset link", pl: "Wyślij link do resetu" },
+  "Сохранить пароль": { ru: "Сохранить пароль", uk: "Зберегти пароль", en: "Save password", pl: "Zapisz hasło" },
+  "Назад": { ru: "Назад", uk: "Назад", en: "Back", pl: "Wstecz" },
+  "Введите корректный email": { ru: "Введите корректный email", uk: "Введіть коректний email", en: "Enter a valid email", pl: "Podaj poprawny email" },
+  "Введите email": { ru: "Введите email", uk: "Введіть email", en: "Enter your email", pl: "Podaj email" },
+  "Пароли не совпадают": { ru: "Пароли не совпадают", uk: "Паролі не збігаються", en: "Passwords do not match", pl: "Hasła nie są takie same" },
+  "Пароль слишком короткий (минимум 6 символов)": { ru: "Пароль слишком короткий (минимум 6 символов)", uk: "Пароль занадто короткий (мінімум 6 символів)", en: "Password is too short (min 6 characters)", pl: "Hasło jest za krótkie (min. 6 znaków)" },
+  "Вход выполнен.": { ru: "Вход выполнен.", uk: "Вхід виконано.", en: "Signed in successfully.", pl: "Zalogowano pomyślnie." },
+  "Вы вышли из аккаунта.": { ru: "Вы вышли из аккаунта.", uk: "Ви вийшли з акаунта.", en: "Signed out.", pl: "Wylogowano." },
+  "Регистрация успешна. Проверьте почту для подтверждения.": { ru: "Регистрация успешна. Проверьте почту для подтверждения.", uk: "Реєстрація успішна. Перевірте пошту для підтвердження.", en: "Registration successful. Check your email to confirm.", pl: "Rejestracja zakończona. Sprawdź pocztę, aby potwierdzić." },
+  "Ссылка для сброса отправлена. Проверьте почту.": { ru: "Ссылка для сброса отправлена. Проверьте почту.", uk: "Посилання для скидання надіслано. Перевірте пошту.", en: "Reset link sent. Check your email.", pl: "Link do resetu wysłany. Sprawdź pocztę." },
+  "Пароль обновлён.": { ru: "Пароль обновлён.", uk: "Пароль оновлено.", en: "Password updated.", pl: "Hasło zaktualizowane." },
+  "Неверный email или пароль": { ru: "Неверный email или пароль", uk: "Невірний email або пароль", en: "Invalid email or password", pl: "Nieprawidłowy email lub hasło" },
+  "Подтвердите email": { ru: "Подтвердите email", uk: "Підтвердіть email", en: "Confirm your email", pl: "Potwierdź email" },
+  "Пользователь с таким email уже существует": { ru: "Пользователь с таким email уже существует", uk: "Користувач з таким email вже існує", en: "User with this email already exists", pl: "Użytkownik z tym e-mailem już istnieje" },
+  "Supabase не подключён": { ru: "Supabase не подключён", uk: "Supabase не підключено", en: "Supabase is not configured", pl: "Supabase nie jest skonfigurowany" },
+  "Вы вошли как:": { ru: "Вы вошли как:", uk: "Ви увійшли як:", en: "Signed in as:", pl: "Zalogowano jako:" }
 };
 
 // ===============================
@@ -202,6 +231,274 @@ let activeRegionCode = "";
 let formRegionCode = "";
 const addModal = document.getElementById("addModal");
 const formMessage = document.getElementById("formMessage");
+
+// ===============================
+// Авторизация Supabase
+// ===============================
+const accountBtn = document.getElementById("accountBtn");
+const accountLabel = document.getElementById("accountLabel");
+const authModal = document.getElementById("authModal");
+const authClose = document.getElementById("authClose");
+const authGuest = document.getElementById("authGuest");
+const authLoggedIn = document.getElementById("authLoggedIn");
+const authUserEmail = document.getElementById("authUserEmail");
+const authSignOut = document.getElementById("authSignOut");
+const authLoginForm = document.getElementById("authLoginForm");
+const authRegisterForm = document.getElementById("authRegisterForm");
+const authResetForm = document.getElementById("authResetForm");
+const authNewPasswordForm = document.getElementById("authNewPasswordForm");
+const authShowReset = document.getElementById("authShowReset");
+const authBackToLogin = document.getElementById("authBackToLogin");
+let currentUser = null;
+let authRecoveryMode = false;
+
+function authText(key) {
+  const item = translations[key];
+  return (item && item[lang]) || key;
+}
+
+function setAuthMessage(form, message, kind = "") {
+  const msg = form?.querySelector(".form-message");
+  if (!msg) return;
+  msg.textContent = message;
+  msg.classList.remove("error", "success");
+  if (kind) msg.classList.add(kind);
+}
+
+function mapAuthError(error) {
+  const raw = String(error?.message || "").toLowerCase();
+  if (raw.includes("invalid login") || raw.includes("invalid credentials")) return authText("Неверный email или пароль");
+  if (raw.includes("email not confirmed")) return authText("Подтвердите email");
+  if (raw.includes("already registered") || raw.includes("already exists") || raw.includes("user already")) return authText("Пользователь с таким email уже существует");
+  if (raw.includes("password should be") || raw.includes("password is too short") || raw.includes("weak password")) return authText("Пароль слишком короткий (минимум 6 символов)");
+  if (raw.includes("email") && (raw.includes("invalid") || raw.includes("valid"))) return authText("Введите корректный email");
+  return error?.message || "Error";
+}
+
+function showAuthView(view) {
+  const views = { login: authLoginForm, register: authRegisterForm, reset: authResetForm, newPassword: authNewPasswordForm };
+  Object.values(views).forEach(form => form?.classList.add("hidden"));
+  views[view]?.classList.remove("hidden");
+  document.querySelectorAll("[data-auth-tab]").forEach(button => {
+    const active = button.dataset.authTab === view;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-selected", String(active));
+  });
+  [authLoginForm, authRegisterForm, authResetForm, authNewPasswordForm].forEach(form => {
+    const msg = form?.querySelector(".form-message");
+    if (msg) { msg.textContent = ""; msg.classList.remove("error", "success"); }
+  });
+}
+
+function updateAccountButton() {
+  if (!accountLabel) return;
+  if (currentUser) {
+    const email = currentUser.email || "";
+    accountLabel.textContent = email.length > 16 ? email.slice(0, 14) + "…" : (email || authText("Аккаунт"));
+    accountBtn?.setAttribute("aria-label", authText("Аккаунт") + ": " + email);
+  } else {
+    accountLabel.textContent = authText("Аккаунт");
+    accountBtn?.setAttribute("aria-label", authText("Аккаунт"));
+  }
+}
+
+function renderAuthModal() {
+  if (!authModal) return;
+  if (currentUser) {
+    authGuest?.classList.add("hidden");
+    authLoggedIn?.classList.remove("hidden");
+    if (authUserEmail) authUserEmail.textContent = currentUser.email || "";
+  } else {
+    authGuest?.classList.remove("hidden");
+    authLoggedIn?.classList.add("hidden");
+    showAuthView(authRecoveryMode ? "newPassword" : "login");
+  }
+}
+
+function openAuthModal() {
+  renderAuthModal();
+  authModal?.classList.remove("hidden");
+  authClose?.focus();
+}
+
+function closeAuthModal() {
+  authModal?.classList.add("hidden");
+}
+
+function updateAuthTranslations() {
+  const setText = (selector, key) => {
+    const element = document.querySelector(selector);
+    if (element) element.textContent = authText(key);
+  };
+  setText("#accountLabel", "Аккаунт");
+  setText("#authEyebrow", "Аккаунт");
+  setText("#authTitle", "Настройки аккаунта");
+  setText('[data-auth-tab="login"]', "Вход");
+  setText('[data-auth-tab="register"]', "Регистрация");
+  setText("#authShowReset", "Забыли пароль?");
+  setText("#authBackToLogin", "Назад");
+  setText("#authLoginForm label:nth-of-type(1) span", "Электронная почта");
+  setText("#authLoginForm label:nth-of-type(2) span", "Пароль");
+  setText("#authRegisterForm label:nth-of-type(1) span", "Электронная почта");
+  setText("#authRegisterForm label:nth-of-type(2) span", "Пароль");
+  setText("#authRegisterForm label:nth-of-type(3) span", "Подтвердите пароль");
+  setText("#authResetForm h3", "Восстановление пароля");
+  setText("#authResetForm label span", "Электронная почта");
+  setText("#authNewPasswordForm h3", "Новый пароль");
+  setText("#authNewPasswordForm label:nth-of-type(1) span", "Новый пароль");
+  setText("#authNewPasswordForm label:nth-of-type(2) span", "Подтвердите пароль");
+  setText("#authLoggedIn .muted", "Вы вошли как:");
+  setText("#authSignOut", "Выход");
+  const submitLabels = [
+    ["#authLoginForm button[type='submit']", "Вход"],
+    ["#authRegisterForm button[type='submit']", "Регистрация"],
+    ["#authResetForm button[type='submit']", "Отправить ссылку для сброса"],
+    ["#authNewPasswordForm button[type='submit']", "Сохранить пароль"]
+  ];
+  submitLabels.forEach(([selector, key]) => setText(selector, key));
+  if (authClose) authClose.setAttribute("aria-label", lang === "en" ? "Close" : lang === "pl" ? "Zamknij" : lang === "uk" ? "Закрити" : "Закрыть");
+  updateAccountButton();
+}
+
+if (accountBtn) accountBtn.addEventListener("click", openAuthModal);
+if (authClose) authClose.addEventListener("click", closeAuthModal);
+if (authModal) authModal.addEventListener("click", event => {
+  if (event.target === authModal) closeAuthModal();
+});
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape" && authModal && !authModal.classList.contains("hidden")) closeAuthModal();
+});
+document.querySelectorAll("[data-auth-tab]").forEach(button => {
+  button.addEventListener("click", () => {
+    authRecoveryMode = false;
+    showAuthView(button.dataset.authTab);
+  });
+});
+authShowReset?.addEventListener("click", () => {
+  authRecoveryMode = false;
+  showAuthView("reset");
+});
+authBackToLogin?.addEventListener("click", () => {
+  authRecoveryMode = false;
+  showAuthView("login");
+});
+
+authLoginForm?.addEventListener("submit", async event => {
+  event.preventDefault();
+  const email = String(authLoginForm.elements.email.value || "").trim();
+  const password = String(authLoginForm.elements.password.value || "");
+  if (!email) return setAuthMessage(authLoginForm, authText("Введите email"), "error");
+  if (!db) return setAuthMessage(authLoginForm, authText("Supabase не подключён"), "error");
+  setAuthMessage(authLoginForm, "…");
+  try {
+    const { error } = await db.auth.signInWithPassword({ email, password });
+    if (error) return setAuthMessage(authLoginForm, mapAuthError(error), "error");
+    setAuthMessage(authLoginForm, authText("Вход выполнен."), "success");
+    setTimeout(() => { closeAuthModal(); authLoginForm.reset(); }, 500);
+  } catch (error) {
+    setAuthMessage(authLoginForm, mapAuthError(error), "error");
+  }
+});
+
+authRegisterForm?.addEventListener("submit", async event => {
+  event.preventDefault();
+  const email = String(authRegisterForm.elements.email.value || "").trim();
+  const password = String(authRegisterForm.elements.password.value || "");
+  const password2 = String(authRegisterForm.elements.password2.value || "");
+  if (!email || !/^\S+@\S+\.\S+$/.test(email)) return setAuthMessage(authRegisterForm, authText("Введите корректный email"), "error");
+  if (password.length < 6) return setAuthMessage(authRegisterForm, authText("Пароль слишком короткий (минимум 6 символов)"), "error");
+  if (password !== password2) return setAuthMessage(authRegisterForm, authText("Пароли не совпадают"), "error");
+  if (!db) return setAuthMessage(authRegisterForm, authText("Supabase не подключён"), "error");
+  setAuthMessage(authRegisterForm, "…");
+  try {
+    const emailRedirectTo = window.location.origin + window.location.pathname;
+    const { data: result, error } = await db.auth.signUp({ email, password, options: { emailRedirectTo } });
+    if (error) return setAuthMessage(authRegisterForm, mapAuthError(error), "error");
+    if (result?.session) {
+      setAuthMessage(authRegisterForm, authText("Вход выполнен."), "success");
+      setTimeout(() => { closeAuthModal(); authRegisterForm.reset(); }, 500);
+    } else {
+      setAuthMessage(authRegisterForm, authText("Регистрация успешна. Проверьте почту для подтверждения."), "success");
+    }
+  } catch (error) {
+    setAuthMessage(authRegisterForm, mapAuthError(error), "error");
+  }
+});
+
+authResetForm?.addEventListener("submit", async event => {
+  event.preventDefault();
+  const email = String(authResetForm.elements.email.value || "").trim();
+  if (!email || !/^\S+@\S+\.\S+$/.test(email)) return setAuthMessage(authResetForm, authText("Введите корректный email"), "error");
+  if (!db) return setAuthMessage(authResetForm, authText("Supabase не подключён"), "error");
+  setAuthMessage(authResetForm, "…");
+  try {
+    const redirectTo = window.location.origin + window.location.pathname;
+    const { error } = await db.auth.resetPasswordForEmail(email, { redirectTo });
+    if (error) return setAuthMessage(authResetForm, mapAuthError(error), "error");
+    setAuthMessage(authResetForm, authText("Ссылка для сброса отправлена. Проверьте почту."), "success");
+  } catch (error) {
+    setAuthMessage(authResetForm, mapAuthError(error), "error");
+  }
+});
+
+authNewPasswordForm?.addEventListener("submit", async event => {
+  event.preventDefault();
+  const password = String(authNewPasswordForm.elements.password.value || "");
+  const password2 = String(authNewPasswordForm.elements.password2.value || "");
+  if (password.length < 6) return setAuthMessage(authNewPasswordForm, authText("Пароль слишком короткий (минимум 6 символов)"), "error");
+  if (password !== password2) return setAuthMessage(authNewPasswordForm, authText("Пароли не совпадают"), "error");
+  if (!db) return setAuthMessage(authNewPasswordForm, authText("Supabase не подключён"), "error");
+  setAuthMessage(authNewPasswordForm, "…");
+  try {
+    const { error } = await db.auth.updateUser({ password });
+    if (error) return setAuthMessage(authNewPasswordForm, mapAuthError(error), "error");
+    authRecoveryMode = false;
+    setAuthMessage(authNewPasswordForm, authText("Пароль обновлён."), "success");
+    setTimeout(() => { closeAuthModal(); authNewPasswordForm.reset(); }, 800);
+  } catch (error) {
+    setAuthMessage(authNewPasswordForm, mapAuthError(error), "error");
+  }
+});
+
+authSignOut?.addEventListener("click", async () => {
+  if (!db) return;
+  const { error } = await db.auth.signOut();
+  if (error) console.error("Sign out failed:", error);
+  else closeAuthModal();
+});
+
+async function initAuth() {
+  if (!db) {
+    updateAccountButton();
+    return;
+  }
+  try {
+    const { data, error } = await db.auth.getSession();
+    if (error) throw error;
+    currentUser = data?.session?.user || null;
+    updateAccountButton();
+    if (currentUser && authUserEmail) authUserEmail.textContent = currentUser.email || "";
+  } catch (error) {
+    console.error("getSession failed:", error);
+  }
+  db.auth.onAuthStateChange((event, session) => {
+    currentUser = session?.user || null;
+    updateAccountButton();
+    if (event === "PASSWORD_RECOVERY") {
+      authRecoveryMode = true;
+      openAuthModal();
+      return;
+    }
+    if (event === "SIGNED_IN") {
+      if (authModal && !authModal.classList.contains("hidden")) renderAuthModal();
+    }
+    if (event === "SIGNED_OUT") {
+      authRecoveryMode = false;
+      closeAuthModal();
+    }
+  });
+}
+
 
 // ===============================
 // Фотографии
@@ -1025,6 +1322,7 @@ function translatePage(selectedLanguage) {
   });
 
   updatePhotoFields();
+  updateAuthTranslations();
 
   translateTextElement(document.getElementById("openAdd"), "+ Добавить объявление");
 
@@ -1216,5 +1514,6 @@ updateClock();
 
 loadListings();
 loadCities();
+initAuth();
 
 // === КОНЕЦ ФАЙЛА ===

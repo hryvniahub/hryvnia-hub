@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hryvnia Hub — объявления Украины</title>
+  <meta name="description" content="Hryvnia Hub — хаб объявлений: автомобили, недвижимость и бизнес.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Чекбокс для CSS-only мобильного меню -->
+  <input type="checkbox" id="menuToggle" class="menu-toggle" hidden aria-hidden="true">
+
+  <header class="header">
+    <div class="container nav">
+      <a class="brand" href="#">
+        <img class="logo" src="hryvnia-hub-logo.png" alt="Hryvnia Hub">
+        <span class="brand-text">HRYVNIA HUB</span>
+      </a>
+
+      <div class="header-actions">
+        <!-- Кнопка языка: флаг + город + электронное время -->
+        <div class="lang-btn" id="langBtn">
+          <button type="button" class="lang-trigger" id="langTrigger"
+                  aria-haspopup="menu" aria-expanded="false" aria-label="Language and time">
+            <span class="lang-flag" id="langFlag" aria-hidden="true">🇬🇧</span>
+            <span class="lang-city" id="langCity">London</span>
+            <span class="lang-clock" id="langClock">--:--</span>
+          </button>
+          <div class="lang-dropdown hidden" id="langDropdown" role="menu" aria-label="Language">
+            <button type="button" class="lang-option" data-lang-value="en" role="menuitem">
+              <span class="flag" aria-hidden="true">🇬🇧</span> English
+            </button>
+            <button type="button" class="lang-option" data-lang-value="uk" role="menuitem">
+              <span class="flag" aria-hidden="true">🇺🇦</span> Українська
+            </button>
+            <button type="button" class="lang-option" data-lang-value="pl" role="menuitem">
+              <span class="flag" aria-hidden="true">🇵🇱</span> Polski
+            </button>
+            <button type="button" class="lang-option" data-lang-value="ru" role="menuitem">
+              <span class="flag-ru" aria-hidden="true"></span> Русский
+            </button>
+          </div>
+          <select id="languageSwitcher" class="sr-only" tabindex="-1" aria-hidden="true">
+            <option value="ru">Русский</option>
+            <option value="uk">Українська</option>
+            <option value="en">English</option>
+            <option value="pl">Polski</option>
+          </select>
+        </div>
+
+        <!-- Кнопка аккаунта: вход, регистрация и восстановление пароля -->
+        <button class="header-action account-btn" id="accountBtn" type="button" aria-label="Аккаунт">
+          <span class="account-icon" aria-hidden="true">👤</span>
+          <span class="account-label" id="accountLabel">Аккаунт</span>
+        </button>
+
+        <!-- Кнопка All (та же логика .category + data-category="") -->
+        <button class="category header-action all-btn active" data-category="" id="allBtn" type="button">
+          <span>Все</span>
+        </button>
+
+        <!-- Кнопка Add listing -->
+        <button class="header-action btn-add" id="openAdd" type="button">+ Добавить объявление</button>
+      </div>
+
+      <!-- Кнопка настроек/меню справа, яркая лаймовая -->
+      <label for="menuToggle" class="settings-btn" aria-label="Settings">☰</label>
+    </div>
+  </header>
+
+  <!-- Мобильное боковое меню -->
+  <label for="menuToggle" class="mobile-menu-overlay" aria-hidden="true"></label>
+  <nav class="mobile-menu" aria-label="Mobile menu">
+    <div class="mobile-menu-header">
+      <span>Menu</span>
+      <label for="menuToggle" class="icon-btn" aria-label="Close">×</label>
+    </div>
+    <ul class="mobile-menu-list">
+      <li><a href="#">♡ Favorites</a></li>
+      <li><a href="#">👤 Profile</a></li>
+    </ul>
+  </nav>
+
+  <!-- Категории: только 4 карточки, кнопка All переехала в шапку -->
+  <section class="categories-section container" aria-label="Categories">
+    <div class="categories-grid">
+      <button class="category category-card" data-category="Автомобили" type="button">
+        <img class="category-card-img" src="assets/images/01_automobiles_no_text.png"
+             alt="" loading="lazy" width="400" height="260">
+        <span class="category-card-label">Автомобили</span>
+      </button>
+      <button class="category category-card" data-category="Недвижимость" type="button">
+        <img class="category-card-img" src="assets/images/02_real_estate_no_text.png"
+             alt="" loading="lazy" width="400" height="260">
+        <span class="category-card-label">Недвижимость</span>
+      </button>
+      <button class="category category-card" data-category="Готовый бизнес" type="button">
+        <img class="category-card-img" src="assets/images/03_ready_business_no_text.png"
+             alt="" loading="lazy" width="400" height="260">
+        <span class="category-card-label">Готовый бизнес</span>
+      </button>
+      <button class="category category-card" data-category="Инвестиции" type="button">
+        <img class="category-card-img" src="assets/images/04_investments_no_text.png"
+             alt="" loading="lazy" width="400" height="260">
+        <span class="category-card-label">Инвестиции</span>
+      </button>
+    </div>
+  </section>
+
+  <main>
+    <!-- Баннер + рыночные показатели -->
+    <section class="hero">
+      <h1 class="sr-only">Найди выгодное предложение</h1>
+      <div class="container">
+        <div class="main-banner">
+          <img class="main-banner-img" src="assets/images/00_hero_banner_no_text.png"
+               alt="" fetchpriority="high" width="1180" height="400">
+          <div class="banner-content">
+            <p class="banner-title">Find the best deals in Ukraine</p>
+            <p class="hero-text">Автомобили, недвижимость и готовый бизнес — в одном месте.</p>
+          </div>
+        </div>
+
+        <div class="market-ticker" aria-label="Market overview">
+          <div class="ticker-scroll">
+            <div class="ticker-item"><span class="ticker-label">USD/UAH</span><span class="ticker-value">—</span></div>
+            <div class="ticker-item"><span class="ticker-label">EUR/UAH</span><span class="ticker-value">—</span></div>
+            <div class="ticker-item"><span class="ticker-label">PLN/UAH</span><span class="ticker-value">—</span></div>
+            <div class="ticker-item"><span class="ticker-label">Bitcoin (BTC)</span><span class="ticker-value">—</span></div>
+            <div class="ticker-item"><span class="ticker-label">S&amp;P 500</span><span class="ticker-value">—</span></div>
+            <div class="ticker-item"><span class="ticker-label">Brent Oil</span><span class="ticker-value">—</span></div>
+          </div>
+          <span class="ticker-note">Live data coming soon</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Поиск + AI Deal Finder -->
+    <section class="search-ai-section container" aria-label="Search and AI">
+      <div class="search-panel">
+        <div class="search-input-row">
+          <input id="searchInput" type="search" placeholder="Что ищете? Например: Skoda Octavia" aria-label="Поиск">
+          <button class="btn btn-primary" id="searchBtn" type="button">Найти</button>
+        </div>
+        <div class="search-filters-row">
+          <select id="catalogRegionSelect" aria-label="Область">
+            <option value="">Все области</option>
+          </select>
+          <div class="catalog-city-search">
+            <input id="catalogCitySearchInput" type="search" autocomplete="off"
+              placeholder="Введите название города" role="combobox" aria-autocomplete="list"
+              aria-expanded="false" aria-controls="catalogCitySuggestions">
+            <div id="catalogCitySuggestions" class="catalog-city-suggestions" role="listbox" hidden></div>
+          </div>
+          <input type="number" placeholder="Цена (любая)" aria-label="Цена">
+          <select aria-label="Радиус поиска">
+            <option value="30">Радиус: 30 км</option>
+            <option value="50">Радиус: 50 км</option>
+            <option value="100">Радиус: 100 км</option>
+            <option value="200">Радиус: 200 км</option>
+          </select>
+        </div>
+      </div>
+
+      <aside class="ai-panel" aria-label="AI Deal Finder">
+        <div class="ai-text">
+          <p class="ai-badge">AI</p>
+          <h3>AI Deal Finder</h3>
+          <p class="ai-subtitle">Find better offers with artificial intelligence</p>
+          <ul class="ai-features">
+            <li>Analyze market prices</li>
+            <li>Find urgent deals</li>
+            <li>Suggest better options</li>
+            <li>Save your search</li>
+          </ul>
+          <button class="btn-ai" type="button" disabled aria-disabled="true" title="Coming soon">✨ Try AI Search</button>
+        </div>
+        <div class="ai-visual" aria-hidden="true">🤖</div>
+      </aside>
+    </section>
+
+    <!-- Срочные предложения -->
+    <section class="urgent-deals container" aria-label="Urgent deals">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">⚡ Hot offers</p>
+          <h2>Urgent deals</h2>
+        </div>
+        <span class="badge-soft">Best offers below market price</span>
+      </div>
+      <div class="urgent-deals-grid">
+        <div class="empty">Urgent deals will appear here once listings are flagged as urgent in the database.</div>
+      </div>
+    </section>
+
+    <!-- Список объявлений -->
+    <section class="listing-section container">
+      <div class="section-head">
+        <div>
+          <p id="listingLabel" class="eyebrow">Листинг</p>
+          <h2 id="latestListingsTitle">Последние объявления</h2>
+        </div>
+        <span id="resultCount" class="muted"></span>
+      </div>
+      <div id="listing" class="listing">
+        <div class="empty">Загрузка объявлений…</div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">© 2026 Hryvnia Hub · MVP</div>
+  </footer>
+
+  <!-- Модальное окно добавления -->
+  <div class="modal hidden" id="addModal">
+    <div class="modal-card">
+      <button class="modal-close" id="closeAdd" type="button">×</button>
+      <p class="eyebrow">Новое объявление</p>
+      <h2>Добавить объявление</h2>
+      <form id="addForm">
+        <label>Категория
+          <select name="category" required>
+            <option value="Автомобили">Автомобили</option>
+            <option value="Недвижимость">Недвижимость</option>
+            <option value="Готовый бизнес">Готовый бизнес</option>
+            <option value="Инвестиции">Инвестиции</option>
+          </select>
+        </label>
+        <label>Название
+          <input name="title" required placeholder="Например: Skoda Octavia 1.6">
+        </label>
+        <label>Город
+          <select id="cityRegionSelect" aria-label="Область">
+            <option value="">Все области</option>
+          </select>
+          <div class="city-search">
+            <input id="citySearchInput" type="search" required autocomplete="off"
+              placeholder="Введите название города" role="combobox" aria-autocomplete="list"
+              aria-expanded="false" aria-controls="citySuggestions">
+            <div id="citySuggestions" class="city-suggestions" role="listbox" hidden></div>
+            <input type="hidden" name="city_id" id="citySelect">
+          </div>
+        </label>
+        <label>Цена, грн
+          <input name="price" type="number" min="0" required placeholder="450000">
+        </label>
+        <label>Описание
+          <textarea name="description" rows="4" placeholder="Коротко опишите предложение"></textarea>
+        </label>
+        <fieldset id="photoFields" class="photo-fields">
+          <legend id="photoLabel">Фотографии</legend>
+          <button id="photoPickerButton" class="btn" type="button">Добавить фотографии</button>
+          <input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp" multiple hidden aria-labelledby="photoLabel" aria-describedby="photoHint photoMessage">
+          <p id="photoHint" class="muted">До 10 фото: JPEG, PNG или WebP, до 10 МБ каждое. Первое фото — главное.</p>
+          <p id="photoMessage" class="form-message" role="status" aria-live="polite"></p>
+          <div id="photoPreview" class="photo-preview"></div>
+        </fieldset>
+        <button class="btn btn-primary full" type="submit">Опубликовать</button>
+        <p id="formMessage" class="form-message"></p>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- Модальное окно аккаунта: авторизация управляется app.js и Supabase -->
+  <div class="modal hidden" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <div class="modal-card auth-card">
+      <button class="modal-close" id="authClose" type="button" aria-label="Закрыть">×</button>
+      <p class="eyebrow" id="authEyebrow">Аккаунт</p>
+      <h2 id="authTitle">Настройки аккаунта</h2>
+
+      <section id="authGuest">
+        <div class="auth-tabs" role="tablist" aria-label="Авторизация">
+          <button class="auth-tab active" type="button" data-auth-tab="login" role="tab" aria-selected="true">Вход</button>
+          <button class="auth-tab" type="button" data-auth-tab="register" role="tab" aria-selected="false">Регистрация</button>
+        </div>
+
+        <form id="authLoginForm" class="auth-form">
+          <label><span>Электронная почта</span>
+            <input type="email" name="email" autocomplete="email" required>
+          </label>
+          <label><span>Пароль</span>
+            <input type="password" name="password" autocomplete="current-password" required minlength="6">
+          </label>
+          <button class="btn btn-primary full" type="submit">Вход</button>
+          <button class="link-btn" id="authShowReset" type="button">Забыли пароль?</button>
+          <p class="form-message" role="status" aria-live="polite"></p>
+        </form>
+
+        <form id="authRegisterForm" class="auth-form hidden">
+          <label><span>Электронная почта</span>
+            <input type="email" name="email" autocomplete="email" required>
+          </label>
+          <label><span>Пароль</span>
+            <input type="password" name="password" autocomplete="new-password" required minlength="6">
+          </label>
+          <label><span>Подтвердите пароль</span>
+            <input type="password" name="password2" autocomplete="new-password" required minlength="6">
+          </label>
+          <button class="btn btn-primary full" type="submit">Регистрация</button>
+          <p class="form-message" role="status" aria-live="polite"></p>
+        </form>
+
+        <form id="authResetForm" class="auth-form hidden">
+          <h3>Восстановление пароля</h3>
+          <label><span>Электронная почта</span>
+            <input type="email" name="email" autocomplete="email" required>
+          </label>
+          <button class="btn btn-primary full" type="submit">Отправить ссылку для сброса</button>
+          <button class="link-btn" id="authBackToLogin" type="button">Назад</button>
+          <p class="form-message" role="status" aria-live="polite"></p>
+        </form>
+
+        <form id="authNewPasswordForm" class="auth-form hidden">
+          <h3>Новый пароль</h3>
+          <label><span>Новый пароль</span>
+            <input type="password" name="password" autocomplete="new-password" required minlength="6">
+          </label>
+          <label><span>Подтвердите пароль</span>
+            <input type="password" name="password2" autocomplete="new-password" required minlength="6">
+          </label>
+          <button class="btn btn-primary full" type="submit">Сохранить пароль</button>
+          <p class="form-message" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section id="authLoggedIn" class="hidden">
+        <p class="muted">Вы вошли как:</p>
+        <p id="authUserEmail" class="auth-user-email"></p>
+        <button class="btn btn-primary full" id="authSignOut" type="button">Выход</button>
+      </section>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js"></script>
+</body>
+</html>

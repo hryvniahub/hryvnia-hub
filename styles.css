@@ -603,3 +603,164 @@ h2 { font-size: 22px; margin: 0; letter-spacing: -0.02em; }
   .search-filters-row { grid-template-columns: 1fr; }
   .category-card-label { font-size: 16px; }
 }
+
+
+/* Индикаторы загрузки кнопок */
+.spinner {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: hh-spin .7s linear infinite;
+  vertical-align: -0.12em;
+  flex: 0 0 auto;
+}
+.is-loading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .55em;
+  cursor: wait;
+}
+.is-loading:disabled { opacity: .85; }
+@keyframes hh-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 1.5s; } }
+
+/* ==== КОМПАКТНАЯ МОБИЛЬНАЯ ШАПКА ==== */
+/* Логотип остаётся исходного размера 36×36 px. */
+@media (max-width: 720px) {
+  .nav {
+    min-height: 46px;
+    gap: 6px;
+    flex-wrap: wrap;
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+
+  .brand { flex: 0 0 auto; }
+  .brand .brand-text { display: none; }
+
+  /* Кнопка настроек остаётся в верхней строке справа от логотипа. */
+  .settings-btn {
+    order: 2;
+    margin-left: auto;
+    width: 30px;
+    height: 30px;
+    min-height: 30px;
+    flex: 0 0 30px;
+    padding: 0;
+    font-size: 15px;
+    border-width: 2px;
+    border-radius: 8px;
+  }
+
+  /* Четыре действия — в одной компактной строке; аккаунт последний, справа. */
+  .header-actions {
+    order: 3;
+    flex: 1 0 100%;
+    width: 100%;
+    min-width: 0;
+    margin-left: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, .8fr) minmax(0, .8fr) minmax(0, 1fr);
+    align-items: stretch;
+    gap: 5px;
+  }
+
+  .header-action {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    height: 30px;
+    min-height: 30px;
+    padding: 0 6px;
+    font-size: 11px;
+    line-height: 1.1;
+    gap: 3px;
+    border-width: 2px;
+    border-radius: 8px;
+  }
+
+  .lang-btn {
+    width: 100%;
+    min-width: 0;
+    height: 30px;
+    box-sizing: border-box;
+    border-width: 2px;
+    border-radius: 8px;
+  }
+
+  .lang-trigger {
+    width: 100%;
+    min-width: 0;
+    justify-content: center;
+    padding: 0 5px;
+    gap: 4px;
+    font-size: 11px;
+    line-height: 1;
+  }
+
+  .lang-flag { font-size: 13px; }
+  .lang-clock { font-size: 10px; }
+  .lang-city { display: none; }
+
+  .account-btn {
+    order: 4;
+    width: 100%;
+    min-width: 0;
+    padding: 0 4px;
+    justify-content: center;
+    gap: 3px;
+  }
+  .account-btn .account-label { display: none; }
+  .account-btn .account-icon { font-size: 13px; line-height: 1; }
+  .all-btn { order: 2; }
+  .btn-add { order: 3; }
+
+  .categories-section { margin-top: 12px; }
+  .categories-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+  .category-card { min-height: 120px; padding: 12px; }
+  .category-card-label { font-size: 18px; }
+
+  .hero { margin-top: 6px; }
+  .main-banner { min-height: 140px; padding: 18px 16px; }
+  .banner-title { font-size: 20px; }
+  .hero-text { font-size: 13px; }
+
+  .market-ticker { padding: 8px 10px; margin-top: 10px; }
+  .ticker-note { display: none; }
+
+  .search-ai-section { margin-top: 10px; gap: 10px; }
+  .search-panel { padding: 12px; width: 58%; justify-self: start; }
+  .search-input-row { grid-template-columns: 1fr; }
+  .search-filters-row { grid-template-columns: 1fr; }
+  .ai-panel { flex-direction: column; align-items: flex-start; }
+  .ai-visual { align-self: flex-end; font-size: 44px; }
+  .listing { grid-template-columns: 1fr; }
+  .urgent-deals-grid { grid-template-columns: 1fr; }
+  .section-head { flex-direction: column; align-items: flex-start; gap: 4px; }
+  h2 { font-size: 20px; }
+  .photo-preview { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .lang-city { display: none; }
+  .header-action { padding-left: 5px; padding-right: 5px; font-size: 10.5px; }
+  .lang-trigger { padding-left: 3px; padding-right: 3px; font-size: 10px; }
+  .header-actions { gap: 4px; }
+}
+
+@media (max-width: 420px) {
+  #openAdd { font-size: 0; padding: 0; min-width: 30px; }
+  #openAdd::before { content: "+"; font-size: 18px; line-height: 1; font-weight: 800; }
+}
+
+@media (max-width: 380px) {
+  .search-panel { width: 100%; }
+  .search-filters-row { grid-template-columns: 1fr; }
+  .category-card-label { font-size: 16px; }
+  .header-actions { gap: 3px; grid-template-columns: minmax(0, 1fr) minmax(0, .8fr) minmax(0, .8fr) minmax(0, 1fr); }
+  .header-action { padding-left: 3px; padding-right: 3px; font-size: 10px; }
+}

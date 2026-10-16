@@ -49,6 +49,12 @@
           </select>
         </div>
 
+        <!-- Кнопка аккаунта: вход, регистрация и восстановление пароля -->
+        <button class="header-action account-btn" id="accountBtn" type="button" aria-label="Аккаунт">
+          <span class="account-icon" aria-hidden="true">👤</span>
+          <span class="account-label" id="accountLabel">Аккаунт</span>
+        </button>
+
         <!-- Кнопка All (та же логика .category + data-category="") -->
         <button class="category header-action all-btn active" data-category="" id="allBtn" type="button">
           <span>Все</span>
@@ -254,6 +260,77 @@
         <button class="btn btn-primary full" type="submit">Опубликовать</button>
         <p id="formMessage" class="form-message"></p>
       </form>
+    </div>
+  </div>
+
+
+  <!-- Модальное окно аккаунта: авторизация управляется app.js и Supabase -->
+  <div class="modal hidden" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <div class="modal-card auth-card">
+      <button class="modal-close" id="authClose" type="button" aria-label="Закрыть">×</button>
+      <p class="eyebrow" id="authEyebrow">Аккаунт</p>
+      <h2 id="authTitle">Настройки аккаунта</h2>
+
+      <section id="authGuest">
+        <div class="auth-tabs" role="tablist" aria-label="Авторизация">
+          <button class="auth-tab active" type="button" data-auth-tab="login" role="tab" aria-selected="true">Вход</button>
+          <button class="auth-tab" type="button" data-auth-tab="register" role="tab" aria-selected="false">Регистрация</button>
+        </div>
+
+        <form id="authLoginForm" class="auth-form">
+          <label><span>Электронная почта</span>
+            <input type="email" name="email" autocomplete="email" required>
+          </label>
+          <label><span>Пароль</span>
+            <input type="password" name="password" autocomplete="current-password" required minlength="6">
+          </label>
+          <button class="btn btn-primary full" type="submit">Вход</button>
+          <button class="link-btn" id="authShowReset" type="button">Забыли пароль?</button>
+          <p class="form-message" role="status" aria-live="polite"></p>
+        </form>
+
+        <form id="authRegisterForm" class="auth-form hidden">
+          <label><span>Электронная почта</span>
+            <input type="email" name="email" autocomplete="email" required>
+          </label>
+          <label><span>Пароль</span>
+            <input type="password" name="password" autocomplete="new-password" required minlength="6">
+          </label>
+          <label><span>Подтвердите пароль</span>
+            <input type="password" name="password2" autocomplete="new-password" required minlength="6">
+          </label>
+          <button class="btn btn-primary full" type="submit">Регистрация</button>
+          <p class="form-message" role="status" aria-live="polite"></p>
+        </form>
+
+        <form id="authResetForm" class="auth-form hidden">
+          <h3>Восстановление пароля</h3>
+          <label><span>Электронная почта</span>
+            <input type="email" name="email" autocomplete="email" required>
+          </label>
+          <button class="btn btn-primary full" type="submit">Отправить ссылку для сброса</button>
+          <button class="link-btn" id="authBackToLogin" type="button">Назад</button>
+          <p class="form-message" role="status" aria-live="polite"></p>
+        </form>
+
+        <form id="authNewPasswordForm" class="auth-form hidden">
+          <h3>Новый пароль</h3>
+          <label><span>Новый пароль</span>
+            <input type="password" name="password" autocomplete="new-password" required minlength="6">
+          </label>
+          <label><span>Подтвердите пароль</span>
+            <input type="password" name="password2" autocomplete="new-password" required minlength="6">
+          </label>
+          <button class="btn btn-primary full" type="submit">Сохранить пароль</button>
+          <p class="form-message" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section id="authLoggedIn" class="hidden">
+        <p class="muted">Вы вошли как:</p>
+        <p id="authUserEmail" class="auth-user-email"></p>
+        <button class="btn btn-primary full" id="authSignOut" type="button">Выход</button>
+      </section>
     </div>
   </div>
 

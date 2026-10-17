@@ -1146,3 +1146,42 @@ input:focus, select:focus, textarea:focus {
     align-items: center !important;
   }
 }
+
+
+/* ==== Точечная доработка мобильной шапки: город/время и перенос надписи ==== */
+@media (max-width: 720px) {
+  /* Размеры и габариты самой кнопки языка не меняем. */
+  .header .lang-city {
+    font-size: 10.5px !important;
+    line-height: 1.05 !important;
+  }
+  .header .lang-clock {
+    font-size: 9.8px !important;
+    line-height: 1.05 !important;
+  }
+
+  /* Оставляем текущие размеры кнопки, разрешаем надписи занять две строки. */
+  .header-actions .btn-add,
+  #openAdd {
+    white-space: normal !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+    text-align: center !important;
+    line-height: 1.02 !important;
+    padding-left: 4px !important;
+    padding-right: 4px !important;
+  }
+
+  /* Чуть светлее само изображение баннера; размер и положение не меняются. */
+  .main-banner-img {
+    filter: brightness(1.07) saturate(1.08);
+  }
+}
+
+@media (max-width: 420px) {
+  /* На узких телефонах — умеренное увеличение, чтобы город и время не обрезались. */
+  .header .lang-city { font-size: 9px !important; }
+  .header .lang-clock { font-size: 8.8px !important; }
+  .header-actions .btn-add,
+  #openAdd { line-height: 1 !important; }
+}

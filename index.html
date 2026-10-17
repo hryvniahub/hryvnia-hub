@@ -15,7 +15,7 @@
     <div class="container nav">
       <a class="brand" href="#">
         <img class="logo" src="hryvnia-hub-logo.png" alt="Hryvnia Hub">
-        <span class="brand-text">HRYVNIA HUB</span>
+        <span class="brand-text"><span class="brand-name">HRYVNIA</span> <span class="brand-hub">HUB</span></span>
       </a>
 
       <div class="header-actions">
@@ -55,17 +55,9 @@
           <span class="account-label" id="accountLabel">Аккаунт</span>
         </button>
 
-        <!-- Кнопка All (та же логика .category + data-category="") -->
-        <button class="category header-action all-btn active" data-category="" id="allBtn" type="button">
-          <span>Все</span>
-        </button>
-
         <!-- Кнопка Add listing -->
         <button class="header-action btn-add" id="openAdd" type="button">+ Добавить объявление</button>
       </div>
-
-      <!-- Кнопка настроек/меню справа, яркая лаймовая -->
-      <label for="menuToggle" class="settings-btn" aria-label="Settings">☰</label>
     </div>
   </header>
 
@@ -82,9 +74,12 @@
     </ul>
   </nav>
 
-  <!-- Категории: только 4 карточки, кнопка All переехала в шапку -->
+  <!-- Категории: 4 карточки + кнопка All в центре (перенесена из шапки) -->
   <section class="categories-section container" aria-label="Categories">
     <div class="categories-grid">
+      <button class="category all-btn active" data-category="" id="allBtn" type="button">
+        <span>Все</span>
+      </button>
       <button class="category category-card" data-category="Автомобили" type="button">
         <img class="category-card-img" src="assets/images/01_automobiles_no_text.png"
              alt="" loading="lazy" width="400" height="260">
@@ -329,6 +324,7 @@
       <section id="authLoggedIn" class="hidden">
         <p class="muted">Вы вошли как:</p>
         <p id="authUserEmail" class="auth-user-email"></p>
+        <button class="auth-menu-btn" id="authOpenMenu" type="button">Меню / Настройки</button>
         <button class="btn btn-primary full" id="authSignOut" type="button">Выход</button>
       </section>
     </div>

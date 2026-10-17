@@ -824,3 +824,35 @@ input:focus, select:focus, textarea:focus {
 .main-banner .banner-icons {
   display: none !important;
 }
+
+
+/* ==== FINAL MOBILE HEADER HEIGHT: LIME STRIP ALIGNED TO BUTTONS ==== */
+.header {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  min-height: 0 !important;
+  box-sizing: border-box;
+}
+
+.header .nav {
+  min-height: 0 !important;
+  height: 58px !important;
+  padding-top: 3px !important;
+  padding-bottom: 3px !important;
+  box-sizing: border-box;
+  align-items: center !important;
+}
+
+@media (max-width: 720px) {
+  .header {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  .header .nav {
+    height: 58px !important;
+    min-height: 0 !important;
+    padding-top: 3px !important;
+    padding-bottom: 3px !important;
+  }
+}

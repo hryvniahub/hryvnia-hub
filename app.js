@@ -77,6 +77,46 @@ const translations = {
   pl: "Znajdź najlepsze oferty w Ukrainie"
 },
 
+  "AI Deal Finder": {
+    ru: "AI-поиск выгодных предложений", uk: "AI-пошук вигідних пропозицій",
+    en: "AI Deal Finder", pl: "AI — wyszukiwarka okazji"
+  },
+  "Find better offers with artificial intelligence": {
+    ru: "Находите лучшие предложения с помощью искусственного интеллекта",
+    uk: "Знаходьте кращі пропозиції за допомогою штучного інтелекту",
+    en: "Find better offers with artificial intelligence",
+    pl: "Znajduj lepsze oferty dzięki sztucznej inteligencji"
+  },
+  "Analyze market prices": {
+    ru: "Анализ рыночных цен", uk: "Аналіз ринкових цін",
+    en: "Analyze market prices", pl: "Analizuj ceny rynkowe"
+  },
+  "Find urgent deals": {
+    ru: "Поиск срочных продаж", uk: "Пошук термінових продажів",
+    en: "Find urgent deals", pl: "Znajduj pilne okazje"
+  },
+  "Suggest better options": {
+    ru: "Подбор более выгодных вариантов", uk: "Підбір вигідніших варіантів",
+    en: "Suggest better options", pl: "Proponuj lepsze opcje"
+  },
+  "Save your search": {
+    ru: "Сохранение поиска", uk: "Збереження пошуку",
+    en: "Save your search", pl: "Zapisz wyszukiwanie"
+  },
+  "✨ Try AI Search": {
+    ru: "✨ Попробовать AI-поиск", uk: "✨ Спробувати AI-пошук",
+    en: "✨ Try AI Search", pl: "✨ Wypróbuj AI"
+  },
+  "Market quotes: NBU, CoinGecko and Yahoo Finance": {
+    ru: "Котировки: НБУ, CoinGecko и Yahoo Finance",
+    uk: "Котирування: НБУ, CoinGecko та Yahoo Finance",
+    en: "Quotes: NBU, CoinGecko and Yahoo Finance",
+    pl: "Notowania: NBU, CoinGecko i Yahoo Finance"
+  },
+  "Quote unavailable": {
+    ru: "Нет данных", uk: "Немає даних", en: "Unavailable", pl: "Brak danych"
+  },
+
   "Автомобили, недвижимость и готовый бизнес — в одном месте.": {
     ru: "Автомобили, недвижимость и готовый бизнес — в одном месте.",
     uk: "Автомобілі, нерухомість і готовий бізнес — в одному місці.",
@@ -1413,8 +1453,109 @@ if (langTrigger && langDropdown) {
   });
 }
 
+// ===============================
+// Рыночные котировки: НБУ, CoinGecko, Yahoo Finance
+// ===============================
+const tickerLocale = { ru: "ru-RU", uk: "uk-UA", en: "en-US", pl: "pl-PL" };
+
+function setTickerValue(key, value) {
+  const el = document.querySelector(`[data-ticker="${key}"]`);
+  if (el) el.textContent = value;
+}
+
+function formatTickerNumber(value, digits = 2) {
+  return new Intl.NumberFormat(tickerLocale[lang] || "uk-UA", {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits
+  }).format(value);
+}
+
+async function fetchJsonWithFallback(url) {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return await response.json();
+  } catch (directError) {
+    const proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(url);
+    const response = await fetch(proxyUrl, { cache: "no-store" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return await response.json();
+  }
+}
+
+async function loadMarketQuotes() {
+  const note = document.getElementById("tickerNote");
+  const unavailable = () => (translations["Quote unavailable"]?.[lang] || "Unavailable");
+
+  const jobs = [
+    ["usd", async () => {
+      const data = await fetchJsonWithFallback("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=USD&json");
+      const row = Array.isArray(data) ? data[0] : null;
+      if (!row || !Number.isFinite(Number(row.rate))) throw new Error("USD rate missing");
+      return `${formatTickerNumber(Number(row.rate))} ₴`;
+    }],
+    ["eur", async () => {
+      const data = await fetchJsonWithFallback("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=EUR&json");
+      const row = Array.isArray(data) ? data[0] : null;
+      if (!row || !Number.isFinite(Number(row.rate))) throw new Error("EUR rate missing");
+      return `${formatTickerNumber(Number(row.rate))} ₴`;
+    }],
+    ["pln", async () => {
+      const data = await fetchJsonWithFallback("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=PLN&json");
+      const row = Array.isArray(data) ? data[0] : null;
+      if (!row || !Number.isFinite(Number(row.rate))) throw new Error("PLN rate missing");
+      return `${formatTickerNumber(Number(row.rate))} ₴`;
+    }],
+    ["btc", async () => {
+      const data = await fetchJsonWithFallback("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=uah");
+      const value = Number(data?.bitcoin?.uah);
+      if (!Number.isFinite(value)) throw new Error("BTC rate missing");
+      return `${formatTickerNumber(value, 0)} ₴`;
+    }],
+    ["sp500", async () => {
+      const data = await fetchJsonWithFallback("https://query1.finance.yahoo.com/v8/finance/chart/%5EGSPC?range=1d&interval=1d");
+      const value = Number(data?.chart?.result?.[0]?.meta?.regularMarketPrice);
+      if (!Number.isFinite(value)) throw new Error("S&P 500 quote missing");
+      return formatTickerNumber(value);
+    }],
+    ["brent", async () => {
+      const data = await fetchJsonWithFallback("https://query1.finance.yahoo.com/v8/finance/chart/BZ%3DF?range=1d&interval=1d");
+      const value = Number(data?.chart?.result?.[0]?.meta?.regularMarketPrice);
+      if (!Number.isFinite(value)) throw new Error("Brent quote missing");
+      return `$${formatTickerNumber(value)}`;
+    }]
+  ];
+
+  let successes = 0;
+  await Promise.all(jobs.map(async ([key, getter]) => {
+    try {
+      const value = await getter();
+      setTickerValue(key, value);
+      successes++;
+    } catch (error) {
+      console.warn(`Market quote ${key} unavailable:`, error);
+      setTickerValue(key, unavailable());
+    }
+  }));
+
+  if (note) {
+    const sourceKey = "Market quotes: NBU, CoinGecko and Yahoo Finance";
+    note.textContent = translations[sourceKey]?.[lang] || sourceKey;
+    note.classList.toggle("ticker-note-warning", successes < jobs.length);
+    note.title = successes < jobs.length
+      ? (lang === "ru" ? "Некоторые источники котировок могут быть временно недоступны." :
+         lang === "uk" ? "Деякі джерела котирувань можуть бути тимчасово недоступні." :
+         lang === "pl" ? "Niektóre źródła notowań mogą być chwilowo niedostępne." :
+         "Some quote sources may be temporarily unavailable.")
+      : "";
+  }
+}
+
 setInterval(updateClock, 30000);
 updateClock();
+
+loadMarketQuotes();
+setInterval(loadMarketQuotes, 5 * 60 * 1000);
 
 loadListings();
 loadCities();

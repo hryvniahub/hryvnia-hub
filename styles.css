@@ -916,3 +916,15 @@ input:focus, select:focus, textarea:focus {
   background: #c6ff00 !important;
   color: #17210a !important;
 }
+
+
+/* ==== FINAL: remove the gap between the header and category panel ==== */
+.categories-section {
+  margin-top: 0 !important;
+}
+
+@media (max-width: 720px) {
+  .categories-section {
+    margin-top: 0 !important;
+  }
+}

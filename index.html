@@ -15,7 +15,7 @@
     <div class="container nav">
       <a class="brand" href="#">
         <img class="logo" src="hryvnia-hub-logo.png" alt="Hryvnia Hub">
-        <span class="brand-text">HRYVNIA HUB</span>
+        <span class="brand-text"><span class="brand-name">HRYVNIA</span> <span class="brand-hub">HUB</span></span>
       </a>
 
       <div class="header-actions">
@@ -58,9 +58,6 @@
         <!-- Кнопка Add listing -->
         <button class="header-action btn-add" id="openAdd" type="button">+ Добавить объявление</button>
       </div>
-
-      <!-- Кнопка настроек/меню справа, яркая лаймовая -->
-      <label for="menuToggle" class="settings-btn" aria-label="Settings">☰</label>
     </div>
   </header>
 
@@ -327,6 +324,7 @@
       <section id="authLoggedIn" class="hidden">
         <p class="muted">Вы вошли как:</p>
         <p id="authUserEmail" class="auth-user-email"></p>
+        <button class="auth-menu-btn" id="authOpenMenu" type="button">Меню / Настройки</button>
         <button class="btn btn-primary full" id="authSignOut" type="button">Выход</button>
       </section>
     </div>

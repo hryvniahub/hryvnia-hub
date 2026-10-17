@@ -857,39 +857,62 @@ input:focus, select:focus, textarea:focus {
   }
 }
 
-/* ==== MOBILE HEADER: REDUCE LIME STRIP TO BUTTON HEIGHT ==== */
-@media (max-width: 720px) {
-  header.header {
-    display: block !important;
-    height: auto !important;
-    min-height: 0 !important;
-    padding-block: 0 !important;
-    margin-block: 0 !important;
-    box-sizing: border-box !important;
-    background: #c6ff00 !important;
-  }
 
-  header.header > .container.nav,
-  .header .container.nav {
-    height: 58px !important;
-    min-height: 58px !important;
-    max-height: 58px !important;
-    padding: 3px 0 !important;
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-    box-sizing: border-box !important;
-    align-items: center !important;
-  }
+/* ==== FINAL APPROVED HEADER + ALL BUTTON: WHITE HEADER, LIME BUTTONS, YELLOW OUTLINE ==== */
+.header {
+  background: #ffffff !important;
+  border-bottom: 1px solid #e4e8e1 !important;
+  backdrop-filter: none !important;
+}
 
-  .header .header-actions {
-    height: 52px !important;
-    min-height: 0 !important;
-    align-items: center !important;
-  }
+.header .nav { background: transparent !important; }
 
-  .header .lang-btn,
-  .header-actions .btn-add,
-  .header-actions .account-btn {
-    margin-block: 0 !important;
-  }
+/* Brand: clean lime frame, HRYVNIA black, HUB lime */
+.header .brand {
+  border: 2px solid #c6ff00 !important;
+  border-radius: 12px !important;
+  padding: 3px 7px !important;
+  background: #ffffff !important;
+  color: #111111 !important;
+  gap: 7px !important;
+}
+.header .brand .brand-text,
+.header .brand .brand-name { color: #111111 !important; }
+.header .brand .brand-hub { color: #c6ff00 !important; }
+
+/* Keep language, add-listing and account buttons exactly the same lime */
+.header .lang-btn,
+.header-actions .btn-add,
+.header-actions .account-btn,
+.header .header-action,
+.header .settings-btn,
+#openAdd,
+#accountBtn {
+  background: #c6ff00 !important;
+  border-color: #7fa800 !important;
+  color: #17210a !important;
+  box-shadow: none !important;
+}
+.header .lang-trigger,
+.header .lang-city,
+.header .lang-clock { color: #17210a !important; }
+.header .lang-dropdown {
+  background: #ffffff !important;
+  border-color: #c6ff00 !important;
+}
+.header .lang-option:hover,
+.header .header-action:hover,
+.header-actions .btn-add:hover,
+#openAdd:hover { background: #b4eb00 !important; }
+
+/* Central All/Усі button: simple yellow outline, no glow or leaf */
+.all-btn,
+.all-btn.active,
+.all-btn:hover {
+  border: 3px solid #ffd400 !important;
+  box-shadow: none !important;
+}
+.all-btn {
+  background: #c6ff00 !important;
+  color: #17210a !important;
 }

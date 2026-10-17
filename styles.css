@@ -1,16 +1,16 @@
 :root {
-  --bg: #f7f8fa;
+  --bg: #f3f5f4;
   --card: #ffffff;
-  --text: #17191c;
-  --muted: #6f7782;
-  --line: #e4e7ec;
-  --accent: #d4ff00;
-  --accent-hover: #c0e800;
-  --accent-soft: #f3ffcc;
-  --accent-light: #eaffb0;
-  --accent-border: #a8e000;
-  --accent-input: #c8e070;
-  --dark: #14161a;
+  --text: #202824;
+  --muted: #707a75;
+  --line: #dce3df;
+  --accent: #caff00;
+  --accent-hover: #b6e600;
+  --accent-soft: #f0f6d9;
+  --accent-light: #e8f3c8;
+  --accent-border: #9abf24;
+  --accent-input: #c4d7a0;
+  --dark: #202b27;
   --radius: 14px;
   --radius-lg: 20px;
   --radius-btn: 12px;
@@ -574,4 +574,74 @@ h2 { font-size: 22px; margin: 0; letter-spacing: -0.02em; }
   .header-actions .btn-add { min-width: 108px; padding: 0 4px; font-size: 9px; }
   .header-actions .account-btn { width: 58px; min-width: 58px; flex-basis: 58px; }
   .brand .brand-text { transform: scale(1.15, 1.5); padding-right: 5px; }
+}
+
+
+/* ==== PREMIUM COLOR FINISH + MOBILE HEADER FIX ==== */
+:root {
+  --premium-forest: #203b31;
+  --premium-forest-deep: #172b24;
+  --premium-gold: #b4a16a;
+}
+
+.header {
+  background: rgba(250, 251, 249, 0.97);
+  border-bottom-color: #d8e0da;
+}
+.brand { color: var(--premium-forest-deep); }
+.brand-hub { color: #78951d; }
+.header-action, .lang-btn {
+  background: #edf4d9;
+  border-color: #9abf24;
+}
+.header-action:hover { background: #e2efbd; }
+.btn-primary, .btn-ai {
+  background: var(--accent);
+  color: #1c2922;
+}
+.ai-panel {
+  background: linear-gradient(145deg, #f0f4e4 0%, #ffffff 72%);
+  border-color: #a4bd53;
+}
+.ai-panel h3 { color: var(--premium-forest); }
+.ai-features li::before { color: #527343; }
+.market-ticker { border-color: #9abf24; background: #fcfdfb; }
+.search-panel, .card { border-color: #dce3df; }
+input, select, textarea { border-color: #c4d7a0; }
+input:focus, select:focus, textarea:focus {
+  border-color: #8eae2b;
+  box-shadow: 0 0 0 3px rgba(154, 191, 36, 0.18);
+}
+.category-card[data-category="Автомобили"] { background: linear-gradient(135deg, #203b4b, #436f7c); }
+.category-card[data-category="Недвижимость"] { background: linear-gradient(135deg, #203b31, #66816a); }
+.category-card[data-category="Готовый бизнес"] { background: linear-gradient(135deg, #252f35, #59656a); }
+.category-card[data-category="Инвестиции"] { background: linear-gradient(135deg, #263a32, #8b793e); }
+
+/* Keep the requested brand scaling. */
+.brand .brand-text {
+  display: inline-block;
+  transform: scale(1.15, 1.5);
+  transform-origin: left center;
+  padding-right: 8px;
+}
+
+/* The HTML already contains “+ Добавить объявление”; do not replace it with a pseudo-element. */
+@media (max-width: 720px) {
+  .header-actions .btn-add, #openAdd {
+    order: 2; width: auto; min-width: 124px; flex: 1 1 auto;
+    padding: 0 7px; font-size: 10px; line-height: 1.1;
+    white-space: nowrap; justify-content: center;
+  }
+  .header-actions .btn-add::before, #openAdd::before { content: none !important; display: none !important; }
+  .header-actions .account-btn { order: 3; width: 58px; min-width: 58px; flex: 0 0 58px; }
+  .brand .brand-text { transform: scale(1.15, 1.5); padding-right: 8px; }
+}
+@media (max-width: 420px) {
+  #openAdd { min-width: 108px; font-size: 9px; padding: 0 4px; }
+  #openAdd::before { content: none !important; display: none !important; }
+}
+@media (max-width: 380px) {
+  .header-actions .btn-add, #openAdd { min-width: 102px; font-size: 8.5px; padding: 0 3px; }
+  .header-actions .account-btn { width: 50px; min-width: 50px; flex-basis: 50px; }
+  .brand .brand-text { transform: scale(1.08, 1.35); padding-right: 4px; }
 }

@@ -905,11 +905,11 @@ input:focus, select:focus, textarea:focus {
 .header-actions .btn-add:hover,
 #openAdd:hover { background: #b4eb00 !important; }
 
-/* Central All/Усі button: simple yellow outline, no glow or leaf */
+/* Central All/Усі button: dark-green outline, no glow or leaf */
 .all-btn,
 .all-btn.active,
 .all-btn:hover {
-  border: 3px solid #ffd400 !important;
+  border: 3px solid #426B16 !important;
   box-shadow: none !important;
 }
 .all-btn {

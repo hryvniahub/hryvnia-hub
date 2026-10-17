@@ -23,7 +23,7 @@ const TIME_ZONES = {
   en: { city: "London",   tz: "Europe/London"  },
   uk: { city: "Київ",     tz: "Europe/Kyiv"    },
   pl: { city: "Warszawa", tz: "Europe/Warsaw"  },
-  ru: { city: "Київ",     tz: "Europe/Kyiv"    }
+  ru: { city: "Варшава",  tz: "Europe/Warsaw"  }
 };
 const LANG_FLAGS = { en: "🇬🇧", uk: "🇺🇦", pl: "🇵🇱" };
 
@@ -70,6 +70,12 @@ const translations = {
 
   "Найди выгодное": { ru: "Найди выгодное", uk: "Знайди вигідну", en: "Find a great", pl: "Znajdź korzystną" },
   "предложение": { ru: "предложение", uk: "пропозицію", en: "deal", pl: "ofertę" },
+"Find the best deals in Ukraine": {
+  ru: "Найдите лучшие предложения в Украине",
+  uk: "Знайдіть найкращі пропозиції в Україні",
+  en: "Find the best deals in Ukraine",
+  pl: "Znajdź najlepsze oferty w Ukrainie"
+},
 
   "Автомобили, недвижимость и готовый бизнес — в одном месте.": {
     ru: "Автомобили, недвижимость и готовый бизнес — в одном месте.",
@@ -182,10 +188,10 @@ const translations = {
 };
 
 const authMessages = {
-  ru: { close:"Закрыть", account:"Аккаунт", settings:"Настройки аккаунта", login:"Вход", register:"Регистрация", email:"Электронная почта", password:"Пароль", confirm:"Подтвердите пароль", forgot:"Забыли пароль?", reset:"Восстановление пароля", resetLink:"Отправить ссылку для сброса", newPassword:"Новый пароль", savePassword:"Сохранить пароль", back:"Назад", signOut:"Выход", signedIn:"Вход выполнен.", signedOut:"Вы вышли из аккаунта.", signingIn:"Вход…", signingUp:"Регистрация…", sending:"Отправка…", saving:"Сохранение…", signingOut:"Выход…", emailRequired:"Введите email", invalidEmail:"Введите корректный email", shortPassword:"Пароль слишком короткий (минимум 6 символов)", mismatch:"Пароли не совпадают", noSupabase:"Supabase не подключён", badLogin:"Неверный email или пароль", confirmEmail:"Подтвердите email", exists:"Пользователь с таким email уже существует", registered:"Регистрация успешна. Проверьте почту для подтверждения.", resetSent:"Ссылка для сброса отправлена. Проверьте почту.", passwordUpdated:"Пароль обновлён.", signOutError:"Не удалось выйти. Попробуйте ещё раз.", signedAs:"Вы вошли как:" },
-  uk: { close:"Закрити", account:"Акаунт", settings:"Налаштування акаунта", login:"Вхід", register:"Реєстрація", email:"Електронна пошта", password:"Пароль", confirm:"Підтвердіть пароль", forgot:"Забули пароль?", reset:"Відновлення пароля", resetLink:"Надіслати посилання для скидання", newPassword:"Новий пароль", savePassword:"Зберегти пароль", back:"Назад", signOut:"Вихід", signedIn:"Вхід виконано.", signedOut:"Ви вийшли з акаунта.", signingIn:"Вхід…", signingUp:"Реєстрація…", sending:"Надсилання…", saving:"Збереження…", signingOut:"Вихід…", emailRequired:"Введіть email", invalidEmail:"Введіть коректний email", shortPassword:"Пароль занадто короткий (мінімум 6 символів)", mismatch:"Паролі не збігаються", noSupabase:"Supabase не підключено", badLogin:"Невірний email або пароль", confirmEmail:"Підтвердіть email", exists:"Користувач з таким email вже існує", registered:"Реєстрація успішна. Перевірте пошту для підтвердження.", resetSent:"Посилання для скидання надіслано. Перевірте пошту.", passwordUpdated:"Пароль оновлено.", signOutError:"Не вдалося вийти. Спробуйте ще раз.", signedAs:"Ви увійшли як:" },
-  en: { close:"Close", account:"Account", settings:"Account settings", login:"Sign in", register:"Sign up", email:"Email", password:"Password", confirm:"Confirm password", forgot:"Forgot password?", reset:"Password reset", resetLink:"Send reset link", newPassword:"New password", savePassword:"Save password", back:"Back", signOut:"Sign out", signedIn:"Signed in successfully.", signedOut:"Signed out.", signingIn:"Signing in…", signingUp:"Signing up…", sending:"Sending…", saving:"Saving…", signingOut:"Signing out…", emailRequired:"Enter your email", invalidEmail:"Enter a valid email", shortPassword:"Password is too short (min 6 characters)", mismatch:"Passwords do not match", noSupabase:"Supabase is not configured", badLogin:"Invalid email or password", confirmEmail:"Confirm your email", exists:"User with this email already exists", registered:"Registration successful. Check your email to confirm.", resetSent:"Reset link sent. Check your email.", passwordUpdated:"Password updated.", signOutError:"Sign out failed. Please try again.", signedAs:"Signed in as:" },
-  pl: { close:"Zamknij", account:"Konto", settings:"Ustawienia konta", login:"Zaloguj się", register:"Zarejestruj się", email:"E-mail", password:"Hasło", confirm:"Potwierdź hasło", forgot:"Nie pamiętasz hasła?", reset:"Reset hasła", resetLink:"Wyślij link do resetu", newPassword:"Nowe hasło", savePassword:"Zapisz hasło", back:"Wstecz", signOut:"Wyloguj się", signedIn:"Zalogowano pomyślnie.", signedOut:"Wylogowano.", signingIn:"Logowanie…", signingUp:"Rejestracja…", sending:"Wysyłanie…", saving:"Zapisywanie…", signingOut:"Wylogowywanie…", emailRequired:"Podaj email", invalidEmail:"Podaj poprawny email", shortPassword:"Hasło jest za krótkie (min. 6 znaków)", mismatch:"Hasła nie są takie same", noSupabase:"Supabase nie jest skonfigurowany", badLogin:"Nieprawidłowy email lub hasło", confirmEmail:"Potwierdź email", exists:"Użytkownik z tym e-mailem już istnieje", registered:"Rejestracja zakończona. Sprawdź pocztę, aby potwierdzić.", resetSent:"Link do resetu wysłany. Sprawdź pocztę.", passwordUpdated:"Hasło zaktualizowane.", signOutError:"Nie udało się wylogować. Spróbuj ponownie.", signedAs:"Zalogowano jako:" }
+  ru: { close:"Закрыть", account:"Аккаунт", settings:"Настройки аккаунта", menu:'Меню / Настройки', login:"Вход", register:"Регистрация", email:"Электронная почта", password:"Пароль", confirm:"Подтвердите пароль", forgot:"Забыли пароль?", reset:"Восстановление пароля", resetLink:"Отправить ссылку для сброса", newPassword:"Новый пароль", savePassword:"Сохранить пароль", back:"Назад", signOut:"Выход", signedIn:"Вход выполнен.", signedOut:"Вы вышли из аккаунта.", signingIn:"Вход…", signingUp:"Регистрация…", sending:"Отправка…", saving:"Сохранение…", signingOut:"Выход…", emailRequired:"Введите email", invalidEmail:"Введите корректный email", shortPassword:"Пароль слишком короткий (минимум 6 символов)", mismatch:"Пароли не совпадают", noSupabase:"Supabase не подключён", badLogin:"Неверный email или пароль", confirmEmail:"Подтвердите email", exists:"Пользователь с таким email уже существует", registered:"Регистрация успешна. Проверьте почту для подтверждения.", resetSent:"Ссылка для сброса отправлена. Проверьте почту.", passwordUpdated:"Пароль обновлён.", signOutError:"Не удалось выйти. Попробуйте ещё раз.", signedAs:"Вы вошли как:" },
+  uk: { close:"Закрити", account:"Акаунт", settings:"Налаштування акаунта", menu:'Меню / Налаштування', login:"Вхід", register:"Реєстрація", email:"Електронна пошта", password:"Пароль", confirm:"Підтвердіть пароль", forgot:"Забули пароль?", reset:"Відновлення пароля", resetLink:"Надіслати посилання для скидання", newPassword:"Новий пароль", savePassword:"Зберегти пароль", back:"Назад", signOut:"Вихід", signedIn:"Вхід виконано.", signedOut:"Ви вийшли з акаунта.", signingIn:"Вхід…", signingUp:"Реєстрація…", sending:"Надсилання…", saving:"Збереження…", signingOut:"Вихід…", emailRequired:"Введіть email", invalidEmail:"Введіть коректний email", shortPassword:"Пароль занадто короткий (мінімум 6 символів)", mismatch:"Паролі не збігаються", noSupabase:"Supabase не підключено", badLogin:"Невірний email або пароль", confirmEmail:"Підтвердіть email", exists:"Користувач з таким email вже існує", registered:"Реєстрація успішна. Перевірте пошту для підтвердження.", resetSent:"Посилання для скидання надіслано. Перевірте пошту.", passwordUpdated:"Пароль оновлено.", signOutError:"Не вдалося вийти. Спробуйте ще раз.", signedAs:"Ви увійшли як:" },
+  en: { close:"Close", account:"Account", settings:"Account settings", menu:'Menu / Settings', login:"Sign in", register:"Sign up", email:"Email", password:"Password", confirm:"Confirm password", forgot:"Forgot password?", reset:"Password reset", resetLink:"Send reset link", newPassword:"New password", savePassword:"Save password", back:"Back", signOut:"Sign out", signedIn:"Signed in successfully.", signedOut:"Signed out.", signingIn:"Signing in…", signingUp:"Signing up…", sending:"Sending…", saving:"Saving…", signingOut:"Signing out…", emailRequired:"Enter your email", invalidEmail:"Enter a valid email", shortPassword:"Password is too short (min 6 characters)", mismatch:"Passwords do not match", noSupabase:"Supabase is not configured", badLogin:"Invalid email or password", confirmEmail:"Confirm your email", exists:"User with this email already exists", registered:"Registration successful. Check your email to confirm.", resetSent:"Reset link sent. Check your email.", passwordUpdated:"Password updated.", signOutError:"Sign out failed. Please try again.", signedAs:"Signed in as:" },
+  pl: { close:"Zamknij", account:"Konto", settings:"Ustawienia konta", menu:'Menu / Ustawienia', login:"Zaloguj się", register:"Zarejestruj się", email:"E-mail", password:"Hasło", confirm:"Potwierdź hasło", forgot:"Nie pamiętasz hasła?", reset:"Reset hasła", resetLink:"Wyślij link do resetu", newPassword:"Nowe hasło", savePassword:"Zapisz hasło", back:"Wstecz", signOut:"Wyloguj się", signedIn:"Zalogowano pomyślnie.", signedOut:"Wylogowano.", signingIn:"Logowanie…", signingUp:"Rejestracja…", sending:"Wysyłanie…", saving:"Zapisywanie…", signingOut:"Wylogowywanie…", emailRequired:"Podaj email", invalidEmail:"Podaj poprawny email", shortPassword:"Hasło jest za krótkie (min. 6 znaków)", mismatch:"Hasła nie są takie same", noSupabase:"Supabase nie jest skonfigurowany", badLogin:"Nieprawidłowy email lub hasło", confirmEmail:"Potwierdź email", exists:"Użytkownik z tym e-mailem już istnieje", registered:"Rejestracja zakończona. Sprawdź pocztę, aby potwierdzić.", resetSent:"Link do resetu wysłany. Sprawdź pocztę.", passwordUpdated:"Hasło zaktualizowane.", signOutError:"Nie udało się wylogować. Spróbuj ponownie.", signedAs:"Zalogowano jako:" }
 };
 function authText(key) { return (authMessages[lang] || authMessages.ru)[key] || key; }
 
@@ -311,7 +317,7 @@ function updateAuthTranslations() {
   setText("#authRegisterForm label:nth-of-type(1) span","email"); setText("#authRegisterForm label:nth-of-type(2) span","password"); setText("#authRegisterForm label:nth-of-type(3) span","confirm");
   setText("#authResetForm h3","reset"); setText("#authResetForm label span","email");
   setText("#authNewPasswordForm h3","newPassword"); setText("#authNewPasswordForm label:nth-of-type(1) span","newPassword"); setText("#authNewPasswordForm label:nth-of-type(2) span","confirm");
-  setText("#authLoggedIn .muted","signedAs"); setText("#authSignOut","signOut");
+  setText("#authLoggedIn .muted","signedAs"); setText("#authSignOut","signOut"); setText("#authOpenMenu","menu");
   [["#authLoginForm button[type='submit']","login"],["#authRegisterForm button[type='submit']","register"],["#authResetForm button[type='submit']","resetLink"],["#authNewPasswordForm button[type='submit']","savePassword"]].forEach(([s,k])=>setText(s,k));
   if(authClose)authClose.setAttribute("aria-label",authText("close") || (lang==="ru"?"Закрыть":"Close"));
   updateAccountButton();
@@ -323,6 +329,11 @@ document.addEventListener("keydown", event => { if(event.key==="Escape" && authM
 document.querySelectorAll("[data-auth-tab]").forEach(button=>button.addEventListener("click",()=>{authRecoveryMode=false;showAuthView(button.dataset.authTab);}));
 authShowReset?.addEventListener("click",()=>{authRecoveryMode=false;showAuthView("reset");});
 authBackToLogin?.addEventListener("click",()=>{authRecoveryMode=false;showAuthView("login");});
+document.getElementById("authOpenMenu")?.addEventListener("click", () => {
+  closeAuthModal();
+  const menuToggle = document.getElementById("menuToggle");
+  if (menuToggle) menuToggle.checked = true;
+});
 async function handleAuthSubmit(form, kind) {
   if (!form || form.dataset.submitting === "1") return;
   const email=String(form.elements.email?.value||"").trim();
@@ -1219,6 +1230,10 @@ function translatePage(selectedLanguage) {
     document.querySelector(".hero-text"),
     "Автомобили, недвижимость и готовый бизнес — в одном месте."
   );
+translateTextElement(
+  document.querySelector(".banner-title"),
+  "Find the best deals in Ukraine"
+);
 
   if (searchInput) {
     const placeholder = translations["Что ищете? Например: Skoda Octavia"];

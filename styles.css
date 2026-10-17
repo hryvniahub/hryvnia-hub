@@ -1,16 +1,16 @@
 :root {
-  --bg: #f7f8fa;
+  --bg: #f3f5f4;
   --card: #ffffff;
-  --text: #17191c;
-  --muted: #6f7782;
-  --line: #e4e7ec;
-  --accent: #d4ff00;
-  --accent-hover: #c0e800;
-  --accent-soft: #f3ffcc;
-  --accent-light: #eaffb0;
-  --accent-border: #a8e000;
-  --accent-input: #c8e070;
-  --dark: #14161a;
+  --text: #202824;
+  --muted: #707a75;
+  --line: #dce3df;
+  --accent: #caff00;
+  --accent-hover: #b6e600;
+  --accent-soft: #f0f6d9;
+  --accent-light: #e8f3c8;
+  --accent-border: #9abf24;
+  --accent-input: #c4d7a0;
+  --dark: #202b27;
   --radius: 14px;
   --radius-lg: 20px;
   --radius-btn: 12px;
@@ -506,3 +506,425 @@ h2 { font-size: 22px; margin: 0; letter-spacing: -0.02em; }
 .is-loading:disabled { opacity: .85; }
 @keyframes hh-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 1.5s; } }
+
+/* Сообщения авторизации */
+.form-message.error {
+  color: #c62828;
+}
+.form-message.success {
+  color: #247a36;
+}
+
+/* ==== АКТУАЛЬНЫЕ ПРАВКИ ВЕРХНЕЙ ПАНЕЛИ HRYVNIA HUB ==== */
+/* Название бренда: +15% по ширине и +50% по высоте */
+.brand .brand-text {
+  display: inline-block;
+  transform: scale(1.15, 1.5);
+  transform-origin: left center;
+  padding-right: 8px;
+}
+
+/* Ширина кнопок на больших экранах */
+@media (min-width: 1200px) {
+  .header-actions .account-btn { width: 318px; min-width: 318px; flex: 0 0 auto; justify-content: center; }
+  .header-actions .btn-add { width: 515px; min-width: 515px; flex: 0 0 auto; justify-content: center; }
+}
+@media (min-width: 1000px) and (max-width: 1199px) {
+  .header-actions .account-btn { width: 254px; min-width: 254px; flex: 0 0 auto; justify-content: center; }
+  .header-actions .btn-add { width: 412px; min-width: 412px; flex: 0 0 auto; justify-content: center; }
+}
+@media (min-width: 900px) and (max-width: 999px) {
+  .header-actions .account-btn { width: 220px; min-width: 220px; flex: 0 0 auto; justify-content: center; }
+  .header-actions .btn-add { width: 360px; min-width: 360px; flex: 0 0 auto; justify-content: center; }
+}
+@media (min-width: 781px) and (max-width: 899px) {
+  .header-actions .account-btn { width: 190px; min-width: 190px; flex: 0 0 auto; justify-content: center; }
+  .header-actions .btn-add { width: 310px; min-width: 310px; flex: 0 0 auto; justify-content: center; }
+}
+@media (min-width: 721px) and (max-width: 780px) {
+  .header-actions .account-btn, .header-actions .btn-add {
+    flex: 1 1 0; width: auto; min-width: 0; justify-content: center;
+  }
+}
+@media (max-width: 720px) {
+  .header-actions .btn-add {
+    order: 2;
+    width: auto;
+    min-width: 124px;
+    flex: 1 1 auto;
+    padding: 0 7px;
+    font-size: 10px;
+    line-height: 1.1;
+    white-space: nowrap;
+    justify-content: center;
+  }
+  .header-actions .btn-add::before { content: none; display: none; }
+  .header-actions .account-btn {
+    width: 75px; min-width: 75px; flex: 0 0 75px;
+    padding: 0; justify-content: center; gap: 0;
+  }
+  .header-actions .account-btn .account-label { display: none; }
+  .brand .brand-text {
+    transform: scale(1.15, 1.5);
+    transform-origin: left center;
+    padding-right: 8px;
+  }
+}
+@media (max-width: 380px) {
+  .header-actions .btn-add { min-width: 108px; padding: 0 4px; font-size: 9px; }
+  .header-actions .account-btn { width: 58px; min-width: 58px; flex-basis: 58px; }
+  .brand .brand-text { transform: scale(1.15, 1.5); padding-right: 5px; }
+}
+
+
+/* ==== PREMIUM COLOR FINISH + MOBILE HEADER FIX ==== */
+:root {
+  --premium-forest: #203b31;
+  --premium-forest-deep: #172b24;
+  --premium-gold: #b4a16a;
+}
+
+.header {
+  background: rgba(250, 251, 249, 0.97);
+  border-bottom-color: #d8e0da;
+}
+.brand { color: var(--premium-forest-deep); }
+.brand-hub { color: #78951d; }
+.header-action, .lang-btn {
+  background: #edf4d9;
+  border-color: #9abf24;
+}
+.header-action:hover { background: #e2efbd; }
+.btn-primary, .btn-ai {
+  background: var(--accent);
+  color: #1c2922;
+}
+.ai-panel {
+  background: linear-gradient(145deg, #f0f4e4 0%, #ffffff 72%);
+  border-color: #a4bd53;
+}
+.ai-panel h3 { color: var(--premium-forest); }
+.ai-features li::before { color: #527343; }
+.market-ticker { border-color: #9abf24; background: #fcfdfb; }
+.search-panel, .card { border-color: #dce3df; }
+input, select, textarea { border-color: #c4d7a0; }
+input:focus, select:focus, textarea:focus {
+  border-color: #8eae2b;
+  box-shadow: 0 0 0 3px rgba(154, 191, 36, 0.18);
+}
+.category-card[data-category="Автомобили"] { background: linear-gradient(135deg, #203b4b, #436f7c); }
+.category-card[data-category="Недвижимость"] { background: linear-gradient(135deg, #203b31, #66816a); }
+.category-card[data-category="Готовый бизнес"] { background: linear-gradient(135deg, #252f35, #59656a); }
+.category-card[data-category="Инвестиции"] { background: linear-gradient(135deg, #263a32, #8b793e); }
+
+/* Keep the requested brand scaling. */
+.brand .brand-text {
+  display: inline-block;
+  transform: scale(1.15, 1.5);
+  transform-origin: left center;
+  padding-right: 8px;
+}
+
+/* The HTML already contains “+ Добавить объявление”; do not replace it with a pseudo-element. */
+@media (max-width: 720px) {
+  .header-actions .btn-add, #openAdd {
+    order: 2; width: auto; min-width: 124px; flex: 1 1 auto;
+    padding: 0 7px; font-size: 10px; line-height: 1.1;
+    white-space: nowrap; justify-content: center;
+  }
+  .header-actions .btn-add::before, #openAdd::before { content: none !important; display: none !important; }
+  .header-actions .account-btn { order: 3; width: 58px; min-width: 58px; flex: 0 0 58px; }
+  .brand .brand-text { transform: scale(1.15, 1.5); padding-right: 8px; }
+}
+@media (max-width: 420px) {
+  #openAdd { min-width: 108px; font-size: 9px; padding: 0 4px; }
+  #openAdd::before { content: none !important; display: none !important; }
+}
+@media (max-width: 380px) {
+  .header-actions .btn-add, #openAdd { min-width: 102px; font-size: 8.5px; padding: 0 3px; }
+  .header-actions .account-btn { width: 50px; min-width: 50px; flex-basis: 50px; }
+  .brand .brand-text { transform: scale(1.08, 1.35); padding-right: 4px; }
+}
+
+
+/* ==== HERO BANNER LAYOUT FIX: balanced text and icon row ==== */
+.main-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 150px;
+  padding: 20px 24px 34px;
+}
+.main-banner::before {
+  background: linear-gradient(
+    180deg,
+    rgba(15, 20, 28, 0.32) 0%,
+    rgba(15, 20, 28, 0.58) 100%
+  );
+}
+.banner-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  text-align: center;
+}
+.banner-title {
+  margin: 0 0 6px;
+  font-size: clamp(20px, 3vw, 29px);
+  line-height: 1.12;
+  text-wrap: balance;
+}
+.hero-text {
+  max-width: 650px;
+  margin: 0 auto;
+  font-size: 14px;
+  line-height: 1.35;
+  text-wrap: pretty;
+}
+.banner-icons {
+  position: absolute;
+  z-index: 2;
+  left: 18px;
+  right: 18px;
+  bottom: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 12px;
+  pointer-events: none;
+}
+.banner-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  font-size: 16px;
+  line-height: 1;
+  opacity: 0.82;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.55));
+}
+
+@media (max-width: 720px) {
+  .main-banner {
+    min-height: 124px;
+    padding: 12px 14px 32px;
+    align-items: center;
+  }
+  .main-banner-img { object-position: center 40%; }
+  .banner-content {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    text-align: center;
+  }
+  .banner-title {
+    font-size: 16px;
+    line-height: 1.12;
+    margin-bottom: 4px;
+  }
+  .hero-text {
+    max-width: 100%;
+    font-size: 11.5px;
+    line-height: 1.25;
+  }
+  .banner-icons {
+    left: 20px;
+    right: 20px;
+    bottom: 8px;
+    gap: 8px;
+  }
+  .banner-icon { font-size: 14px; }
+}
+
+/* ==== FINAL HEADER: ONE BRIGHT, DEEP LIME TONE ==== */
+:root {
+  --accent: #c6ff00;
+  --accent-hover: #b4eb00;
+  --accent-soft: #e9ff9a;
+  --accent-light: #c6ff00;
+  --accent-border: #7fa800;
+  --accent-input: #c6df80;
+}
+
+.header {
+  background: #c6ff00;
+  border-bottom: 1px solid #7fa800;
+  backdrop-filter: none;
+}
+
+.header .nav {
+  min-height: 50px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  align-items: center;
+}
+
+.header .brand,
+.header .brand-text,
+.header .brand-name,
+.header .brand-hub {
+  color: #17210a;
+}
+
+.header .header-actions { align-items: center; }
+
+.header .header-action,
+.header .lang-btn,
+.header .settings-btn,
+.header-actions .btn-add,
+.header-actions .account-btn,
+#openAdd,
+#accountBtn {
+  background-color: #c6ff00;
+  border-color: #7fa800;
+  color: #17210a;
+  box-shadow: none;
+}
+
+.header .header-action:hover,
+.header-actions .btn-add:hover,
+#openAdd:hover,
+.header .lang-option:hover {
+  background-color: #b4eb00;
+}
+
+.header .lang-trigger,
+.header .lang-city,
+.header .lang-clock,
+.header .lang-option {
+  color: #17210a;
+}
+
+.header .lang-dropdown {
+  background: #c6ff00;
+  border-color: #7fa800;
+}
+
+@media (max-width: 720px) {
+  .header .nav {
+    min-height: 50px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+  }
+
+  .header .header-action,
+  .header .lang-btn,
+  .header-actions .btn-add,
+  .header-actions .account-btn,
+  #openAdd,
+  #accountBtn {
+    background-color: #c6ff00;
+    border-color: #7fa800;
+  }
+}
+
+/* Hide colorful emoji overlay; keep the lime icons built into the banner image. */
+.main-banner .banner-icons {
+  display: none !important;
+}
+
+
+/* ==== FINAL MOBILE HEADER HEIGHT: LIME STRIP ALIGNED TO BUTTONS ==== */
+.header {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  min-height: 0 !important;
+  box-sizing: border-box;
+}
+
+.header .nav {
+  min-height: 0 !important;
+  height: 58px !important;
+  padding-top: 3px !important;
+  padding-bottom: 3px !important;
+  box-sizing: border-box;
+  align-items: center !important;
+}
+
+@media (max-width: 720px) {
+  .header {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  .header .nav {
+    height: 58px !important;
+    min-height: 0 !important;
+    padding-top: 3px !important;
+    padding-bottom: 3px !important;
+  }
+}
+
+
+/* ==== FINAL APPROVED HEADER + ALL BUTTON: WHITE HEADER, LIME BUTTONS, YELLOW OUTLINE ==== */
+.header {
+  background: #ffffff !important;
+  border-bottom: 1px solid #e4e8e1 !important;
+  backdrop-filter: none !important;
+}
+
+.header .nav { background: transparent !important; }
+
+/* Brand: clean lime frame, HRYVNIA black, HUB lime */
+.header .brand {
+  border: 2px solid #c6ff00 !important;
+  border-radius: 12px !important;
+  padding: 3px 7px !important;
+  background: #ffffff !important;
+  color: #111111 !important;
+  gap: 7px !important;
+}
+.header .brand .brand-text,
+.header .brand .brand-name { color: #111111 !important; }
+.header .brand .brand-hub { color: #c6ff00 !important; }
+
+/* Keep language, add-listing and account buttons exactly the same lime */
+.header .lang-btn,
+.header-actions .btn-add,
+.header-actions .account-btn,
+.header .header-action,
+.header .settings-btn,
+#openAdd,
+#accountBtn {
+  background: #c6ff00 !important;
+  border-color: #7fa800 !important;
+  color: #17210a !important;
+  box-shadow: none !important;
+}
+.header .lang-trigger,
+.header .lang-city,
+.header .lang-clock { color: #17210a !important; }
+.header .lang-dropdown {
+  background: #ffffff !important;
+  border-color: #c6ff00 !important;
+}
+.header .lang-option:hover,
+.header .header-action:hover,
+.header-actions .btn-add:hover,
+#openAdd:hover { background: #b4eb00 !important; }
+
+/* Central All/Усі button: simple yellow outline, no glow or leaf */
+.all-btn,
+.all-btn.active,
+.all-btn:hover {
+  border: 3px solid #ffd400 !important;
+  box-shadow: none !important;
+}
+.all-btn {
+  background: #c6ff00 !important;
+  color: #17210a !important;
+}
+
+
+/* ==== FINAL: remove the gap between the header and category panel ==== */
+.categories-section {
+  margin-top: 0 !important;
+}
+
+@media (max-width: 720px) {
+  .categories-section {
+    margin-top: 0 !important;
+  }
+}

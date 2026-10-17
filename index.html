@@ -78,7 +78,7 @@
   <section class="categories-section container" aria-label="Categories">
     <div class="categories-grid">
       <button class="category all-btn active" data-category="" id="allBtn" type="button">
-        <span>Все</span>
+        <span data-i18n="Все">Все</span>
       </button>
       <button class="category category-card" data-category="Автомобили" type="button">
         <img class="category-card-img" src="assets/images/01_automobiles_no_text.png"
@@ -111,6 +111,12 @@
         <div class="main-banner">
           <img class="main-banner-img" src="assets/images/00_hero_banner_no_text.png"
                alt="" fetchpriority="high" width="1180" height="400">
+          <div class="banner-icons" aria-hidden="true">
+            <span class="banner-icon banner-icon-car">🚗</span>
+            <span class="banner-icon banner-icon-home">🏠</span>
+            <span class="banner-icon banner-icon-business">💼</span>
+            <span class="banner-icon banner-icon-invest">📈</span>
+          </div>
           <div class="banner-content">
             <p class="banner-title">Find the best deals in Ukraine</p>
             <p class="hero-text">Автомобили, недвижимость и готовый бизнес — в одном месте.</p>
@@ -119,14 +125,14 @@
 
         <div class="market-ticker" aria-label="Market overview">
           <div class="ticker-scroll">
-            <div class="ticker-item"><span class="ticker-label">USD/UAH</span><span class="ticker-value">—</span></div>
-            <div class="ticker-item"><span class="ticker-label">EUR/UAH</span><span class="ticker-value">—</span></div>
-            <div class="ticker-item"><span class="ticker-label">PLN/UAH</span><span class="ticker-value">—</span></div>
-            <div class="ticker-item"><span class="ticker-label">Bitcoin (BTC)</span><span class="ticker-value">—</span></div>
-            <div class="ticker-item"><span class="ticker-label">S&amp;P 500</span><span class="ticker-value">—</span></div>
-            <div class="ticker-item"><span class="ticker-label">Brent Oil</span><span class="ticker-value">—</span></div>
+            <div class="ticker-item"><span class="ticker-label">USD/UAH</span><span class="ticker-value" data-ticker="usd">…</span></div>
+            <div class="ticker-item"><span class="ticker-label">EUR/UAH</span><span class="ticker-value" data-ticker="eur">…</span></div>
+            <div class="ticker-item"><span class="ticker-label">PLN/UAH</span><span class="ticker-value" data-ticker="pln">…</span></div>
+            <div class="ticker-item"><span class="ticker-label">Bitcoin (BTC)</span><span class="ticker-value" data-ticker="btc">…</span></div>
+            <div class="ticker-item"><span class="ticker-label">S&amp;P 500</span><span class="ticker-value" data-ticker="sp500">…</span></div>
+            <div class="ticker-item"><span class="ticker-label">Brent Oil</span><span class="ticker-value" data-ticker="brent">…</span></div>
           </div>
-          <span class="ticker-note">Live data coming soon</span>
+          <span class="ticker-note" id="tickerNote" data-i18n="Market quotes: NBU, CoinGecko and Yahoo Finance">Quotes: NBU, CoinGecko and Yahoo Finance</span>
         </div>
       </div>
     </section>
@@ -161,15 +167,15 @@
       <aside class="ai-panel" aria-label="AI Deal Finder">
         <div class="ai-text">
           <p class="ai-badge">AI</p>
-          <h3>AI Deal Finder</h3>
-          <p class="ai-subtitle">Find better offers with artificial intelligence</p>
+          <h3 data-i18n="AI Deal Finder">AI Deal Finder</h3>
+          <p class="ai-subtitle" data-i18n="Find better offers with artificial intelligence">Find better offers with artificial intelligence</p>
           <ul class="ai-features">
-            <li>Analyze market prices</li>
-            <li>Find urgent deals</li>
-            <li>Suggest better options</li>
-            <li>Save your search</li>
+            <li data-i18n="Analyze market prices">Analyze market prices</li>
+            <li data-i18n="Find urgent deals">Find urgent deals</li>
+            <li data-i18n="Suggest better options">Suggest better options</li>
+            <li data-i18n="Save your search">Save your search</li>
           </ul>
-          <button class="btn-ai" type="button" disabled aria-disabled="true" title="Coming soon">✨ Try AI Search</button>
+          <button class="btn-ai" type="button" disabled aria-disabled="true" title="Coming soon" data-i18n="✨ Try AI Search">✨ Try AI Search</button>
         </div>
         <div class="ai-visual" aria-hidden="true">🤖</div>
       </aside>
@@ -326,6 +332,7 @@
         <p id="authUserEmail" class="auth-user-email"></p>
         <button class="auth-menu-btn" id="authOpenMenu" type="button">Меню / Настройки</button>
         <button class="btn btn-primary full" id="authSignOut" type="button">Выход</button>
+        <p id="authSignOutMessage" class="form-message" role="status" aria-live="polite"></p>
       </section>
     </div>
   </div>

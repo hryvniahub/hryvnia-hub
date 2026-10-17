@@ -737,3 +737,90 @@ input:focus, select:focus, textarea:focus {
   }
   .banner-icon { font-size: 14px; }
 }
+
+/* ==== FINAL HEADER: ONE BRIGHT, DEEP LIME TONE ==== */
+:root {
+  --accent: #c6ff00;
+  --accent-hover: #b4eb00;
+  --accent-soft: #e9ff9a;
+  --accent-light: #c6ff00;
+  --accent-border: #7fa800;
+  --accent-input: #c6df80;
+}
+
+.header {
+  background: #c6ff00;
+  border-bottom: 1px solid #7fa800;
+  backdrop-filter: none;
+}
+
+.header .nav {
+  min-height: 50px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  align-items: center;
+}
+
+.header .brand,
+.header .brand-text,
+.header .brand-name,
+.header .brand-hub {
+  color: #17210a;
+}
+
+.header .header-actions { align-items: center; }
+
+.header .header-action,
+.header .lang-btn,
+.header .settings-btn,
+.header-actions .btn-add,
+.header-actions .account-btn,
+#openAdd,
+#accountBtn {
+  background-color: #c6ff00;
+  border-color: #7fa800;
+  color: #17210a;
+  box-shadow: none;
+}
+
+.header .header-action:hover,
+.header-actions .btn-add:hover,
+#openAdd:hover,
+.header .lang-option:hover {
+  background-color: #b4eb00;
+}
+
+.header .lang-trigger,
+.header .lang-city,
+.header .lang-clock,
+.header .lang-option {
+  color: #17210a;
+}
+
+.header .lang-dropdown {
+  background: #c6ff00;
+  border-color: #7fa800;
+}
+
+@media (max-width: 720px) {
+  .header .nav {
+    min-height: 50px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+  }
+
+  .header .header-action,
+  .header .lang-btn,
+  .header-actions .btn-add,
+  .header-actions .account-btn,
+  #openAdd,
+  #accountBtn {
+    background-color: #c6ff00;
+    border-color: #7fa800;
+  }
+}
+
+/* Hide colorful emoji overlay; keep the lime icons built into the banner image. */
+.main-banner .banner-icons {
+  display: none !important;
+}

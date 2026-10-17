@@ -1259,7 +1259,13 @@ function translatePage(selectedLanguage) {
   }
 
   const categoryButtons = document.querySelectorAll(".category");
-  const categoryNames = ["Все", "Автомобили", "Недвижимость", "Готовый бизнес", "Инвестиции"];
+  const categoryKeyFromData = {
+    "": "Все",
+    "Автомобили": "Автомобили",
+    "Недвижимость": "Недвижимость",
+    "Готовый бизнес": "Готовый бизнес",
+    "Инвестиции": "Инвестиции"
+  };
   const categoryDescriptions = {
     "Все": "Все объявления",
     "Автомобили": "Легковые и другие",
@@ -1268,8 +1274,8 @@ function translatePage(selectedLanguage) {
     "Инвестиции": "Инвестиционные возможности"
   };
 
-  categoryButtons.forEach((button, index) => {
-    const name = categoryNames[index];
+  categoryButtons.forEach(button => {
+    const name = categoryKeyFromData[button.dataset.category];
     if (!name) return;
     const span = button.querySelector("span");
     const small = button.querySelector("small");

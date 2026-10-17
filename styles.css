@@ -856,3 +856,40 @@ input:focus, select:focus, textarea:focus {
     padding-bottom: 3px !important;
   }
 }
+
+/* ==== MOBILE HEADER: REDUCE LIME STRIP TO BUTTON HEIGHT ==== */
+@media (max-width: 720px) {
+  header.header {
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding-block: 0 !important;
+    margin-block: 0 !important;
+    box-sizing: border-box !important;
+    background: #c6ff00 !important;
+  }
+
+  header.header > .container.nav,
+  .header .container.nav {
+    height: 58px !important;
+    min-height: 58px !important;
+    max-height: 58px !important;
+    padding: 3px 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    box-sizing: border-box !important;
+    align-items: center !important;
+  }
+
+  .header .header-actions {
+    height: 52px !important;
+    min-height: 0 !important;
+    align-items: center !important;
+  }
+
+  .header .lang-btn,
+  .header-actions .btn-add,
+  .header-actions .account-btn {
+    margin-block: 0 !important;
+  }
+}

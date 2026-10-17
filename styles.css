@@ -190,24 +190,9 @@ body:has(.menu-toggle:checked) .mobile-menu-overlay { opacity: 1; pointer-events
   content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
   background: linear-gradient(180deg, rgba(15, 20, 28, 0.20) 0%, rgba(15, 20, 28, 0.75) 100%);
 }
-.banner-icons {
-  position: absolute; z-index: 2; right: 22px; top: 18px;
-  display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px;
-  max-width: 190px; pointer-events: none;
-}
-.banner-icon {
-  display: grid; place-items: center; width: 38px; height: 38px;
-  border: 1px solid rgba(212, 255, 0, 0.75); border-radius: 12px;
-  background: rgba(13, 18, 24, 0.64); box-shadow: 0 4px 14px rgba(0,0,0,.16);
-  font-size: 19px; line-height: 1; backdrop-filter: blur(4px);
-}
 .banner-content { position: relative; z-index: 2; max-width: 620px; }
 .banner-title { margin: 0 0 6px; font-size: clamp(20px, 3vw, 30px); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; color: #fff; }
 .hero-text { margin: 0; font-size: 13.5px; color: rgba(255, 255, 255, 0.9); max-width: 560px; }
-
-@media (min-width: 721px) and (max-width: 900px) {
-  .banner-content { max-width: calc(100% - 210px); }
-}
 
 /* ==== TICKER ==== */
 .market-ticker {
@@ -218,8 +203,8 @@ body:has(.menu-toggle:checked) .mobile-menu-overlay { opacity: 1; pointer-events
 .ticker-scroll::-webkit-scrollbar { display: none; }
 .ticker-item { display: inline-flex; align-items: baseline; gap: 6px; white-space: nowrap; font-size: 13px; color: var(--text); }
 .ticker-label { font-weight: 600; color: var(--muted); font-size: 12px; letter-spacing: 0.02em; }
-.ticker-value { font-weight: 800; color: var(--text); }
-.ticker-note { font-size: 11px; color: var(--muted); padding: 3px 8px; border-radius: 999px; background: #f3f4f7; white-space: nowrap; }\n.ticker-note-warning { border: 1px solid var(--accent-border); }
+.ticker-value { font-weight: 800; color: var(--muted); }
+.ticker-note { font-size: 11px; color: var(--muted); padding: 3px 8px; border-radius: 999px; background: #f3f4f7; white-space: nowrap; }
 
 /* ==== SEARCH + AI ==== */
 .search-ai-section { margin-top: 12px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; align-items: stretch; }
@@ -462,9 +447,6 @@ h2 { font-size: 22px; margin: 0; letter-spacing: -0.02em; }
     align-items: flex-start;
   }
   .main-banner-img { object-position: center 40%; }
-  .banner-icons { top: 8px; right: 8px; gap: 4px; max-width: 100px; }
-  .banner-icon { width: 25px; height: 25px; border-radius: 8px; font-size: 13px; }
-  .banner-content { max-width: calc(100% - 72px); }
   .banner-title { font-size: 16px; line-height: 1.15; margin-bottom: 4px; }
   .hero-text { font-size: 11.5px; line-height: 1.3; }
 
@@ -532,3 +514,56 @@ h2 { font-size: 22px; margin: 0; letter-spacing: -0.02em; }
 .form-message.success {
   color: #247a36;
 }
+
+/* ==== ПОСЛЕДНИЕ ПРАВКИ ВЕРХНЕЙ ПАНЕЛИ HRYVNIA HUB ==== */
+/* Название бренда: +10% по ширине и +30% по высоте */
+.brand .brand-text {
+  display: inline-block;
+  transform: scale(1.1, 1.3);
+  transform-origin: left center;
+  padding-right: 6px;
+}
+
+/* Ширина кнопок увеличена относительно исходных размеров. */
+@media (min-width: 1200px) {
+  .header-actions .account-btn { width: 318px; min-width: 318px; flex: 0 0 auto; justify-content: center; }
+  .header-actions .btn-add { width: 515px; min-width: 515px; flex: 0 0 auto; justify-content: center; }
+}
+@media (min-width: 1000px) and (max-width: 1199px) {
+  .header-actions .account-btn { width: 254px; min-width: 254px; flex: 0 0 auto; justify-content: center; }
+  .header-actions .btn-add { width: 412px; min-width: 412px; flex: 0 0 auto; justify-content: center; }
+}
+@media (min-width: 900px) and (max-width: 999px) {
+  .header-actions .account-btn { width: 220px; min-width: 220px; flex: 0 0 auto; justify-content: center; }
+  .header-actions .btn-add { width: 360px; min-width: 360px; flex: 0 0 auto; justify-content: center; }
+}
+@media (min-width: 781px) and (max-width: 899px) {
+  .header-actions .account-btn { width: 190px; min-width: 190px; flex: 0 0 auto; justify-content: center; }
+  .header-actions .btn-add { width: 310px; min-width: 310px; flex: 0 0 auto; justify-content: center; }
+}
+@media (min-width: 721px) and (max-width: 780px) {
+  .header-actions .account-btn, .header-actions .btn-add {
+    flex: 1 1 0; width: auto; min-width: 0; justify-content: center;
+  }
+}
+@media (max-width: 720px) {
+  .header-actions .btn-add, .header-actions .account-btn {
+    width: 75px; min-width: 75px; flex: 0 0 75px;
+  }
+  .header-actions .btn-add { padding: 0; font-size: 0; }
+  .header-actions .btn-add::before {
+    content: "+"; font-size: 17px; font-weight: 800; line-height: 1;
+  }
+  .header-actions .account-btn { padding: 0; justify-content: center; gap: 0; }
+  .header-actions .account-btn .account-label { display: none; }
+  .brand .brand-text {
+    transform: scale(1.1, 1.3); transform-origin: left center; padding-right: 4px;
+  }
+}
+@media (max-width: 340px) {
+  .header-actions .btn-add, .header-actions .account-btn {
+    width: 60px; min-width: 60px; flex-basis: 60px;
+  }
+  .brand .brand-text { transform: scale(1.1, 1.3); padding-right: 2px; }
+}
+

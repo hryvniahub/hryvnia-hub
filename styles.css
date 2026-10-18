@@ -1447,26 +1447,29 @@ input:focus, select:focus, textarea:focus {
   .messages-card .conversations-list { max-height: 45dvh; }
 }
 
-/* ==== HRYVNIA HUB: согласованная нижняя мобильная панель ==== */
+/* ==== HRYVNIA HUB: финальная настройка нижней мобильной панели ==== */
 @media (max-width: 720px) {
-  /* Увеличиваем только три иконки; фон, высота и расположение панели не меняются. */
+  /* Все иконки приводим к одному лаймовому оттенку, включая цветной emoji-домик. */
   .bottom-nav-btn .bottom-nav-icon {
-    font-size: 22px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
     line-height: 1 !important;
     color: #d4ff00 !important;
+    filter: grayscale(1) brightness(0) saturate(100%) invert(89%) sepia(100%) saturate(1700%) hue-rotate(19deg) brightness(103%) contrast(104%);
+    transition: color .15s, filter .15s;
   }
 
-  /* Все подписи — одного прежнего мягкого светло-серого оттенка,
-     включая активную вкладку «Главная». */
+  /* Чуть компенсируем разницу в начертании символов, чтобы они выглядели одинаковыми по размеру. */
+  .bottom-nav-btn:nth-child(1) .bottom-nav-icon { font-size: 27px !important; } /* домик */
+  .bottom-nav-btn:nth-child(2) .bottom-nav-icon { font-size: 24px !important; } /* сердечко */
+  .bottom-nav-btn:nth-child(3) .bottom-nav-icon { font-size: 29px !important; } /* конверт */
+
+  /* Все подписи сохраняют одинаковый мягкий светло-серо-белый оттенок. */
   .bottom-nav-btn,
   .bottom-nav-btn.active,
   .bottom-nav-btn .bottom-nav-label,
   .bottom-nav-btn.active .bottom-nav-label {
     color: #c8d5c0 !important;
-  }
-
-  /* Акцентный лаймовый цвет сохраняется у всех трёх иконок. */
-  .bottom-nav-btn.active .bottom-nav-icon {
-    color: #d4ff00 !important;
   }
 }

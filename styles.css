@@ -1446,3 +1446,27 @@ input:focus, select:focus, textarea:focus {
   .messages-card .thread-messages,
   .messages-card .conversations-list { max-height: 45dvh; }
 }
+
+/* ==== HRYVNIA HUB: согласованная нижняя мобильная панель ==== */
+@media (max-width: 720px) {
+  /* Увеличиваем только три иконки; фон, высота и расположение панели не меняются. */
+  .bottom-nav-btn .bottom-nav-icon {
+    font-size: 22px !important;
+    line-height: 1 !important;
+    color: #d4ff00 !important;
+  }
+
+  /* Все подписи — одного прежнего мягкого светло-серого оттенка,
+     включая активную вкладку «Главная». */
+  .bottom-nav-btn,
+  .bottom-nav-btn.active,
+  .bottom-nav-btn .bottom-nav-label,
+  .bottom-nav-btn.active .bottom-nav-label {
+    color: #c8d5c0 !important;
+  }
+
+  /* Акцентный лаймовый цвет сохраняется у всех трёх иконок. */
+  .bottom-nav-btn.active .bottom-nav-icon {
+    color: #d4ff00 !important;
+  }
+}

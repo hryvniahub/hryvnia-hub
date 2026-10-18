@@ -1447,9 +1447,8 @@ input:focus, select:focus, textarea:focus {
   .messages-card .conversations-list { max-height: 45dvh; }
 }
 
-/* ==== HRYVNIA HUB: финальная настройка нижней мобильной панели ==== */
+/* ==== HRYVNIA HUB: согласованный вид нижней мобильной панели ==== */
 @media (max-width: 720px) {
-  /* Все иконки приводим к одному лаймовому оттенку, включая цветной emoji-домик. */
   .bottom-nav-btn .bottom-nav-icon {
     display: inline-flex !important;
     align-items: center !important;
@@ -1460,12 +1459,43 @@ input:focus, select:focus, textarea:focus {
     transition: color .15s, filter .15s;
   }
 
-  /* Чуть компенсируем разницу в начертании символов, чтобы они выглядели одинаковыми по размеру. */
-  .bottom-nav-btn:nth-child(1) .bottom-nav-icon { font-size: 27px !important; } /* домик */
-  .bottom-nav-btn:nth-child(2) .bottom-nav-icon { font-size: 24px !important; } /* сердечко */
-  .bottom-nav-btn:nth-child(3) .bottom-nav-icon { font-size: 29px !important; } /* конверт */
+  /* Домик и сердечко подогнаны по визуальному размеру, а не только по цифре font-size. */
+  .bottom-nav-btn:nth-child(1) .bottom-nav-icon {
+    font-size: 24px !important;
+    width: 26px;
+    height: 24px;
+  }
+  .bottom-nav-btn:nth-child(2) .bottom-nav-icon {
+    font-size: 24px !important;
+    width: 26px;
+    height: 24px;
+  }
 
-  /* Все подписи сохраняют одинаковый мягкий светло-серо-белый оттенок. */
+  /* Рисуем конверт залитым лаймовым прямоугольником с тёмно-зелёным сгибом. */
+  .bottom-nav-btn:nth-child(3) .bottom-nav-icon {
+    font-size: 0 !important;
+    color: transparent !important;
+    filter: none !important;
+    position: relative;
+    display: inline-block !important;
+    width: 28px !important;
+    height: 21px !important;
+    flex: 0 0 21px;
+    border-radius: 3px;
+    background-color: #d4ff00 !important;
+    overflow: hidden;
+  }
+  .bottom-nav-btn:nth-child(3) .bottom-nav-icon::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(143deg, transparent 46%, #203b31 48%, #203b31 53%, transparent 55%) left top / 51% 75% no-repeat,
+      linear-gradient(217deg, transparent 46%, #203b31 48%, #203b31 53%, transparent 55%) right top / 51% 75% no-repeat;
+    pointer-events: none;
+  }
+
+  /* Подписи остаются в согласованном светло-серо-белом оттенке. */
   .bottom-nav-btn,
   .bottom-nav-btn.active,
   .bottom-nav-btn .bottom-nav-label,

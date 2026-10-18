@@ -1446,3 +1446,83 @@ input:focus, select:focus, textarea:focus {
   .messages-card .thread-messages,
   .messages-card .conversations-list { max-height: 45dvh; }
 }
+
+/* ==== HRYVNIA HUB: единый визуальный размер иконок нижней панели ==== */
+@media (max-width: 720px) {
+  .bottom-nav-btn .bottom-nav-icon {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 28px !important;
+    width: 28px !important;
+    height: 28px !important;
+    max-width: 28px !important;
+    max-height: 28px !important;
+    line-height: 1 !important;
+    font-size: 22px !important;
+    color: #d4ff00 !important;
+    filter: grayscale(1) brightness(0) saturate(100%) invert(89%) sepia(100%) saturate(1700%) hue-rotate(19deg) brightness(103%) contrast(104%);
+    transition: color .15s, filter .15s;
+  }
+
+  /* Ограничиваем размеры SVG/изображений, если иконка задана не символом шрифта. */
+  .bottom-nav-btn .bottom-nav-icon svg,
+  .bottom-nav-btn .bottom-nav-icon img {
+    width: 26px !important;
+    height: 26px !important;
+    max-width: 26px !important;
+    max-height: 26px !important;
+    object-fit: contain !important;
+  }
+
+  /* Домик немного компактнее, чтобы крыша не делала его визуально крупнее сердца. */
+  .bottom-nav-btn:nth-child(1) .bottom-nav-icon {
+    font-size: 20px !important;
+  }
+
+  /* Сердечко увеличиваем, чтобы визуально соответствовало домику. */
+  .bottom-nav-btn:nth-child(2) .bottom-nav-icon {
+    font-size: 28px !important;
+  }
+  .bottom-nav-btn:nth-child(2) .bottom-nav-icon svg,
+  .bottom-nav-btn:nth-child(2) .bottom-nav-icon img {
+    width: 28px !important;
+    height: 28px !important;
+    max-width: 28px !important;
+    max-height: 28px !important;
+  }
+
+  /* Конверт уменьшен примерно на 10%; лаймовая заливка и тёмный сгиб сохранены. */
+  .bottom-nav-btn:nth-child(3) .bottom-nav-icon {
+    font-size: 0 !important;
+    color: transparent !important;
+    filter: none !important;
+    position: relative !important;
+    display: inline-block !important;
+    flex: 0 0 21px !important;
+    width: 21px !important;
+    height: 16px !important;
+    max-width: 21px !important;
+    max-height: 16px !important;
+    border-radius: 3px;
+    background-color: #d4ff00 !important;
+    overflow: hidden;
+  }
+  .bottom-nav-btn:nth-child(3) .bottom-nav-icon::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(140deg, transparent 46%, #203b31 48%, #203b31 52%, transparent 54%) left top / 51% 76% no-repeat,
+      linear-gradient(220deg, transparent 46%, #203b31 48%, #203b31 52%, transparent 54%) right top / 51% 76% no-repeat;
+    pointer-events: none;
+  }
+
+  /* Все подписи остаются светло-серо-белыми, включая активную вкладку. */
+  .bottom-nav-btn,
+  .bottom-nav-btn.active,
+  .bottom-nav-btn .bottom-nav-label,
+  .bottom-nav-btn.active .bottom-nav-label {
+    color: #c8d5c0 !important;
+  }
+}

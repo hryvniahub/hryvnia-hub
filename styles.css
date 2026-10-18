@@ -1492,18 +1492,18 @@ input:focus, select:focus, textarea:focus {
     max-height: 28px !important;
   }
 
-  /* Конверт залит лаймовым; тёмный сгиб сохраняет читаемую форму письма. */
+  /* Конверт уменьшен примерно на 10%; лаймовая заливка и тёмный сгиб сохранены. */
   .bottom-nav-btn:nth-child(3) .bottom-nav-icon {
     font-size: 0 !important;
     color: transparent !important;
     filter: none !important;
     position: relative !important;
     display: inline-block !important;
-    flex: 0 0 23px !important;
-    width: 23px !important;
-    height: 18px !important;
-    max-width: 23px !important;
-    max-height: 18px !important;
+    flex: 0 0 21px !important;
+    width: 21px !important;
+    height: 16px !important;
+    max-width: 21px !important;
+    max-height: 16px !important;
     border-radius: 3px;
     background-color: #d4ff00 !important;
     overflow: hidden;

@@ -970,29 +970,24 @@ function loadTickerPrev() {
 function saveTickerPrev(data) {
   try { localStorage.setItem(TICKER_PREV_KEY, JSON.stringify(data)); } catch {}
 }
-function setTickerValue(key, display, numeric) {
+function setTickerValue(key, display, numeric, comparisonKey = key) {
   const el = document.querySelector(`[data-ticker="${key}"]`);
   if (el) el.textContent = display;
   const arrow = document.querySelector(`[data-ticker-arrow="${key}"]`);
   if (!arrow) return;
-  arrow.className = "ticker-arrow";
-  arrow.textContent = "";
+  arrow.className = "ticker-arrow"; arrow.textContent = "";
   if (!Number.isFinite(numeric)) return;
-  const prev = loadTickerPrev();
-  const prevVal = Number(prev[key]);
+  const prev = loadTickerPrev(); const prevVal = Number(prev[comparisonKey]);
   if (Number.isFinite(prevVal) && prevVal !== 0) {
-    if (numeric > prevVal)       { arrow.textContent = "▲"; arrow.classList.add("up"); }
-    else if (numeric < prevVal)  { arrow.textContent = "▼"; arrow.classList.add("down"); }
-    else                         { arrow.textContent = "•"; arrow.classList.add("flat"); }
+    if (numeric > prevVal) { arrow.textContent = "▲"; arrow.classList.add("up"); }
+    else if (numeric < prevVal) { arrow.textContent = "▼"; arrow.classList.add("down"); }
+    else { arrow.textContent = "•"; arrow.classList.add("flat"); }
   }
-  prev[key] = numeric;
-  saveTickerPrev(prev);
+  prev[comparisonKey] = numeric; saveTickerPrev(prev);
 }
 const tickerLocale = { ru: "ru-RU", uk: "uk-UA", en: "en-US", pl: "pl-PL" };
 function formatTickerNumber(value, digits = 2) {
-  return new Intl.NumberFormat(tickerLocale[lang] || "uk-UA", {
-    minimumFractionDigits: digits, maximumFractionDigits: digits
-  }).format(value);
+  return new Intl.NumberFormat(tickerLocale[lang] || "uk-UA", { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(value);
 }
 async function fetchJsonWithFallback(url) {
   try {
@@ -1006,70 +1001,56 @@ async function fetchJsonWithFallback(url) {
     return await response.json();
   }
 }
+function tickerBaseCurrency() { return lang === "pl" ? "PLN" : lang === "en" ? "USD" : "UAH"; }
+function tickerDate(dateValue) {
+  if (!dateValue) return "";
+  const parsed = new Date(dateValue);
+  if (Number.isNaN(parsed.getTime())) return "";
+  return new Intl.DateTimeFormat(tickerLocale[lang] || "uk-UA", { day: "2-digit", month: "2-digit", year: "numeric" }).format(parsed);
+}
+function tickerSetText(attribute, key, value) {
+  const el = document.querySelector(`[data-ticker-${attribute}="${key}"]`);
+  if (el) el.textContent = value;
+}
 async function loadMarketQuotes() {
   const note = document.getElementById("tickerNote");
   const unavailable = () => (translations["Quote unavailable"]?.[lang] || "Unavailable");
-  const jobs = [
-    ["usd", async () => {
-      const data = await fetchJsonWithFallback("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=USD&json");
-      const row = Array.isArray(data) ? data[0] : null;
-      const numeric = Number(row?.rate);
-      if (!Number.isFinite(numeric)) throw new Error("USD rate missing");
-      return { display: `${formatTickerNumber(numeric)} ₴`, numeric };
-    }],
-    ["eur", async () => {
-      const data = await fetchJsonWithFallback("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=EUR&json");
-      const row = Array.isArray(data) ? data[0] : null;
-      const numeric = Number(row?.rate);
-      if (!Number.isFinite(numeric)) throw new Error("EUR rate missing");
-      return { display: `${formatTickerNumber(numeric)} ₴`, numeric };
-    }],
-    ["pln", async () => {
-      const data = await fetchJsonWithFallback("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=PLN&json");
-      const row = Array.isArray(data) ? data[0] : null;
-      const numeric = Number(row?.rate);
-      if (!Number.isFinite(numeric)) throw new Error("PLN rate missing");
-      return { display: `${formatTickerNumber(numeric)} ₴`, numeric };
-    }],
-    ["btc", async () => {
-      const data = await fetchJsonWithFallback("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=uah");
-      const numeric = Number(data?.bitcoin?.uah);
-      if (!Number.isFinite(numeric)) throw new Error("BTC rate missing");
-      return { display: `${formatTickerNumber(numeric, 0)} ₴`, numeric };
-    }],
-    ["sp500", async () => {
-      const data = await fetchJsonWithFallback("https://query1.finance.yahoo.com/v8/finance/chart/%5EGSPC?range=1d&interval=1d");
-      const numeric = Number(data?.chart?.result?.[0]?.meta?.regularMarketPrice);
-      if (!Number.isFinite(numeric)) throw new Error("S&P 500 quote missing");
-      return { display: formatTickerNumber(numeric), numeric };
-    }],
-    ["brent", async () => {
-      const data = await fetchJsonWithFallback("https://query1.finance.yahoo.com/v8/finance/chart/BZ%3DF?range=1d&interval=1d");
-      const numeric = Number(data?.chart?.result?.[0]?.meta?.regularMarketPrice);
-      if (!Number.isFinite(numeric)) throw new Error("Brent quote missing");
-      return { display: `$${formatTickerNumber(numeric)}`, numeric };
-    }]
-  ];
-  let successes = 0;
-  await Promise.all(jobs.map(async ([key, getter]) => {
-    try {
-      const { display, numeric } = await getter();
-      setTickerValue(key, display, numeric);
-      successes++;
-    } catch (error) {
-      console.warn(`Market quote ${key} unavailable:`, error);
-      setTickerValue(key, unavailable(), null);
-    }
-  }));
-  if (note) {
-    const sourceKey = "Market quotes: NBU, CoinGecko and Yahoo Finance";
-    note.textContent = translations[sourceKey]?.[lang] || sourceKey;
-    note.title = successes < jobs.length
-      ? (lang === "ru" ? "Некоторые источники котировок могут быть временно недоступны."
-        : lang === "uk" ? "Деякі джерела котирувань можуть бути тимчасово недоступні."
-        : lang === "pl" ? "Niektóre źródła notowań mogą być chwilowo niedostępne."
-        : "Some quote sources may be temporarily unavailable.")
-      : "";
+  const base = tickerBaseCurrency();
+  const pairs = {
+    UAH: { usd: "USD/UAH", pln: "PLN/UAH", btc: "BTC/UAH" },
+    PLN: { usd: "USD/PLN", pln: "UAH/PLN", btc: "BTC/PLN" },
+    USD: { usd: "PLN/USD", pln: "UAH/USD", btc: "BTC/USD" }
+  };
+  const icons = base === "UAH" ? { usd: "🇺🇸", pln: "🇵🇱" } : base === "PLN" ? { usd: "🇺🇸", pln: "🇺🇦" } : { usd: "🇵🇱", pln: "🇺🇦" };
+  for (const key of ["usd", "pln", "btc"]) tickerSetText("label", key, pairs[base][key]);
+  tickerSetText("icon", "usd", icons.usd); tickerSetText("icon", "pln", icons.pln);
+  try {
+    const [usdData, plnData, btcData] = await Promise.all([
+      fetchJsonWithFallback("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=USD&json"),
+      fetchJsonWithFallback("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=PLN&json"),
+      fetchJsonWithFallback("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=uah")
+    ]);
+    const usdRow = Array.isArray(usdData) ? usdData[0] : null;
+    const plnRow = Array.isArray(plnData) ? plnData[0] : null;
+    const usdUah = Number(usdRow?.rate), plnUah = Number(plnRow?.rate), btcUah = Number(btcData?.bitcoin?.uah);
+    if (![usdUah, plnUah, btcUah].every(Number.isFinite) || usdUah <= 0 || plnUah <= 0 || btcUah <= 0) throw new Error("Currency quote missing");
+    const rates = base === "UAH" ? { usd: usdUah, pln: plnUah, btc: btcUah }
+      : base === "PLN" ? { usd: usdUah / plnUah, pln: 1 / plnUah, btc: btcUah / plnUah }
+      : { usd: plnUah / usdUah, pln: 1 / usdUah, btc: btcUah / usdUah };
+    const date = tickerDate(usdRow?.exchangedate || plnRow?.exchangedate);
+    const sourceDate = date || (lang === "pl" ? "data NBP" : lang === "en" ? "NBU rate" : "курс НБУ");
+    const checkedAt = new Intl.DateTimeFormat(tickerLocale[lang] || "uk-UA", { hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date());
+    setTickerValue("usd", formatTickerNumber(rates.usd, 2), rates.usd, pairs[base].usd);
+    setTickerValue("pln", formatTickerNumber(rates.pln, base === "USD" ? 4 : 2), rates.pln, pairs[base].pln);
+    setTickerValue("btc", formatTickerNumber(rates.btc, 0), rates.btc, pairs[base].btc);
+    tickerSetText("source", "usd", `${lang === "pl" ? "NBP" : "НБУ"} · ${sourceDate}`);
+    tickerSetText("source", "pln", `${lang === "pl" ? "NBP" : "НБУ"} · ${sourceDate}`);
+    tickerSetText("source", "btc", `CoinGecko · ${checkedAt}`);
+    if (note) note.textContent = lang === "pl" ? `Kursy walut · sprawdzono ${checkedAt}` : lang === "en" ? `Currency rates · checked ${checkedAt}` : lang === "ru" ? `Курсы валют · проверено ${checkedAt}` : `Курси валют · перевірено ${checkedAt}`;
+  } catch (error) {
+    console.warn("Currency ticker unavailable:", error);
+    for (const key of ["usd", "pln", "btc"]) { setTickerValue(key, unavailable(), null); tickerSetText("source", key, ""); }
+    if (note) note.textContent = lang === "pl" ? "Dane chwilowo niedostępne" : lang === "en" ? "Quotes temporarily unavailable" : lang === "ru" ? "Котировки временно недоступны" : "Котирування тимчасово недоступні";
   }
 }
 
@@ -1552,6 +1533,7 @@ function translateTextElement(element, original) {
 }
 function translatePage(selectedLanguage) {
   lang = selectedLanguage;
+  if (typeof loadMarketQuotes === "function") loadMarketQuotes();
   document.documentElement.lang = lang;
   localStorage.setItem("hryvniaHubLanguage", lang);
   updateLangButton();

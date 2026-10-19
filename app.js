@@ -317,17 +317,70 @@ function escapeHtml(value = "") {
   }[char]));
 }
 
-function money(value) {
+const LISTING_RATES_KEY = "hryvniaHubListingRates";
+let listingRates = loadListingRates();
+
+function loadListingRates() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(LISTING_RATES_KEY) || "null");
+    if (saved && Number(saved.usdUah) > 0 && Number(saved.plnUah) > 0) {
+      return { usdUah: Number(saved.usdUah), plnUah: Number(saved.plnUah), rateDate: saved.rateDate || "", checkedAt: saved.checkedAt || "" };
+    }
+  } catch {}
+  return null;
+}
+
+function listingCurrencyForLanguage() {
+  return lang === "en" ? "USD" : lang === "pl" ? "PLN" : "UAH";
+}
+
+function money(value, sourceCurrency = "UAH") {
   const localeMap = { uk: "uk-UA", ru: "ru-RU", en: "en-US", pl: "pl-PL" };
-  const isoCurrency = lang === "en" ? "USD" : lang === "pl" ? "PLN" : "UAH";
+  const source = String(sourceCurrency || "UAH").toUpperCase();
+  const target = listingCurrencyForLanguage();
+  const amount = Number(value);
+  if (!Number.isFinite(amount)) return "—";
+
+  // Do not relabel an amount as another currency if we have no usable exchange rate.
+  if (source !== target && !listingRates) {
+    try {
+      return new Intl.NumberFormat(localeMap[lang] || "uk-UA", {
+        style: "currency", currency: ["UAH", "USD", "PLN"].includes(source) ? source : "UAH",
+        maximumFractionDigits: 0
+      }).format(amount);
+    } catch {
+      return `${amount} ${source}`;
+    }
+  }
+
+  const uahPerCurrency = {
+    UAH: 1,
+    USD: listingRates?.usdUah,
+    PLN: listingRates?.plnUah
+  };
+  const sourceRate = uahPerCurrency[source];
+  const targetRate = uahPerCurrency[target];
+
+  if (!Number.isFinite(sourceRate) || sourceRate <= 0 || !Number.isFinite(targetRate) || targetRate <= 0) {
+    try {
+      return new Intl.NumberFormat(localeMap[lang] || "uk-UA", {
+        style: "currency", currency: ["UAH", "USD", "PLN"].includes(source) ? source : "UAH",
+        maximumFractionDigits: 0
+      }).format(amount);
+    } catch {
+      return `${amount} ${source}`;
+    }
+  }
+
+  const converted = amount * sourceRate / targetRate;
   try {
     return new Intl.NumberFormat(localeMap[lang] || "uk-UA", {
       style: "currency",
-      currency: isoCurrency,
+      currency: target,
       maximumFractionDigits: 0
-    }).format(Number(value || 0));
+    }).format(converted);
   } catch {
-    return new Intl.NumberFormat("uk-UA").format(Number(value || 0)) + " грн";
+    return `${Math.round(converted)} ${target}`;
   }
 }
 
@@ -749,7 +802,7 @@ async function renderFavoritesList() {
     <article class="card fav-card" data-fav-open-id="${escapeHtml(String(item.id))}" tabindex="0">
       ${listingCover(item)}
       <h3>${escapeHtml(item.title)}</h3>
-      <p class="price">${money(item.price)}</p>
+      <p class="price">${money(item.price, item.currency || "UAH")}</p>
     </article>
   `).join("");
 }
@@ -1025,15 +1078,27 @@ async function loadMarketQuotes() {
   for (const key of ["usd", "pln", "btc"]) tickerSetText("label", key, pairs[base][key]);
   tickerSetText("icon", "usd", icons.usd); tickerSetText("icon", "pln", icons.pln);
   try {
-    const [usdData, plnData, btcData] = await Promise.all([
+    const [usdResult, plnResult, btcResult] = await Promise.allSettled([
       fetchJsonWithFallback("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=USD&json"),
       fetchJsonWithFallback("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=PLN&json"),
       fetchJsonWithFallback("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=uah")
     ]);
+    if (usdResult.status !== "fulfilled" || plnResult.status !== "fulfilled") {
+      throw new Error("NBU exchange rates unavailable");
+    }
+    const usdData = usdResult.value, plnData = plnResult.value;
+    const btcData = btcResult.status === "fulfilled" ? btcResult.value : null;
     const usdRow = Array.isArray(usdData) ? usdData[0] : null;
     const plnRow = Array.isArray(plnData) ? plnData[0] : null;
     const usdUah = Number(usdRow?.rate), plnUah = Number(plnRow?.rate), btcUah = Number(btcData?.bitcoin?.uah);
-    if (![usdUah, plnUah, btcUah].every(Number.isFinite) || usdUah <= 0 || plnUah <= 0 || btcUah <= 0) throw new Error("Currency quote missing");
+    if (![usdUah, plnUah].every(Number.isFinite) || usdUah <= 0 || plnUah <= 0) throw new Error("NBU currency quote missing");
+    listingRates = {
+      usdUah,
+      plnUah,
+      rateDate: usdRow?.exchangedate || plnRow?.exchangedate || "",
+      checkedAt: new Date().toISOString()
+    };
+    try { localStorage.setItem(LISTING_RATES_KEY, JSON.stringify(listingRates)); } catch {}
     const rates = base === "UAH" ? { usd: usdUah, pln: plnUah, btc: btcUah }
       : base === "PLN" ? { usd: usdUah / plnUah, pln: 1 / plnUah, btc: btcUah / plnUah }
       : { usd: plnUah / usdUah, pln: 1 / usdUah, btc: btcUah / usdUah };
@@ -1042,15 +1107,43 @@ async function loadMarketQuotes() {
     const checkedAt = new Intl.DateTimeFormat(tickerLocale[lang] || "uk-UA", { hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date());
     setTickerValue("usd", formatTickerNumber(rates.usd, 2), rates.usd, pairs[base].usd);
     setTickerValue("pln", formatTickerNumber(rates.pln, base === "USD" ? 4 : 2), rates.pln, pairs[base].pln);
-    setTickerValue("btc", formatTickerNumber(rates.btc, 0), rates.btc, pairs[base].btc);
+    if (Number.isFinite(btcUah) && btcUah > 0) {
+      setTickerValue("btc", formatTickerNumber(rates.btc, 0), rates.btc, pairs[base].btc);
+      tickerSetText("source", "btc", `CoinGecko · ${checkedAt}`);
+    } else {
+      setTickerValue("btc", unavailable(), null);
+      tickerSetText("source", "btc", "");
+    }
     tickerSetText("source", "usd", `${lang === "pl" ? "NBP" : "НБУ"} · ${sourceDate}`);
     tickerSetText("source", "pln", `${lang === "pl" ? "NBP" : "НБУ"} · ${sourceDate}`);
-    tickerSetText("source", "btc", `CoinGecko · ${checkedAt}`);
     if (note) note.textContent = lang === "pl" ? `Kursy walut · sprawdzono ${checkedAt}` : lang === "en" ? `Currency rates · checked ${checkedAt}` : lang === "ru" ? `Курсы валют · проверено ${checkedAt}` : `Курси валют · перевірено ${checkedAt}`;
   } catch (error) {
     console.warn("Currency ticker unavailable:", error);
-    for (const key of ["usd", "pln", "btc"]) { setTickerValue(key, unavailable(), null); tickerSetText("source", key, ""); }
-    if (note) note.textContent = lang === "pl" ? "Dane chwilowo niedostępne" : lang === "en" ? "Quotes temporarily unavailable" : lang === "ru" ? "Котировки временно недоступны" : "Котирування тимчасово недоступні";
+    if (listingRates) {
+      const rates = base === "UAH"
+        ? { usd: listingRates.usdUah, pln: listingRates.plnUah }
+        : base === "PLN"
+          ? { usd: listingRates.usdUah / listingRates.plnUah, pln: 1 / listingRates.plnUah }
+          : { usd: listingRates.plnUah / listingRates.usdUah, pln: 1 / listingRates.usdUah };
+      setTickerValue("usd", formatTickerNumber(rates.usd, 2), rates.usd, pairs[base].usd);
+      setTickerValue("pln", formatTickerNumber(rates.pln, base === "USD" ? 4 : 2), rates.pln, pairs[base].pln);
+      tickerSetText("source", "usd", `NBU · ${listingRates.rateDate || "last saved rate"}`);
+      tickerSetText("source", "pln", `NBU · ${listingRates.rateDate || "last saved rate"}`);
+      tickerSetText("source", "btc", "");
+      if (note) note.textContent = lang === "pl"
+        ? `Używany ostatni zapisany kurs · ${listingRates.rateDate || "data niedostępna"}`
+        : lang === "en"
+          ? `Using last saved rate · ${listingRates.rateDate || "date unavailable"}`
+          : lang === "ru"
+            ? `Используется последний сохранённый курс · ${listingRates.rateDate || "дата неизвестна"}`
+            : `Використовується останній збережений курс · ${listingRates.rateDate || "дату не вказано"}`;
+    } else {
+      for (const key of ["usd", "pln", "btc"]) { setTickerValue(key, unavailable(), null); tickerSetText("source", key, ""); }
+      if (note) note.textContent = lang === "pl" ? "Brak zapisanych kursów" : lang === "en" ? "No saved exchange rates available" : lang === "ru" ? "Нет сохранённых курсов валют" : "Немає збережених курсів валют";
+    }
+  } finally {
+    // Re-render all visible prices whenever the available rates change or the language changes.
+    if (Array.isArray(visibleListings) && visibleListings.length) renderListings(visibleListings);
   }
 }
 
@@ -1329,7 +1422,7 @@ function openListing(item, galleryOnly = false) {
     </section>` : ""}
     ${galleryOnly ? "" : `<span class="badge">${categoryLabel(item)}</span>
       <p class="city">${escapeHtml(item.cities?.[`name_${lang}`] || item.cities?.name_ru || item.city || "")}</p>
-      <p class="price">${money(item.price)}</p>
+      <p class="price">${money(item.price, item.currency || "UAH")}</p>
       <p class="desc" style="white-space:pre-wrap">${escapeHtml(item.description || "")}</p>
       ${showContact && currentUser && currentUser.id !== item.user_id
         ? `<button type="button" class="btn btn-primary full btn-contact" data-contact="${escapeHtml(String(item.id))}">${escapeHtml(t("Написать продавцу"))}</button>`
@@ -1401,7 +1494,7 @@ function renderListings(items) {
         <span class="city">${escapeHtml(item.cities?.[`name_${lang}`] || item.cities?.name_ru || "")}</span>
       </div>
       <h3>${escapeHtml(item.title)}</h3>
-      <p class="price">${money(item.price)}</p>
+      <p class="price">${money(item.price, item.currency || "UAH")}</p>
       <p class="desc">${escapeHtml(item.description || "Описание не указано.")}</p>
     </article>`;
   }).join("");

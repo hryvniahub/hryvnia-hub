@@ -215,6 +215,21 @@ const translations = {
     en: "AI picks: below the category average",
     pl: "Wybór AI: poniżej średniej kategorii"
   },
+  "HOT OFFERS": { ru: "ГОРЯЧИЕ ПРЕДЛОЖЕНИЯ", uk: "ГАРЯЧІ ПРОПОЗИЦІЇ", en: "HOT OFFERS", pl: "GORĄCE OFERTY" },
+  "Urgent deals": { ru: "Срочные предложения", uk: "Термінові пропозиції", en: "Urgent deals", pl: "Pilne okazje" },
+  "Best offers below market price": { ru: "Лучшие предложения ниже рыночной цены", uk: "Найкращі пропозиції нижче ринкової ціни", en: "Best offers below market price", pl: "Najlepsze oferty poniżej ceny rynkowej" },
+  "Urgent deals will appear here once listings are flagged as urgent in the database.": { ru: "Срочные предложения появятся здесь, когда объявления будут отмечены как срочные.", uk: "Термінові пропозиції з'являться тут, коли оголошення будуть позначені як термінові.", en: "Urgent deals will appear here once listings are flagged as urgent in the database.", pl: "Pilne okazje pojawią się tutaj, gdy ogłoszenia zostaną oznaczone jako pilne." },
+  "Цена (любая)": { ru: "Цена (любая)", uk: "Ціна (будь-яка)", en: "Price (any)", pl: "Cena (dowolna)" },
+  "Радиус поиска": { ru: "Радиус поиска", uk: "Радіус пошуку", en: "Search radius", pl: "Promień wyszukiwania" },
+  "Радиус: 30 км": { ru: "Радиус: 30 км", uk: "Радіус: 30 км", en: "Radius: 30 km", pl: "Promień: 30 km" },
+  "Радиус: 50 км": { ru: "Радиус: 50 км", uk: "Радіус: 50 км", en: "Radius: 50 km", pl: "Promień: 50 km" },
+  "Радиус: 100 км": { ru: "Радиус: 100 км", uk: "Радіус: 100 км", en: "Radius: 100 km", pl: "Promień: 100 km" },
+  "Радиус: 200 км": { ru: "Радиус: 200 км", uk: "Радіус: 200 км", en: "Radius: 200 km", pl: "Promień: 200 km" },
+  "Область": { ru: "Область", uk: "Область", en: "Region", pl: "Region" },
+  "Поиск": { ru: "Поиск", uk: "Пошук", en: "Search", pl: "Szukaj" },
+  "Описание не указано.": { ru: "Описание не указано.", uk: "Опис не вказано.", en: "No description provided.", pl: "Brak opisu." },
+  "В избранное": { ru: "В избранное", uk: "В обране", en: "Add to favorites", pl: "Dodaj do ulubionych" },
+  "Убрать из избранного": { ru: "Убрать из избранного", uk: "Прибрати з обраного", en: "Remove from favorites", pl: "Usuń z ulubionych" },
   "Объявление": { ru: "Объявление", uk: "Оголошення", en: "Listing", pl: "Ogłoszenie" }
 };
 
@@ -302,17 +317,70 @@ function escapeHtml(value = "") {
   }[char]));
 }
 
-function money(value) {
+const LISTING_RATES_KEY = "hryvniaHubListingRates";
+let listingRates = loadListingRates();
+
+function loadListingRates() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(LISTING_RATES_KEY) || "null");
+    if (saved && Number(saved.usdUah) > 0 && Number(saved.plnUah) > 0) {
+      return { usdUah: Number(saved.usdUah), plnUah: Number(saved.plnUah), rateDate: saved.rateDate || "", checkedAt: saved.checkedAt || "" };
+    }
+  } catch {}
+  return null;
+}
+
+function listingCurrencyForLanguage() {
+  return lang === "en" ? "USD" : lang === "pl" ? "PLN" : "UAH";
+}
+
+function money(value, sourceCurrency = "UAH") {
   const localeMap = { uk: "uk-UA", ru: "ru-RU", en: "en-US", pl: "pl-PL" };
-  const isoCurrency = lang === "en" ? "USD" : lang === "pl" ? "PLN" : "UAH";
+  const source = String(sourceCurrency || "UAH").toUpperCase();
+  const target = listingCurrencyForLanguage();
+  const amount = Number(value);
+  if (!Number.isFinite(amount)) return "—";
+
+  // Do not relabel an amount as another currency if we have no usable exchange rate.
+  if (source !== target && !listingRates) {
+    try {
+      return new Intl.NumberFormat(localeMap[lang] || "uk-UA", {
+        style: "currency", currency: ["UAH", "USD", "PLN"].includes(source) ? source : "UAH",
+        maximumFractionDigits: 0
+      }).format(amount);
+    } catch {
+      return `${amount} ${source}`;
+    }
+  }
+
+  const uahPerCurrency = {
+    UAH: 1,
+    USD: listingRates?.usdUah,
+    PLN: listingRates?.plnUah
+  };
+  const sourceRate = uahPerCurrency[source];
+  const targetRate = uahPerCurrency[target];
+
+  if (!Number.isFinite(sourceRate) || sourceRate <= 0 || !Number.isFinite(targetRate) || targetRate <= 0) {
+    try {
+      return new Intl.NumberFormat(localeMap[lang] || "uk-UA", {
+        style: "currency", currency: ["UAH", "USD", "PLN"].includes(source) ? source : "UAH",
+        maximumFractionDigits: 0
+      }).format(amount);
+    } catch {
+      return `${amount} ${source}`;
+    }
+  }
+
+  const converted = amount * sourceRate / targetRate;
   try {
     return new Intl.NumberFormat(localeMap[lang] || "uk-UA", {
       style: "currency",
-      currency: isoCurrency,
+      currency: target,
       maximumFractionDigits: 0
-    }).format(Number(value || 0));
+    }).format(converted);
   } catch {
-    return new Intl.NumberFormat("uk-UA").format(Number(value || 0)) + " грн";
+    return `${Math.round(converted)} ${target}`;
   }
 }
 
@@ -696,7 +764,7 @@ function toggleFavorite(id) {
   document.querySelectorAll(`.fav-btn[data-fav-id="${CSS.escape(key)}"]`).forEach(btn => {
     btn.classList.toggle("active", !wasFav);
     btn.setAttribute("aria-pressed", String(!wasFav));
-    btn.setAttribute("aria-label", !wasFav ? "Убрать из избранного" : "В избранное");
+    btn.setAttribute("aria-label", !wasFav ? t("Убрать из избранного") : t("В избранное"));
     const span = btn.querySelector("span");
     if (span) span.textContent = !wasFav ? "♥" : "♡";
   });
@@ -734,7 +802,7 @@ async function renderFavoritesList() {
     <article class="card fav-card" data-fav-open-id="${escapeHtml(String(item.id))}" tabindex="0">
       ${listingCover(item)}
       <h3>${escapeHtml(item.title)}</h3>
-      <p class="price">${money(item.price)}</p>
+      <p class="price">${money(item.price, item.currency || "UAH")}</p>
     </article>
   `).join("");
 }
@@ -955,29 +1023,24 @@ function loadTickerPrev() {
 function saveTickerPrev(data) {
   try { localStorage.setItem(TICKER_PREV_KEY, JSON.stringify(data)); } catch {}
 }
-function setTickerValue(key, display, numeric) {
+function setTickerValue(key, display, numeric, comparisonKey = key) {
   const el = document.querySelector(`[data-ticker="${key}"]`);
   if (el) el.textContent = display;
   const arrow = document.querySelector(`[data-ticker-arrow="${key}"]`);
   if (!arrow) return;
-  arrow.className = "ticker-arrow";
-  arrow.textContent = "";
+  arrow.className = "ticker-arrow"; arrow.textContent = "";
   if (!Number.isFinite(numeric)) return;
-  const prev = loadTickerPrev();
-  const prevVal = Number(prev[key]);
+  const prev = loadTickerPrev(); const prevVal = Number(prev[comparisonKey]);
   if (Number.isFinite(prevVal) && prevVal !== 0) {
-    if (numeric > prevVal)       { arrow.textContent = "▲"; arrow.classList.add("up"); }
-    else if (numeric < prevVal)  { arrow.textContent = "▼"; arrow.classList.add("down"); }
-    else                         { arrow.textContent = "•"; arrow.classList.add("flat"); }
+    if (numeric > prevVal) { arrow.textContent = "▲"; arrow.classList.add("up"); }
+    else if (numeric < prevVal) { arrow.textContent = "▼"; arrow.classList.add("down"); }
+    else { arrow.textContent = "•"; arrow.classList.add("flat"); }
   }
-  prev[key] = numeric;
-  saveTickerPrev(prev);
+  prev[comparisonKey] = numeric; saveTickerPrev(prev);
 }
 const tickerLocale = { ru: "ru-RU", uk: "uk-UA", en: "en-US", pl: "pl-PL" };
 function formatTickerNumber(value, digits = 2) {
-  return new Intl.NumberFormat(tickerLocale[lang] || "uk-UA", {
-    minimumFractionDigits: digits, maximumFractionDigits: digits
-  }).format(value);
+  return new Intl.NumberFormat(tickerLocale[lang] || "uk-UA", { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(value);
 }
 async function fetchJsonWithFallback(url) {
   try {
@@ -991,70 +1054,96 @@ async function fetchJsonWithFallback(url) {
     return await response.json();
   }
 }
+function tickerBaseCurrency() { return lang === "pl" ? "PLN" : lang === "en" ? "USD" : "UAH"; }
+function tickerDate(dateValue) {
+  if (!dateValue) return "";
+  const parsed = new Date(dateValue);
+  if (Number.isNaN(parsed.getTime())) return "";
+  return new Intl.DateTimeFormat(tickerLocale[lang] || "uk-UA", { day: "2-digit", month: "2-digit", year: "numeric" }).format(parsed);
+}
+function tickerSetText(attribute, key, value) {
+  const el = document.querySelector(`[data-ticker-${attribute}="${key}"]`);
+  if (el) el.textContent = value;
+}
 async function loadMarketQuotes() {
   const note = document.getElementById("tickerNote");
   const unavailable = () => (translations["Quote unavailable"]?.[lang] || "Unavailable");
-  const jobs = [
-    ["usd", async () => {
-      const data = await fetchJsonWithFallback("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=USD&json");
-      const row = Array.isArray(data) ? data[0] : null;
-      const numeric = Number(row?.rate);
-      if (!Number.isFinite(numeric)) throw new Error("USD rate missing");
-      return { display: `${formatTickerNumber(numeric)} ₴`, numeric };
-    }],
-    ["eur", async () => {
-      const data = await fetchJsonWithFallback("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=EUR&json");
-      const row = Array.isArray(data) ? data[0] : null;
-      const numeric = Number(row?.rate);
-      if (!Number.isFinite(numeric)) throw new Error("EUR rate missing");
-      return { display: `${formatTickerNumber(numeric)} ₴`, numeric };
-    }],
-    ["pln", async () => {
-      const data = await fetchJsonWithFallback("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=PLN&json");
-      const row = Array.isArray(data) ? data[0] : null;
-      const numeric = Number(row?.rate);
-      if (!Number.isFinite(numeric)) throw new Error("PLN rate missing");
-      return { display: `${formatTickerNumber(numeric)} ₴`, numeric };
-    }],
-    ["btc", async () => {
-      const data = await fetchJsonWithFallback("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=uah");
-      const numeric = Number(data?.bitcoin?.uah);
-      if (!Number.isFinite(numeric)) throw new Error("BTC rate missing");
-      return { display: `${formatTickerNumber(numeric, 0)} ₴`, numeric };
-    }],
-    ["sp500", async () => {
-      const data = await fetchJsonWithFallback("https://query1.finance.yahoo.com/v8/finance/chart/%5EGSPC?range=1d&interval=1d");
-      const numeric = Number(data?.chart?.result?.[0]?.meta?.regularMarketPrice);
-      if (!Number.isFinite(numeric)) throw new Error("S&P 500 quote missing");
-      return { display: formatTickerNumber(numeric), numeric };
-    }],
-    ["brent", async () => {
-      const data = await fetchJsonWithFallback("https://query1.finance.yahoo.com/v8/finance/chart/BZ%3DF?range=1d&interval=1d");
-      const numeric = Number(data?.chart?.result?.[0]?.meta?.regularMarketPrice);
-      if (!Number.isFinite(numeric)) throw new Error("Brent quote missing");
-      return { display: `$${formatTickerNumber(numeric)}`, numeric };
-    }]
-  ];
-  let successes = 0;
-  await Promise.all(jobs.map(async ([key, getter]) => {
-    try {
-      const { display, numeric } = await getter();
-      setTickerValue(key, display, numeric);
-      successes++;
-    } catch (error) {
-      console.warn(`Market quote ${key} unavailable:`, error);
-      setTickerValue(key, unavailable(), null);
+  const base = tickerBaseCurrency();
+  const pairs = {
+    UAH: { usd: "USD/UAH", pln: "PLN/UAH", btc: "BTC/UAH" },
+    PLN: { usd: "USD/PLN", pln: "UAH/PLN", btc: "BTC/PLN" },
+    USD: { usd: "PLN/USD", pln: "UAH/USD", btc: "BTC/USD" }
+  };
+  const icons = base === "UAH" ? { usd: "🇺🇸", pln: "🇵🇱" } : base === "PLN" ? { usd: "🇺🇸", pln: "🇺🇦" } : { usd: "🇵🇱", pln: "🇺🇦" };
+  for (const key of ["usd", "pln", "btc"]) tickerSetText("label", key, pairs[base][key]);
+  tickerSetText("icon", "usd", icons.usd); tickerSetText("icon", "pln", icons.pln);
+  try {
+    const [usdResult, plnResult, btcResult] = await Promise.allSettled([
+      fetchJsonWithFallback("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=USD&json"),
+      fetchJsonWithFallback("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=PLN&json"),
+      fetchJsonWithFallback("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=uah")
+    ]);
+    if (usdResult.status !== "fulfilled" || plnResult.status !== "fulfilled") {
+      throw new Error("NBU exchange rates unavailable");
     }
-  }));
-  if (note) {
-    const sourceKey = "Market quotes: NBU, CoinGecko and Yahoo Finance";
-    note.textContent = translations[sourceKey]?.[lang] || sourceKey;
-    note.title = successes < jobs.length
-      ? (lang === "ru" ? "Некоторые источники котировок могут быть временно недоступны."
-        : lang === "uk" ? "Деякі джерела котирувань можуть бути тимчасово недоступні."
-        : lang === "pl" ? "Niektóre źródła notowań mogą być chwilowo niedostępne."
-        : "Some quote sources may be temporarily unavailable.")
-      : "";
+    const usdData = usdResult.value, plnData = plnResult.value;
+    const btcData = btcResult.status === "fulfilled" ? btcResult.value : null;
+    const usdRow = Array.isArray(usdData) ? usdData[0] : null;
+    const plnRow = Array.isArray(plnData) ? plnData[0] : null;
+    const usdUah = Number(usdRow?.rate), plnUah = Number(plnRow?.rate), btcUah = Number(btcData?.bitcoin?.uah);
+    if (![usdUah, plnUah].every(Number.isFinite) || usdUah <= 0 || plnUah <= 0) throw new Error("NBU currency quote missing");
+    listingRates = {
+      usdUah,
+      plnUah,
+      rateDate: usdRow?.exchangedate || plnRow?.exchangedate || "",
+      checkedAt: new Date().toISOString()
+    };
+    try { localStorage.setItem(LISTING_RATES_KEY, JSON.stringify(listingRates)); } catch {}
+    const rates = base === "UAH" ? { usd: usdUah, pln: plnUah, btc: btcUah }
+      : base === "PLN" ? { usd: usdUah / plnUah, pln: 1 / plnUah, btc: btcUah / plnUah }
+      : { usd: plnUah / usdUah, pln: 1 / usdUah, btc: btcUah / usdUah };
+    const date = tickerDate(usdRow?.exchangedate || plnRow?.exchangedate);
+    const sourceDate = date || (lang === "pl" ? "data NBP" : lang === "en" ? "NBU rate" : "курс НБУ");
+    const checkedAt = new Intl.DateTimeFormat(tickerLocale[lang] || "uk-UA", { hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date());
+    setTickerValue("usd", formatTickerNumber(rates.usd, 2), rates.usd, pairs[base].usd);
+    setTickerValue("pln", formatTickerNumber(rates.pln, base === "USD" ? 4 : 2), rates.pln, pairs[base].pln);
+    if (Number.isFinite(btcUah) && btcUah > 0) {
+      setTickerValue("btc", formatTickerNumber(rates.btc, 0), rates.btc, pairs[base].btc);
+      tickerSetText("source", "btc", `CoinGecko · ${checkedAt}`);
+    } else {
+      setTickerValue("btc", unavailable(), null);
+      tickerSetText("source", "btc", "");
+    }
+    tickerSetText("source", "usd", `${lang === "pl" ? "NBP" : "НБУ"} · ${sourceDate}`);
+    tickerSetText("source", "pln", `${lang === "pl" ? "NBP" : "НБУ"} · ${sourceDate}`);
+    if (note) note.textContent = lang === "pl" ? `Kursy walut · sprawdzono ${checkedAt}` : lang === "en" ? `Currency rates · checked ${checkedAt}` : lang === "ru" ? `Курсы валют · проверено ${checkedAt}` : `Курси валют · перевірено ${checkedAt}`;
+  } catch (error) {
+    console.warn("Currency ticker unavailable:", error);
+    if (listingRates) {
+      const rates = base === "UAH"
+        ? { usd: listingRates.usdUah, pln: listingRates.plnUah }
+        : base === "PLN"
+          ? { usd: listingRates.usdUah / listingRates.plnUah, pln: 1 / listingRates.plnUah }
+          : { usd: listingRates.plnUah / listingRates.usdUah, pln: 1 / listingRates.usdUah };
+      setTickerValue("usd", formatTickerNumber(rates.usd, 2), rates.usd, pairs[base].usd);
+      setTickerValue("pln", formatTickerNumber(rates.pln, base === "USD" ? 4 : 2), rates.pln, pairs[base].pln);
+      tickerSetText("source", "usd", `NBU · ${listingRates.rateDate || "last saved rate"}`);
+      tickerSetText("source", "pln", `NBU · ${listingRates.rateDate || "last saved rate"}`);
+      tickerSetText("source", "btc", "");
+      if (note) note.textContent = lang === "pl"
+        ? `Używany ostatni zapisany kurs · ${listingRates.rateDate || "data niedostępna"}`
+        : lang === "en"
+          ? `Using last saved rate · ${listingRates.rateDate || "date unavailable"}`
+          : lang === "ru"
+            ? `Используется последний сохранённый курс · ${listingRates.rateDate || "дата неизвестна"}`
+            : `Використовується останній збережений курс · ${listingRates.rateDate || "дату не вказано"}`;
+    } else {
+      for (const key of ["usd", "pln", "btc"]) { setTickerValue(key, unavailable(), null); tickerSetText("source", key, ""); }
+      if (note) note.textContent = lang === "pl" ? "Brak zapisanych kursów" : lang === "en" ? "No saved exchange rates available" : lang === "ru" ? "Нет сохранённых курсов валют" : "Немає збережених курсів валют";
+    }
+  } finally {
+    // Re-render all visible prices whenever the available rates change or the language changes.
+    if (Array.isArray(visibleListings) && visibleListings.length) renderListings(visibleListings);
   }
 }
 
@@ -1079,11 +1168,24 @@ function getQueryVariants(text) {
   variants.add(swapLayout(base, EN_LAYOUT_MAP));
   return [...variants].filter(Boolean);
 }
+function transliterate(name) {
+  const map = {"а":"a","б":"b","в":"v","г":"h","ґ":"g","д":"d","е":"e","є":"ye","ж":"zh","з":"z","и":"y","і":"i","ї":"yi","й":"y","к":"k","л":"l","м":"m","н":"n","о":"o","п":"p","р":"r","с":"s","т":"t","у":"u","ф":"f","х":"kh","ц":"ts","ч":"ch","ш":"sh","щ":"shch","ь":"","ю":"yu","я":"ya","ы":"y","э":"e","ё":"yo","ъ":""};
+  return String(name || "").split("").map(char => map[char] || char).join("");
+}
 function buildCityEntry(city) {
-  const nameTokens = [...new Set(["name_ru", "name_uk", "name_en", "name_pl"].map(key => normalizeCitySearch(city[key])).filter(Boolean))];
+  const rawNames = ["name_ru", "name_uk", "name_en", "name_pl"]
+    .map(key => normalizeCitySearch(city[key]))
+    .filter(Boolean);
+  const nameTokens = new Set(rawNames);
+  rawNames.forEach(name => {
+    if (/[а-яёїєґ]/i.test(name)) {
+      const translit = transliterate(name);
+      if (translit) nameTokens.add(translit);
+    }
+  });
   const regionNameUk = regionNames[String(city.region_katottg_code)] || "";
   const regionToken = normalizeCitySearch(regionNameUk);
-  return { city, nameTokens, regionToken, regionNameUk };
+  return { city, nameTokens: [...nameTokens], regionToken, regionNameUk };
 }
 function rankCityEntry(entry, queryVariants) {
   if (!queryVariants.length) return 0;
@@ -1320,7 +1422,7 @@ function openListing(item, galleryOnly = false) {
     </section>` : ""}
     ${galleryOnly ? "" : `<span class="badge">${categoryLabel(item)}</span>
       <p class="city">${escapeHtml(item.cities?.[`name_${lang}`] || item.cities?.name_ru || item.city || "")}</p>
-      <p class="price">${money(item.price)}</p>
+      <p class="price">${money(item.price, item.currency || "UAH")}</p>
       <p class="desc" style="white-space:pre-wrap">${escapeHtml(item.description || "")}</p>
       ${showContact && currentUser && currentUser.id !== item.user_id
         ? `<button type="button" class="btn btn-primary full btn-contact" data-contact="${escapeHtml(String(item.id))}">${escapeHtml(t("Написать продавцу"))}</button>`
@@ -1392,7 +1494,7 @@ function renderListings(items) {
         <span class="city">${escapeHtml(item.cities?.[`name_${lang}`] || item.cities?.name_ru || "")}</span>
       </div>
       <h3>${escapeHtml(item.title)}</h3>
-      <p class="price">${money(item.price)}</p>
+      <p class="price">${money(item.price, item.currency || "UAH")}</p>
       <p class="desc">${escapeHtml(item.description || "Описание не указано.")}</p>
     </article>`;
   }).join("");
@@ -1524,11 +1626,20 @@ function translateTextElement(element, original) {
 }
 function translatePage(selectedLanguage) {
   lang = selectedLanguage;
+  if (typeof loadMarketQuotes === "function") loadMarketQuotes();
   document.documentElement.lang = lang;
   localStorage.setItem("hryvniaHubLanguage", lang);
   updateLangButton();
   updateAuthTranslations();
   document.querySelectorAll("[data-i18n]").forEach(el => translateTextElement(el, el.dataset.i18n));
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+    const item = translations[el.dataset.i18nPlaceholder];
+    if (item && item[lang]) el.placeholder = item[lang];
+  });
+  document.querySelectorAll("[data-i18n-aria]").forEach(el => {
+    const item = translations[el.dataset.i18nAria];
+    if (item && item[lang]) el.setAttribute("aria-label", item[lang]);
+  });
   updatePhotoFields();
   translateTextElement(document.getElementById("openAdd"), "+ Добавить объявление");
   const heroTitle = document.querySelector(".hero h1");

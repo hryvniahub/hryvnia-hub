@@ -194,18 +194,28 @@ body:has(.menu-toggle:checked) .mobile-menu-overlay { opacity: 1; pointer-events
 .banner-title { margin: 0 0 6px; font-size: clamp(20px, 3vw, 30px); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; color: #fff; }
 .hero-text { margin: 0; font-size: 13.5px; color: rgba(255, 255, 255, 0.9); max-width: 560px; }
 
-/* ==== TICKER ==== */
+/* ==== CURRENCY TICKER ==== */
 .market-ticker {
-  margin-top: 12px; background: #fff; border: 2.5px solid var(--accent-border);
-  border-radius: var(--radius); padding: 10px 12px; display: flex; align-items: center; gap: 12px;
+  position: relative; z-index: 3; margin: -18px 12px 12px; padding: 12px 14px;
+  background: rgba(255,255,255,.97); border: 1px solid var(--accent-border); border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(23,35,24,.13), inset 0 1px 0 rgba(255,255,255,.9);
+  display: flex; align-items: center; gap: 12px;
 }
-.ticker-scroll { display: flex; gap: 20px; overflow-x: auto; scrollbar-width: none; flex: 1; }
-.ticker-scroll::-webkit-scrollbar { display: none; }
-.ticker-item { display: inline-flex; align-items: baseline; gap: 6px; white-space: nowrap; font-size: 13px; color: var(--text); }
-.ticker-label { font-weight: 600; color: var(--muted); font-size: 12px; letter-spacing: 0.02em; }
-.ticker-value { font-weight: 800; color: var(--muted); }
-.ticker-note { font-size: 11px; color: var(--muted); padding: 3px 8px; border-radius: 999px; background: #f3f4f7; white-space: nowrap; }
-
+.ticker-scroll { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); width: 100%; min-width: 0; overflow: hidden; }
+.ticker-item { display: flex; align-items: center; gap: 12px; min-width: 0; padding: 2px 16px; white-space: nowrap; }
+.ticker-item + .ticker-item { border-left: 1px solid #d8dfd9; }
+.ticker-icon { display: inline-flex; flex: 0 0 42px; width: 42px; height: 42px; align-items: center; justify-content: center; border-radius: 50%; background: #f1f4ef; font-size: 26px; line-height: 1; }
+.ticker-icon-btc { background: #ff951b; color: #fff; font-size: 29px; font-weight: 800; }
+.ticker-details { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.ticker-label { font-weight: 800; color: #202824; font-size: 12px; letter-spacing: .025em; }
+.ticker-main { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.ticker-value { font-weight: 800; color: #18231d; font-size: clamp(15px,1.45vw,20px); line-height: 1.1; }
+.ticker-arrow { font-size: 11px; font-weight: 700; }
+.ticker-arrow.up { color: #159447; }
+.ticker-arrow.down { color: #e32f3d; }
+.ticker-arrow.flat { color: var(--muted); }
+.ticker-source { color: var(--muted); font-size: 10.5px; line-height: 1.25; }
+.ticker-note { display: none; font-size: 10px; color: var(--muted); white-space: nowrap; }
 /* ==== SEARCH + AI ==== */
 .search-ai-section { margin-top: 12px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; align-items: stretch; }
 .search-panel {
@@ -451,7 +461,15 @@ h2 { font-size: 22px; margin: 0; letter-spacing: -0.02em; }
   .hero-text { font-size: 11.5px; line-height: 1.3; }
 
   /* --- ОСТАЛЬНОЕ БЕЗ ИЗМЕНЕНИЙ --- */
-  .market-ticker { padding: 8px 10px; margin-top: 8px; }
+  .market-ticker { margin: -10px 4px 8px; padding: 8px 5px; border-radius: 14px; }
+  .ticker-item { gap: 6px; padding: 2px 7px; }
+  .ticker-icon { flex-basis: 28px; width: 28px; height: 28px; font-size: 17px; }
+  .ticker-icon-btc { font-size: 19px; }
+  .ticker-label { font-size: 9px; letter-spacing: 0; }
+  .ticker-value { font-size: clamp(11px,3vw,14px); }
+  .ticker-main { gap: 3px; }
+  .ticker-arrow { font-size: 9px; }
+  .ticker-source { font-size: 8px; }
   .ticker-note { display: none; }
   .search-ai-section { margin-top: 8px; gap: 8px; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); }
   .search-panel { padding: 10px; width: auto; justify-self: stretch; }
@@ -1525,4 +1543,74 @@ input:focus, select:focus, textarea:focus {
   .bottom-nav-btn.active .bottom-nav-label {
     color: #c8d5c0 !important;
   }
+}
+
+
+/* Компактная валютная панель на очень узких экранах */
+@media (max-width: 380px) {
+  .market-ticker { margin-left: 0; margin-right: 0; padding-left: 2px; padding-right: 2px; }
+  .ticker-item { gap: 4px; padding-left: 4px; padding-right: 4px; }
+  .ticker-icon { flex-basis: 23px; width: 23px; height: 23px; font-size: 14px; }
+  .ticker-icon-btc { font-size: 16px; }
+  .ticker-value { font-size: 10px; }
+  .ticker-source { font-size: 7px; }
+}
+
+/* ==== ТОЧЕЧНАЯ ПРАВКА: компактная лента курсов валют ==== */
+/* Уменьшаем вертикальную высоту, не меняя расположение блоков сайта. */
+.market-ticker {
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+  gap: 8px !important;
+}
+.ticker-item {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  gap: 8px !important;
+}
+.ticker-icon {
+  flex-basis: 34px !important;
+  width: 34px !important;
+  height: 34px !important;
+  font-size: 21px !important;
+}
+.ticker-icon-btc { font-size: 23px !important; }
+.ticker-details { gap: 2px !important; }
+.ticker-value { font-size: clamp(13px, 1.25vw, 17px) !important; line-height: 1.05 !important; }
+.ticker-label { font-size: 10.5px !important; }
+.ticker-source { font-size: 9px !important; line-height: 1.15 !important; }
+
+@media (max-width: 720px) {
+  .market-ticker {
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+    margin-bottom: 6px !important;
+  }
+  .ticker-item { gap: 5px !important; padding-top: 0 !important; padding-bottom: 0 !important; }
+  .ticker-icon {
+    flex-basis: 24px !important;
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 15px !important;
+  }
+  .ticker-icon-btc { font-size: 17px !important; }
+  .ticker-details { gap: 1px !important; }
+  .ticker-label { font-size: 8.5px !important; }
+  .ticker-value { font-size: clamp(10px, 2.8vw, 12px) !important; line-height: 1 !important; }
+  .ticker-arrow { font-size: 8px !important; }
+  .ticker-source { font-size: 7.5px !important; line-height: 1.1 !important; }
+}
+
+@media (max-width: 380px) {
+  .market-ticker { padding-top: 3px !important; padding-bottom: 3px !important; }
+  .ticker-item { gap: 3px !important; padding-left: 3px !important; padding-right: 3px !important; }
+  .ticker-icon {
+    flex-basis: 21px !important;
+    width: 21px !important;
+    height: 21px !important;
+    font-size: 13px !important;
+  }
+  .ticker-icon-btc { font-size: 15px !important; }
+  .ticker-value { font-size: 9.5px !important; }
+  .ticker-source { font-size: 7px !important; }
 }

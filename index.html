@@ -33,14 +33,23 @@
   <main>
     <section class="hero"><h1 class="sr-only">Найди выгодное предложение</h1><div class="container">
       <div class="main-banner"><img class="main-banner-img" src="assets/images/00_hero_banner_no_text.png" alt="" fetchpriority="high" width="1180" height="400"><div class="banner-content"><p class="banner-title">Find the best deals in Ukraine</p><p class="hero-text">Автомобили, недвижимость и готовый бизнес — в одном месте.</p></div></div>
-      <div class="market-ticker" aria-label="Market overview"><div class="ticker-scroll">
-        <div class="ticker-item"><span class="ticker-label">USD/UAH</span><span class="ticker-value" data-ticker="usd">…</span><span class="ticker-arrow" data-ticker-arrow="usd" aria-hidden="true"></span></div>
-        <div class="ticker-item"><span class="ticker-label">EUR/UAH</span><span class="ticker-value" data-ticker="eur">…</span><span class="ticker-arrow" data-ticker-arrow="eur" aria-hidden="true"></span></div>
-        <div class="ticker-item"><span class="ticker-label">PLN/UAH</span><span class="ticker-value" data-ticker="pln">…</span><span class="ticker-arrow" data-ticker-arrow="pln" aria-hidden="true"></span></div>
-        <div class="ticker-item"><span class="ticker-label">Bitcoin (BTC)</span><span class="ticker-value" data-ticker="btc">…</span><span class="ticker-arrow" data-ticker-arrow="btc" aria-hidden="true"></span></div>
-        <div class="ticker-item"><span class="ticker-label">S&amp;P 500</span><span class="ticker-value" data-ticker="sp500">…</span><span class="ticker-arrow" data-ticker-arrow="sp500" aria-hidden="true"></span></div>
-        <div class="ticker-item"><span class="ticker-label">Brent Oil</span><span class="ticker-value" data-ticker="brent">…</span><span class="ticker-arrow" data-ticker-arrow="brent" aria-hidden="true"></span></div>
-      </div><span class="ticker-note" id="tickerNote" data-i18n="Market quotes: NBU, CoinGecko and Yahoo Finance">Quotes: NBU, CoinGecko and Yahoo Finance</span></div>
+      <div class="market-ticker" aria-label="Currency rates">
+        <div class="ticker-scroll">
+          <div class="ticker-item" data-ticker-item="usd">
+            <span class="ticker-icon ticker-icon-usd" data-ticker-icon="usd" aria-hidden="true">🇺🇸</span>
+            <div class="ticker-details"><span class="ticker-label" data-ticker-label="usd">USD/UAH</span><div class="ticker-main"><span class="ticker-value" data-ticker="usd">…</span><span class="ticker-arrow" data-ticker-arrow="usd" aria-hidden="true"></span></div><span class="ticker-source" data-ticker-source="usd">НБУ · …</span></div>
+          </div>
+          <div class="ticker-item" data-ticker-item="pln">
+            <span class="ticker-icon ticker-icon-pln" data-ticker-icon="pln" aria-hidden="true">🇵🇱</span>
+            <div class="ticker-details"><span class="ticker-label" data-ticker-label="pln">PLN/UAH</span><div class="ticker-main"><span class="ticker-value" data-ticker="pln">…</span><span class="ticker-arrow" data-ticker-arrow="pln" aria-hidden="true"></span></div><span class="ticker-source" data-ticker-source="pln">НБУ · …</span></div>
+          </div>
+          <div class="ticker-item" data-ticker-item="btc">
+            <span class="ticker-icon ticker-icon-btc" data-ticker-icon="btc" aria-hidden="true">₿</span>
+            <div class="ticker-details"><span class="ticker-label" data-ticker-label="btc">BTC/UAH</span><div class="ticker-main"><span class="ticker-value" data-ticker="btc">…</span><span class="ticker-arrow" data-ticker-arrow="btc" aria-hidden="true"></span></div><span class="ticker-source" data-ticker-source="btc">CoinGecko · …</span></div>
+          </div>
+        </div>
+        <span class="ticker-note" id="tickerNote">Курсы валют · данные загружаются</span>
+      </div>
     </div></section>
     <section class="search-ai-section container" aria-label="Search and AI">
       <div class="search-panel"><div class="search-input-row"><input id="searchInput" type="search" placeholder="Что ищете? Например: Skoda Octavia" aria-label="Поиск" data-i18n-placeholder="Что ищете? Например: Skoda Octavia" data-i18n-aria="Поиск"><button class="btn btn-primary" id="searchBtn" type="button">Найти</button></div>

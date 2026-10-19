@@ -215,6 +215,21 @@ const translations = {
     en: "AI picks: below the category average",
     pl: "Wybór AI: poniżej średniej kategorii"
   },
+  "HOT OFFERS": { ru: "ГОРЯЧИЕ ПРЕДЛОЖЕНИЯ", uk: "ГАРЯЧІ ПРОПОЗИЦІЇ", en: "HOT OFFERS", pl: "GORĄCE OFERTY" },
+  "Urgent deals": { ru: "Срочные предложения", uk: "Термінові пропозиції", en: "Urgent deals", pl: "Pilne okazje" },
+  "Best offers below market price": { ru: "Лучшие предложения ниже рыночной цены", uk: "Найкращі пропозиції нижче ринкової ціни", en: "Best offers below market price", pl: "Najlepsze oferty poniżej ceny rynkowej" },
+  "Urgent deals will appear here once listings are flagged as urgent in the database.": { ru: "Срочные предложения появятся здесь, когда объявления будут отмечены как срочные.", uk: "Термінові пропозиції з'являться тут, коли оголошення будуть позначені як термінові.", en: "Urgent deals will appear here once listings are flagged as urgent in the database.", pl: "Pilne okazje pojawią się tutaj, gdy ogłoszenia zostaną oznaczone jako pilne." },
+  "Цена (любая)": { ru: "Цена (любая)", uk: "Ціна (будь-яка)", en: "Price (any)", pl: "Cena (dowolna)" },
+  "Радиус поиска": { ru: "Радиус поиска", uk: "Радіус пошуку", en: "Search radius", pl: "Promień wyszukiwania" },
+  "Радиус: 30 км": { ru: "Радиус: 30 км", uk: "Радіус: 30 км", en: "Radius: 30 km", pl: "Promień: 30 km" },
+  "Радиус: 50 км": { ru: "Радиус: 50 км", uk: "Радіус: 50 км", en: "Radius: 50 km", pl: "Promień: 50 km" },
+  "Радиус: 100 км": { ru: "Радиус: 100 км", uk: "Радіус: 100 км", en: "Radius: 100 km", pl: "Promień: 100 km" },
+  "Радиус: 200 км": { ru: "Радиус: 200 км", uk: "Радіус: 200 км", en: "Radius: 200 km", pl: "Promień: 200 km" },
+  "Область": { ru: "Область", uk: "Область", en: "Region", pl: "Region" },
+  "Поиск": { ru: "Поиск", uk: "Пошук", en: "Search", pl: "Szukaj" },
+  "Описание не указано.": { ru: "Описание не указано.", uk: "Опис не вказано.", en: "No description provided.", pl: "Brak opisu." },
+  "В избранное": { ru: "В избранное", uk: "В обране", en: "Add to favorites", pl: "Dodaj do ulubionych" },
+  "Убрать из избранного": { ru: "Убрать из избранного", uk: "Прибрати з обраного", en: "Remove from favorites", pl: "Usuń z ulubionych" },
   "Объявление": { ru: "Объявление", uk: "Оголошення", en: "Listing", pl: "Ogłoszenie" }
 };
 
@@ -696,7 +711,7 @@ function toggleFavorite(id) {
   document.querySelectorAll(`.fav-btn[data-fav-id="${CSS.escape(key)}"]`).forEach(btn => {
     btn.classList.toggle("active", !wasFav);
     btn.setAttribute("aria-pressed", String(!wasFav));
-    btn.setAttribute("aria-label", !wasFav ? "Убрать из избранного" : "В избранное");
+    btn.setAttribute("aria-label", !wasFav ? t("Убрать из избранного") : t("В избранное"));
     const span = btn.querySelector("span");
     if (span) span.textContent = !wasFav ? "♥" : "♡";
   });
@@ -1079,11 +1094,24 @@ function getQueryVariants(text) {
   variants.add(swapLayout(base, EN_LAYOUT_MAP));
   return [...variants].filter(Boolean);
 }
+function transliterate(name) {
+  const map = {"а":"a","б":"b","в":"v","г":"h","ґ":"g","д":"d","е":"e","є":"ye","ж":"zh","з":"z","и":"y","і":"i","ї":"yi","й":"y","к":"k","л":"l","м":"m","н":"n","о":"o","п":"p","р":"r","с":"s","т":"t","у":"u","ф":"f","х":"kh","ц":"ts","ч":"ch","ш":"sh","щ":"shch","ь":"","ю":"yu","я":"ya","ы":"y","э":"e","ё":"yo","ъ":""};
+  return String(name || "").split("").map(char => map[char] || char).join("");
+}
 function buildCityEntry(city) {
-  const nameTokens = [...new Set(["name_ru", "name_uk", "name_en", "name_pl"].map(key => normalizeCitySearch(city[key])).filter(Boolean))];
+  const rawNames = ["name_ru", "name_uk", "name_en", "name_pl"]
+    .map(key => normalizeCitySearch(city[key]))
+    .filter(Boolean);
+  const nameTokens = new Set(rawNames);
+  rawNames.forEach(name => {
+    if (/[а-яёїєґ]/i.test(name)) {
+      const translit = transliterate(name);
+      if (translit) nameTokens.add(translit);
+    }
+  });
   const regionNameUk = regionNames[String(city.region_katottg_code)] || "";
   const regionToken = normalizeCitySearch(regionNameUk);
-  return { city, nameTokens, regionToken, regionNameUk };
+  return { city, nameTokens: [...nameTokens], regionToken, regionNameUk };
 }
 function rankCityEntry(entry, queryVariants) {
   if (!queryVariants.length) return 0;
@@ -1529,6 +1557,14 @@ function translatePage(selectedLanguage) {
   updateLangButton();
   updateAuthTranslations();
   document.querySelectorAll("[data-i18n]").forEach(el => translateTextElement(el, el.dataset.i18n));
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+    const item = translations[el.dataset.i18nPlaceholder];
+    if (item && item[lang]) el.placeholder = item[lang];
+  });
+  document.querySelectorAll("[data-i18n-aria]").forEach(el => {
+    const item = translations[el.dataset.i18nAria];
+    if (item && item[lang]) el.setAttribute("aria-label", item[lang]);
+  });
   updatePhotoFields();
   translateTextElement(document.getElementById("openAdd"), "+ Добавить объявление");
   const heroTitle = document.querySelector(".hero h1");

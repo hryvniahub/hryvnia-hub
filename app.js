@@ -1070,28 +1070,53 @@ async function loadMarketQuotes() {
   const unavailable = () => (translations["Quote unavailable"]?.[lang] || "Unavailable");
   const base = tickerBaseCurrency();
   const pairs = {
-    UAH: { usd: "USD/UAH", pln: "PLN/UAH", btc: "BTC/UAH" },
-    PLN: { usd: "USD/PLN", pln: "UAH/PLN", btc: "BTC/PLN" },
-    USD: { usd: "PLN/USD", pln: "UAH/USD", btc: "BTC/USD" }
+    UAH: { usd: "USD/UAH", pln: "PLN/UAH", btc: "BTC/UAH", xau: "XAU/UAH" },
+    PLN: { usd: "USD/PLN", pln: "UAH/PLN", btc: "BTC/PLN", xau: "XAU/PLN" },
+    USD: { usd: "PLN/USD", pln: "UAH/USD", btc: "BTC/USD", xau: "XAU/USD" }
   };
-  const icons = base === "UAH" ? { usd: "🇺🇸", pln: "🇵🇱" } : base === "PLN" ? { usd: "🇺🇸", pln: "🇺🇦" } : { usd: "🇵🇱", pln: "🇺🇦" };
-  for (const key of ["usd", "pln", "btc"]) tickerSetText("label", key, pairs[base][key]);
-  tickerSetText("icon", "usd", icons.usd); tickerSetText("icon", "pln", icons.pln);
+  const icons = base === "UAH"
+    ? { usd: "🇺🇸", pln: "🇵🇱", xau: "🥇" }
+    : base === "PLN"
+      ? { usd: "🇺🇸", pln: "🇺🇦", xau: "🥇" }
+      : { usd: "🇵🇱", pln: "🇺🇦", xau: "🥇" };
+  for (const key of ["usd", "pln", "btc", "xau"]) tickerSetText("label", key, pairs[base][key]);
+  tickerSetText("icon", "usd", icons.usd);
+  tickerSetText("icon", "pln", icons.pln);
+  tickerSetText("icon", "xau", icons.xau);
+
+  // Единица измерения золота — тройская унция (troy ounce).
+  const goldUnitLabel = lang === "pl"
+    ? "za uncję trojańską"
+    : lang === "en"
+      ? "per troy ounce"
+      : lang === "ru"
+        ? "за тройскую унцию"
+        : "за тройську унцію";
+
   try {
-    const [usdResult, plnResult, btcResult] = await Promise.allSettled([
+    const [usdResult, plnResult, btcResult, xauResult] = await Promise.allSettled([
       fetchJsonWithFallback("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=USD&json"),
       fetchJsonWithFallback("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=PLN&json"),
-      fetchJsonWithFallback("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=uah")
+      fetchJsonWithFallback("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=uah"),
+      // XAU в USD: CoinGecko Tether Gold (XAUT), привязан к тройской унции золота.
+      fetchJsonWithFallback("https://api.coingecko.com/api/v3/simple/price?ids=tether-gold&vs_currencies=usd")
     ]);
     if (usdResult.status !== "fulfilled" || plnResult.status !== "fulfilled") {
       throw new Error("NBU exchange rates unavailable");
     }
     const usdData = usdResult.value, plnData = plnResult.value;
     const btcData = btcResult.status === "fulfilled" ? btcResult.value : null;
+    const xauData = xauResult.status === "fulfilled" ? xauResult.value : null;
+
     const usdRow = Array.isArray(usdData) ? usdData[0] : null;
     const plnRow = Array.isArray(plnData) ? plnData[0] : null;
-    const usdUah = Number(usdRow?.rate), plnUah = Number(plnRow?.rate), btcUah = Number(btcData?.bitcoin?.uah);
-    if (![usdUah, plnUah].every(Number.isFinite) || usdUah <= 0 || plnUah <= 0) throw new Error("NBU currency quote missing");
+    const usdUah = Number(usdRow?.rate), plnUah = Number(plnRow?.rate);
+    const btcUah = Number(btcData?.bitcoin?.uah);
+    const xauUsd = Number(xauData?.["tether-gold"]?.usd);
+
+    if (![usdUah, plnUah].every(Number.isFinite) || usdUah <= 0 || plnUah <= 0) {
+      throw new Error("NBU currency quote missing");
+    }
     listingRates = {
       usdUah,
       plnUah,
@@ -1099,14 +1124,21 @@ async function loadMarketQuotes() {
       checkedAt: new Date().toISOString()
     };
     try { localStorage.setItem(LISTING_RATES_KEY, JSON.stringify(listingRates)); } catch {}
-    const rates = base === "UAH" ? { usd: usdUah, pln: plnUah, btc: btcUah }
-      : base === "PLN" ? { usd: usdUah / plnUah, pln: 1 / plnUah, btc: btcUah / plnUah }
-      : { usd: plnUah / usdUah, pln: 1 / usdUah, btc: btcUah / usdUah };
+
+    // Конвертация из USD (база XAU) в валюту интерфейса по актуальным курсам НБУ.
+    const rates = base === "UAH"
+      ? { usd: usdUah, pln: plnUah, btc: btcUah, xau: Number.isFinite(xauUsd) ? xauUsd * usdUah : NaN }
+      : base === "PLN"
+        ? { usd: usdUah / plnUah, pln: 1 / plnUah, btc: btcUah / plnUah, xau: Number.isFinite(xauUsd) ? xauUsd * usdUah / plnUah : NaN }
+        : { usd: plnUah / usdUah, pln: 1 / usdUah, btc: btcUah / usdUah, xau: Number.isFinite(xauUsd) ? xauUsd : NaN };
+
     const date = tickerDate(usdRow?.exchangedate || plnRow?.exchangedate);
     const sourceDate = date || (lang === "pl" ? "data NBP" : lang === "en" ? "NBU rate" : "курс НБУ");
     const checkedAt = new Intl.DateTimeFormat(tickerLocale[lang] || "uk-UA", { hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date());
+
     setTickerValue("usd", formatTickerNumber(rates.usd, 2), rates.usd, pairs[base].usd);
     setTickerValue("pln", formatTickerNumber(rates.pln, base === "USD" ? 4 : 2), rates.pln, pairs[base].pln);
+
     if (Number.isFinite(btcUah) && btcUah > 0) {
       setTickerValue("btc", formatTickerNumber(rates.btc, 0), rates.btc, pairs[base].btc);
       tickerSetText("source", "btc", `CoinGecko · ${checkedAt}`);
@@ -1114,9 +1146,26 @@ async function loadMarketQuotes() {
       setTickerValue("btc", unavailable(), null);
       tickerSetText("source", "btc", "");
     }
+
+    if (Number.isFinite(rates.xau) && rates.xau > 0) {
+      // Для XAU в UAH/PLN сумма крупная — без копеек; в USD — 2 знака.
+      const digits = base === "USD" ? 2 : 0;
+      setTickerValue("xau", formatTickerNumber(rates.xau, digits), rates.xau, pairs[base].xau);
+      tickerSetText("source", "xau", `Gold · ${goldUnitLabel} · ${checkedAt}`);
+    } else {
+      setTickerValue("xau", unavailable(), null);
+      tickerSetText("source", "xau", "");
+    }
+
     tickerSetText("source", "usd", `${lang === "pl" ? "NBP" : "НБУ"} · ${sourceDate}`);
     tickerSetText("source", "pln", `${lang === "pl" ? "NBP" : "НБУ"} · ${sourceDate}`);
-    if (note) note.textContent = lang === "pl" ? `Kursy walut · sprawdzono ${checkedAt}` : lang === "en" ? `Currency rates · checked ${checkedAt}` : lang === "ru" ? `Курсы валют · проверено ${checkedAt}` : `Курси валют · перевірено ${checkedAt}`;
+    if (note) note.textContent = lang === "pl"
+      ? `Kursy walut · sprawdzono ${checkedAt}`
+      : lang === "en"
+        ? `Currency rates · checked ${checkedAt}`
+        : lang === "ru"
+          ? `Курсы валют · проверено ${checkedAt}`
+          : `Курси валют · перевірено ${checkedAt}`;
   } catch (error) {
     console.warn("Currency ticker unavailable:", error);
     if (listingRates) {
@@ -1129,7 +1178,9 @@ async function loadMarketQuotes() {
       setTickerValue("pln", formatTickerNumber(rates.pln, base === "USD" ? 4 : 2), rates.pln, pairs[base].pln);
       tickerSetText("source", "usd", `NBU · ${listingRates.rateDate || "last saved rate"}`);
       tickerSetText("source", "pln", `NBU · ${listingRates.rateDate || "last saved rate"}`);
+      setTickerValue("xau", unavailable(), null);
       tickerSetText("source", "btc", "");
+      tickerSetText("source", "xau", "");
       if (note) note.textContent = lang === "pl"
         ? `Używany ostatni zapisany kurs · ${listingRates.rateDate || "data niedostępna"}`
         : lang === "en"
@@ -1138,11 +1189,20 @@ async function loadMarketQuotes() {
             ? `Используется последний сохранённый курс · ${listingRates.rateDate || "дата неизвестна"}`
             : `Використовується останній збережений курс · ${listingRates.rateDate || "дату не вказано"}`;
     } else {
-      for (const key of ["usd", "pln", "btc"]) { setTickerValue(key, unavailable(), null); tickerSetText("source", key, ""); }
-      if (note) note.textContent = lang === "pl" ? "Brak zapisanych kursów" : lang === "en" ? "No saved exchange rates available" : lang === "ru" ? "Нет сохранённых курсов валют" : "Немає збережених курсів валют";
+      for (const key of ["usd", "pln", "btc", "xau"]) {
+        setTickerValue(key, unavailable(), null);
+        tickerSetText("source", key, "");
+      }
+      if (note) note.textContent = lang === "pl"
+        ? "Brak zapisanych kursów"
+        : lang === "en"
+          ? "No saved exchange rates available"
+          : lang === "ru"
+            ? "Нет сохранённых курсов валют"
+            : "Немає збережених курсів валют";
     }
   } finally {
-    // Re-render all visible prices whenever the available rates change or the language changes.
+    // Перерисовываем цены объявлений при смене курсов/языка.
     if (Array.isArray(visibleListings) && visibleListings.length) renderListings(visibleListings);
   }
 }
@@ -1483,12 +1543,14 @@ function renderListings(items) {
   }
   listing.innerHTML = items.map((item, index) => {
     const fav = isFavorite(item.id);
+    const cover = listingCover(item);
+    const hasCover = cover !== "";
     return `
-    <article class="card" data-listing-index="${index}" tabindex="0" role="button" aria-label="${escapeHtml(item.title)}" style="cursor:pointer">
+    <article class="card${hasCover ? " has-cover" : " no-cover"}" data-listing-index="${index}" tabindex="0" role="button" aria-label="${escapeHtml(item.title)}" style="cursor:pointer">
       <button class="fav-btn ${fav ? "active" : ""}" data-fav-id="${escapeHtml(String(item.id))}" type="button" aria-pressed="${fav ? "true" : "false"}" aria-label="${fav ? "Убрать из избранного" : "В избранное"}">
         <span aria-hidden="true">${fav ? "♥" : "♡"}</span>
       </button>
-      ${listingCover(item)}
+      ${cover}
       <div class="card-top">
         <span class="badge">${categoryLabel(item)}</span>
         <span class="city">${escapeHtml(item.cities?.[`name_${lang}`] || item.cities?.name_ru || "")}</span>

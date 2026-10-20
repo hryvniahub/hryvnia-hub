@@ -2442,3 +2442,55 @@ input:focus, select:focus, textarea:focus {
     padding: 8px !important;
   }
 }
+
+/* HRYVNIA HUB — stronger text contrast on category cards and hero banner */
+.category-card::before {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.08) 0%,
+    rgba(0, 0, 0, 0.20) 38%,
+    rgba(0, 0, 0, 0.76) 100%
+  ) !important;
+}
+
+.category-card-label {
+  color: #fff !important;
+  font-weight: 900 !important;
+  -webkit-text-stroke: 0.25px rgba(0, 0, 0, 0.45);
+  text-shadow:
+    0 2px 3px rgba(0, 0, 0, 0.95),
+    0 0 8px rgba(0, 0, 0, 0.85),
+    0 1px 14px rgba(0, 0, 0, 0.65) !important;
+}
+
+.main-banner::before {
+  background: linear-gradient(
+    90deg,
+    rgba(8, 16, 24, 0.52) 0%,
+    rgba(8, 16, 24, 0.28) 50%,
+    rgba(8, 16, 24, 0.52) 100%
+  ), linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.12) 0%,
+    rgba(0, 0, 0, 0.42) 100%
+  ) !important;
+}
+
+.banner-title {
+  color: #fff !important;
+  font-weight: 900 !important;
+  -webkit-text-stroke: 0.25px rgba(0, 0, 0, 0.5);
+  text-shadow:
+    0 2px 3px rgba(0, 0, 0, 0.98),
+    0 0 9px rgba(0, 0, 0, 0.95),
+    0 1px 16px rgba(0, 0, 0, 0.8) !important;
+}
+
+.hero-text {
+  color: #fff !important;
+  font-weight: 600 !important;
+  text-shadow:
+    0 1px 3px rgba(0, 0, 0, 1),
+    0 0 7px rgba(0, 0, 0, 0.95),
+    0 1px 12px rgba(0, 0, 0, 0.8) !important;
+}

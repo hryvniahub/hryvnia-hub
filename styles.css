@@ -2771,3 +2771,16 @@ input:focus, select:focus, textarea:focus {
     font-size: 17px !important;
   }
 }
+
+
+/* Hryvnia Hub: understated green account outlines */
+#authModal .auth-card { border: 1px solid #75a983; box-shadow: 0 12px 34px rgba(32, 72, 42, .12); }
+#authModal .auth-tabs { border-color: #83b18e; }
+#authModal .auth-tab { border-color: #83b18e; }
+#authModal input:not([type="checkbox"]), #authModal select, #authModal textarea { border-color: #83b18e; }
+#authModal input:focus, #authModal select:focus, #authModal textarea:focus { border-color: #39834d; box-shadow: 0 0 0 3px rgba(79, 153, 97, .14); outline: none; }
+#authModal .auth-menu-btn { border-color: #75a983; background: #f8fcf8; }
+#authModal .auth-menu-btn:hover { background: #edf7ee; }
+#accountMenuRoot .account-menu-item { border-color: #8eb89a; box-shadow: 0 2px 7px rgba(42,105,58,.06); }
+#accountMenuRoot .account-menu-item:hover { border-color: #4f9961; background: #f7fbf7; }
+#accountMenuRoot .account-menu-panel { border-color: #75a983; box-shadow: 0 3px 12px rgba(42,105,58,.07); }

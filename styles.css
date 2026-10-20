@@ -1959,3 +1959,108 @@ input:focus, select:focus, textarea:focus {
   color: #c6ff00 !important;
   filter: saturate(1.35) brightness(1.05);
 }
+
+
+/* ==== FINAL MOBILE/DETAIL TUNING ==== */
+
+/* Keep the decorative leaves hollow and subtle; add two small leaves to the bottom navigation. */
+.header .lang-btn::after,
+.header-actions .account-btn::after,
+.header-actions .btn-add::after,
+#openAdd::after,
+#accountBtn::after,
+.categories-grid .all-btn::after {
+  background: transparent !important;
+  border: 1.5px solid #a9d900 !important;
+  box-shadow: none !important;
+}
+.bottom-nav-btn {
+  position: relative;
+}
+.bottom-nav-btn::after {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 11px;
+  border: 1.5px solid #caff00;
+  border-radius: 100% 0 100% 0;
+  background: transparent;
+  pointer-events: none;
+  opacity: .9;
+}
+.bottom-nav-btn[data-nav="home"]::after {
+  top: 7px;
+  right: calc(50% - 25px);
+  transform: rotate(28deg);
+}
+.bottom-nav-btn[data-nav="messages"]::after {
+  top: 7px;
+  left: calc(50% - 25px);
+  transform: rotate(-38deg);
+}
+
+/* Give the market ticker the same usable width as the banner. */
+.market-ticker {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+@media (max-width: 720px) {
+  .market-ticker {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 3px !important;
+    padding-right: 3px !important;
+  }
+  /* Flags/icons ~20% smaller; ticker text ~10% smaller than the previous tuning. */
+  .ticker-icon {
+    flex-basis: 18px !important;
+    width: 18px !important;
+    height: 18px !important;
+    font-size: 10.5px !important;
+  }
+  .ticker-icon-btc { font-size: 12px !important; }
+  .ticker-label { font-size: 7.2px !important; }
+  .ticker-value { font-size: clamp(8.5px, 2.25vw, 10.8px) !important; }
+  .ticker-source { font-size: 6.3px !important; }
+}
+@media (max-width: 380px) {
+  .ticker-icon {
+    flex-basis: 16px !important;
+    width: 16px !important;
+    height: 16px !important;
+    font-size: 9px !important;
+  }
+  .ticker-icon-btc { font-size: 10.5px !important; }
+  .ticker-label { font-size: 6.5px !important; }
+  .ticker-value { font-size: 8px !important; }
+  .ticker-source { font-size: 5.8px !important; }
+}
+
+/* Make area/radius select labels a little smaller on mobile so they fit. */
+@media (max-width: 720px) {
+  #catalogRegionSelect,
+  .search-filters-row > select,
+  .search-filters-row > input[type="number"] {
+    font-size: 11.2px !important;
+    padding-left: 7px !important;
+    padding-right: 5px !important;
+  }
+}
+
+/* Slightly increase both banner text lines, preserving the title text itself. */
+.banner-title {
+  font-size: clamp(21px, 3.15vw, 31px) !important;
+}
+.hero-text {
+  font-size: 15.5px !important;
+}
+@media (max-width: 720px) {
+  .banner-title { font-size: clamp(17px, 3.5vw, 19px) !important; }
+  .hero-text { font-size: 13px !important; }
+}
+
+/* Bottom navigation and the three decorative quick-navigation glyphs use a brighter lime. */
+.bottom-nav-icon {
+  color: #caff00 !important;
+  filter: brightness(1.12) saturate(1.2);
+}

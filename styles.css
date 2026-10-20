@@ -1111,10 +1111,7 @@ input:focus, select:focus, textarea:focus {
   position: relative;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.68), inset 0 -1px 0 rgba(42,57,14,.10) !important;
 }
-.header .brand::after,
-.header .lang-btn::after,
-.header-actions .btn-add::after,
-.header-actions .account-btn::after {
+.header .brand::after {
   content: "";
   position: absolute;
   left: 10px;
@@ -1613,4 +1610,209 @@ input:focus, select:focus, textarea:focus {
   .ticker-icon-btc { font-size: 15px !important; }
   .ticker-value { font-size: 9.5px !important; }
   .ticker-source { font-size: 7px !important; }
+}
+
+/* ============================================================
+   ОБЪЕДИНЁННЫЕ ТОЧЕЧНЫЕ ПРАВКИ HRYVNIA HUB
+   Добавлены поверх исходного styles.css; исходные стили сохранены.
+   ============================================================ */
+
+/* Карточка без фотографии: сердечко не должно наезжать на город. */
+.card:not(:has(.listing-photo)) .fav-btn {
+  top: 6px;
+  right: 6px;
+}
+.card:not(:has(.listing-photo)) .card-top {
+  padding-right: 44px;
+}
+
+/* Небольшой дополнительный отступ справа у логотипа на компьютере. */
+@media (min-width: 721px) {
+  .header .brand {
+    padding-right: 6px;
+  }
+  .header .brand .brand-text {
+    padding-right: 10px;
+  }
+}
+
+/* Небольшие лаймовые листики внутри верхних кнопок.
+   Не меняем размеры и позиционирование самих кнопок. */
+.header .lang-btn,
+.header-actions .btn-add,
+.header-actions .account-btn,
+#openAdd,
+#accountBtn {
+  position: relative;
+}
+.header .lang-btn::after,
+.header-actions .btn-add::after,
+.header-actions .account-btn::after,
+#openAdd::after,
+#accountBtn::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 5px;
+  width: 7px;
+  height: 10px;
+  border-radius: 100% 0 100% 0;
+  background: #D4FF00;
+  box-shadow: 0 0 0 1px rgba(60,80,0,.3);
+  transform: rotate(-25deg);
+  pointer-events: none;
+  z-index: 2;
+}
+@media (max-width: 720px) {
+  .header .lang-btn::after,
+  .header-actions .btn-add::after,
+  .header-actions .account-btn::after,
+  #openAdd::after,
+  #accountBtn::after {
+    width: 5px;
+    height: 7px;
+    left: 3px;
+    top: 3px;
+  }
+}
+
+/* Листик внутри круглой кнопки «Все» без изменения её положения. */
+.categories-grid .all-btn {
+  position: absolute;
+}
+.categories-grid .all-btn::after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  right: 7px;
+  width: 7px;
+  height: 10px;
+  border-radius: 100% 0 100% 0;
+  background: #D4FF00;
+  box-shadow: 0 0 0 1px rgba(60,80,0,.3);
+  transform: rotate(20deg);
+  pointer-events: none;
+}
+
+/* Подписи категорий по центру; оставляем место для круглой кнопки «Все». */
+.category-card {
+  align-items: flex-end;
+  justify-content: center;
+}
+.category-card-label {
+  width: 100%;
+  text-align: center;
+  padding: 0 36px 2px;
+}
+@media (max-width: 720px) {
+  .category-card-label {
+    padding: 0 8px 2px;
+  }
+}
+
+/* Компактная сетка фильтров: две колонки, без увеличения высоты панели.
+   Если в HTML используются классы полей, город получает больше места. */
+.search-filters-row {
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+}
+.search-filters-row > .city-filter,
+.search-filters-row > .filter-city,
+.search-filters-row > [name="city"],
+.search-filters-row > #cityFilter {
+  min-width: 0;
+}
+@media (max-width: 720px) {
+  .search-filters-row {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  }
+}
+@media (max-width: 380px) {
+  .search-filters-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Четыре показателя валютной ленты в одну строку, где позволяет ширина. */
+.ticker-scroll {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.ticker-item {
+  min-width: 0;
+  gap: 7px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+@media (max-width: 720px) {
+  .ticker-scroll {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .ticker-item {
+    gap: 3px;
+    padding-left: 3px;
+    padding-right: 3px;
+  }
+}
+
+/* Заголовок баннера: чуть крупнее, акцентный штрих лаймового цвета. */
+.banner-title {
+  font-size: clamp(22px, 3.4vw, 33px);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+.banner-title::after {
+  content: "";
+  display: block;
+  width: 52px;
+  height: 3px;
+  margin: 7px auto 0;
+  border-radius: 3px;
+  background: #c6ff00;
+}
+.banner-content {
+  padding-bottom: 6px;
+}
+@media (max-width: 720px) {
+  .banner-title {
+    font-size: 16px;
+  }
+  .banner-title::after {
+    width: 36px;
+    height: 2px;
+    margin-top: 5px;
+  }
+}
+
+/* Вкладки авторизации: одинаковый размер, аккуратный премиальный вид. */
+.auth-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.auth-tabs button,
+.auth-tab {
+  min-width: 0;
+  min-height: 46px;
+  border: 2px solid #c6ff00;
+  border-radius: 10px;
+  background: #fff;
+  color: #203b31;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.auth-tabs button.active,
+.auth-tab.active {
+  background: #c6ff00;
+  color: #17210a;
+}
+
+/* Фиксируем оформление по назначению вкладки, а не по active-состоянию. */
+.auth-tab[data-auth-tab="register"] {
+  background: #D4FF00;
+  border-color: #7fa800;
+  color: #17210a;
+}
+.auth-tab[data-auth-tab="login"] {
+  background: #ffffff;
+  border-color: #9abf24;
+  color: #17210a;
 }

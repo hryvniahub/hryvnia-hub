@@ -2669,3 +2669,48 @@ input:focus, select:focus, textarea:focus {
     font-size: 9px !important;
   }
 }
+
+/* ==== STAGE A: password toggle + HEIC/HEIF hint ==== */
+.password-field {
+  position: relative;
+  display: block;
+}
+.password-field > input[type="password"],
+.password-field > input[type="text"] {
+  padding-right: 44px; /* место под кнопку-глаз */
+}
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  width: 34px;
+  height: 34px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  z-index: 2;
+}
+.password-toggle:hover { background: #f3f4f7; color: var(--text); }
+.password-toggle:focus-visible {
+  outline: none;
+  border-color: var(--accent-border);
+  box-shadow: 0 0 0 3px rgba(154, 191, 36, 0.25);
+}
+.password-toggle[aria-pressed="true"] { color: var(--accent-border); }
+.password-field.is-visible .password-toggle-icon { font-size: 15px; }
+
+@media (max-width: 720px) {
+  .password-toggle { width: 30px; height: 30px; font-size: 14px; right: 4px; }
+  .password-field > input[type="password"],
+  .password-field > input[type="text"] { padding-right: 38px; }
+}
+

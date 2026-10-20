@@ -2573,3 +2573,52 @@ input:focus, select:focus, textarea:focus {
     line-height: 1 !important;
   }
 }
+
+/* ==== HRYVNIA HUB: MOBILE HERO TEXT + SHORTER MARKET TICKER ==== */
+/* Only mobile styling is changed. Header and desktop layout stay untouched. */
+@media (max-width: 720px) {
+  /* Increase the main banner title and subtitle by approximately 20%. */
+  .banner-title {
+    font-size: clamp(19.2px, 4.8vw, 22.8px) !important;
+    line-height: 1.1 !important;
+  }
+
+  .hero-text {
+    font-size: 13.8px !important;
+    line-height: 1.15 !important;
+  }
+
+  /* Reduce ticker height while preserving its width and four-column layout. */
+  .market-ticker {
+    padding-top: 3px !important;
+    padding-bottom: 3px !important;
+  }
+
+  .ticker-icon {
+    height: 19px !important;
+  }
+
+  .ticker-details {
+    gap: 0 !important;
+  }
+
+  .ticker-label,
+  .ticker-value,
+  .ticker-source {
+    line-height: 1 !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .banner-title {
+    font-size: clamp(18px, 4.8vw, 20px) !important;
+  }
+
+  .hero-text {
+    font-size: 12.5px !important;
+  }
+
+  .ticker-icon {
+    height: 18px !important;
+  }
+}

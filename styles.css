@@ -2258,3 +2258,255 @@ input:focus, select:focus, textarea:focus {
     gap: 8px !important;
   }
 }
+
+/* ==== HRYVNIA HUB: COMPACT MOBILE HERO BANNER ONLY ==== */
+/* Keep desktop styling unchanged; reduce banner height on phones. */
+@media (max-width: 720px) {
+  .main-banner {
+    height: 112px !important;
+    min-height: 112px !important;
+    max-height: 112px !important;
+    padding: 8px 12px !important;
+    align-items: center !important;
+  }
+
+  .main-banner-img {
+    object-fit: cover !important;
+    object-position: center 42% !important;
+  }
+
+  .banner-content {
+    padding-bottom: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .banner-title {
+    font-size: clamp(16px, 4vw, 19px) !important;
+    line-height: 1.1 !important;
+    margin-bottom: 3px !important;
+  }
+
+  .banner-title::after {
+    width: 34px !important;
+    height: 2px !important;
+    margin-top: 3px !important;
+  }
+
+  .hero-text {
+    font-size: 11.5px !important;
+    line-height: 1.2 !important;
+    max-width: 100% !important;
+  }
+}
+
+/* ============================================================
+   HRYVNIA HUB — FIX 2026-10-20
+   Banner becomes more compact on desktop and mobile without
+   cropping the banner artwork; desktop header stays in bounds.
+   ============================================================ */
+
+/* Compact banner: fill the banner width and remove the empty side bands.
+   Keep the source image proportional; the banner clips only the excess vertically. */
+.main-banner {
+  position: relative !important;
+  height: 105px !important;
+  min-height: 105px !important;
+  max-height: 105px !important;
+  padding: 10px 22px 26px !important;
+  overflow: hidden !important;
+  align-items: center !important;
+  background-color: #263b36 !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+  background-position: center 52% !important;
+}
+
+.main-banner-img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center 52% !important;
+}
+
+.banner-content {
+  max-width: 100% !important;
+  padding: 0 8px !important;
+  text-align: center !important;
+}
+
+.banner-title {
+  font-size: clamp(18px, 2.2vw, 27px) !important;
+  line-height: 1.08 !important;
+  margin-bottom: 4px !important;
+  text-wrap: balance !important;
+}
+
+.hero-text {
+  font-size: clamp(11px, 1.25vw, 14px) !important;
+  line-height: 1.2 !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Desktop/tablet header: keep all controls inside the viewport. */
+@media (min-width: 721px) {
+  .nav {
+    gap: 8px !important;
+    min-width: 0 !important;
+  }
+
+  .header-actions {
+    gap: 8px !important;
+    min-width: 0 !important;
+    flex: 0 1 auto !important;
+  }
+
+  .header-actions .btn-add,
+  #openAdd {
+    min-width: 0 !important;
+    max-width: 280px !important;
+    flex: 0 1 280px !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    white-space: normal !important;
+    text-align: center !important;
+    line-height: 1.1 !important;
+  }
+
+  .header .brand .brand-text {
+    padding-right: 0 !important;
+  }
+}
+
+/* Mobile: keep the existing header/category/search layout; only compact the banner. */
+@media (max-width: 720px) {
+  .main-banner {
+    height: 76px !important;
+    min-height: 76px !important;
+    max-height: 76px !important;
+    padding: 5px 8px !important;
+    align-items: center !important;
+  }
+
+  .main-banner-img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center 52% !important;
+  }
+
+  .main-banner::before {
+    background: linear-gradient(180deg, rgba(15,20,28,.30), rgba(15,20,28,.62)) !important;
+  }
+
+  .banner-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 2px !important;
+  }
+
+  .banner-title {
+    font-size: clamp(14px, 3.9vw, 18px) !important;
+    line-height: 1.05 !important;
+    margin-bottom: 2px !important;
+  }
+
+  .banner-title::after {
+    width: 28px !important;
+    height: 2px !important;
+    margin-top: 2px !important;
+  }
+
+  .hero-text {
+    font-size: clamp(9px, 2.8vw, 11px) !important;
+    line-height: 1.08 !important;
+    max-width: 100% !important;
+  }
+
+  .main-banner .banner-icons {
+    display: none !important;
+  }
+}
+
+/* HRYVNIA HUB — category cards 20% shorter, without scaling the text or images */
+.categories-grid > .category-card:not(.all-btn) {
+  height: auto !important;
+  min-height: 0 !important;
+  aspect-ratio: 1.85 / 1 !important;
+}
+
+@media (max-width: 720px) {
+  .categories-grid > .category-card:not(.all-btn) {
+    aspect-ratio: 2.98 / 1 !important;
+    min-height: 0 !important;
+    padding: 8px !important;
+  }
+}
+
+/* HRYVNIA HUB — stronger text contrast on category cards and hero banner */
+.category-card::before {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.08) 0%,
+    rgba(0, 0, 0, 0.20) 38%,
+    rgba(0, 0, 0, 0.76) 100%
+  ) !important;
+}
+
+.category-card-label {
+  color: #fff !important;
+  font-weight: 900 !important;
+  -webkit-text-stroke: 0.25px rgba(0, 0, 0, 0.45);
+  text-shadow:
+    0 2px 3px rgba(0, 0, 0, 0.95),
+    0 0 8px rgba(0, 0, 0, 0.85),
+    0 1px 14px rgba(0, 0, 0, 0.65) !important;
+}
+
+.main-banner::before {
+  background: linear-gradient(
+    90deg,
+    rgba(8, 16, 24, 0.52) 0%,
+    rgba(8, 16, 24, 0.28) 50%,
+    rgba(8, 16, 24, 0.52) 100%
+  ), linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.12) 0%,
+    rgba(0, 0, 0, 0.42) 100%
+  ) !important;
+}
+
+.banner-title {
+  color: #fff !important;
+  font-weight: 900 !important;
+  -webkit-text-stroke: 0.25px rgba(0, 0, 0, 0.5);
+  text-shadow:
+    0 2px 3px rgba(0, 0, 0, 0.98),
+    0 0 9px rgba(0, 0, 0, 0.95),
+    0 1px 16px rgba(0, 0, 0, 0.8) !important;
+}
+
+.hero-text {
+  color: #fff !important;
+  font-weight: 600 !important;
+  text-shadow:
+    0 1px 3px rgba(0, 0, 0, 1),
+    0 0 7px rgba(0, 0, 0, 0.95),
+    0 1px 12px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* HRYVNIA HUB — slightly larger, higher main banner headline */
+.banner-title {
+  font-size: clamp(20px, 2.35vw, 29px) !important;
+  position: relative !important;
+  top: -4px !important;
+  line-height: 1.08 !important;
+}
+
+@media (max-width: 720px) {
+  .banner-title {
+    font-size: clamp(15px, 4.15vw, 19px) !important;
+    top: -3px !important;
+    line-height: 1.04 !important;
+  }
+}

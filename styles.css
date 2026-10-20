@@ -2714,3 +2714,60 @@ input:focus, select:focus, textarea:focus {
   .password-field > input[type="text"] { padding-right: 38px; }
 }
 
+/* ==== HRYVNIA HUB: компактное улучшение кнопок возврата ==== */
+/* Кнопка «Назад до меню» в разделах аккаунта. */
+.account-menu-back {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 9px !important;
+  min-height: 46px !important;
+  padding: 10px 16px !important;
+  margin: 0 0 14px !important;
+  border: 1px solid #86ad00 !important;
+  border-radius: 12px !important;
+  background: #d4ff00 !important;
+  color: #202a12 !important;
+  box-shadow: 0 3px 0 rgba(66, 107, 22, .16) !important;
+  font-size: 17px !important;
+  font-weight: 750 !important;
+  line-height: 1.25 !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  transition: background .15s ease, transform .15s ease, box-shadow .15s ease !important;
+}
+.account-menu-back:hover {
+  background: #c6f000 !important;
+  box-shadow: 0 4px 0 rgba(66, 107, 22, .18) !important;
+}
+.account-menu-back:active {
+  transform: translateY(1px) !important;
+  box-shadow: 0 1px 0 rgba(66, 107, 22, .16) !important;
+}
+
+/* Кнопка «До списку» у вікні переписки. */
+#backToConvs {
+  min-height: 44px !important;
+  padding: 10px 15px !important;
+  border: 1px solid #86ad00 !important;
+  border-radius: 12px !important;
+  background: #d4ff00 !important;
+  color: #202a12 !important;
+  font-size: 17px !important;
+  font-weight: 750 !important;
+  line-height: 1.25 !important;
+  box-shadow: 0 3px 0 rgba(66, 107, 22, .16) !important;
+  cursor: pointer !important;
+  transition: background .15s ease, transform .15s ease, box-shadow .15s ease !important;
+}
+#backToConvs:hover { background: #c6f000 !important; }
+#backToConvs:active {
+  transform: translateY(1px) !important;
+  box-shadow: 0 1px 0 rgba(66, 107, 22, .16) !important;
+}
+@media (max-width: 520px) {
+  .account-menu-back, #backToConvs {
+    min-height: 46px !important;
+    font-size: 17px !important;
+  }
+}

@@ -2305,7 +2305,8 @@ input:focus, select:focus, textarea:focus {
    cropping the banner artwork; desktop header stays in bounds.
    ============================================================ */
 
-/* Show the complete banner artwork instead of cropping it. */
+/* Compact banner: fill the banner width and remove the empty side bands.
+   Keep the source image proportional; the banner clips only the excess vertically. */
 .main-banner {
   position: relative !important;
   height: 105px !important;
@@ -2314,18 +2315,17 @@ input:focus, select:focus, textarea:focus {
   padding: 10px 22px 26px !important;
   overflow: hidden !important;
   align-items: center !important;
+  background-color: #263b36 !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+  background-position: center 52% !important;
 }
 
 .main-banner-img {
-  object-fit: contain !important;
-  object-position: center center !important;
-}
-
-.main-banner {
-  background-color: #263b36 !important;
-  background-size: contain !important;
-  background-repeat: no-repeat !important;
-  background-position: center center !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center 52% !important;
 }
 
 .banner-content {
@@ -2389,8 +2389,10 @@ input:focus, select:focus, textarea:focus {
   }
 
   .main-banner-img {
-    object-fit: contain !important;
-    object-position: center center !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center 52% !important;
   }
 
   .main-banner::before {

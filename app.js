@@ -449,6 +449,9 @@ function updateAccountButton() {
 function renderAuthModal() {
   if (!authModal) return;
   if (currentUser) {
+    ensureAccountMenuUI();
+    updateAccountMenuLabels();
+    showAccountMenuList();
     authGuest?.classList.add("hidden");
     authLoggedIn?.classList.remove("hidden");
     if (authUserEmail) authUserEmail.textContent = currentUser.email || "";
@@ -536,6 +539,140 @@ document.querySelectorAll("[data-auth-tab]").forEach(button => button.addEventLi
 }));
 authShowReset?.addEventListener("click", () => { authRecoveryMode = false; showAuthView("reset"); });
 authBackToLogin?.addEventListener("click", () => { authRecoveryMode = false; showAuthView("login"); });
+// === ACCOUNT MENU: standard account sections, scoped to the existing auth modal ===
+const ACCOUNT_MENU_TEXT = {
+  ru: { profile:"Мой профиль", listings:"Мои объявления", favorites:"Избранное", messages:"Сообщения", settings:"Настройки", security:"Безопасность аккаунта", signOut:"Выйти из аккаунта", back:"← Назад в меню", profileTitle:"Мой профиль", email:"Электронная почта", userId:"ID аккаунта", settingsTitle:"Настройки", settingsNote:"Дополнительные настройки будут добавляться постепенно. Язык интерфейса уже переключается в верхней панели.", securityTitle:"Безопасность аккаунта", newPassword:"Новый пароль", confirmPassword:"Подтвердите новый пароль", save:"Сохранить пароль", passwordSaved:"Пароль успешно изменён.", passwordMismatch:"Пароли не совпадают.", passwordShort:"Пароль должен содержать не менее 6 символов.", listingsEmpty:"У вас пока нет объявлений.", loading:"Загрузка…", error:"Не удалось загрузить данные." },
+  uk: { profile:"Мій профіль", listings:"Мої оголошення", favorites:"Обране", messages:"Повідомлення", settings:"Налаштування", security:"Безпека облікового запису", signOut:"Вийти з облікового запису", back:"← Назад до меню", profileTitle:"Мій профіль", email:"Електронна пошта", userId:"ID облікового запису", settingsTitle:"Налаштування", settingsNote:"Додаткові налаштування додаватимемо поступово. Мова інтерфейсу вже перемикається у верхній панелі.", securityTitle:"Безпека облікового запису", newPassword:"Новий пароль", confirmPassword:"Підтвердьте новий пароль", save:"Зберегти пароль", passwordSaved:"Пароль успішно змінено.", passwordMismatch:"Паролі не збігаються.", passwordShort:"Пароль має містити щонайменше 6 символів.", listingsEmpty:"У вас поки немає оголошень.", loading:"Завантаження…", error:"Не вдалося завантажити дані." },
+  en: { profile:"My profile", listings:"My listings", favorites:"Favorites", messages:"Messages", settings:"Settings", security:"Account security", signOut:"Sign out", back:"← Back to menu", profileTitle:"My profile", email:"Email", userId:"Account ID", settingsTitle:"Settings", settingsNote:"More settings will be added gradually. The interface language can already be changed from the top bar.", securityTitle:"Account security", newPassword:"New password", confirmPassword:"Confirm new password", save:"Save password", passwordSaved:"Password changed successfully.", passwordMismatch:"Passwords do not match.", passwordShort:"Password must be at least 6 characters.", listingsEmpty:"You have no listings yet.", loading:"Loading…", error:"Could not load data." },
+  pl: { profile:"Mój profil", listings:"Moje ogłoszenia", favorites:"Ulubione", messages:"Wiadomości", settings:"Ustawienia", security:"Bezpieczeństwo konta", signOut:"Wyloguj się", back:"← Wróć do menu", profileTitle:"Mój profil", email:"E-mail", userId:"ID konta", settingsTitle:"Ustawienia", settingsNote:"Dodatkowe ustawienia będziemy dodawać stopniowo. Język interfejsu można już zmienić na górnym pasku.", securityTitle:"Bezpieczeństwo konta", newPassword:"Nowe hasło", confirmPassword:"Potwierdź nowe hasło", save:"Zapisz hasło", passwordSaved:"Hasło zostało zmienione.", passwordMismatch:"Hasła nie są zgodne.", passwordShort:"Hasło musi mieć co najmniej 6 znaków.", listingsEmpty:"Nie masz jeszcze ogłoszeń.", loading:"Ładowanie…", error:"Nie udało się wczytać danych." }
+};
+function accountMenuText(key) { return (ACCOUNT_MENU_TEXT[lang] || ACCOUNT_MENU_TEXT.uk)[key] || key; }
+
+let accountMenuRoot = null;
+let accountListingsModal = null;
+function ensureAccountMenuUI() {
+  if (!authLoggedIn || accountMenuRoot) return;
+  const oldMenuButton = document.getElementById("authOpenMenu");
+  if (oldMenuButton) oldMenuButton.classList.add("hidden");
+
+  accountMenuRoot = document.createElement("div");
+  accountMenuRoot.id = "accountMenuRoot";
+  accountMenuRoot.innerHTML = `
+    <nav class="account-menu-list" aria-label="Account menu">
+      <button type="button" class="account-menu-item" data-account-action="profile"><span aria-hidden="true">👤</span><span data-account-label="profile"></span><span aria-hidden="true">›</span></button>
+      <button type="button" class="account-menu-item" data-account-action="listings"><span aria-hidden="true">📋</span><span data-account-label="listings"></span><span aria-hidden="true">›</span></button>
+      <button type="button" class="account-menu-item" data-account-action="favorites"><span aria-hidden="true">♥</span><span data-account-label="favorites"></span><span aria-hidden="true">›</span></button>
+      <button type="button" class="account-menu-item" data-account-action="messages"><span aria-hidden="true">✉</span><span data-account-label="messages"></span><span aria-hidden="true">›</span></button>
+      <button type="button" class="account-menu-item" data-account-action="settings"><span aria-hidden="true">⚙</span><span data-account-label="settings"></span><span aria-hidden="true">›</span></button>
+      <button type="button" class="account-menu-item" data-account-action="security"><span aria-hidden="true">🔐</span><span data-account-label="security"></span><span aria-hidden="true">›</span></button>
+    </nav>
+    <section id="accountMenuPanel" class="account-menu-panel hidden" aria-live="polite"></section>`;
+  const emailEl = document.getElementById("authUserEmail");
+  if (emailEl) emailEl.insertAdjacentElement("afterend", accountMenuRoot);
+
+  const signOutMessage = document.getElementById("authSignOutMessage");
+  const signOut = document.getElementById("authSignOut");
+  if (signOut) {
+    signOut.classList.add("account-signout-btn");
+    signOut.textContent = accountMenuText("signOut");
+  }
+  if (signOutMessage && signOut) signOut.insertAdjacentElement("afterend", signOutMessage);
+
+  const style = document.createElement("style");
+  style.id = "accountMenuStyles";
+  style.textContent = `
+    #accountMenuRoot{margin:18px 0 22px} .account-menu-list{display:grid;gap:8px}
+    .account-menu-item{display:grid;grid-template-columns:28px 1fr 16px;align-items:center;gap:10px;width:100%;min-height:48px;padding:11px 13px;border:1px solid #e1e4df;border-radius:13px;background:#fff;color:#252a27;text-align:left;font:inherit;font-weight:600;cursor:pointer}
+    .account-menu-item>span:first-child{font-size:19px;text-align:center}.account-menu-item>span:last-child{font-size:22px;color:#7b827b}
+    .account-menu-item:active{background:#f5ffd6;border-color:#d4ff00}.account-menu-panel{padding:14px;margin-top:10px;border:1px solid #e1e4df;border-radius:14px;background:#fafbf8}
+    .account-menu-panel h3{margin:0 0 12px;font-size:20px}.account-menu-panel p{overflow-wrap:anywhere}.account-menu-back{margin:0 0 12px;padding:7px 0;border:0;background:none;color:#525a50;font:inherit;font-weight:600;cursor:pointer}
+    .account-menu-panel label{display:block;margin:10px 0}.account-menu-panel label span{display:block;margin-bottom:5px;font-size:14px}.account-menu-panel input{box-sizing:border-box;width:100%;min-height:44px;padding:10px;border:1px solid #cbd4c4;border-radius:10px;font:inherit}
+    .account-menu-panel .account-save{width:100%;min-height:46px;margin-top:8px;border:0;border-radius:12px;background:#d4ff00;color:#20251e;font:inherit;font-weight:700;cursor:pointer}
+    .account-signout-btn{margin-top:10px!important;min-height:48px;border-radius:12px!important;background:#d4ff00!important;color:#20251e!important;font-weight:700!important}
+    #authLoggedIn .muted{margin-bottom:4px} #authLoggedIn .auth-user-email{overflow-wrap:anywhere}
+    .account-listing-row{display:block;width:100%;padding:12px 0;border:0;border-bottom:1px solid #e4e7e2;background:none;text-align:left;font:inherit;cursor:pointer}.account-listing-row strong{display:block;margin-bottom:4px}
+  `;
+  document.head.appendChild(style);
+  updateAccountMenuLabels();
+  accountMenuRoot.addEventListener("click", handleAccountMenuClick);
+}
+function updateAccountMenuLabels() {
+  if (!accountMenuRoot) return;
+  accountMenuRoot.querySelectorAll("[data-account-label]").forEach(el => { el.textContent = accountMenuText(el.dataset.accountLabel); });
+  const signOut = document.getElementById("authSignOut");
+  if (signOut) signOut.textContent = accountMenuText("signOut");
+}
+function showAccountMenuPanel(title, bodyHTML) {
+  ensureAccountMenuUI();
+  const list = accountMenuRoot?.querySelector(".account-menu-list");
+  const panel = document.getElementById("accountMenuPanel");
+  if (!panel || !list) return;
+  list.classList.add("hidden");
+  panel.innerHTML = `<button type="button" class="account-menu-back" data-account-action="back">${escapeHtml(accountMenuText("back"))}</button><h3>${escapeHtml(title)}</h3>${bodyHTML}`;
+  panel.classList.remove("hidden");
+}
+function showAccountMenuList() {
+  const list = accountMenuRoot?.querySelector(".account-menu-list");
+  const panel = document.getElementById("accountMenuPanel");
+  list?.classList.remove("hidden");
+  if (panel) { panel.classList.add("hidden"); panel.innerHTML = ""; }
+}
+async function showMyListings() {
+  if (!db || !currentUser) return;
+  showAccountMenuPanel(accountMenuText("listings"), `<p class="muted">${escapeHtml(accountMenuText("loading"))}</p>`);
+  const panel = document.getElementById("accountMenuPanel");
+  const { data, error } = await db.from("listings").select("id,title,price,currency,created_at").eq("user_id", currentUser.id).order("created_at", { ascending: false });
+  if (!panel || panel.classList.contains("hidden")) return;
+  if (error) { panel.insertAdjacentHTML("beforeend", `<p class="form-message error">${escapeHtml(accountMenuText("error"))}</p>`); return; }
+  if (!data?.length) { panel.insertAdjacentHTML("beforeend", `<p class="muted">${escapeHtml(accountMenuText("listingsEmpty"))}</p>`); return; }
+  const rows = data.map(item => `<button type="button" class="account-listing-row" data-account-listing-id="${escapeHtml(String(item.id))}"><strong>${escapeHtml(item.title || t("Объявление"))}</strong><span>${escapeHtml(money(item.price, item.currency || "UAH"))}</span></button>`).join("");
+  panel.insertAdjacentHTML("beforeend", rows);
+}
+async function handleAccountMenuClick(event) {
+  const listingBtn = event.target.closest("[data-account-listing-id]");
+  if (listingBtn) {
+    const id = listingBtn.dataset.accountListingId;
+    const item = visibleListings.find(x => String(x.id) === id);
+    if (item) { closeAuthModal(); openListing(item); }
+    else { closeAuthModal(); await loadListings(); const found = visibleListings.find(x => String(x.id) === id); if (found) openListing(found); }
+    return;
+  }
+  const btn = event.target.closest("[data-account-action]");
+  if (!btn) return;
+  const action = btn.dataset.accountAction;
+  if (action === "back") { showAccountMenuList(); return; }
+  if (action === "profile") {
+    showAccountMenuPanel(accountMenuText("profileTitle"), `<p><strong>${escapeHtml(accountMenuText("email"))}</strong><br>${escapeHtml(currentUser?.email || "—")}</p><p><strong>${escapeHtml(accountMenuText("userId"))}</strong><br><small>${escapeHtml(currentUser?.id || "—")}</small></p>`);
+  } else if (action === "listings") {
+    await showMyListings();
+  } else if (action === "favorites") {
+    closeAuthModal(); openFavoritesModal();
+  } else if (action === "messages") {
+    closeAuthModal(); openMessagesModal();
+  } else if (action === "settings") {
+    showAccountMenuPanel(accountMenuText("settingsTitle"), `<p class="muted">${escapeHtml(accountMenuText("settingsNote"))}</p>`);
+  } else if (action === "security") {
+    showAccountMenuPanel(accountMenuText("securityTitle"), `<form id="accountPasswordForm"><label><span>${escapeHtml(accountMenuText("newPassword"))}</span><input name="password" type="password" minlength="6" autocomplete="new-password" required></label><label><span>${escapeHtml(accountMenuText("confirmPassword"))}</span><input name="password2" type="password" minlength="6" autocomplete="new-password" required></label><button class="account-save" type="submit">${escapeHtml(accountMenuText("save"))}</button><p class="form-message" role="status" aria-live="polite"></p></form>`);
+    const form = document.getElementById("accountPasswordForm");
+    form?.addEventListener("submit", async e => {
+      e.preventDefault();
+      const p1 = String(form.elements.password.value || "");
+      const p2 = String(form.elements.password2.value || "");
+      const message = form.querySelector(".form-message");
+      if (p1.length < 6) { message.textContent = accountMenuText("passwordShort"); message.classList.add("error"); return; }
+      if (p1 !== p2) { message.textContent = accountMenuText("passwordMismatch"); message.classList.add("error"); return; }
+      const submit = form.querySelector("button[type=submit]");
+      setButtonLoading(submit, true);
+      const { error } = await db.auth.updateUser({ password: p1 });
+      setButtonLoading(submit, false);
+      message.textContent = error ? (error.message || accountMenuText("error")) : accountMenuText("passwordSaved");
+      message.classList.toggle("error", Boolean(error));
+      message.classList.toggle("success", !error);
+      if (!error) form.reset();
+    });
+  }
+}
+
 document.getElementById("authOpenMenu")?.addEventListener("click", () => {
   closeAuthModal();
   const menuToggle = document.getElementById("menuToggle");

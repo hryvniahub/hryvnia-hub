@@ -2494,3 +2494,19 @@ input:focus, select:focus, textarea:focus {
     0 0 7px rgba(0, 0, 0, 0.95),
     0 1px 12px rgba(0, 0, 0, 0.8) !important;
 }
+
+/* HRYVNIA HUB — slightly larger, higher main banner headline */
+.banner-title {
+  font-size: clamp(20px, 2.35vw, 29px) !important;
+  position: relative !important;
+  top: -4px !important;
+  line-height: 1.08 !important;
+}
+
+@media (max-width: 720px) {
+  .banner-title {
+    font-size: clamp(15px, 4.15vw, 19px) !important;
+    top: -3px !important;
+    line-height: 1.04 !important;
+  }
+}

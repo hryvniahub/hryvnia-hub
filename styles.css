@@ -2219,3 +2219,42 @@ input:focus, select:focus, textarea:focus {
   .ticker-item { gap: 2px !important; padding-left: 2px !important; padding-right: 2px !important; }
   .ticker-item img, .ticker-item svg, .ticker-icon { width: 19px !important; height: 19px !important; flex-basis: 19px !important; }
 }
+
+/* ==== MOBILE: TIGHTER VERTICAL SPACING BETWEEN SECTIONS ==== */
+@media (max-width: 720px) {
+  /* Bring the urgent-deals heading closer to the AI/search cards. */
+  .urgent-deals {
+    padding-top: 8px !important;
+    margin-top: 0 !important;
+  }
+  .urgent-deals .eyebrow {
+    margin-bottom: 3px !important;
+  }
+  .urgent-deals h2 {
+    margin-bottom: 5px !important;
+  }
+  .urgent-deals .badge-soft {
+    display: inline-block;
+    margin-bottom: 0 !important;
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
+    line-height: 1.2 !important;
+  }
+  /* Reduce the gap after the urgent-deals placeholder before latest listings. */
+  .listing-section {
+    padding-top: 8px !important;
+    margin-top: 0 !important;
+  }
+  .listing-section .section-head {
+    margin-bottom: 8px !important;
+  }
+  .listing-section .eyebrow {
+    margin-bottom: 3px !important;
+  }
+  .listing-section h2 {
+    margin-bottom: 3px !important;
+  }
+  .urgent-deals-grid {
+    gap: 8px !important;
+  }
+}

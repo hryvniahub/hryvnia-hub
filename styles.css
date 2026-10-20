@@ -2092,11 +2092,60 @@ input:focus, select:focus, textarea:focus {
     pointer-events: none !important;
   }
   .bottom-nav-btn:nth-child(2)::before {
-    left: calc(50% - 24px) !important;
+    left: calc(50% - 35px) !important;
     transform: rotate(-35deg) !important;
   }
   .bottom-nav-btn:nth-child(2)::after {
-    right: calc(50% - 24px) !important;
+    right: calc(50% - 35px) !important;
     transform: rotate(35deg) !important;
+  }
+}
+
+/* ==== FINAL MOBILE TUNING: COMPACT AI SEARCH + AREA/RADIUS FIELDS ==== */
+@media (max-width: 720px) {
+  /* Keep the AI card visually compact; leave the title, short description and action visible. */
+  .ai-panel {
+    padding: 8px !important;
+    gap: 4px !important;
+    min-height: 0 !important;
+    justify-content: center !important;
+  }
+  .ai-panel .ai-badge {
+    margin: 0 0 2px !important;
+    font-size: 9px !important;
+    line-height: 1.1 !important;
+  }
+  .ai-panel h3 {
+    margin: 0 0 3px !important;
+    font-size: 13px !important;
+    line-height: 1.15 !important;
+  }
+  .ai-panel .ai-subtitle {
+    margin: 0 0 4px !important;
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+  }
+  /* The feature list adds height and repeats the message on a narrow screen. */
+  .ai-panel .ai-features {
+    display: none !important;
+  }
+  .ai-panel .ai-visual {
+    font-size: 22px !important;
+    line-height: 1 !important;
+  }
+  .ai-panel .btn-ai {
+    padding: 6px 8px !important;
+    font-size: 10px !important;
+    line-height: 1.15 !important;
+    margin-top: 2px !important;
+  }
+
+  /* Reduce only the area and radius controls; keep city and other fields unchanged. */
+  #catalogRegionSelect,
+  .search-filters-row > select,
+  .search-filters-row > input[type="number"] {
+    font-size: 10.5px !important;
+    padding-left: 6px !important;
+    padding-right: 4px !important;
   }
 }

@@ -2064,3 +2064,39 @@ input:focus, select:focus, textarea:focus {
   color: #caff00 !important;
   filter: brightness(1.12) saturate(1.2);
 }
+
+
+/* ==== FINAL FIX: EXACTLY TWO FILLED LIME LEAVES BESIDE FAVORITES ==== */
+@media (max-width: 720px) {
+  /* Remove the three incorrectly placed leaves from the previous version. */
+  .bottom-nav-btn::before,
+  .bottom-nav-btn::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  /* The heart is the second button: place one filled leaf on each side. */
+  .bottom-nav-btn:nth-child(2)::before,
+  .bottom-nav-btn:nth-child(2)::after {
+    content: "" !important;
+    display: block !important;
+    position: absolute !important;
+    top: 13px !important;
+    width: 7px !important;
+    height: 10px !important;
+    border: 0 !important;
+    border-radius: 100% 0 100% 0 !important;
+    background: #d4ff00 !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+    pointer-events: none !important;
+  }
+  .bottom-nav-btn:nth-child(2)::before {
+    left: calc(50% - 24px) !important;
+    transform: rotate(-35deg) !important;
+  }
+  .bottom-nav-btn:nth-child(2)::after {
+    right: calc(50% - 24px) !important;
+    transform: rotate(35deg) !important;
+  }
+}

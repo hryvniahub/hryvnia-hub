@@ -163,6 +163,12 @@ const translations = {
     en: "Sign in to message the seller.",
     pl: "Zaloguj się, aby napisać do sprzedawcy."
   },
+  "Войдите, чтобы добавить объявление": {
+    ru: "Войдите, чтобы добавить объявление",
+    uk: "Увійдіть, щоб додати оголошення",
+    en: "Sign in to add a listing",
+    pl: "Zaloguj się, aby dodać ogłoszenie"
+  },
   "Войдите, чтобы видеть сообщения.": {
     ru: "Войдите, чтобы видеть сообщения.",
     uk: "Увійдіть, щоб бачити повідомлення.",
@@ -457,6 +463,36 @@ function renderAuthModal() {
 function openAuthModal() { renderAuthModal(); authModal?.classList.remove("hidden"); authClose?.focus(); }
 function closeAuthModal() { authModal?.classList.add("hidden"); }
 
+// ==== STAGE A: show/hide password ====
+const PASSWORD_TOGGLE_LABELS = {
+  ru: { show: "Показать пароль", hide: "Скрыть пароль" },
+  uk: { show: "Показати пароль", hide: "Приховати пароль" },
+  en: { show: "Show password", hide: "Hide password" },
+  pl: { show: "Pokaż hasło", hide: "Ukryj hasło" }
+};
+function passwordToggleLabel(key) {
+  return (PASSWORD_TOGGLE_LABELS[lang] || PASSWORD_TOGGLE_LABELS.ru)[key];
+}
+function initPasswordToggles() {
+  document.querySelectorAll("[data-password-toggle]").forEach(btn => {
+    if (btn.dataset.bound === "1") return;
+    btn.dataset.bound = "1";
+    btn.addEventListener("click", () => {
+      const field = btn.closest(".password-field");
+      const input = field?.querySelector("input");
+      if (!input) return;
+      const show = input.type === "password";
+      input.type = show ? "text" : "password";
+      btn.setAttribute("aria-pressed", String(show));
+      btn.setAttribute("aria-label", passwordToggleLabel(show ? "hide" : "show"));
+      const icon = btn.querySelector(".password-toggle-icon");
+      if (icon) icon.textContent = show ? "🙈" : "👁";
+      field.classList.toggle("is-visible", show);
+      input.focus({ preventScroll: true });
+    });
+  });
+}
+
 function updateAuthTranslations() {
   const setText = (s, k) => { const el = document.querySelector(s); if (el) el.textContent = authText(k); };
   setText("#authEyebrow", "account");
@@ -481,6 +517,11 @@ function updateAuthTranslations() {
   [["#authLoginForm button[type='submit']", "login"], ["#authRegisterForm button[type='submit']", "register"], ["#authResetForm button[type='submit']", "resetLink"], ["#authNewPasswordForm button[type='submit']", "savePassword"]].forEach(([s, k]) => setText(s, k));
   if (authClose) authClose.setAttribute("aria-label", authText("close"));
   updateAccountButton();
+  initPasswordToggles();
+  document.querySelectorAll("[data-password-toggle]").forEach(btn => {
+    const pressed = btn.getAttribute("aria-pressed") === "true";
+    btn.setAttribute("aria-label", passwordToggleLabel(pressed ? "hide" : "show"));
+  });
 }
 
 accountBtn?.addEventListener("click", openAuthModal);
@@ -717,18 +758,80 @@ if (photoPreview) {
   });
 }
 
+// ==== STAGE A: client-side photo compression ====
+const COMPRESS_MAX_SIDE = 1920;
+const COMPRESS_QUALITY = 0.82;
+const COMPRESS_MIME = "image/webp";
+
+function loadImageFromBlob(blob) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("decode-failed")); };
+    img.src = url;
+  });
+}
+
+function canvasToBlob(canvas, type, quality) {
+  return new Promise(resolve => canvas.toBlob(resolve, type, quality));
+}
+
+async function compressPhoto(file) {
+  let img;
+  try {
+    img = await loadImageFromBlob(file);
+  } catch {
+    return { blob: file, mime: file.type, width: 0, height: 0, compressed: false, undecodable: true };
+  }
+  const ratio = Math.min(1, COMPRESS_MAX_SIDE / Math.max(img.naturalWidth, img.naturalHeight));
+  const width = Math.max(1, Math.round(img.naturalWidth * ratio));
+  const height = Math.max(1, Math.round(img.naturalHeight * ratio));
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d", { alpha: false });
+  if (!ctx) return { blob: file, mime: file.type, width, height, compressed: false, undecodable: false };
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, width, height);
+  ctx.filter = "brightness(1.05) contrast(1.06) saturate(1.04)";
+  ctx.drawImage(img, 0, 0, width, height);
+  ctx.filter = "none";
+
+  if (ratio === 1 && file.size <= 350 * 1024) {
+    return { blob: file, mime: file.type, width, height, compressed: false, undecodable: false };
+  }
+
+  let blob = await canvasToBlob(canvas, COMPRESS_MIME, COMPRESS_QUALITY);
+  let mime = COMPRESS_MIME;
+  if (!blob) {
+    blob = await canvasToBlob(canvas, "image/jpeg", 0.86);
+    mime = "image/jpeg";
+  }
+  if (!blob) return { blob: file, mime: file.type, width, height, compressed: false, undecodable: false };
+  return { blob, mime, width, height, compressed: true, undecodable: false };
+}
+
 async function uploadListingPhotos() {
   const { error: schemaError } = await db.from("listings").select("image_urls").limit(0);
   if (schemaError) throw new Error(photoText("setup"));
   const bucket = db.storage.from(PHOTO_BUCKET);
   const urls = [];
   for (const photo of selectedPhotos) {
-    if (!photo.uploadedUrl) {
-      const path = `${crypto.randomUUID()}.${PHOTO_TYPES[photo.file.type]}`;
-      const { error } = await bucket.upload(path, photo.file, { contentType: photo.file.type, upsert: false });
-      if (error) throw new Error(photoText("failed"));
-      photo.uploadedUrl = bucket.getPublicUrl(path).data.publicUrl;
-    }
+    if (photo.uploadedUrl) { urls.push(photo.uploadedUrl); continue; }
+
+    const result = await compressPhoto(photo.file);
+    if (result.undecodable) throw new Error(photoText("unreadable"));
+    if (result.blob.size > MAX_PHOTO_BYTES) throw new Error(photoText("invalid"));
+    const ext = result.mime === "image/webp" ? "webp"
+              : result.mime === "image/jpeg" ? "jpg"
+              : result.mime === "image/png" ? "png"
+              : "bin";
+    const path = `${crypto.randomUUID()}.${ext}`;
+    const { error } = await bucket.upload(path, result.blob, { contentType: result.mime, upsert: false });
+    if (error) throw new Error(photoText("failed"));
+    photo.uploadedUrl = bucket.getPublicUrl(path).data.publicUrl;
     urls.push(photo.uploadedUrl);
   }
   return urls;
@@ -797,7 +900,16 @@ async function renderFavoritesList() {
   favoritesList.innerHTML = `<p class="muted">${escapeHtml(t("Загрузка…"))}</p>`;
   const { data, error } = await db.from("listings").select("*, cities!inner(name_ru, name_uk, name_en, name_pl)").in("id", favs);
   if (error) { favoritesList.innerHTML = `<p class="muted">${escapeHtml(t("Ошибка") + ": " + error.message)}</p>`; return; }
-  if (!data || !data.length) { favoritesList.innerHTML = `<p class="muted">${escapeHtml(t("В избранном пока ничего нет."))}</p>`; return; }
+  if (!data || !data.length) {
+    saveLocalFavorites([]);
+    favoritesList.innerHTML = `<p class="muted">${escapeHtml(t("В избранном пока ничего нет."))}</p>`;
+    return;
+  }
+  const remoteIds = new Set(data.map(item => String(item.id)));
+  const local = getLocalFavorites();
+  const pruned = local.filter(id => remoteIds.has(id));
+  if (pruned.length !== local.length) saveLocalFavorites(pruned);
+
   favoritesList.innerHTML = data.map(item => `
     <article class="card fav-card" data-fav-open-id="${escapeHtml(String(item.id))}" tabindex="0">
       ${listingCover(item)}
@@ -1625,8 +1737,25 @@ document.querySelectorAll(".category").forEach(button => {
 if (searchBtn) searchBtn.addEventListener("click", loadListings);
 if (searchInput) searchInput.addEventListener("keydown", e => { if (e.key === "Enter") loadListings(); });
 
+// ==== STAGE A: запрет создания объявления без авторизации ====
 const openAddBtn = document.getElementById("openAdd");
-if (openAddBtn) openAddBtn.addEventListener("click", () => addModal?.classList.remove("hidden"));
+if (openAddBtn) openAddBtn.addEventListener("click", () => {
+  if (!currentUser) {
+    openAuthModal();
+    const hint = document.createElement("p");
+    hint.className = "form-message stage-a-hint";
+    hint.setAttribute("role", "status");
+    hint.textContent = t("Войдите, чтобы добавить объявление");
+    const guest = document.getElementById("authGuest");
+    if (guest) {
+      guest.querySelectorAll(".stage-a-hint").forEach(n => n.remove());
+      guest.prepend(hint);
+      setTimeout(() => hint.remove(), 6000);
+    }
+    return;
+  }
+  addModal?.classList.remove("hidden");
+});
 const closeAddBtn = document.getElementById("closeAdd");
 if (closeAddBtn) closeAddBtn.addEventListener("click", () => addModal?.classList.add("hidden"));
 if (addModal) addModal.addEventListener("click", e => { if (e.target === addModal) addModal.classList.add("hidden"); });
@@ -1634,6 +1763,17 @@ if (addModal) addModal.addEventListener("click", e => { if (e.target === addModa
 if (addForm) {
   addForm.addEventListener("submit", async e => {
     e.preventDefault();
+    // STAGE A: запрет добавления без авторизации (UI-уровень).
+    if (!currentUser) {
+      if (formMessage) {
+        formMessage.textContent = t("Войдите, чтобы добавить объявление");
+        formMessage.classList.remove("success");
+        formMessage.classList.add("error");
+      }
+      addModal?.classList.add("hidden");
+      openAuthModal();
+      return;
+    }
     if (publishing || validatingPhotos) return;
     if (formMessage) formMessage.textContent = "";
     if (!db) { if (formMessage) formMessage.textContent = "Сначала подключим Supabase — сейчас работает демо-режим."; return; }
@@ -1650,7 +1790,7 @@ if (addForm) {
       city_id: Number(form.get("city_id")),
       price: Number(form.get("price")),
       description: form.get("description") || "",
-      user_id: currentUser?.id || null
+      user_id: currentUser.id
     };
     const withPhotos = selectedPhotos.length > 0;
     publishing = true;

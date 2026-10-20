@@ -67,14 +67,39 @@
     <label>Название<input name="title" required placeholder="Например: Skoda Octavia 1.6"></label>
     <label>Город<select id="cityRegionSelect" aria-label="Область"><option value="">Все области</option></select><div class="city-search"><input id="citySearchInput" type="search" required autocomplete="off" placeholder="Введите название города" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="citySuggestions"><div id="citySuggestions" class="city-suggestions" role="listbox" hidden></div><input type="hidden" name="city_id" id="citySelect"></div></label>
     <label>Цена, грн<input name="price" type="number" min="0" required placeholder="450000"></label><label>Описание<textarea name="description" rows="4" placeholder="Коротко опишите предложение"></textarea></label>
-    <fieldset id="photoFields" class="photo-fields"><legend id="photoLabel">Фотографии</legend><button id="photoPickerButton" class="btn" type="button">Добавить фотографии</button><input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp" multiple hidden aria-labelledby="photoLabel" aria-describedby="photoHint photoMessage"><p id="photoHint" class="muted">До 10 фото: JPEG, PNG или WebP, до 10 МБ каждое. Первое фото — главное.</p><p id="photoMessage" class="form-message" role="status" aria-live="polite"></p><div id="photoPreview" class="photo-preview"></div></fieldset>
+    <fieldset id="photoFields" class="photo-fields"><legend id="photoLabel">Фотографии</legend><button id="photoPickerButton" class="btn" type="button">Добавить фотографии</button><input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple hidden aria-labelledby="photoLabel" aria-describedby="photoHint photoMessage"><p id="photoHint" class="muted">До 10 фото: JPEG, PNG или WebP, до 10 МБ каждое. Первое фото — главное.</p><p id="photoMessage" class="form-message" role="status" aria-live="polite"></p><div id="photoPreview" class="photo-preview"></div></fieldset>
     <button class="btn btn-primary full" type="submit">Опубликовать</button><p id="formMessage" class="form-message"></p></form></div></div>
   <div class="modal hidden" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authTitle"><div class="modal-card auth-card"><button class="modal-close" id="authClose" type="button" aria-label="Закрыть">×</button><p class="eyebrow" id="authEyebrow">Аккаунт</p><h2 id="authTitle">Настройки аккаунта</h2>
     <section id="authGuest"><div class="auth-tabs" role="tablist" aria-label="Авторизация"><button class="auth-tab active" type="button" data-auth-tab="login" role="tab" aria-selected="true">Вход</button><button class="auth-tab" type="button" data-auth-tab="register" role="tab" aria-selected="false">Регистрация</button></div>
-      <form id="authLoginForm" class="auth-form"><label><span>Электронная почта</span><input type="email" name="email" autocomplete="email" required></label><label><span>Пароль</span><input type="password" name="password" autocomplete="current-password" required minlength="6"></label><button class="btn btn-primary full" type="submit">Вход</button><button class="link-btn" id="authShowReset" type="button">Забыли пароль?</button><p class="form-message" role="status" aria-live="polite"></p></form>
-      <form id="authRegisterForm" class="auth-form hidden"><label><span>Электронная почта</span><input type="email" name="email" autocomplete="email" required></label><label><span>Пароль</span><input type="password" name="password" autocomplete="new-password" required minlength="6"></label><label><span>Подтвердите пароль</span><input type="password" name="password2" autocomplete="new-password" required minlength="6"></label><button class="btn btn-primary full" type="submit">Регистрация</button><p class="form-message" role="status" aria-live="polite"></p></form>
+      <form id="authLoginForm" class="auth-form"><label><span>Электронная почта</span><input type="email" name="email" autocomplete="email" required></label><label><span>Пароль</span>
+        <div class="password-field">
+          <input type="password" name="password" autocomplete="current-password" required minlength="6">
+          <button type="button" class="password-toggle" aria-label="Показать пароль" aria-pressed="false" data-password-toggle><span class="password-toggle-icon" aria-hidden="true">👁</span></button>
+        </div>
+      </label><button class="btn btn-primary full" type="submit">Вход</button><button class="link-btn" id="authShowReset" type="button">Забыли пароль?</button><p class="form-message" role="status" aria-live="polite"></p></form>
+      <form id="authRegisterForm" class="auth-form hidden"><label><span>Электронная почта</span><input type="email" name="email" autocomplete="email" required></label><label><span>Пароль</span>
+        <div class="password-field">
+          <input type="password" name="password" autocomplete="new-password" required minlength="6">
+          <button type="button" class="password-toggle" aria-label="Показать пароль" aria-pressed="false" data-password-toggle><span class="password-toggle-icon" aria-hidden="true">👁</span></button>
+        </div>
+      </label><label><span>Подтвердите пароль</span>
+        <div class="password-field">
+          <input type="password" name="password2" autocomplete="new-password" required minlength="6">
+          <button type="button" class="password-toggle" aria-label="Показать пароль" aria-pressed="false" data-password-toggle><span class="password-toggle-icon" aria-hidden="true">👁</span></button>
+        </div>
+      </label><button class="btn btn-primary full" type="submit">Регистрация</button><p class="form-message" role="status" aria-live="polite"></p></form>
       <form id="authResetForm" class="auth-form hidden"><h3>Восстановление пароля</h3><label><span>Электронная почта</span><input type="email" name="email" autocomplete="email" required></label><button class="btn btn-primary full" type="submit">Отправить ссылку для сброса</button><button class="link-btn" id="authBackToLogin" type="button">Назад</button><p class="form-message" role="status" aria-live="polite"></p></form>
-      <form id="authNewPasswordForm" class="auth-form hidden"><h3>Новый пароль</h3><label><span>Новый пароль</span><input type="password" name="password" autocomplete="new-password" required minlength="6"></label><label><span>Подтвердите пароль</span><input type="password" name="password2" autocomplete="new-password" required minlength="6"></label><button class="btn btn-primary full" type="submit">Сохранить пароль</button><p class="form-message" role="status" aria-live="polite"></p></form>
+      <form id="authNewPasswordForm" class="auth-form hidden"><h3>Новый пароль</h3><label><span>Новый пароль</span>
+        <div class="password-field">
+          <input type="password" name="password" autocomplete="new-password" required minlength="6">
+          <button type="button" class="password-toggle" aria-label="Показать пароль" aria-pressed="false" data-password-toggle><span class="password-toggle-icon" aria-hidden="true">👁</span></button>
+        </div>
+      </label><label><span>Подтвердите пароль</span>
+        <div class="password-field">
+          <input type="password" name="password2" autocomplete="new-password" required minlength="6">
+          <button type="button" class="password-toggle" aria-label="Показать пароль" aria-pressed="false" data-password-toggle><span class="password-toggle-icon" aria-hidden="true">👁</span></button>
+        </div>
+      </label><button class="btn btn-primary full" type="submit">Сохранить пароль</button><p class="form-message" role="status" aria-live="polite"></p></form>
     </section><section id="authLoggedIn" class="hidden"><p class="muted">Вы вошли как:</p><p id="authUserEmail" class="auth-user-email"></p><button class="auth-menu-btn" id="authOpenMenu" type="button">Меню / Настройки</button><button class="btn btn-primary full" id="authSignOut" type="button">Выход</button><p id="authSignOutMessage" class="form-message" role="status" aria-live="polite"></p></section>
   </div></div>
   <div class="modal hidden" id="favoritesModal" role="dialog" aria-modal="true" aria-labelledby="favoritesTitle"><div class="modal-card"><button class="modal-close" id="closeFavorites" type="button" aria-label="Закрыть">×</button><h2 id="favoritesTitle" data-i18n="Избранное">Избранное</h2><div id="favoritesList" class="favorites-list"></div></div></div>

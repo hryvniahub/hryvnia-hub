@@ -2427,3 +2427,18 @@ input:focus, select:focus, textarea:focus {
     display: none !important;
   }
 }
+
+/* HRYVNIA HUB — category cards 20% shorter, without scaling the text or images */
+.categories-grid > .category-card:not(.all-btn) {
+  height: auto !important;
+  min-height: 0 !important;
+  aspect-ratio: 1.85 / 1 !important;
+}
+
+@media (max-width: 720px) {
+  .categories-grid > .category-card:not(.all-btn) {
+    aspect-ratio: 2.98 / 1 !important;
+    min-height: 0 !important;
+    padding: 8px !important;
+  }
+}

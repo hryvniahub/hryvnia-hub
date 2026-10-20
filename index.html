@@ -1,8 +1,9 @@
 <!doctype html>
-<html lang="uk">
+<html lang="uk" translate="no">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="google" content="notranslate">
   <title>Hryvnia Hub — объявления Украины</title>
   <meta name="description" content="Hryvnia Hub — хаб объявлений: автомобили, недвижимость и бизнес.">
   <link rel="stylesheet" href="styles.css">
@@ -35,18 +36,10 @@
       <div class="main-banner"><img class="main-banner-img" src="assets/images/00_hero_banner_no_text.png" alt="" fetchpriority="high" width="1180" height="400"><div class="banner-content"><p class="banner-title">Find the best deals in Ukraine</p><p class="hero-text">Автомобили, недвижимость и готовый бизнес — в одном месте.</p></div></div>
       <div class="market-ticker" aria-label="Currency rates">
         <div class="ticker-scroll">
-          <div class="ticker-item" data-ticker-item="usd">
-            <span class="ticker-icon ticker-icon-usd" data-ticker-icon="usd" aria-hidden="true">🇺🇸</span>
-            <div class="ticker-details"><span class="ticker-label" data-ticker-label="usd">USD/UAH</span><div class="ticker-main"><span class="ticker-value" data-ticker="usd">…</span><span class="ticker-arrow" data-ticker-arrow="usd" aria-hidden="true"></span></div><span class="ticker-source" data-ticker-source="usd">НБУ · …</span></div>
-          </div>
-          <div class="ticker-item" data-ticker-item="pln">
-            <span class="ticker-icon ticker-icon-pln" data-ticker-icon="pln" aria-hidden="true">🇵🇱</span>
-            <div class="ticker-details"><span class="ticker-label" data-ticker-label="pln">PLN/UAH</span><div class="ticker-main"><span class="ticker-value" data-ticker="pln">…</span><span class="ticker-arrow" data-ticker-arrow="pln" aria-hidden="true"></span></div><span class="ticker-source" data-ticker-source="pln">НБУ · …</span></div>
-          </div>
-          <div class="ticker-item" data-ticker-item="btc">
-            <span class="ticker-icon ticker-icon-btc" data-ticker-icon="btc" aria-hidden="true">₿</span>
-            <div class="ticker-details"><span class="ticker-label" data-ticker-label="btc">BTC/UAH</span><div class="ticker-main"><span class="ticker-value" data-ticker="btc">…</span><span class="ticker-arrow" data-ticker-arrow="btc" aria-hidden="true"></span></div><span class="ticker-source" data-ticker-source="btc">CoinGecko · …</span></div>
-          </div>
+          <div class="ticker-item" data-ticker-item="usd"><span class="ticker-icon ticker-icon-usd" data-ticker-icon="usd" aria-hidden="true">🇺🇸</span><div class="ticker-details"><span class="ticker-label" data-ticker-label="usd">USD/UAH</span><div class="ticker-main"><span class="ticker-value" data-ticker="usd">…</span><span class="ticker-arrow" data-ticker-arrow="usd" aria-hidden="true"></span></div><span class="ticker-source" data-ticker-source="usd">НБУ · …</span></div></div>
+          <div class="ticker-item" data-ticker-item="pln"><span class="ticker-icon ticker-icon-pln" data-ticker-icon="pln" aria-hidden="true">🇵🇱</span><div class="ticker-details"><span class="ticker-label" data-ticker-label="pln">PLN/UAH</span><div class="ticker-main"><span class="ticker-value" data-ticker="pln">…</span><span class="ticker-arrow" data-ticker-arrow="pln" aria-hidden="true"></span></div><span class="ticker-source" data-ticker-source="pln">НБУ · …</span></div></div>
+          <div class="ticker-item" data-ticker-item="btc"><span class="ticker-icon ticker-icon-btc" data-ticker-icon="btc" aria-hidden="true">₿</span><div class="ticker-details"><span class="ticker-label" data-ticker-label="btc">BTC/UAH</span><div class="ticker-main"><span class="ticker-value" data-ticker="btc">…</span><span class="ticker-arrow" data-ticker-arrow="btc" aria-hidden="true"></span></div><span class="ticker-source" data-ticker-source="btc">CoinGecko · …</span></div></div>
+          <div class="ticker-item" data-ticker-item="xau"><span class="ticker-icon ticker-icon-xau" data-ticker-icon="xau" aria-hidden="true">🥇</span><div class="ticker-details"><span class="ticker-label" data-ticker-label="xau">XAU/USD</span><div class="ticker-main"><span class="ticker-value" data-ticker="xau">…</span><span class="ticker-arrow" data-ticker-arrow="xau" aria-hidden="true"></span></div><span class="ticker-source" data-ticker-source="xau">Gold · …</span></div></div>
         </div>
         <span class="ticker-note" id="tickerNote">Курсы валют · данные загружаются</span>
       </div>
@@ -58,27 +51,13 @@
           <div class="catalog-city-search"><input id="catalogCitySearchInput" type="search" autocomplete="off" placeholder="Введите название города" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="catalogCitySuggestions" data-i18n-placeholder="Введите название города"><div id="catalogCitySuggestions" class="catalog-city-suggestions" role="listbox" hidden></div></div>
           <input type="number" placeholder="Цена (любая)" aria-label="Цена" data-i18n-placeholder="Цена (любая)" data-i18n-aria="Цена">
           <select aria-label="Радиус поиска" data-i18n-aria="Радиус поиска">
-            <option value="30" data-i18n="Радиус: 30 км">Радиус: 30 км</option>
-            <option value="50" data-i18n="Радиус: 50 км">Радиус: 50 км</option>
-            <option value="100" data-i18n="Радиус: 100 км">Радиус: 100 км</option>
-            <option value="200" data-i18n="Радиус: 200 км">Радиус: 200 км</option>
+            <option value="30" data-i18n="Радиус: 30 км">Радиус: 30 км</option><option value="50" data-i18n="Радиус: 50 км">Радиус: 50 км</option><option value="100" data-i18n="Радиус: 100 км">Радиус: 100 км</option><option value="200" data-i18n="Радиус: 200 км">Радиус: 200 км</option>
           </select>
         </div>
       </div>
       <aside class="ai-panel" aria-label="AI Deal Finder"><div class="ai-text"><p class="ai-badge">AI</p><h3 data-i18n="AI Deal Finder">AI-пошук вигідних пропозицій</h3><p class="ai-subtitle" data-i18n="Find better offers with artificial intelligence">Знаходьте вигідні пропозиції за допомогою ШІ.</p><ul class="ai-features"><li data-i18n="Analyze market prices">Аналіз ринкових цін</li><li data-i18n="Find urgent deals">Пошук термінових продажів</li></ul><button class="btn-ai" id="aiSearchBtn" type="button" data-i18n="✨ Try AI Search">✨ Спробувати AI-пошук</button></div><div class="ai-visual" aria-hidden="true">🤖</div></aside>
     </section>
-    <section class="urgent-deals container" aria-label="Urgent deals">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">⚡ <span data-i18n="HOT OFFERS">HOT OFFERS</span></p>
-          <h2 data-i18n="Urgent deals">Urgent deals</h2>
-        </div>
-        <span class="badge-soft" data-i18n="Best offers below market price">Best offers below market price</span>
-      </div>
-      <div class="urgent-deals-grid">
-        <div class="empty" data-i18n="Urgent deals will appear here once listings are flagged as urgent in the database.">Urgent deals will appear here once listings are flagged as urgent in the database.</div>
-      </div>
-    </section>
+    <section class="urgent-deals container" aria-label="Urgent deals"><div class="section-head"><div><p class="eyebrow">⚡ <span data-i18n="HOT OFFERS">HOT OFFERS</span></p><h2 data-i18n="Urgent deals">Urgent deals</h2></div><span class="badge-soft" data-i18n="Best offers below market price">Best offers below market price</span></div><div class="urgent-deals-grid"><div class="empty" data-i18n="Urgent deals will appear here once listings are flagged as urgent in the database.">Urgent deals will appear here once listings are flagged as urgent in the database.</div></div></section>
     <section class="listing-section container"><div class="section-head"><div><p id="listingLabel" class="eyebrow">Листинг</p><h2 id="latestListingsTitle">Последние объявления</h2></div><span id="resultCount" class="muted"></span></div><div id="listing" class="listing"><div class="empty">Загрузка объявлений…</div></div></section>
   </main>
   <footer class="footer"><div class="container">© 2026 Hryvnia Hub · MVP</div></footer>

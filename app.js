@@ -1712,6 +1712,9 @@ function renderCatalogCitySuggestions() {
 function selectCatalogCity(city) {
   selectedCatalogCityId = String(city.id);
   catalogCitySearchInput.value = cityName(city);
+  const isCapital = String(city.official_code || "") === "UA80000000000093317" || Number(city.id) === 29707;
+  activeRegionCode = isCapital ? "" : String(city.region_katottg_code || "");
+  if (catalogRegionSelect) catalogRegionSelect.value = activeRegionCode;
   closeCatalogCitySuggestions();
   loadListings();
 }

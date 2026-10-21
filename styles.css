@@ -3398,3 +3398,137 @@ input:focus, select:focus, textarea:focus {
   .search-filters-row > input[type="number"],
   #catalogRegionSelect { font-size: 10.5px !important; }
 }
+
+
+/* ============================================================
+   HRYVNIA HUB — RESPONSIVE ALIGNMENT & READABILITY PATCH
+   Requested: centered category labels, desktop logo fit, larger banner text.
+   Append-only overrides for Stylus; no HTML/JS changes.
+   ============================================================ */
+
+/* Category names: center horizontally and vertically, and wrap within each card. */
+.categories-grid > .category-card:not(.all-btn),
+.category-card:not(.all-btn) {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+.category-card-label {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 auto !important;
+  padding: 4px 12px !important;
+  box-sizing: border-box !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+  line-height: 1.08 !important;
+  transform: none !important;
+}
+
+/* Desktop/tablet: keep long category labels inside their own card. */
+@media screen and (min-width: 721px) {
+  .category-card-label {
+    font-size: clamp(16px, 1.65vw, 24px) !important;
+    line-height: 1.08 !important;
+    padding: 5px 10px !important;
+  }
+
+  /* Logo: fit the full “HRYVNIA HUB” wordmark inside its green frame. */
+  .header .brand {
+    min-width: 0 !important;
+    flex: 0 1 auto !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
+    padding-right: 12px !important;
+  }
+
+  .header .brand .brand-text,
+  .header .brand .brand-name {
+    display: inline-block !important;
+    transform: none !important;
+    font-size: clamp(19px, 1.55vw, 25px) !important;
+    line-height: 1 !important;
+    letter-spacing: -0.45px !important;
+    white-space: nowrap !important;
+    padding-right: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Larger, readable two-line banner message on desktop. */
+  .main-banner .banner-title {
+    font-size: clamp(27px, 2.35vw, 36px) !important;
+    line-height: 1.08 !important;
+    margin: 0 0 5px !important;
+    text-align: center !important;
+    text-wrap: balance !important;
+  }
+
+  .main-banner .hero-text {
+    font-size: clamp(15px, 1.2vw, 19px) !important;
+    line-height: 1.2 !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    text-align: center !important;
+  }
+}
+
+/* Mobile: center all category names and make both banner lines easier to read. */
+@media screen and (max-width: 720px) {
+  .category-card-label {
+    font-size: clamp(16px, 4.3vw, 21px) !important;
+    line-height: 1.08 !important;
+    padding: 3px 8px !important;
+    text-align: center !important;
+  }
+
+  .main-banner .banner-content {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  .main-banner .banner-title {
+    width: 100% !important;
+    font-size: clamp(16px, 4.6vw, 20px) !important;
+    line-height: 1.08 !important;
+    margin: 0 0 3px !important;
+    text-align: center !important;
+    text-wrap: balance !important;
+  }
+
+  .main-banner .hero-text {
+    width: 100% !important;
+    max-width: 100% !important;
+    font-size: clamp(11px, 3.2vw, 14px) !important;
+    line-height: 1.12 !important;
+    margin: 0 auto !important;
+    text-align: center !important;
+  }
+}
+
+/* Extra-narrow phones: preserve centered labels without clipping. */
+@media screen and (max-width: 380px) {
+  .category-card-label {
+    font-size: clamp(14px, 4.2vw, 17px) !important;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+  }
+  .main-banner .banner-title {
+    font-size: clamp(15px, 4.5vw, 17px) !important;
+  }
+  .main-banner .hero-text {
+    font-size: clamp(10px, 3vw, 11.5px) !important;
+  }
+}

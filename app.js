@@ -1871,6 +1871,13 @@ function renderListings(items) {
     const fav = isFavorite(item.id);
     const cover = listingCover(item);
     const hasCover = cover !== "";
+    const isOwner = Boolean(currentUser?.id && item.user_id && String(currentUser.id) === String(item.user_id));
+    const myListingLabel = ({
+      uk: "Моє оголошення",
+      ru: "Моё объявление",
+      en: "My listing",
+      pl: "Moje ogłoszenie"
+    })[lang] || "My listing";
     return `
     <article class="card${hasCover ? " has-cover" : " no-cover"}" data-listing-index="${index}" tabindex="0" role="button" aria-label="${escapeHtml(item.title)}" style="cursor:pointer">
       <button class="fav-btn ${fav ? "active" : ""}" data-fav-id="${escapeHtml(String(item.id))}" type="button" aria-pressed="${fav ? "true" : "false"}" aria-label="${fav ? "Убрать из избранного" : "В избранное"}">
@@ -1879,6 +1886,7 @@ function renderListings(items) {
       ${cover}
       <div class="card-top">
         <span class="badge">${categoryLabel(item)}</span>
+        ${isOwner ? `<span class="owner-listing-badge" style="display:inline-flex;align-items:center;gap:5px;margin:5px 0;padding:4px 8px;border:1px solid rgba(212,255,0,.7);border-radius:6px;background:rgba(212,255,0,.13);color:var(--text,#1b2b20);font-size:11px;font-weight:700;line-height:1.25">✓ ${escapeHtml(myListingLabel)}</span>` : ""}
         <span class="city">${escapeHtml(item.cities?.[`name_${lang}`] || item.cities?.name_ru || "")}</span>
       </div>
       <h3>${escapeHtml(item.title)}</h3>

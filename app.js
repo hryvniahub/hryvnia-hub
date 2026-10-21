@@ -1735,6 +1735,13 @@ function openListing(item, galleryOnly = false) {
   dialog.setAttribute("aria-labelledby", "listingDialogTitle");
   dialog.style.cssText = "border:0;color:var(--text);max-width:calc(100% - 24px);max-height:90dvh;overflow-wrap:anywhere;";
   const showContact = !galleryOnly && item.user_id;
+  const isOwner = !galleryOnly && currentUser && item.user_id && String(currentUser.id) === String(item.user_id);
+  const ownerLabels = {
+    ru: { edit: "Редактировать", del: "Удалить", confirm: "Удалить объявление? Это действие необратимо.", failed: "Не удалось выполнить действие. Проверьте права доступа.", denied: "Это не ваше объявление." },
+    uk: { edit: "Редагувати", del: "Видалити", confirm: "Видалити оголошення? Цю дію не можна скасувати.", failed: "Не вдалося виконати дію. Перевірте права доступу.", denied: "Це не ваше оголошення." },
+    en: { edit: "Edit", del: "Delete", confirm: "Delete this listing? This cannot be undone.", failed: "Could not complete the action. Check your permissions.", denied: "This is not your listing." },
+    pl: { edit: "Edytuj", del: "Usuń", confirm: "Usunąć ogłoszenie? Tej czynności nie można cofnąć.", failed: "Nie udało się wykonać akcji. Sprawdź uprawnienia.", denied: "To nie jest Twoje ogłoszenie." }
+  }[lang] || { edit: "Edit", del: "Delete", confirm: "Delete this listing?", failed: "Failed.", denied: "Not your listing." };
   dialog.innerHTML = `
     <button type="button" class="modal-close" aria-label="${labels[0]}" data-close>×</button>
     <h2 id="listingDialogTitle" style="padding-right:24px">${escapeHtml(item.title)}</h2>
@@ -1750,6 +1757,10 @@ function openListing(item, galleryOnly = false) {
       <p class="city">${escapeHtml(item.cities?.[`name_${lang}`] || item.cities?.name_ru || item.city || "")}</p>
       <p class="price">${money(item.price, item.currency || "UAH")}</p>
       <p class="desc" style="white-space:pre-wrap">${escapeHtml(item.description || "")}</p>
+      ${isOwner ? `<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+        <button type="button" class="btn btn-primary" data-owner-edit="${escapeHtml(String(item.id))}">${escapeHtml(ownerLabels.edit)}</button>
+        <button type="button" class="btn" data-owner-delete="${escapeHtml(String(item.id))}" style="background:#ffe5e5;color:#8a1a1a;border:1px solid #e6a8a8">${escapeHtml(ownerLabels.del)}</button>
+      </div>` : ""}
       ${showContact && currentUser && currentUser.id !== item.user_id
         ? `<button type="button" class="btn btn-primary full btn-contact" data-contact="${escapeHtml(String(item.id))}">${escapeHtml(t("Написать продавцу"))}</button>`
         : ""}
@@ -1777,6 +1788,21 @@ function openListing(item, galleryOnly = false) {
     dialog.close();
     await startConversation(target);
   });
+  dialog.querySelector("[data-owner-edit]")?.addEventListener("click", async (evt) => {
+    const id = evt.currentTarget.dataset.ownerEdit;
+    const target = visibleListings.find(l => String(l.id) === id);
+    if (!target) return;
+    dialog.close();
+    await editListing(target, ownerLabels);
+  });
+  dialog.querySelector("[data-owner-delete]")?.addEventListener("click", async (evt) => {
+    const id = evt.currentTarget.dataset.ownerDelete;
+    const target = visibleListings.find(l => String(l.id) === id);
+    if (!target) return;
+    if (!confirm(ownerLabels.confirm)) return;
+    dialog.close();
+    await deleteListing(target, ownerLabels);
+  });
   const oldOverflow = document.body.style.overflow;
   dialog.addEventListener("close", () => {
     document.body.style.overflow = oldOverflow;
@@ -1787,6 +1813,40 @@ function openListing(item, galleryOnly = false) {
   showPhoto(0);
   dialog.showModal();
   document.body.style.overflow = "hidden";
+}
+
+// ==== БЕЗОПАСНОЕ РЕДАКТИРОВАНИЕ/УДАЛЕНИЕ: только владелец; финальная проверка — на RLS ====
+async function editListing(item, labels) {
+  if (!db || !currentUser) { alert(labels.denied); return; }
+  if (String(currentUser.id) !== String(item.user_id || "")) { alert(labels.denied); return; }
+  const newTitle = prompt(labels.edit + ": " + t("Название"), item.title || "");
+  if (newTitle === null) return;
+  const newPriceRaw = prompt(labels.edit + ": " + t("Цена, грн"), String(item.price ?? ""));
+  if (newPriceRaw === null) return;
+  const newPrice = Number(String(newPriceRaw).replace(",", ".").trim());
+  if (!Number.isFinite(newPrice) || newPrice < 0) { alert(labels.failed); return; }
+  const { data, error } = await db
+    .from("listings")
+    .update({ title: String(newTitle).trim(), price: newPrice })
+    .eq("id", item.id)
+    .eq("user_id", currentUser.id)
+    .select("id,title,price,user_id")
+    .maybeSingle();
+  if (error || !data) { alert(error?.message ? error.message : labels.failed); return; }
+  await loadListings();
+}
+async function deleteListing(item, labels) {
+  if (!db || !currentUser) { alert(labels.denied); return; }
+  if (String(currentUser.id) !== String(item.user_id || "")) { alert(labels.denied); return; }
+  const { data, error } = await db
+    .from("listings")
+    .delete()
+    .eq("id", item.id)
+    .eq("user_id", currentUser.id)
+    .select("id")
+    .maybeSingle();
+  if (error || !data) { alert(error?.message ? error.message : labels.failed); return; }
+  await loadListings();
 }
 
 function renderListings(items) {
@@ -1957,16 +2017,28 @@ if (addForm) {
         payload.image_url = payload.image_urls[0];
       }
       const { error } = await db.from("listings").insert(payload);
-      if (error) throw error;
+      if (error) {
+        // RLS-отказ или другая ошибка Supabase. Не выдаём «успех».
+        const raw = String(error.message || "");
+        if (/row-level security|permission denied|new row violates/i.test(raw)) {
+          throw new Error(t("Ошибка") + ": " + raw + " — проверьте права доступа.");
+        }
+        throw error;
+      }
       e.target.reset();
       resetPhotos();
       if (formMessage) formMessage.textContent = "Объявление опубликовано!";
       await loadListings();
       setTimeout(() => addModal?.classList.add("hidden"), 700);
     } catch (error) {
-      if (formMessage) formMessage.textContent = withPhotos
-        ? (error.message === photoText("setup") ? error.message : photoText("failed"))
-        : `Ошибка: ${error.message}`;
+      if (formMessage) {
+        const errorText = error?.message || String(error);
+        formMessage.textContent = withPhotos
+          ? (errorText === photoText("setup")
+              ? errorText
+              : `${photoText("failed")} ${errorText}`)
+          : `Ошибка: ${errorText}`;
+      }
     } finally {
       publishing = false;
       controls.forEach(([control, disabled]) => { control.disabled = disabled; });

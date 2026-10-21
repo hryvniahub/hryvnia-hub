@@ -94,6 +94,22 @@ const translations = {
   "Автомобили": { ru: "Автомобили", uk: "Автомобілі", en: "Cars", pl: "Samochody" },
   "Недвижимость": { ru: "Недвижимость", uk: "Нерухомість", en: "Real estate", pl: "Nieruchomości" },
   "Готовый бизнес": { ru: "Готовый бизнес", uk: "Готовий бізнес", en: "Ready-made business", pl: "Gotowy biznes" },
+  "Бизнес и предпринимательство": { ru: "Бизнес и предпринимательство", uk: "Бізнес і підприємництво", en: "Business & entrepreneurship", pl: "Biznes i przedsiębiorczość" },
+  "Куплю автомобиль": { ru: "Куплю автомобиль", uk: "Куплю автомобіль", en: "Buy a car", pl: "Kupię samochód" },
+  "Арендую автомобиль": { ru: "Арендую автомобиль", uk: "Орендую автомобіль", en: "Rent a car", pl: "Wynajmę samochód" },
+  "Обменяю автомобиль": { ru: "Обменяю автомобиль", uk: "Обміняю автомобіль", en: "Exchange a car", pl: "Zamienię samochód" },
+  "Куплю недвижимость": { ru: "Куплю недвижимость", uk: "Куплю нерухомість", en: "Buy property", pl: "Kupię nieruchomość" },
+  "Арендую недвижимость": { ru: "Арендую недвижимость", uk: "Орендую нерухомість", en: "Rent property", pl: "Wynajmę nieruchomość" },
+  "Куплю бизнес": { ru: "Куплю бизнес", uk: "Куплю бізнес", en: "Buy a business", pl: "Kupię firmę" },
+  "Продам бизнес": { ru: "Продам бизнес", uk: "Продам бізнес", en: "Sell a business", pl: "Sprzedam firmę" },
+  "Ищу бизнес-партнёра": { ru: "Ищу бизнес-партнёра", uk: "Шукаю бізнес-партнера", en: "Looking for a business partner", pl: "Szukam partnera biznesowego" },
+  "Услуги": { ru: "Услуги", uk: "Послуги", en: "Services", pl: "Usługi" },
+  "Ищу инвестора": { ru: "Ищу инвестора", uk: "Шукаю інвестора", en: "Looking for an investor", pl: "Szukam inwestora" },
+  "Стану инвестором": { ru: "Стану инвестором", uk: "Стану інвестором", en: "Become an investor", pl: "Zostanę inwestorem" },
+  "Стартапы": { ru: "Стартапы", uk: "Стартапи", en: "Startups", pl: "Startupy" },
+  "Столица Украины": { ru: "Столица Украины", uk: "Столиця України", en: "Capital of Ukraine", pl: "Stolica Ukrainy" },
+  "Область / регион": { ru: "Область / регион", uk: "Область / регіон", en: "Region", pl: "Region" },
+  "Закрыть": { ru: "Закрыть", uk: "Закрити", en: "Close", pl: "Zamknij" },
   "Инвестиции": { ru: "Инвестиции", uk: "Інвестиції", en: "Investments", pl: "Inwestycje" },
   "Днепр": { ru: "Днепр", uk: "Дніпро", en: "Dnipro", pl: "Dniepr" },
   "Сумы": { ru: "Сумы", uk: "Суми", en: "Sumy", pl: "Sumy" },
@@ -1192,10 +1208,29 @@ function subscribeToGlobalMessages() {
       // Не увеличиваем счётчик собственными сообщениями.
       if (currentUser && String(newMsg.sender_id) === String(currentUser.id)) return;
       updateUnreadMessageIndicators();
+      showNewMessageToast();
       if (messagesModal && !messagesModal.classList.contains("hidden") && !currentConversation) loadConversations();
     })
     .subscribe();
 }
+function showNewMessageToast() {
+  if (document.hidden) return;
+  let toast = document.getElementById("newMessageToast");
+  if (!toast) {
+    toast = document.createElement("button");
+    toast.type = "button";
+    toast.id = "newMessageToast";
+    toast.className = "new-message-toast";
+    toast.addEventListener("click", () => { toast.classList.remove("visible"); openMessagesModal(); });
+    document.body.appendChild(toast);
+  }
+  toast.textContent = lang === "uk" ? "✉ Нове повідомлення — відкрити" : lang === "en" ? "✉ New message — open" : lang === "pl" ? "✉ Nowa wiadomość — otwórz" : "✉ Новое сообщение — открыть";
+  toast.classList.add("visible");
+  clearTimeout(showNewMessageToast.timer);
+  showNewMessageToast.timer = setTimeout(() => toast.classList.remove("visible"), 7000);
+}
+// Realtime may be unavailable or delayed by Supabase configuration; refresh unread counts as a fallback.
+setInterval(() => { if (currentUser && db) updateUnreadMessageIndicators(); }, 20000);
 async function renderMessagesModal() {
   if (!db) {
     if (messagesGuestHint) { messagesGuestHint.textContent = t("Supabase не подключён."); messagesGuestHint.classList.remove("hidden"); }
@@ -1633,9 +1668,10 @@ function buildCityEntry(city) {
       if (translit) nameTokens.add(translit);
     }
   });
-  const regionNameUk = regionNames[String(city.region_katottg_code)] || "";
+  const isCapital = String(city.official_code || "") === "UA80000000000093317" || Number(city.id) === 29707;
+  const regionNameUk = isCapital ? cityTranslation("Столица Украины") : (regionNames[String(city.region_katottg_code)] || "");
   const regionToken = normalizeCitySearch(regionNameUk);
-  return { city, nameTokens: [...nameTokens], regionToken, regionNameUk };
+  return { city, nameTokens: [...nameTokens], regionToken, regionNameUk, isCapital };
 }
 function rankCityEntry(entry, queryVariants) {
   if (!queryVariants.length) return 0;
@@ -1710,6 +1746,9 @@ function renderCitySuggestions() {
 function selectCity(city) {
   citySelect.value = String(city.id);
   citySearchInput.value = cityName(city);
+  const isCapital = String(city.official_code || "") === "UA80000000000093317" || Number(city.id) === 29707;
+  formRegionCode = isCapital ? "" : String(city.region_katottg_code || "");
+  if (cityRegionSelect) cityRegionSelect.value = isCapital ? "__capital__" : formRegionCode;
   closeCitySuggestions();
   if (formMessage) formMessage.textContent = "";
 }
@@ -1728,9 +1767,12 @@ function updateCities(items, names = {}) {
   const allRegionsLabel = cityTranslation("Все области");
   [[catalogRegionSelect, activeRegionCode], [cityRegionSelect, formRegionCode]].forEach(([select, current]) => {
     if (!select) return;
-    select.innerHTML = `<option value="">${escapeHtml(allRegionsLabel)}</option>` +
+    const capitalOption = select === cityRegionSelect ? `<option value="__capital__">${escapeHtml(cityTranslation("Столица Украины"))}</option>` : "";
+    select.innerHTML = `<option value="">${escapeHtml(allRegionsLabel)}</option>` + capitalOption +
       regionCodes.map(code => `<option value="${escapeHtml(code)}">${escapeHtml(regionNames[code] || "")}</option>`).join("");
-    select.value = regionCodes.includes(current) ? current : "";
+    const selectedFormCity = select === cityRegionSelect ? availableCities.find(city => String(city.id) === String(citySelect?.value || "")) : null;
+    const isCapital = selectedFormCity && (String(selectedFormCity.official_code || "") === "UA80000000000093317" || Number(selectedFormCity.id) === 29707);
+    select.value = isCapital ? "__capital__" : (regionCodes.includes(current) ? current : "");
   });
   updateCitySearchLanguage();
   updateCatalogCitySearchLanguage();
@@ -1778,7 +1820,7 @@ if (catalogRegionSelect) {
 }
 if (cityRegionSelect) {
   cityRegionSelect.addEventListener("change", () => {
-    formRegionCode = cityRegionSelect.value;
+    formRegionCode = cityRegionSelect.value === "__capital__" ? "" : cityRegionSelect.value;
     if (citySelect) citySelect.value = "";
     if (citySearchInput) citySearchInput.value = "";
     renderCitySuggestions();
@@ -2150,18 +2192,63 @@ async function loadListings() {
   }
 }
 
+const categorySubcategories = {
+  "Автомобили": ["Куплю автомобиль", "Арендую автомобиль", "Обменяю автомобиль"],
+  "Недвижимость": ["Куплю недвижимость", "Арендую недвижимость"],
+  "Готовый бизнес": ["Куплю бизнес", "Продам бизнес", "Ищу бизнес-партнёра", "Услуги"],
+  "Инвестиции": ["Ищу инвестора", "Стану инвестором", "Стартапы"]
+};
+const categoryMenu = document.getElementById("categoryMenu");
+const categoryMenuBackdrop = document.getElementById("categoryMenuBackdrop");
+const categoryMenuTitle = document.getElementById("categoryMenuTitle");
+const categoryMenuOptions = document.getElementById("categoryMenuOptions");
+function closeCategoryMenu() {
+  categoryMenu?.classList.add("hidden");
+  categoryMenuBackdrop?.classList.add("hidden");
+}
+function openCategoryMenu(category) {
+  if (!categoryMenu || !categoryMenuOptions) return;
+  categoryMenuTitle.textContent = t(category === "Готовый бизнес" ? "Бизнес и предпринимательство" : category);
+  categoryMenuOptions.innerHTML = (categorySubcategories[category] || []).map(key => `<button type="button" class="category-menu-option" data-subcategory="${escapeHtml(key)}">${escapeHtml(t(key))}<span aria-hidden="true">›</span></button>`).join("");
+  categoryMenu.dataset.category = category;
+  categoryMenu.classList.remove("hidden");
+  categoryMenuBackdrop?.classList.remove("hidden");
+}
 document.querySelectorAll(".category").forEach(button => {
   button.addEventListener("click", () => {
+    const category = button.dataset.category || "";
+    if (button.classList.contains("category-card") && category) {
+      openCategoryMenu(category);
+      return;
+    }
     document.querySelectorAll(".category").forEach(b => b.classList.remove("active"));
     button.classList.add("active");
-    currentCategory = button.dataset.category;
+    currentCategory = category;
     const listingLabelEl = document.getElementById("listingLabel");
     const latestListingsTitleEl = document.getElementById("latestListingsTitle");
     if (listingLabelEl) listingLabelEl.textContent = t("Листинг");
     if (latestListingsTitleEl) latestListingsTitleEl.textContent = t("Последние объявления");
+    if (searchInput) searchInput.value = "";
     loadListings();
   });
 });
+categoryMenuOptions?.addEventListener("click", event => {
+  const option = event.target.closest("[data-subcategory]");
+  if (!option) return;
+  const category = categoryMenu?.dataset.category || "";
+  document.querySelectorAll(".category").forEach(b => b.classList.toggle("active", b.dataset.category === category));
+  currentCategory = category;
+  if (searchInput) searchInput.value = t(option.dataset.subcategory);
+  closeCategoryMenu();
+  const listingLabelEl = document.getElementById("listingLabel");
+  const latestListingsTitleEl = document.getElementById("latestListingsTitle");
+  if (listingLabelEl) listingLabelEl.textContent = t("Листинг");
+  if (latestListingsTitleEl) latestListingsTitleEl.textContent = t("Последние объявления");
+  loadListings();
+});
+document.getElementById("categoryMenuClose")?.addEventListener("click", closeCategoryMenu);
+categoryMenuBackdrop?.addEventListener("click", closeCategoryMenu);
+document.addEventListener("keydown", event => { if (event.key === "Escape") closeCategoryMenu(); });
 if (searchBtn) searchBtn.addEventListener("click", loadListings);
 if (searchInput) searchInput.addEventListener("keydown", e => { if (e.key === "Enter") loadListings(); });
 
@@ -2314,7 +2401,7 @@ function translatePage(selectedLanguage) {
     translateTextElement(addModal.querySelector(".eyebrow"), "Новое объявление");
     translateTextElement(addModal.querySelector("h2"), "Добавить объявление");
     const labels = addModal.querySelectorAll("label");
-    const labelKeys = ["Категория", "Название", "Город", "Цена, грн", "Описание"];
+    const labelKeys = ["Категория", "Название", "Город", "Область / регион", "Цена, грн", "Описание"];
     labels.forEach((label, index) => {
       const key = labelKeys[index];
       if (!key) return;
@@ -2325,7 +2412,7 @@ function translatePage(selectedLanguage) {
     });
     const categorySelect = addModal.querySelector('select[name="category"]');
     if (categorySelect) {
-      const categoryKeys = ["Автомобили", "Недвижимость", "Готовый бизнес", "Инвестиции"];
+      const categoryKeys = ["Автомобили", "Недвижимость", "Бизнес и предпринимательство", "Инвестиции"];
       [...categorySelect.options].forEach((option, index) => {
         const key = categoryKeys[index];
         const item = translations[key];

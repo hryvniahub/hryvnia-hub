@@ -3106,3 +3106,475 @@ input:focus, select:focus, textarea:focus {
 .new-message-toast { position: fixed; z-index: 1100; left: 50%; bottom: calc(78px + env(safe-area-inset-bottom)); transform: translate(-50%, 12px); opacity: 0; pointer-events: none; border: 1px solid var(--accent-border, #d4ff00); border-radius: 14px; padding: 13px 18px; background: #183b2c; color: #fff; box-shadow: 0 10px 34px rgba(0,0,0,.25); font: inherit; font-weight: 700; max-width: calc(100vw - 28px); transition: opacity .2s ease, transform .2s ease; }
 .new-message-toast.visible { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; cursor: pointer; }
 @media (max-width: 520px) { .category-menu { padding: 20px 16px; } .category-menu h2 { font-size: 20px; } }
+
+
+/* Hryvnia Hub: compact frosted-glass category menus */
+.category-menu-backdrop {
+  background: rgba(8, 18, 13, .38);
+  -webkit-backdrop-filter: blur(8px) saturate(115%);
+  backdrop-filter: blur(8px) saturate(115%);
+}
+.category-menu {
+  top: 42%;
+  width: min(88vw, 390px);
+  max-height: min(40dvh, 390px);
+  overflow-y: auto;
+  padding: 20px 20px 16px;
+  border: 1px solid rgba(212, 255, 0, .38);
+  border-radius: 22px;
+  background: rgba(18, 39, 29, .76);
+  color: #f7f9f5;
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(18px) saturate(135%);
+  box-shadow: 0 18px 55px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(255, 255, 255, .12);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212, 255, 0, .45) transparent;
+  animation: categoryMenuEnter .18s ease-out;
+}
+.category-menu h2 {
+  margin: 0 42px 10px 0;
+  color: #f7f9f5;
+  font-size: 21px;
+  line-height: 1.25;
+}
+.category-menu-close {
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(255, 255, 255, .22);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .07);
+  color: #f7f9f5;
+}
+.category-menu-options { gap: 0; }
+.category-menu-option {
+  position: relative;
+  min-height: 48px;
+  padding: 11px 4px;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, .16);
+  border-radius: 0;
+  background: transparent;
+  color: #f7f9f5;
+  font-size: 16px;
+  text-align: left;
+  transition: color .16s ease, padding .16s ease, background .16s ease;
+}
+.category-menu-option:last-child { border-bottom: 0; }
+.category-menu-option::before {
+  content: "";
+  flex: 0 0 7px;
+  width: 7px;
+  height: 7px;
+  margin-right: 4px;
+  border: 1.5px solid var(--accent, #d4ff00);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(212, 255, 0, .18);
+}
+.category-menu-option:hover,
+.category-menu-option:focus-visible {
+  padding-left: 8px;
+  border-bottom-color: rgba(212, 255, 0, .34);
+  background: rgba(212, 255, 0, .07);
+  color: var(--accent, #d4ff00);
+  outline: none;
+}
+.category-menu-option span { margin-left: auto; color: var(--accent, #d4ff00); font-size: 23px; }
+@keyframes categoryMenuEnter {
+  from { opacity: 0; transform: translate(-50%, -47%) scale(.985); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+@media (max-width: 520px) {
+  .category-menu { top: 40%; width: min(88vw, 390px); max-height: min(40dvh, 390px); padding: 17px 17px 13px; border-radius: 20px; }
+  .category-menu h2 { margin-bottom: 8px; font-size: 20px; }
+  .category-menu-option { min-height: 44px; padding-top: 9px; padding-bottom: 9px; font-size: 15px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .category-menu { animation: none; }
+  .category-menu-option { transition: none; }
+}
+
+/* HRYVNIA HUB — final mobile polish: fit region/radius labels and slightly enlarge banner text. */
+@media (max-width: 720px) {
+  #catalogRegionSelect,
+  .search-filters-row > select {
+    font-size: 9.5px !important;
+    letter-spacing: -0.15px !important;
+    padding-left: 5px !important;
+    padding-right: 3px !important;
+  }
+
+  .main-banner .banner-title {
+    font-size: clamp(15px, 4.1vw, 17px) !important;
+    line-height: 1.06 !important;
+  }
+
+  .main-banner .hero-text {
+    font-size: clamp(10px, 2.9vw, 11.5px) !important;
+    line-height: 1.1 !important;
+  }
+}
+
+
+/* ============================================================
+   HRYVNIA HUB — MOBILE HOMEPAGE FINAL MOCKUP IMPLEMENTATION
+   Compact categories; banner height matches one category card;
+   slight gap before ticker; narrower AI panel; wider main search.
+   Intended for Stylus on hryvniahub.vercel.app.
+   ============================================================ */
+@media screen and (max-width: 720px) {
+  /* Categories: reduce vertical gaps and keep all four cards compact. */
+  .categories-section {
+    margin-top: 3px !important;
+    margin-bottom: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  .categories-grid {
+    gap: 4px !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .categories-grid > .category-card:not(.all-btn) {
+    /* Keep the two-column cards approximately 15% shorter than before. */
+    aspect-ratio: 3.45 / 1 !important;
+    min-height: 0 !important;
+    padding: 5px !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .category-card-label {
+    padding: 0 6px 1px !important;
+    line-height: 1.05 !important;
+  }
+
+  /* Banner: height approximately equals one category card, not taller.
+     Its own bottom margin and ticker top margin preserve a visible gap. */
+  .main-banner {
+    height: clamp(50px, calc((100vw - 42px) / 6.9), 58px) !important;
+    min-height: clamp(50px, calc((100vw - 42px) / 6.9), 58px) !important;
+    max-height: clamp(50px, calc((100vw - 42px) / 6.9), 58px) !important;
+    margin-top: 5px !important;
+    margin-bottom: 5px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  .main-banner-img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center 52% !important;
+  }
+
+  .main-banner .banner-content {
+    padding: 0 6px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .main-banner .banner-title {
+    font-size: clamp(14px, 3.7vw, 16px) !important;
+    line-height: 1.05 !important;
+    margin: 0 0 2px !important;
+  }
+
+  .main-banner .banner-title::after {
+    margin: 2px auto 0 !important;
+  }
+
+  .main-banner .hero-text {
+    font-size: clamp(9px, 2.5vw, 10.5px) !important;
+    line-height: 1.08 !important;
+    margin: 0 auto !important;
+  }
+
+  /* Currency ticker: distinct from banner, no overlay onto its text/image. */
+  .market-ticker,
+  #marketTicker,
+  .market-ticker-wrap {
+    position: relative !important;
+    z-index: 1 !important;
+    margin-top: 5px !important;
+    margin-bottom: 7px !important;
+  }
+
+  /* Transfer width from AI to the search panel, not from city/price fields. */
+  .search-ai-section {
+    display: grid !important;
+    grid-template-columns: minmax(0, 2.25fr) minmax(0, 0.8fr) !important;
+    gap: 8px !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    margin-top: 8px !important;
+    box-sizing: border-box !important;
+  }
+
+  .search-panel {
+    width: 100% !important;
+    min-width: 0 !important;
+    justify-self: stretch !important;
+    padding: 10px !important;
+    box-sizing: border-box !important;
+  }
+
+  .ai-panel {
+    width: 100% !important;
+    min-width: 0 !important;
+    justify-self: stretch !important;
+    padding: 8px !important;
+    gap: 4px !important;
+    box-sizing: border-box !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .ai-panel h3 {
+    font-size: 13px !important;
+    line-height: 1.15 !important;
+  }
+
+  .ai-panel .ai-subtitle {
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+  }
+
+  .ai-panel .btn-ai {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 6px 5px !important;
+    font-size: 10px !important;
+    line-height: 1.15 !important;
+    white-space: normal !important;
+    box-sizing: border-box !important;
+  }
+
+  /* With the main panel wider, keep city and price at least as wide as
+     the area/radius controls; the second column gets a small extra share. */
+  .search-filters-row {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr) !important;
+    gap: 7px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .search-filters-row > *,
+  .search-filters-row input,
+  .search-filters-row select,
+  .search-panel input,
+  .search-panel select,
+  .search-panel button {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .search-filters-row > select,
+  .search-filters-row > input[type="number"],
+  #catalogRegionSelect {
+    padding-left: 8px !important;
+    padding-right: 6px !important;
+    font-size: 11.5px !important;
+  }
+}
+
+/* Very narrow phones: avoid squeezing the AI card and keep labels legible. */
+@media screen and (max-width: 360px) {
+  .search-ai-section {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 0.85fr) !important;
+    gap: 6px !important;
+  }
+  .search-panel { padding: 8px !important; }
+  .ai-panel { padding: 6px !important; }
+  .search-filters-row { gap: 5px !important; }
+  .search-filters-row > select,
+  .search-filters-row > input[type="number"],
+  #catalogRegionSelect { font-size: 10.5px !important; }
+}
+
+
+/* ============================================================
+   HRYVNIA HUB — RESPONSIVE ALIGNMENT & READABILITY PATCH
+   Requested: centered category labels, desktop logo fit, larger banner text.
+   Append-only overrides for Stylus; no HTML/JS changes.
+   ============================================================ */
+
+/* Category names: center horizontally and vertically, and wrap within each card. */
+.categories-grid > .category-card:not(.all-btn),
+.category-card:not(.all-btn) {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+.category-card-label {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 auto !important;
+  padding: 4px 12px !important;
+  box-sizing: border-box !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+  line-height: 1.08 !important;
+  transform: none !important;
+}
+
+/* Desktop/tablet: keep long category labels inside their own card. */
+@media screen and (min-width: 721px) {
+  .category-card-label {
+    font-size: clamp(16px, 1.65vw, 24px) !important;
+    line-height: 1.08 !important;
+    padding: 5px 10px !important;
+  }
+
+  /* Logo: fit the full “HRYVNIA HUB” wordmark inside its green frame. */
+  .header .brand {
+    min-width: 0 !important;
+    flex: 0 1 auto !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
+    padding-right: 12px !important;
+  }
+
+  .header .brand .brand-text,
+  .header .brand .brand-name {
+    display: inline-block !important;
+    transform: none !important;
+    font-size: clamp(19px, 1.55vw, 25px) !important;
+    line-height: 1 !important;
+    letter-spacing: -0.45px !important;
+    white-space: nowrap !important;
+    padding-right: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Larger, readable two-line banner message on desktop. */
+  .main-banner .banner-title {
+    font-size: clamp(27px, 2.35vw, 36px) !important;
+    line-height: 1.08 !important;
+    margin: 0 0 5px !important;
+    text-align: center !important;
+    text-wrap: balance !important;
+  }
+
+  .main-banner .hero-text {
+    font-size: clamp(15px, 1.2vw, 19px) !important;
+    line-height: 1.2 !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    text-align: center !important;
+  }
+}
+
+/* Mobile: center all category names and make both banner lines easier to read. */
+@media screen and (max-width: 720px) {
+  .category-card-label {
+    font-size: clamp(16px, 4.3vw, 21px) !important;
+    line-height: 1.08 !important;
+    padding: 3px 8px !important;
+    text-align: center !important;
+  }
+
+  .main-banner .banner-content {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  .main-banner .banner-title {
+    width: 100% !important;
+    font-size: clamp(16px, 4.6vw, 20px) !important;
+    line-height: 1.08 !important;
+    margin: 0 0 3px !important;
+    text-align: center !important;
+    text-wrap: balance !important;
+  }
+
+  .main-banner .hero-text {
+    width: 100% !important;
+    max-width: 100% !important;
+    font-size: clamp(11px, 3.2vw, 14px) !important;
+    line-height: 1.12 !important;
+    margin: 0 auto !important;
+    text-align: center !important;
+  }
+}
+
+/* Extra-narrow phones: preserve centered labels without clipping. */
+@media screen and (max-width: 380px) {
+  .category-card-label {
+    font-size: clamp(14px, 4.2vw, 17px) !important;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+  }
+  .main-banner .banner-title {
+    font-size: clamp(15px, 4.5vw, 17px) !important;
+  }
+  .main-banner .hero-text {
+    font-size: clamp(10px, 3vw, 11.5px) !important;
+  }
+}
+
+
+/* HRYVNIA HUB — final banner typography adjustment (2026-10-22).
+   Slightly reduce the top headline so it stays comfortably inside the banner. */
+@media screen and (min-width: 721px) {
+  .main-banner .banner-title {
+    font-size: clamp(25px, 2.2vw, 33px) !important;
+    line-height: 1.12 !important;
+  }
+}
+
+@media screen and (max-width: 720px) {
+  .main-banner .banner-title {
+    font-size: clamp(15px, 4.3vw, 18.5px) !important;
+    line-height: 1.12 !important;
+    padding-top: 1px !important;
+  }
+}
+
+@media screen and (max-width: 380px) {
+  .main-banner .banner-title {
+    font-size: clamp(14.5px, 4.2vw, 16px) !important;
+    line-height: 1.12 !important;
+  }
+}
+
+
+/* HRYVNIA HUB — final hero banner spacing refinement. Keep headline typography unchanged. */
+@media screen and (min-width: 721px) {
+  .main-banner .banner-title {
+    transform: translateY(2px) !important;
+    margin-bottom: 2px !important;
+  }
+}
+
+@media screen and (max-width: 720px) {
+  .main-banner .banner-title {
+    transform: translateY(2px) !important;
+    margin-bottom: 0 !important;
+  }
+  .main-banner .hero-text {
+    transform: translateY(-2px) !important;
+    margin-top: -1px !important;
+    line-height: 1.08 !important;
+  }
+}

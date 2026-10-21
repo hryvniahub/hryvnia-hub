@@ -74,11 +74,11 @@ const translations = {
     pl: "Notowania: NBU, CoinGecko i Yahoo Finance"
   },
   "Quote unavailable": { ru: "Нет данных", uk: "Немає даних", en: "Unavailable", pl: "Brak danych" },
-  "Автомобили, недвижимость и готовый бизнес — в одном месте.": {
-    ru: "Автомобили, недвижимость и готовый бизнес — в одном месте.",
-    uk: "Автомобілі, нерухомість і готовий бізнес — в одному місці.",
-    en: "Cars, real estate and ready-made businesses — all in one place.",
-    pl: "Samochody, nieruchomości i gotowy biznes — wszystko w jednym miejscu."
+  "Автомобили, недвижимость и бизнес в одном месте.": {
+    ru: "Автомобили, недвижимость и бизнес в одном месте.",
+    uk: "Автомобілі, нерухомість і бізнес в одному місці.",
+    en: "Cars, real estate and business all in one place.",
+    pl: "Samochody, nieruchomości i biznes wszystko w jednym miejscu."
   },
   "Что ищете? Например: Skoda Octavia": {
     ru: "Что ищете? Например: Skoda Octavia",
@@ -1712,6 +1712,9 @@ function renderCatalogCitySuggestions() {
 function selectCatalogCity(city) {
   selectedCatalogCityId = String(city.id);
   catalogCitySearchInput.value = cityName(city);
+  const isCapital = String(city.official_code || "") === "UA80000000000093317" || Number(city.id) === 29707;
+  activeRegionCode = isCapital ? "" : String(city.region_katottg_code || "");
+  if (catalogRegionSelect) catalogRegionSelect.value = activeRegionCode;
   closeCatalogCitySuggestions();
   loadListings();
 }
@@ -2379,7 +2382,7 @@ function translatePage(selectedLanguage) {
     const deal = translations["предложение"];
     if (title && deal) heroTitle.innerHTML = `${title[lang]}<br>${deal[lang]}`;
   }
-  translateTextElement(document.querySelector(".hero-text"), "Автомобили, недвижимость и готовый бизнес — в одном месте.");
+  translateTextElement(document.querySelector(".hero-text"), "Автомобили, недвижимость и бизнес в одном месте.");
   translateTextElement(document.querySelector(".banner-title"), "Find the best deals in Ukraine");
   if (searchInput) {
     const placeholder = translations["Что ищете? Например: Skoda Octavia"];

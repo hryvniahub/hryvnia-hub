@@ -2784,3 +2784,310 @@ input:focus, select:focus, textarea:focus {
 #accountMenuRoot .account-menu-item { border-color: #8eb89a; box-shadow: 0 2px 7px rgba(42,105,58,.06); }
 #accountMenuRoot .account-menu-item:hover { border-color: #4f9961; background: #f7fbf7; }
 #accountMenuRoot .account-menu-panel { border-color: #75a983; box-shadow: 0 3px 12px rgba(42,105,58,.07); }
+
+/* ============================================================
+   HRYVNIA HUB PATCH 2026-10-21
+   Badges (hot / urgent / owner), conversations cards, nav badges
+   ============================================================ */
+
+/* --- Метки объявлений --- */
+.hot-listing-badge,
+.urgent-listing-badge,
+.owner-listing-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.25;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.hot-listing-badge {
+  background: #ff4d3d;
+  color: #ffffff;
+  border: 1px solid #d63324;
+  box-shadow: 0 1px 2px rgba(214, 51, 36, .28);
+}
+.urgent-listing-badge {
+  background: #ffb23d;
+  color: #332000;
+  border: 1px solid #d98f1e;
+  box-shadow: 0 1px 2px rgba(217, 143, 30, .22);
+}
+.owner-listing-badge {
+  background: rgba(198, 255, 0, .18);
+  color: #17210a;
+  border: 1px solid #7fa800;
+}
+
+/* --- Метки в карточке: перенос строк без наложений --- */
+.card .card-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  row-gap: 6px;
+  justify-content: flex-start;
+}
+.card .card-top .badge,
+.card .card-top .hot-listing-badge,
+.card .card-top .urgent-listing-badge,
+.card .card-top .owner-listing-badge { flex: 0 0 auto; }
+.card .card-top .city {
+  flex: 1 1 100%;
+  text-align: left;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+/* --- Горизонтальная лента «Термінові пропозиції» --- */
+.hot-listings-row {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding: 4px 2px 14px;
+  scroll-snap-type: x proximity;
+}
+.hot-listing-card {
+  flex: 0 0 230px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+  border: 1px solid #7fa800;
+  border-radius: 14px;
+  padding: 10px;
+  background: var(--card, #fff);
+  color: var(--text);
+  scroll-snap-align: start;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: transform .15s, box-shadow .15s;
+}
+.hot-listing-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.hot-listing-card .listing-photo,
+.hot-listing-card .listing-placeholder {
+  width: 100%;
+  height: 120px;
+  min-height: 120px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+.hot-listing-card .hot-card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+.hot-listing-card .hot-card-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+.hot-listing-card strong { font-size: 15px; color: var(--text); }
+.hot-listing-card small { color: var(--muted); font-size: 12px; }
+
+/* --- Бейдж непрочитанных на нижней навигации --- */
+.bottom-nav-btn { position: relative; }
+.nav-badge {
+  position: absolute;
+  top: 2px;
+  right: calc(50% - 26px);
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: #ff4d3d;
+  color: #ffffff;
+  font-size: 10.5px;
+  font-weight: 800;
+  line-height: 18px;
+  text-align: center;
+  box-shadow: 0 0 0 2px #203b31, 0 2px 4px rgba(0,0,0,.25);
+  pointer-events: none;
+  z-index: 3;
+}
+.nav-badge[hidden] { display: none !important; }
+.unread-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: #ff4d3d;
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 800;
+  line-height: 18px;
+  text-align: center;
+  box-shadow: 0 0 0 2px #203b31;
+}
+
+/* --- Окно «Повідомлення» --- */
+.messages-card { max-width: 660px; }
+.messages-card .modal-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 50%;
+  background: #f0f4ec;
+  border: 1px solid #cfe0b0;
+  color: #355320;
+  font-size: 22px;
+  line-height: 1;
+  transition: background .15s, transform .1s, border-color .15s;
+}
+.messages-card .modal-close:hover { background: #e2efbd; border-color: #7fa800; }
+.messages-card .modal-close:active { transform: scale(.94); }
+.conversations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 62dvh;
+  overflow: auto;
+  padding: 2px;
+}
+.conversation-card {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #dce3df;
+  border-radius: 12px;
+  background: #ffffff;
+  color: var(--text);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, box-shadow .15s, transform .1s;
+}
+.conversation-card:hover {
+  background: #f7fbe9;
+  border-color: #7fa800;
+  box-shadow: 0 2px 6px rgba(127, 168, 0, .12);
+}
+.conversation-card:active { transform: translateY(1px); }
+.conversation-card.is-unread { background: #f6ffdb; border-color: #a4c454; }
+.conversation-card.is-unread .conv-title { font-weight: 800; }
+.conversation-card.is-unread .conv-icon { background: #c6ff00; }
+.conv-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #eaf3d8;
+  color: #355320;
+  font-size: 18px;
+  line-height: 1;
+  flex: 0 0 40px;
+}
+.conversation-card.is-unread .conv-icon { color: #17210a; }
+.conv-main { min-width: 0; }
+.conv-title {
+  display: block;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.conv-last {
+  display: block;
+  margin-top: 3px;
+  font-size: 12.5px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.conv-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex: 0 0 auto;
+}
+.conv-time { font-size: 11px; color: var(--muted); white-space: nowrap; }
+.conv-unread {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: #ff4d3d;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 20px;
+  text-align: center;
+}
+.messages-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 30px 16px;
+  text-align: center;
+  border: 1px dashed #cfe0b0;
+  border-radius: 12px;
+  background: #f9fdf1;
+  color: var(--muted);
+}
+.messages-empty-icon {
+  font-size: 40px;
+  line-height: 1;
+  color: #7fa800;
+  filter: drop-shadow(0 2px 4px rgba(127, 168, 0, .2));
+}
+@media (max-width: 520px) {
+  .conversation-card {
+    padding: 10px;
+    grid-template-columns: 34px 1fr auto;
+    gap: 8px;
+  }
+  .conv-icon { width: 34px; height: 34px; flex-basis: 34px; font-size: 16px; }
+  .conv-title { font-size: 13.5px; }
+  .conv-last { font-size: 12px; }
+  .conv-time { font-size: 10.5px; }
+  .messages-empty { padding: 22px 12px; }
+  .messages-empty-icon { font-size: 34px; }
+}
+@media (max-width: 720px) {
+  .nav-badge {
+    top: 0;
+    right: calc(50% - 22px);
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    font-size: 9.5px;
+    line-height: 16px;
+    border-radius: 8px;
+  }
+}
+
+
+/* HOT BADGE CONTRAST FIX: orange fill, dark readable text, keep red border */
+.hot-listing-badge {
+  background: #ff8a00 !important;
+  color: #203f32 !important;
+  border: 1px solid #d63324 !important;
+  box-shadow: none !important;
+}

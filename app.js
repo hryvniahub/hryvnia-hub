@@ -397,8 +397,18 @@ function listingPhotos(item) {
 
 function listingCover(item) {
   const url = listingPhotos(item)[0];
-  if (typeof url !== "string" || !/^https?:\/\//i.test(url)) return "";
-  return `<img class="listing-photo" tabindex="0" role="button" src="${escapeHtml(url)}" alt="${escapeHtml(item.title)}" loading="lazy">`;
+  if (typeof url === "string" && /^https?:\/\//i.test(url)) {
+    return `<img class="listing-photo" tabindex="0" role="button" src="${escapeHtml(url)}" alt="${escapeHtml(item.title)}" loading="lazy">`;
+  }
+  const category = String(item.category || "");
+  const drawings = {
+    "Автомобили": '<path d="M4 17h16l-1.5-6a2 2 0 0 0-2-1.5h-9A2 2 0 0 0 5.5 11L4 17Z"/><path d="M3 17v3h3v-3m12 0v3h3v-3M7 9l1.5-4h7L17 9M7 13h.01M17 13h.01"/>',
+    "Недвижимость": '<path d="m3 11 9-7 9 7v9H3Z"/><path d="M9 20v-6h6v6M7 11h.01M17 11h.01"/>',
+    "Готовый бизнес": '<path d="M3 9h18v11H3zM8 9V5h8v4M3 13h18M10 13v2h4v-2"/>',
+    "Инвестиции": '<path d="M4 20V4m0 16h17M7 16l4-5 3 2 6-8M16 5h4v4"/>'
+  };
+  const drawing = drawings[category] || drawings["Готовый бизнес"];
+  return `<div class="listing-placeholder" aria-label="${escapeHtml(item.category || "Hryvnia Hub")}"><svg viewBox="0 0 24 24" role="img" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${drawing}</svg></div>`;
 }
 
 // === ЧАСТЬ 5 END ===
@@ -772,13 +782,25 @@ async function initAuth() {
     currentUser = data?.session?.user || null;
     updateAccountButton();
     if (currentUser && authUserEmail) authUserEmail.textContent = currentUser.email || "";
-    if (currentUser) await syncFavoritesOnLogin();
+    if (currentUser) {
+      await syncFavoritesOnLogin();
+      await updateUnreadMessageIndicators();
+      subscribeToGlobalMessages();
+    }
   } catch (error) {
     console.error("getSession failed:", error);
   }
   db.auth.onAuthStateChange(async (event, session) => {
     currentUser = session?.user || null;
     updateAccountButton();
+    if (currentUser) {
+      setTimeout(updateUnreadMessageIndicators, 0);
+      subscribeToGlobalMessages();
+    } else if (globalMessagesChannel) {
+      try { db.removeChannel(globalMessagesChannel); } catch {}
+      globalMessagesChannel = null;
+      updateUnreadMessageIndicators();
+    }
     if (event === "PASSWORD_RECOVERY") {
       authRecoveryMode = true;
       openAuthModal();
@@ -787,11 +809,15 @@ async function initAuth() {
     if (event === "SIGNED_IN") {
       if (authModal && !authModal.classList.contains("hidden")) renderAuthModal();
       await syncFavoritesOnLogin();
+      subscribeToGlobalMessages();
+      await updateUnreadMessageIndicators();
       renderListings(visibleListings);
     }
     if (event === "SIGNED_OUT") {
       authRecoveryMode = false;
       closeAuthModal();
+      if (globalMessagesChannel) { try { db.removeChannel(globalMessagesChannel); } catch {} globalMessagesChannel = null; }
+      updateUnreadMessageIndicators();
       renderListings(visibleListings);
     }
   });
@@ -1097,6 +1123,52 @@ let currentConversation = null;
 let messagesChannel = null;
 const renderedMessageIds = new Set();
 
+async function updateUnreadMessageIndicators() {
+  const navButtons = [...document.querySelectorAll('[data-nav="messages"]')];
+  const badge = document.getElementById("messagesBadge");
+  const account = document.getElementById("accountBtn");
+  const clearAll = () => {
+    if (badge) { badge.hidden = true; badge.textContent = ""; }
+    navButtons.forEach(button => button.querySelector(".unread-count")?.remove());
+    account?.querySelector(".unread-count")?.remove();
+  };
+  if (!db || !currentUser) { clearAll(); return; }
+  try {
+    const { data: reads, error: readError } = await db.from("conversation_reads")
+      .select("conversation_id,last_read_at").eq("user_id", currentUser.id);
+    if (readError) throw readError;
+    const readMap = new Map((reads || []).map(r => [String(r.conversation_id), r.last_read_at]));
+    const { data: convs, error: convError } = await db.from("conversations")
+      .select("id").or(`buyer_id.eq.${currentUser.id},seller_id.eq.${currentUser.id}`);
+    if (convError) throw convError;
+    const counts = await Promise.all((convs || []).map(async conv => {
+      let q = db.from("messages").select("id", { count: "exact", head: true })
+        .eq("conversation_id", conv.id).neq("sender_id", currentUser.id);
+      const lastRead = readMap.get(String(conv.id));
+      if (lastRead) q = q.gt("created_at", lastRead);
+      const result = await q;
+      if (result.error) throw result.error;
+      return result.count || 0;
+    }));
+    const unread = counts.reduce((sum, count) => sum + count, 0);
+    const display = unread > 99 ? "99+" : String(unread);
+    if (unread > 0 && badge) {
+      badge.textContent = display;
+      badge.hidden = false;
+      badge.setAttribute("aria-label", `${unread} unread messages`);
+    } else if (badge) {
+      badge.hidden = true;
+      badge.textContent = "";
+    }
+    // Совместимость с возможными старыми бейджами в навигации/кнопке аккаунта.
+    navButtons.forEach(button => button.querySelector(".unread-count")?.remove());
+    account?.querySelector(".unread-count")?.remove();
+  } catch (error) {
+    console.warn("Unread message indicator requires conversation_reads migration:", error.message);
+    clearAll();
+  }
+}
+
 function openMessagesModal() {
   messagesModal?.classList.remove("hidden");
   renderMessagesModal();
@@ -1107,6 +1179,22 @@ function closeMessagesModal() {
   messagesThread?.classList.add("hidden");
   conversationsList?.classList.remove("hidden");
   if (messagesChannel) { try { db.removeChannel(messagesChannel); } catch {} messagesChannel = null; }
+}
+
+let globalMessagesChannel = null;
+function subscribeToGlobalMessages() {
+  if (!db) return;
+  if (globalMessagesChannel) { try { db.removeChannel(globalMessagesChannel); } catch {} globalMessagesChannel = null; }
+  globalMessagesChannel = db.channel("messages:global-inserts")
+    .on("postgres_changes", { event:"INSERT", schema:"public", table:"messages" }, payload => {
+      const newMsg = payload.new;
+      if (!newMsg) return;
+      // Не увеличиваем счётчик собственными сообщениями.
+      if (currentUser && String(newMsg.sender_id) === String(currentUser.id)) return;
+      updateUnreadMessageIndicators();
+      if (messagesModal && !messagesModal.classList.contains("hidden") && !currentConversation) loadConversations();
+    })
+    .subscribe();
 }
 async function renderMessagesModal() {
   if (!db) {
@@ -1125,6 +1213,7 @@ async function renderMessagesModal() {
   conversationsList?.classList.remove("hidden");
   messagesThread?.classList.add("hidden");
   await loadConversations();
+  await updateUnreadMessageIndicators();
 }
 async function loadConversations() {
   if (!db || !currentUser || !conversationsList) return;
@@ -1134,14 +1223,43 @@ async function loadConversations() {
     .or(`buyer_id.eq.${currentUser.id},seller_id.eq.${currentUser.id}`)
     .order("updated_at", { ascending: false });
   if (error) { conversationsList.innerHTML = `<p class="muted">${escapeHtml(t("Ошибка") + ": " + error.message)}</p>`; return; }
-  if (!data || !data.length) { conversationsList.innerHTML = `<p class="muted">${escapeHtml(t("Сообщений пока нет."))}</p>`; return; }
-  conversationsList.innerHTML = data.map(c => `
-    <button type="button" class="conversation-item" data-conv-id="${escapeHtml(c.id)}">
-      <span class="conv-title">${escapeHtml(c.listings?.title || t("Объявление"))}</span>
-      <span class="conv-time">${c.updated_at ? new Date(c.updated_at).toLocaleDateString() : ""}</span>
-    </button>
-  `).join("");
+  if (!data || !data.length) {
+    conversationsList.innerHTML = `<div class="messages-empty"><span class="messages-empty-icon" aria-hidden="true">✉</span><p class="muted">${escapeHtml(t("Сообщений пока нет."))}</p></div>`;
+    return;
+  }
+  const reads = await db.from("conversation_reads").select("conversation_id,last_read_at").eq("user_id", currentUser.id);
+  const readMap = new Map((reads.data || []).map(r => [String(r.conversation_id), r.last_read_at]));
+  const locale = ({ ru:"ru-RU", uk:"uk-UA", en:"en-GB", pl:"pl-PL" })[lang] || "uk-UA";
+  const cards = await Promise.all(data.map(async c => {
+    const last = await db.from("messages").select("body, created_at, sender_id")
+      .eq("conversation_id", c.id).order("created_at", { ascending: false }).limit(1).maybeSingle();
+    const lastMessage = last.data || null;
+    const lastRead = readMap.get(String(c.id));
+    let unreadQ = db.from("messages").select("id", { count: "exact", head: true })
+      .eq("conversation_id", c.id).neq("sender_id", currentUser.id);
+    if (lastRead) unreadQ = unreadQ.gt("created_at", lastRead);
+    const unreadRes = await unreadQ;
+    const unreadCount = unreadRes.count || 0;
+    const when = lastMessage?.created_at || c.updated_at;
+    let timeLabel = "";
+    if (when) {
+      const d = new Date(when);
+      if (!Number.isNaN(d.getTime())) {
+        const sameDay = d.toDateString() === new Date().toDateString();
+        try { timeLabel = sameDay ? d.toLocaleTimeString(locale, { hour:"2-digit", minute:"2-digit" }) : d.toLocaleDateString(locale, { day:"2-digit", month:"2-digit" }); }
+        catch { timeLabel = ""; }
+      }
+    }
+    return { id:c.id, title:c.listings?.title || t("Объявление"), preview:lastMessage?.body || "", timeLabel, unreadCount };
+  }));
+  conversationsList.innerHTML = cards.map(c => `
+    <button type="button" class="conversation-card ${c.unreadCount > 0 ? "is-unread" : ""}" data-conv-id="${escapeHtml(String(c.id))}" aria-label="${escapeHtml(c.title)}">
+      <span class="conv-icon" aria-hidden="true">✉</span>
+      <span class="conv-main"><span class="conv-title">${escapeHtml(c.title)}</span><span class="conv-last">${escapeHtml(c.preview || "—")}</span></span>
+      <span class="conv-side"><span class="conv-time">${escapeHtml(c.timeLabel)}</span>${c.unreadCount > 0 ? `<span class="conv-unread">${c.unreadCount > 99 ? "99+" : c.unreadCount}</span>` : ""}</span>
+    </button>`).join("");
 }
+
 conversationsList?.addEventListener("click", (e) => {
   const btn = e.target.closest("[data-conv-id]");
   if (!btn) return;
@@ -1154,6 +1272,11 @@ async function openConversation(id) {
   conversationsList?.classList.add("hidden");
   messagesThread?.classList.remove("hidden");
   await loadThread(id);
+  if (db && currentUser) {
+    const { error } = await db.from("conversation_reads").upsert({ user_id:currentUser.id, conversation_id:id, last_read_at:new Date().toISOString() }, { onConflict:"user_id,conversation_id" });
+    if (error) console.warn("Could not mark conversation read:",error.message);
+    await updateUnreadMessageIndicators();
+  }
   subscribeToThread(id);
 }
 async function loadThread(id) {
@@ -1202,6 +1325,7 @@ sendMessageForm?.addEventListener("submit", async (e) => {
   if (error) { console.warn("send message:", error.message); return; }
   sendMessageForm.reset();
   await db.from("conversations").update({ updated_at: new Date().toISOString() }).eq("id", currentConversation);
+  await updateUnreadMessageIndicators();
 });
 backToConvs?.addEventListener("click", () => {
   currentConversation = null;
@@ -1755,7 +1879,9 @@ function openListing(item, galleryOnly = false) {
     </section>` : ""}
     ${galleryOnly ? "" : `<span class="badge">${categoryLabel(item)}</span>
       <p class="city">${escapeHtml(item.cities?.[`name_${lang}`] || item.cities?.name_ru || item.city || "")}</p>
-      <p class="price">${money(item.price, item.currency || "UAH")}</p>
+      ${item.created_at ? `<p class="listing-published-date">${escapeHtml(({ru:"Опубликовано",uk:"Опубліковано",en:"Published",pl:"Opublikowano"})[lang] || "Published")}: ${escapeHtml(new Date(item.created_at).toLocaleDateString(({ru:"ru-RU",uk:"uk-UA",en:"en-GB",pl:"pl-PL"})[lang] || "uk-UA"))}</p>` : ""}
+      <p class="price">${item.previous_price != null && Number(item.previous_price) !== Number(item.price) ? `<span class="old-price">${money(item.previous_price, item.currency || "UAH")}</span> ` : ""}${money(item.price, item.currency || "UAH")}</p>
+      ${item.previous_price != null && Number(item.previous_price) !== Number(item.price) ? `<p class="price-change-note">${escapeHtml(({ru:"Цена изменена",uk:"Ціну змінено",en:"Price changed",pl:"Zmieniono cenę"})[lang] || "Price changed")}: ${money(Math.abs(Number(item.previous_price)-Number(item.price)), item.currency || "UAH")} (${Number(item.price)<Number(item.previous_price)?"−":"+"}${(Math.abs(Number(item.previous_price)-Number(item.price))/Math.max(1,Number(item.previous_price))*100).toFixed(1)}%)</p>` : ""}
       <p class="desc" style="white-space:pre-wrap">${escapeHtml(item.description || "")}</p>
       ${isOwner ? `<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
         <button type="button" class="btn btn-primary" data-owner-edit="${escapeHtml(String(item.id))}">${escapeHtml(ownerLabels.edit)}</button>
@@ -1819,21 +1945,53 @@ function openListing(item, galleryOnly = false) {
 async function editListing(item, labels) {
   if (!db || !currentUser) { alert(labels.denied); return; }
   if (String(currentUser.id) !== String(item.user_id || "")) { alert(labels.denied); return; }
-  const newTitle = prompt(labels.edit + ": " + t("Название"), item.title || "");
-  if (newTitle === null) return;
-  const newPriceRaw = prompt(labels.edit + ": " + t("Цена, грн"), String(item.price ?? ""));
-  if (newPriceRaw === null) return;
-  const newPrice = Number(String(newPriceRaw).replace(",", ".").trim());
-  if (!Number.isFinite(newPrice) || newPrice < 0) { alert(labels.failed); return; }
-  const { data, error } = await db
-    .from("listings")
-    .update({ title: String(newTitle).trim(), price: newPrice })
-    .eq("id", item.id)
-    .eq("user_id", currentUser.id)
-    .select("id,title,price,user_id")
-    .maybeSingle();
-  if (error || !data) { alert(error?.message ? error.message : labels.failed); return; }
-  await loadListings();
+  const cityOptions = availableCities.map(city => `<option value="${escapeHtml(String(city.id))}" ${String(city.id) === String(item.city_id || item.cities?.id || "") ? "selected" : ""}>${escapeHtml(city[`name_${lang}`] || city.name_uk || city.name_ru || city.name || "")}</option>`).join("");
+  const categoryOptions = ["Автомобили", "Недвижимость", "Готовый бизнес", "Инвестиции"].map(cat => `<option value="${cat}" ${item.category === cat ? "selected" : ""}>${escapeHtml(translations[cat]?.[lang] || cat)}</option>`).join("");
+  const photos = listingPhotos(item);
+  const dialog = document.createElement("dialog");
+  dialog.className = "modal-card listing-edit-dialog";
+  dialog.style.cssText = "width:min(680px,calc(100% - 24px));max-height:90dvh;overflow:auto;border:1px solid var(--border,#d9e0d9);border-radius:16px;color:var(--text,#1b2b20);";
+  const labelsByLang = {
+    ru: {title:"Название",category:"Категория",city:"Город",price:"Цена (грн)",description:"Описание",photos:"Фотографии (URL через новую строку)",hot:"Горячее объявление",urgent:"Срочная продажа",save:"Сохранить изменения",cancel:"Отмена",published:"Опубликовано",priceDown:"Цена изменена"},
+    uk: {title:"Назва",category:"Категорія",city:"Місто",price:"Ціна (грн)",description:"Опис",photos:"Фотографії (URL з нового рядка)",hot:"Гаряче оголошення",urgent:"Терміновий продаж",save:"Зберегти зміни",cancel:"Скасувати",published:"Опубліковано",priceDown:"Ціну змінено"},
+    en: {title:"Title",category:"Category",city:"City",price:"Price (UAH)",description:"Description",photos:"Photos (one URL per line)",hot:"Hot listing",urgent:"Urgent sale",save:"Save changes",cancel:"Cancel",published:"Published",priceDown:"Price changed"},
+    pl: {title:"Tytuł",category:"Kategoria",city:"Miasto",price:"Cena (UAH)",description:"Opis",photos:"Zdjęcia (jeden URL w wierszu)",hot:"Gorące ogłoszenie",urgent:"Pilna sprzedaż",save:"Zapisz zmiany",cancel:"Anuluj",published:"Opublikowano",priceDown:"Zmieniono cenę"}
+  };
+  const L = labelsByLang[lang] || labelsByLang.uk;
+  dialog.innerHTML = `<form class="listing-edit-form"><h2>${escapeHtml(labels.edit)}</h2>
+    <label>${escapeHtml(L.title)}<input name="title" required maxlength="180" value="${escapeHtml(item.title || "")}"></label>
+    <label>${escapeHtml(L.category)}<select name="category" required>${categoryOptions}</select></label>
+    <label>${escapeHtml(L.city)}<select name="city_id" required>${cityOptions}</select></label>
+    <label>${escapeHtml(L.price)}<input name="price" type="number" min="0" step="0.01" required value="${escapeHtml(String(item.price ?? ""))}"></label>
+    <label>${escapeHtml(L.description)}<textarea name="description" rows="5" maxlength="10000">${escapeHtml(item.description || "")}</textarea></label>
+    <label>${escapeHtml(L.photos)}<textarea name="photo_urls" rows="3">${escapeHtml(photos.join("\n"))}</textarea></label>
+    <label class="hot-toggle"><input type="checkbox" name="is_hot" ${item.is_hot ? "checked" : ""}> ${escapeHtml(L.hot)}</label>
+    <label class="hot-toggle"><input type="checkbox" name="is_urgent" ${item.is_urgent ? "checked" : ""}> ${escapeHtml(L.urgent)}</label>
+    <p class="muted">${escapeHtml(L.published)}: ${item.created_at ? escapeHtml(new Date(item.created_at).toLocaleDateString()) : "—"}</p>
+    <div class="edit-actions"><button class="btn btn-primary" type="submit">${escapeHtml(L.save)}</button><button class="btn" type="button" data-edit-cancel>${escapeHtml(L.cancel)}</button></div><p class="form-message" role="status"></p></form>`;
+  document.body.append(dialog); dialog.showModal();
+  dialog.querySelector("[data-edit-cancel]").addEventListener("click", () => dialog.close());
+  dialog.addEventListener("close", () => dialog.remove(), { once:true });
+  dialog.querySelector("form").addEventListener("submit", async event => {
+    event.preventDefault();
+    const form = event.currentTarget; const button = form.querySelector('button[type="submit"]'); const message = form.querySelector(".form-message");
+    const price = Number(form.elements.price.value);
+    if (!Number.isFinite(price) || price < 0) { message.textContent = labels.failed; return; }
+    const urls = [...new Set(form.elements.photo_urls.value.split(/\r?\n/).map(x=>x.trim()).filter(x=>/^https?:\/\//i.test(x)))].slice(0,10);
+    const payload = { title: form.elements.title.value.trim(), category: form.elements.category.value, city_id: Number(form.elements.city_id.value), price, previous_price: Number(item.price) !== price ? Number(item.price) : (item.previous_price ?? null), description: form.elements.description.value.trim(), image_urls: urls, image_url: urls[0] || null, is_hot: form.elements.is_hot.checked, is_urgent: Boolean(form.elements.is_urgent?.checked) };
+    if (!payload.title) { message.textContent = labels.failed; return; }
+    button.disabled = true; message.textContent = "…";
+    try {
+      const { data, error } = await db.from("listings").update(payload).eq("id", item.id).eq("user_id", currentUser.id).select("id,title,price,user_id,created_at").maybeSingle();
+      if (error) throw error;
+      if (!data) throw new Error(labels.denied);
+      if (Number(item.price) !== price) {
+        const { error: historyError } = await db.from("listing_price_history").insert({ listing_id:item.id, user_id:currentUser.id, old_price:Number(item.price), new_price:price, changed_at:new Date().toISOString() });
+        if (historyError) console.warn("Price history was not saved; apply the Hryvnia Hub SQL migration.", historyError.message);
+      }
+      dialog.close(); await loadListings();
+    } catch (error) { message.textContent = error?.message || labels.failed; button.disabled = false; }
+  });
 }
 async function deleteListing(item, labels) {
   if (!db || !currentUser) { alert(labels.denied); return; }
@@ -1849,8 +2007,53 @@ async function deleteListing(item, labels) {
   await loadListings();
 }
 
+async function renderHotListings(items) {
+  const host = document.querySelector(".urgent-deals-grid");
+  if (!host) return;
+  // Загружаем горячие и срочные объявления независимо от текущих фильтров.
+  if (db) {
+    const { data, error } = await db.from("listings")
+      .select("*, cities!inner(name_ru, name_uk, name_en, name_pl, region_katottg_code)")
+      .or("is_hot.eq.true,is_urgent.eq.true")
+      .order("created_at", { ascending: false })
+      .limit(20);
+    if (!error) items = data || [];
+    else console.warn("Hot listings query failed; apply the Hryvnia Hub SQL migration:", error.message);
+  }
+  items = (items || []).filter(item => item.is_hot || item.is_urgent);
+  const langPack = {
+    ru: { hot:"⚡ Горячее", urgent:"⏱ Срочно", empty:"Горячих и срочных объявлений пока нет." },
+    uk: { hot:"⚡ Гаряче", urgent:"⏱ Терміново", empty:"Гарячих і термінових оголошень поки немає." },
+    en: { hot:"⚡ Hot", urgent:"⏱ Urgent", empty:"No hot or urgent listings yet." },
+    pl: { hot:"⚡ Gorące", urgent:"⏱ Pilne", empty:"Brak gorących i pilnych ogłoszeń." }
+  };
+  const L = langPack[lang] || langPack.ru;
+  if (!items.length) {
+    host.innerHTML = `<div class="empty">${escapeHtml(L.empty)}</div>`;
+    return;
+  }
+  host.innerHTML = `<div class="hot-listings-row">${items.map(item => {
+    const badges = [
+      item.is_hot ? `<span class="hot-listing-badge">${escapeHtml(L.hot)}</span>` : "",
+      item.is_urgent ? `<span class="urgent-listing-badge">${escapeHtml(L.urgent)}</span>` : ""
+    ].join("");
+    return `<button type="button" class="hot-listing-card" data-hot-id="${escapeHtml(String(item.id))}">
+      ${listingCover(item)}
+      <span class="hot-card-badges">${badges}</span>
+      <span class="hot-card-title">${escapeHtml(item.title || "")}</span>
+      <strong>${money(item.price, item.currency || "UAH")}</strong>
+      <small>${escapeHtml(item.cities?.[`name_${lang}`] || item.cities?.name_ru || "")}</small>
+    </button>`;
+  }).join("")}</div>`;
+  host.querySelectorAll("[data-hot-id]").forEach(btn => btn.addEventListener("click", () => {
+    const item = items.find(x => String(x.id) === btn.dataset.hotId);
+    if (item) openListing(item);
+  }));
+}
+
 function renderListings(items) {
   visibleListings = items;
+  renderHotListings(items.filter(item => item.is_hot));
   if (resultCount) {
     const wordMap = { uk: ["оголошення", "оголошень", "оголошення"], ru: ["объявление", "объявлений", "объявления"], en: ["listing", "listings", "listings"], pl: ["ogłoszenie", "ogłoszeń", "ogłoszenia"] };
     const [one, many, few] = wordMap[lang] || wordMap.ru;
@@ -1871,6 +2074,13 @@ function renderListings(items) {
     const fav = isFavorite(item.id);
     const cover = listingCover(item);
     const hasCover = cover !== "";
+    const isOwner = Boolean(currentUser?.id && item.user_id && String(currentUser.id) === String(item.user_id));
+    const myListingLabel = ({
+      uk: "Моє оголошення",
+      ru: "Моё объявление",
+      en: "My listing",
+      pl: "Moje ogłoszenie"
+    })[lang] || "My listing";
     return `
     <article class="card${hasCover ? " has-cover" : " no-cover"}" data-listing-index="${index}" tabindex="0" role="button" aria-label="${escapeHtml(item.title)}" style="cursor:pointer">
       <button class="fav-btn ${fav ? "active" : ""}" data-fav-id="${escapeHtml(String(item.id))}" type="button" aria-pressed="${fav ? "true" : "false"}" aria-label="${fav ? "Убрать из избранного" : "В избранное"}">
@@ -1879,10 +2089,14 @@ function renderListings(items) {
       ${cover}
       <div class="card-top">
         <span class="badge">${categoryLabel(item)}</span>
+        ${item.is_hot ? `<span class="hot-listing-badge">⚡ ${escapeHtml(({ru:"Горячее",uk:"Гаряче",en:"Hot",pl:"Gorące"})[lang] || "Hot")}</span>` : ""}
+        ${item.is_urgent ? `<span class="urgent-listing-badge">⏱ ${escapeHtml(({ru:"Срочно",uk:"Терміново",en:"Urgent",pl:"Pilne"})[lang] || "Urgent")}</span>` : ""}
+        ${isOwner ? `<span class="owner-listing-badge">✓ ${escapeHtml(myListingLabel)}</span>` : ""}
         <span class="city">${escapeHtml(item.cities?.[`name_${lang}`] || item.cities?.name_ru || "")}</span>
       </div>
       <h3>${escapeHtml(item.title)}</h3>
-      <p class="price">${money(item.price, item.currency || "UAH")}</p>
+      <p class="price">${item.previous_price != null && Number(item.previous_price) !== Number(item.price) ? `<span class="old-price">${money(item.previous_price, item.currency || "UAH")}</span> ` : ""}${money(item.price, item.currency || "UAH")}</p>
+      ${item.previous_price != null && Number(item.previous_price) !== Number(item.price) ? `<p class="price-change-note">${escapeHtml(({ru:"Цена изменена",uk:"Ціну змінено",en:"Price changed",pl:"Zmieniono cenę"})[lang] || "Price changed")}: ${money(Math.abs(Number(item.previous_price)-Number(item.price)), item.currency || "UAH")} (${Number(item.price)<Number(item.previous_price)?"−":"+"}${(Math.abs(Number(item.previous_price)-Number(item.price))/Math.max(1,Number(item.previous_price))*100).toFixed(1)}%)</p>` : ""}
       <p class="desc">${escapeHtml(item.description || "Описание не указано.")}</p>
     </article>`;
   }).join("");
@@ -2004,6 +2218,8 @@ if (addForm) {
       city_id: Number(form.get("city_id")),
       price: Number(form.get("price")),
       description: form.get("description") || "",
+      is_hot: Boolean(form.get("is_hot")),
+      is_urgent: Boolean(form.get("is_urgent")),
       user_id: currentUser.id
     };
     const withPhotos = selectedPhotos.length > 0;
@@ -2194,3 +2410,5 @@ loadCities();
 initAuth();
 
 // === КОНЕЦ ФАЙЛА ===
+
+;(()=>{const s=document.createElement("style");s.textContent='\n/* Hryvnia Hub listing enhancements */\n.listing-placeholder{display:flex;align-items:center;justify-content:center;min-height:150px;background:linear-gradient(135deg,rgba(212,255,0,.20),rgba(13,70,43,.08));color:#24583c;border-radius:12px}.listing-placeholder svg{width:76px;height:76px}.hot-listings-row{display:flex;gap:14px;overflow-x:auto;padding:4px 2px 14px;scroll-snap-type:x proximity}.hot-listing-card{flex:0 0 220px;display:flex;flex-direction:column;gap:8px;text-align:left;border:1px solid rgba(212,255,0,.75);border-radius:14px;padding:10px;background:var(--surface,#fff);color:var(--text,#1b2b20);scroll-snap-align:start;cursor:pointer}.hot-listing-card .listing-photo,.hot-listing-card .listing-placeholder{width:100%;height:120px;min-height:120px;object-fit:cover}.hot-card-title{font-weight:700}.hot-listing-badge{display:inline-flex;padding:4px 7px;border-radius:6px;background:rgba(212,255,0,.25);font-size:11px;font-weight:700}.old-price{text-decoration:line-through;opacity:.6;font-size:inherit}.price-change-note{font-size:12px;opacity:.8;margin-top:-8px}.listing-edit-dialog::backdrop{background:rgba(0,0,0,.55)}.listing-edit-form{display:grid;gap:12px}.listing-edit-form label{display:grid;gap:5px}.listing-edit-form input:not([type=checkbox]),.listing-edit-form select,.listing-edit-form textarea{width:100%;box-sizing:border-box;padding:10px;border:1px solid var(--border,#d9e0d9);border-radius:8px;background:var(--surface,#fff);color:inherit}.listing-edit-form .hot-toggle{display:flex;align-items:center;gap:8px}.edit-actions{display:flex;gap:10px;flex-wrap:wrap}.listing-edit-form .form-message{overflow-wrap:anywhere}\n';document.head.appendChild(s);})();

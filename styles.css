@@ -3115,6 +3115,7 @@ input:focus, select:focus, textarea:focus {
   backdrop-filter: blur(8px) saturate(115%);
 }
 .category-menu {
+  top: 42%;
   width: min(88vw, 390px);
   max-height: min(40dvh, 390px);
   overflow-y: auto;
@@ -3185,11 +3186,32 @@ input:focus, select:focus, textarea:focus {
   to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
 @media (max-width: 520px) {
-  .category-menu { width: min(88vw, 390px); max-height: min(40dvh, 390px); padding: 17px 17px 13px; border-radius: 20px; }
+  .category-menu { top: 40%; width: min(88vw, 390px); max-height: min(40dvh, 390px); padding: 17px 17px 13px; border-radius: 20px; }
   .category-menu h2 { margin-bottom: 8px; font-size: 20px; }
   .category-menu-option { min-height: 44px; padding-top: 9px; padding-bottom: 9px; font-size: 15px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .category-menu { animation: none; }
   .category-menu-option { transition: none; }
+}
+
+/* HRYVNIA HUB — final mobile polish: fit region/radius labels and slightly enlarge banner text. */
+@media (max-width: 720px) {
+  #catalogRegionSelect,
+  .search-filters-row > select {
+    font-size: 9.5px !important;
+    letter-spacing: -0.15px !important;
+    padding-left: 5px !important;
+    padding-right: 3px !important;
+  }
+
+  .main-banner .banner-title {
+    font-size: clamp(15px, 4.1vw, 17px) !important;
+    line-height: 1.06 !important;
+  }
+
+  .main-banner .hero-text {
+    font-size: clamp(10px, 2.9vw, 11.5px) !important;
+    line-height: 1.1 !important;
+  }
 }

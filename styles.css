@@ -3082,3 +3082,12 @@ input:focus, select:focus, textarea:focus {
     border-radius: 8px;
   }
 }
+
+
+/* HOT BADGE CONTRAST FIX: orange fill, dark readable text, keep red border */
+.hot-listing-badge {
+  background: #ff8a00 !important;
+  color: #203f32 !important;
+  border: 1px solid #d63324 !important;
+  box-shadow: none !important;
+}

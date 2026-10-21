@@ -3557,3 +3557,24 @@ input:focus, select:focus, textarea:focus {
     line-height: 1.12 !important;
   }
 }
+
+
+/* HRYVNIA HUB — final hero banner spacing refinement. Keep headline typography unchanged. */
+@media screen and (min-width: 721px) {
+  .main-banner .banner-title {
+    transform: translateY(2px) !important;
+    margin-bottom: 2px !important;
+  }
+}
+
+@media screen and (max-width: 720px) {
+  .main-banner .banner-title {
+    transform: translateY(2px) !important;
+    margin-bottom: 0 !important;
+  }
+  .main-banner .hero-text {
+    transform: translateY(-2px) !important;
+    margin-top: -1px !important;
+    line-height: 1.08 !important;
+  }
+}

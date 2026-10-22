@@ -4585,3 +4585,42 @@ input:focus, select:focus, textarea:focus {
     ) !important;
   }
 }
+
+/* HRYVNIA HUB — компактная мобильная доработка баннера и иконки авто */
+@media screen and (max-width: 720px) {
+  /* Увеличиваем только иконку автомобиля, не меняя размеры карточки. */
+  .category-card[data-category="Автомобили"] .category-icon {
+    transform: scale(1.12) !important;
+    transform-origin: center !important;
+  }
+
+  /* Баннер остаётся компактным: достаточно места для двух строк и иконок. */
+  .main-banner {
+    min-height: 100px !important;
+    height: auto !important;
+    max-height: none !important;
+    padding: 8px 10px 25px !important;
+    box-sizing: border-box !important;
+  }
+  .main-banner .banner-content {
+    padding: 0 3px 15px !important;
+  }
+
+  /* Вторая строка немного крупнее, но не раздувает баннер. */
+  .main-banner .hero-text {
+    font-size: clamp(12px, 3.35vw, 15px) !important;
+    line-height: 1.15 !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95) !important;
+  }
+
+  /* Чуть сильнее затемняем фон для контраста текста. */
+  .main-banner::before {
+    background: linear-gradient(
+      180deg,
+      rgba(5, 12, 18, 0.74) 0%,
+      rgba(5, 12, 18, 0.65) 42%,
+      rgba(5, 12, 18, 0.44) 68%,
+      rgba(5, 12, 18, 0.12) 100%
+    ) !important;
+  }
+}

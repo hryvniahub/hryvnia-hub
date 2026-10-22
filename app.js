@@ -49,6 +49,9 @@ const translations = {
   "Недвижимость": { ru: "Недвижимость", uk: "Нерухомість", en: "Real estate", pl: "Nieruchomości" },
   "Готовый бизнес": { ru: "Готовый бизнес", uk: "Готовий бізнес", en: "Business", pl: "Gotowy biznes" },
   "Инвестиции": { ru: "Инвестиции", uk: "Інвестиції", en: "Investments", pl: "Inwestycje" },
+  "Все категории": { ru: "Все категории", uk: "Усі категорії", en: "All categories", pl: "Wszystkie kategorie" },
+  "Купівля автомобіля": { ru: "Покупка автомобиля", uk: "Купівля автомобіля", en: "Buy a car", pl: "Kupno samochodu" },
+  "Оренда автомобіля": { ru: "Аренда автомобиля", uk: "Оренда автомобіля", en: "Rent a car", pl: "Wynajem samochodu" },
   "Русский": { ru: "Русский", uk: "Українська", en: "English", pl: "Polski" },
   "Українська": { ru: "Російська", uk: "Українська", en: "English", pl: "Polski" },
   "English": { ru: "Russian", uk: "Ukrainian", en: "English", pl: "Polish" },
@@ -103,10 +106,12 @@ const translations = {
   "Куплю автомобиль": { ru: "Куплю автомобиль", uk: "Куплю автомобіль", en: "Buy a car", pl: "Kupię samochód" },
   "Арендую автомобиль": { ru: "Арендую автомобиль", uk: "Орендую автомобіль", en: "Rent a car", pl: "Wynajmę samochód" },
   "Обменяю автомобиль": { ru: "Обменяю автомобиль", uk: "Обміняю автомобіль", en: "Exchange a car", pl: "Zamienię samochód" },
-  "Куплю недвижимость": { ru: "Куплю недвижимость", uk: "Куплю нерухомість", en: "Buy property", pl: "Kupię nieruchomość" },
-  "Арендую недвижимость": { ru: "Арендую недвижимость", uk: "Орендую нерухомість", en: "Rent property", pl: "Wynajmę nieruchomość" },
-  "Куплю бизнес": { ru: "Куплю бизнес", uk: "Куплю бізнес", en: "Buy a business", pl: "Kupię firmę" },
-  "Продам бизнес": { ru: "Продам бизнес", uk: "Продам бізнес", en: "Sell a business", pl: "Sprzedam firmę" },
+  "Купівля": { ru: "Покупка", uk: "Купівля", en: "Buying", pl: "Kupno" },
+  "Оренда": { ru: "Аренда", uk: "Оренда", en: "Renting", pl: "Wynajem" },
+  "Куплю готовый бизнес": { ru: "Куплю готовый бизнес", uk: "Куплю готовий бізнес", en: "Buy an existing business", pl: "Kupię działającą firmę" },
+  "Продам готовый бизнес": { ru: "Продам готовый бизнес", uk: "Продам готовий бізнес", en: "Sell an existing business", pl: "Sprzedam działającą firmę" },
+  "Ищу бизнес-партнёра": { ru: "Ищу бизнес-партнёра", uk: "Шукаю бізнес-партнера", en: "Looking for a business partner", pl: "Szukam partnera biznesowego" },
+  "Услуги": { ru: "Услуги", uk: "Послуги", en: "Services", pl: "Usługi" },
   "Ищу бизнес-партнёра": { ru: "Ищу бизнес-партнёра", uk: "Шукаю бізнес-партнера", en: "Looking for a business partner", pl: "Szukam partnera biznesowego" },
   "Услуги": { ru: "Услуги", uk: "Послуги", en: "Services", pl: "Usługi" },
   "Ищу инвестора": { ru: "Ищу инвестора", uk: "Шукаю інвестора", en: "Looking for an investor", pl: "Szukam inwestora" },
@@ -2223,9 +2228,9 @@ async function loadListings() {
 }
 
 const categorySubcategories = {
-  "Автомобили": ["Куплю автомобиль", "Продам автомобиль", "Арендую автомобиль", "Сдам автомобиль", "Обменяю автомобиль"],
-  "Недвижимость": ["Куплю недвижимость", "Продам недвижимость", "Арендую недвижимость", "Сдам недвижимость"],
-  "Готовый бизнес": ["Куплю готовый бизнес", "Продам готовый бизнес", "Ищу партнёра", "Предложу партнёрство"],
+  "Автомобили": ["Купівля автомобіля", "Оренда автомобіля"],
+  "Недвижимость": ["Купівля", "Оренда"],
+  "Готовый бизнес": ["Куплю готовый бизнес", "Продам готовый бизнес", "Ищу бизнес-партнёра", "Услуги"],
   "Инвестиции": ["Ищу инвестора", "Стану инвестором", "Стартапы"]
 };
 const categoryMenu = document.getElementById("categoryMenu");
@@ -2251,7 +2256,7 @@ function openCategoryMenu(parentCategory = "") {
   if (parentCategory) {
     categoryMenuTitle.textContent = t(parentCategory === "Готовый бизнес" ? "Бизнес и предпринимательство" : parentCategory);
     const options = categorySubcategories[parentCategory] || [];
-    categoryMenuOptions.innerHTML = `<button type="button" class="category-menu-option category-menu-back" data-search-category="" data-category-back="1"><span class="category-menu-icon" aria-hidden="true">‹</span><span class="category-menu-option-label">${escapeHtml(t("Назад"))}</span><span aria-hidden="true"> </span></button>` + options.map(label => `<button type="button" class="category-menu-option" data-search-category="${escapeHtml(parentCategory)}" data-search-subcategory="${escapeHtml(label)}"><span class="category-menu-icon" aria-hidden="true">•</span><span class="category-menu-option-label">${escapeHtml(t(label))}</span><span aria-hidden="true">›</span></button>`).join("");
+    categoryMenuOptions.innerHTML = options.map(label => `<button type="button" class="category-menu-option" data-search-category="${escapeHtml(parentCategory)}" data-search-subcategory="${escapeHtml(label)}"><span class="category-menu-icon" aria-hidden="true">•</span><span class="category-menu-option-label">${escapeHtml(t(label))}</span><span aria-hidden="true">›</span></button>`).join("");
   } else {
     categoryMenuTitle.textContent = t("Категорії");
     categoryMenuOptions.innerHTML = cats.map(([key, icon, label]) => `<button type="button" class="category-menu-option" data-search-category="${escapeHtml(key)}" ${key ? 'data-open-submenu="1"' : 'data-all-categories="1"'}><span class="category-menu-icon" aria-hidden="true">${icon}</span><span class="category-menu-option-label">${escapeHtml(t(label || (key === "Готовый бизнес" ? "Бизнес и предпринимательство" : key)))}</span><span aria-hidden="true">›</span></button>`).join("");
@@ -2327,10 +2332,9 @@ syncVehicleListingFields();
 categorySelectTrigger?.addEventListener("click", () => openCategoryMenu());
 categoryMenuOptions?.addEventListener("click", event => {
   const option = event.target.closest("[data-search-category]"); if (!option) return;
-  if (option.hasAttribute("data-category-back")) { openCategoryMenu(); return; }
   const category = option.dataset.searchCategory || "";
   if (option.hasAttribute("data-open-submenu")) {
-    if (category === "Автомобили") { selectedSearchCategory = category; currentCategory = category; if (categorySelectLabel) categorySelectLabel.textContent = t(category); openVehicleSearch(); return; }
+    if (category === "Автомобили") { selectedSearchCategory = category; currentCategory = category; if (categorySelectLabel) categorySelectLabel.textContent = t(category); openCategoryMenu(category); return; }
     openCategoryMenu(category); return;
   }
   const subcategory = option.dataset.searchSubcategory;
@@ -2339,6 +2343,12 @@ categoryMenuOptions?.addEventListener("click", event => {
   if (categorySelectLabel) categorySelectLabel.textContent = category ? t(category === "Готовый бизнес" ? "Бизнес и предпринимательство" : category) : t("Все категории");
   document.querySelectorAll(".category").forEach(b => b.classList.toggle("active", (b.dataset.category || "") === category));
   closeCategoryMenu();
+  if (category === "Автомобили" && subcategory) {
+    const title = document.getElementById("vehicleSearchTitle");
+    if (title) title.textContent = t(subcategory);
+    openVehicleSearch();
+    return;
+  }
   loadListings();
 });
 document.querySelectorAll(".category").forEach(button => {
@@ -2347,7 +2357,7 @@ document.querySelectorAll(".category").forEach(button => {
     if (button.classList.contains("category-card") && category) {
       selectedSearchCategory = category; currentCategory = category;
       if (categorySelectLabel) categorySelectLabel.textContent = t(category === "Готовый бизнес" ? "Бизнес и предпринимательство" : category);
-      if (category === "Автомобили") openVehicleSearch(); else openCategoryMenu(category);
+      openCategoryMenu(category);
       return;
     }
     document.querySelectorAll(".category").forEach(b => b.classList.remove("active")); button.classList.add("active");

@@ -3579,29 +3579,7 @@ input:focus, select:focus, textarea:focus {
   }
 }
 
-/* HRYVNIA HUB — final banner position tweak only (2026-10-22).
-   Keep all wording, font sizes, and other page styles unchanged. */
-@media screen and (min-width: 721px) {
-  .main-banner .banner-title {
-    transform: translateY(3px) !important;
-  }
-  .main-banner .hero-text {
-    transform: translateY(-2px) !important;
-  }
-}
-
-@media screen and (max-width: 720px) {
-  .main-banner .banner-title {
-    transform: translateY(3px) !important;
-    margin-bottom: 0 !important;
-  }
-  .main-banner .hero-text {
-    transform: translateY(-4px) !important;
-    margin-top: -2px !important;
-    line-height: 1.08 !important;
-  }
-}
-
+/* Retained additions for vehicle search/listing controls from the newer version. */
 /* Search category dropdown + vehicle filters, Hryvnia Hub */
 .search-input-row-stacked { grid-template-columns: minmax(0, 1fr); }
 .search-input-row-stacked > input, .search-input-row-stacked > button { width:100%; min-width:0; }
@@ -3634,205 +3612,40 @@ input:focus, select:focus, textarea:focus {
 .category-menu-option:hover,.category-menu-option:focus-visible { background:rgba(212,255,0,.1); }
 @media(max-width:520px) { .vehicle-listing-fields { grid-template-columns:1fr; gap:10px; padding:12px; } }
 
-
-/* HRYVNIA HUB — комплексная правка категорий и баннера (2026-10-22) */
-.categories-section .categories-grid {
-  align-items: stretch !important;
-  grid-auto-rows: 1fr !important;
-}
-.categories-section .categories-grid > .category-card:not(.all-btn) {
-  height: 100% !important;
-  min-height: 0 !important;
-  aspect-ratio: auto !important;
-  box-sizing: border-box !important;
-}
-.categories-section .categories-grid > .category-card:not(.all-btn) .category-card-img {
-  position: absolute !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-}
-.categories-section .categories-grid > .all-btn {
-  width: 100% !important;
-  min-width: 0 !important;
-  height: 100% !important;
-  min-height: 0 !important;
-  box-sizing: border-box !important;
-}
-.category-menu-options { align-items: stretch !important; }
-.category-menu-option {
-  display: grid !important;
-  grid-template-columns: 28px minmax(0,1fr) 18px !important;
-  align-items: center !important;
-  justify-content: initial !important;
-  gap: 10px !important;
-  width: 100% !important;
-  min-height: 48px !important;
-  text-align: left !important;
-  box-sizing: border-box !important;
-}
-.category-menu-option .category-menu-option-label {
-  display: block !important;
-  min-width: 0 !important;
-  margin: 0 !important;
-  text-align: left !important;
-  font-size: 16px !important;
-  line-height: 1.25 !important;
-  overflow-wrap: anywhere !important;
-  color: inherit !important;
-}
-.category-menu-option > span:last-child { justify-self: end !important; margin-left: 0 !important; }
-.category-menu-option .category-menu-icon { width: 28px !important; text-align: center !important; }
-.category-menu-option.category-menu-back { border-bottom: 1px solid rgba(212,255,0,.22) !important; }
-.main-banner {
-  height: clamp(112px, 18vw, 190px) !important;
-  min-height: 112px !important;
-  max-height: 190px !important;
-  padding: 12px 18px !important;
-  box-sizing: border-box !important;
-}
-.main-banner .banner-content {
-  position: relative !important;
-  z-index: 2 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  height: 100% !important;
-  padding: 0 8px !important;
-  box-sizing: border-box !important;
-  gap: 5px !important;
-}
-.main-banner .banner-title,
-.main-banner .hero-text {
-  position: static !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  transform: none !important;
-  word-break: normal !important;
-  overflow-wrap: normal !important;
-  text-wrap: balance !important;
-  text-align: center !important;
-}
-.main-banner .banner-title { font-size: clamp(18px, 2.4vw, 32px) !important; line-height: 1.12 !important; }
-.main-banner .hero-text { font-size: clamp(12px, 1.25vw, 18px) !important; line-height: 1.25 !important; }
-@media screen and (max-width: 720px) {
-  .categories-section .categories-grid { grid-template-columns: repeat(2, minmax(0,1fr)) !important; grid-auto-rows: 104px !important; gap: 8px !important; }
-  .categories-section .categories-grid > .category-card:not(.all-btn) { min-height: 104px !important; height: 104px !important; }
-  .categories-section .categories-grid > .all-btn { min-height: 104px !important; height: 104px !important; }
-  .main-banner { height: clamp(112px, 31vw, 145px) !important; min-height: 112px !important; max-height: 145px !important; padding: 9px 10px !important; }
-  .main-banner .banner-content { gap: 5px !important; }
-  .main-banner .banner-title { font-size: clamp(16px, 4.4vw, 21px) !important; line-height: 1.15 !important; }
-  .main-banner .hero-text { font-size: clamp(11px, 3.1vw, 14px) !important; line-height: 1.22 !important; }
-  .category-menu-option .category-menu-option-label { font-size: 15px !important; }
-}
-@media screen and (max-width: 380px) {
-  .categories-section .categories-grid { grid-auto-rows: 94px !important; }
-  .categories-section .categories-grid > .category-card:not(.all-btn),
-  .categories-section .categories-grid > .all-btn { min-height: 94px !important; height: 94px !important; }
-  .main-banner { height: 112px !important; min-height: 112px !important; }
-  .main-banner .banner-title { font-size: 15px !important; }
-  .main-banner .hero-text { font-size: 11px !important; }
-}
-
-
-/* HRYVNIA HUB — corrective mobile layout patch (2026-10-22)
-   Fix category modal's collapsed text column; restore compact category cards/banner.
-   Keep the existing All button size and position. */
-.category-menu {
-  width: min(92vw, 460px) !important;
-  max-width: calc(100vw - 28px) !important;
-  box-sizing: border-box !important;
-  overflow-x: hidden !important;
-}
+/* HRYVNIA HUB — safe category menu row layout fix.
+   Keep the original Main category-card and banner sizing rules intact. */
 .category-menu-options {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: stretch !important;
-  width: 100% !important;
-  min-width: 0 !important;
-  box-sizing: border-box !important;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: stretch;
+  width: 100%;
 }
 .category-menu-option {
-  display: grid !important;
-  grid-template-columns: 28px minmax(0, 1fr) 18px !important;
-  width: 100% !important;
-  min-width: 0 !important;
-  max-width: 100% !important;
-  gap: 10px !important;
-  align-items: center !important;
-  justify-content: initial !important;
-  box-sizing: border-box !important;
-  white-space: normal !important;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  white-space: normal;
+}
+.category-menu-option .category-menu-icon {
+  flex: 0 0 28px;
+  width: 28px;
+  text-align: center;
 }
 .category-menu-option .category-menu-option-label {
-  display: block !important;
-  width: 100% !important;
-  min-width: 0 !important;
-  max-width: 100% !important;
-  white-space: normal !important;
-  word-break: normal !important;
-  overflow-wrap: break-word !important;
-  text-align: left !important;
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: break-word;
+  word-break: normal;
+  line-height: 1.25;
+  text-align: left;
 }
-.category-menu-option .category-menu-icon { width: 28px !important; min-width: 28px !important; }
-.category-menu-option > span:last-child { min-width: 18px !important; }
-
-@media screen and (max-width: 720px) {
-  .categories-section .categories-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    grid-auto-rows: 84px !important;
-    gap: 7px !important;
-    align-items: stretch !important;
-  }
-  .categories-section .categories-grid > .category-card:not(.all-btn) {
-    width: 100% !important;
-    height: 84px !important;
-    min-height: 84px !important;
-    aspect-ratio: auto !important;
-  }
-  .categories-section .categories-grid > .all-btn {
-    width: 52px !important;
-    min-width: 52px !important;
-    height: 52px !important;
-    min-height: 52px !important;
-    border-radius: 50% !important;
-    padding: 2px !important;
-    left: 50% !important;
-    top: 50% !important;
-    transform: translate(-50%, -50%) !important;
-  }
-  .main-banner {
-    height: 112px !important;
-    min-height: 112px !important;
-    max-height: 112px !important;
-    padding: 10px 12px 26px !important;
-  }
-  .main-banner .banner-content { gap: 4px !important; }
-  .main-banner .banner-title { font-size: clamp(15px, 4.1vw, 18px) !important; line-height: 1.1 !important; }
-  .main-banner .hero-text { font-size: clamp(10px, 2.9vw, 12px) !important; line-height: 1.15 !important; }
-  .category-menu {
-    left: 50% !important;
-    top: 50% !important;
-    width: calc(100vw - 36px) !important;
-    max-width: 460px !important;
-    max-height: 78dvh !important;
-    padding: 18px 16px !important;
-    transform: translate(-50%, -50%) !important;
-  }
-  .category-menu-option { grid-template-columns: 28px minmax(0, 1fr) 18px !important; gap: 8px !important; min-height: 48px !important; }
-  .category-menu-option .category-menu-option-label { font-size: 15px !important; line-height: 1.3 !important; }
-}
-@media screen and (max-width: 380px) {
-  .categories-section .categories-grid { grid-auto-rows: 78px !important; }
-  .categories-section .categories-grid > .category-card:not(.all-btn) { height: 78px !important; min-height: 78px !important; }
-  .main-banner { height: 106px !important; min-height: 106px !important; max-height: 106px !important; }
-  .category-menu { width: calc(100vw - 28px) !important; padding: 16px 13px !important; }
-  .category-menu-option { grid-template-columns: 24px minmax(0, 1fr) 16px !important; gap: 7px !important; }
-  .category-menu-option .category-menu-option-label { font-size: 14px !important; }
+.category-menu-option > span:last-child {
+  flex: 0 0 auto;
+  margin-left: auto;
 }

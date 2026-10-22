@@ -3919,19 +3919,6 @@ input:focus, select:focus, textarea:focus {
 
 
 
-/* Final mobile banner sizing: compact height with both text lines readable. */
-@media screen and (max-width: 720px) {
-  .main-banner { height: 56px !important; min-height: 56px !important; max-height: 56px !important; padding: 3px 8px !important; box-sizing: border-box !important; }
-  .main-banner .banner-content { gap: 2px !important; justify-content: center !important; padding: 0 4px !important; }
-  .main-banner .banner-title { font-size: clamp(12px, 3.2vw, 17px) !important; line-height: 1.05 !important; margin: 0 !important; }
-  .main-banner .hero-text { font-size: clamp(9px, 2.3vw, 12px) !important; line-height: 1.1 !important; margin: 0 !important; }
-}
-@media screen and (max-width: 380px) {
-  .main-banner { height: 56px !important; min-height: 56px !important; max-height: 56px !important; }
-  .main-banner .banner-title { font-size: 12px !important; }
-  .main-banner .hero-text { font-size: 9px !important; }
-}
-
 /* Fix: compact the “All categories” selector in the search text menu only. */
 .search-panel .search-input-row-stacked > #categorySelectTrigger,
 .search-input-row-stacked > #categorySelectTrigger.category-select-trigger {
@@ -4035,592 +4022,64 @@ input:focus, select:focus, textarea:focus {
 
 
 /* ============================================================
-   HRYVNIA HUB — CATEGORY ICONS + SEARCH CATEGORY SELECTOR
-   Added without changing the existing layout or JavaScript hooks.
-   ============================================================ */
-.category-card-label {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: clamp(6px, 1vw, 10px) !important;
-}
-.category-card-label > span[data-i18n] {
-  min-width: 0;
-}
-.category-icon {
-  display: block;
-  flex: 0 0 26px;
-  width: 26px;
-  height: 26px;
-  color: #fff;
-  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, .55));
-}
-@media (max-width: 720px) {
-  .category-icon {
-    flex-basis: 23px;
-    width: 23px;
-    height: 23px;
-  }
-  .category-card-label {
-    gap: 7px !important;
-  }
-}
-@media (max-width: 380px) {
-  .category-icon {
-    flex-basis: 20px;
-    width: 20px;
-    height: 20px;
-  }
-  .category-card-label {
-    gap: 5px !important;
-  }
-}
-
-/* Light lime tint, dark green text and a crisp four-square icon. */
-.search-panel .search-input-row-stacked #categorySelectTrigger.category-select-trigger {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  gap: 12px !important;
-  width: 100% !important;
-  min-height: 60px !important;
-  height: 60px !important;
-  max-height: 60px !important;
-  padding: 0 16px !important;
-  border: 1.5px solid #bfd68e !important;
-  border-radius: 16px !important;
-  background: linear-gradient(110deg, #f5fbdc 0%, #eaf6c8 100%) !important;
-  color: #194b39 !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 2px 5px rgba(26,76,53,.07) !important;
-  box-sizing: border-box !important;
-  overflow: hidden !important;
-}
-.search-panel .search-input-row-stacked #categorySelectTrigger .category-select-icon {
-  display: block;
-  flex: 0 0 27px;
-  width: 27px;
-  height: 27px;
-  color: #194b39;
-}
-.search-panel .search-input-row-stacked #categorySelectTrigger #categorySelectLabel {
-  display: block !important;
-  flex: 1 1 auto !important;
-  min-width: 0 !important;
-  color: #194b39 !important;
-  font-size: inherit;
-  font-weight: 750;
-  line-height: 1.2 !important;
-  text-align: left;
-}
-.search-panel .search-input-row-stacked #categorySelectTrigger .category-select-arrow {
-  display: block;
-  flex: 0 0 20px;
-  width: 20px;
-  height: 20px;
-  color: #194b39;
-  transition: transform .18s ease;
-}
-.search-panel .search-input-row-stacked #categorySelectTrigger[aria-expanded="true"] .category-select-arrow {
-  transform: rotate(180deg);
-}
-.search-panel .search-input-row-stacked #categorySelectTrigger:hover {
-  border-color: #a9cc46 !important;
-  background: linear-gradient(110deg, #eff9c8 0%, #e0f2a5 100%) !important;
-}
-.search-panel .search-input-row-stacked #categorySelectTrigger:focus-visible {
-  outline: 3px solid rgba(212,255,0,.6);
-  outline-offset: 2px;
-}
-@media (max-width: 720px) {
-  .search-panel .search-input-row-stacked #categorySelectTrigger.category-select-trigger {
-    gap: 10px !important;
-    padding: 0 13px !important;
-  }
-  .search-panel .search-input-row-stacked #categorySelectTrigger .category-select-icon {
-    flex-basis: 24px;
-    width: 24px;
-    height: 24px;
-  }
-}
-
-
-/* ============================================================
-   HRYVNIA HUB — banner refinement + multilingual business label
-   Keep the existing banner dimensions; improve text and icons only.
+   HRYVNIA HUB — FINAL MOBILE FIX (banner −25%, wider content)
    ============================================================ */
 
-/* Keep “Business” at the normal size and reduce only its final word. */
-.category-card[data-category="Готовый бизнес"] .category-card-label {
-  gap: 5px !important;
-  white-space: nowrap !important;
-  overflow-wrap: normal !important;
-  word-break: normal !important;
-}
-.category-card[data-category="Готовый бизнес"] .category-icon {
-  flex: 0 0 21px !important;
-  width: 21px !important;
-  height: 21px !important;
-}
-.category-card-long-word {
-  display: inline-block !important;
-  flex: 0 1 auto !important;
-  min-width: 0 !important;
-  max-width: 100% !important;
-  font-size: 0.70em !important;
-  font-weight: 800 !important;
-  line-height: 1 !important;
-  letter-spacing: -0.025em !important;
-  white-space: nowrap !important;
-  overflow-wrap: normal !important;
-}
-
-/* The banner stays the same height. Remove the heavy dark overlay so the
-   background artwork and lime category symbols are easier to see. */
-.main-banner::before {
-  background: linear-gradient(180deg, rgba(15, 20, 28, 0.015) 0%, rgba(15, 20, 28, 0.12) 100%) !important;
-}
-.main-banner {
-  isolation: isolate;
-}
-.main-banner .main-banner-img {
-  filter: brightness(1.10) saturate(1.08) !important;
-}
-.main-banner .banner-content {
-  z-index: 2 !important;
-  padding-bottom: 13px !important;
-  gap: 2px !important;
-}
-.main-banner .banner-title {
-  font-size: clamp(19px, 2.8vw, 32px) !important;
-  line-height: 1.08 !important;
-  margin: 0 !important;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45) !important;
-}
-.main-banner .hero-text {
-  font-size: clamp(12px, 1.35vw, 17px) !important;
-  line-height: 1.12 !important;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45) !important;
-}
-.main-banner .banner-icons {
-  position: absolute !important;
-  z-index: 3 !important;
-  left: 8% !important;
-  right: 8% !important;
-  bottom: 3px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-around !important;
-  gap: 8px !important;
-  height: 13px !important;
-  pointer-events: none !important;
-}
-.main-banner .banner-icon {
-  display: block !important;
-  flex: 0 0 15px !important;
-  width: 15px !important;
-  height: 15px !important;
-  min-width: 15px !important;
-  color: #d4ff00 !important;
-  opacity: 1 !important;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35)) !important;
-}
+/* Mobile banner: 100px baseline -> 75px target. Desktop unchanged. */
 @media screen and (max-width: 720px) {
-  /* Do not set height/min-height here: preserve the existing mobile banner height. */
-  .main-banner .banner-content {
-    padding: 0 5px 13px !important;
-    gap: 2px !important;
-  }
-  .main-banner .banner-title {
-    font-size: clamp(15px, 4.0vw, 19px) !important;
-    line-height: 1.04 !important;
-  }
-  .main-banner .hero-text {
-    font-size: clamp(10px, 2.75vw, 13px) !important;
-    line-height: 1.06 !important;
-  }
-  .main-banner .banner-icons {
-    left: 8% !important;
-    right: 8% !important;
-    bottom: 2px !important;
-    height: 11px !important;
-    gap: 6px !important;
-  }
-  .main-banner .banner-icon {
-    flex-basis: 13px !important;
-    width: 13px !important;
-    height: 13px !important;
-    min-width: 13px !important;
-  }
-  .category-card[data-category="Готовый бизнес"] .category-card-label {
-    gap: 4px !important;
-  }
-  .category-card[data-category="Готовый бизнес"] .category-icon {
-    flex-basis: 19px !important;
-    width: 19px !important;
-    height: 19px !important;
-  }
-  .category-card-long-word { font-size: 0.66em !important; }
-}
-@media screen and (max-width: 380px) {
-  .main-banner .banner-title { font-size: 15px !important; }
-  .main-banner .hero-text { font-size: 10px !important; }
-  .main-banner .banner-content { padding-bottom: 12px !important; }
-  .category-card-long-word { font-size: 0.62em !important; }
-}
-
-
-/* ============================================================
-   HRYVNIA HUB — FINAL OVERRIDES AFTER ALL LEGACY MOBILE RULES
-   Keep the existing banner height unchanged.
-   ============================================================ */
-.category-card[data-category="Готовый бизнес"] .category-card-label {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  flex-wrap: nowrap !important;
-  white-space: nowrap !important;
-  gap: 5px !important;
-  max-width: 100% !important;
-}
-.category-card[data-category="Готовый бизнес"] .category-card-label > span[data-i18n] {
-  display: block !important;
-  min-width: 0 !important;
-  max-width: 100% !important;
-  white-space: normal !important;
-  overflow-wrap: normal !important;
-  word-break: normal !important;
-  line-height: 1.05 !important;
-}
-.category-card-long-word {
-  display: inline-block !important;
-  flex: 0 0 auto !important;
-  white-space: nowrap !important;
-  font-size: 0.62em !important;
-  line-height: 1 !important;
-  letter-spacing: -0.035em !important;
-  vertical-align: baseline !important;
-}
-.category-card[data-category="Готовый бизнес"] .category-icon {
-  flex: 0 0 19px !important;
-  width: 19px !important;
-  height: 19px !important;
-}
-
-.main-banner::before {
-  background: linear-gradient(
-    180deg,
-    rgba(8, 16, 24, 0.02) 0%,
-    rgba(8, 16, 24, 0.14) 100%
-  ) !important;
-}
-.main-banner .main-banner-img {
-  filter: brightness(1.12) saturate(1.12) !important;
-}
-.main-banner .banner-title {
-  font-size: clamp(20px, 3vw, 32px) !important;
-  line-height: 1.08 !important;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35) !important;
-}
-.main-banner .hero-text {
-  font-size: clamp(12px, 1.5vw, 17px) !important;
-  line-height: 1.12 !important;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35) !important;
-}
-.main-banner .banner-icons {
-  display: flex !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  left: 8% !important;
-  right: 8% !important;
-  bottom: 2px !important;
-  height: 17px !important;
-  overflow: visible !important;
-  z-index: 5 !important;
-}
-.main-banner .banner-icon {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  flex: 0 0 17px !important;
-  width: 17px !important;
-  height: 17px !important;
-  min-width: 17px !important;
-  color: #d4ff00 !important;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25)) !important;
-}
-@media screen and (max-width: 720px) {
-  /* Preserve the current banner height; only change text and icon visibility. */
-  .main-banner .banner-content {
-    padding: 0 5px 18px !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-  }
-  .main-banner .banner-title {
-    font-size: clamp(17px, 4.6vw, 21px) !important;
-    line-height: 1.05 !important;
-    margin: 0 0 2px !important;
-  }
-  .main-banner .hero-text {
-    font-size: clamp(10px, 3.1vw, 13px) !important;
-    line-height: 1.08 !important;
-  }
-  .main-banner .banner-icons {
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    left: 8% !important;
-    right: 8% !important;
-    bottom: 2px !important;
-    height: 16px !important;
-    gap: 6px !important;
-  }
-  .main-banner .banner-icon {
-    flex-basis: 15px !important;
-    width: 15px !important;
-    height: 15px !important;
-    min-width: 15px !important;
-  }
-  .category-card[data-category="Готовый бизнес"] .category-card-label {
-    gap: 3px !important;
-  }
-  .category-card[data-category="Готовый бизнес"] .category-icon {
-    flex-basis: 17px !important;
-    width: 17px !important;
-    height: 17px !important;
-  }
-  .category-card-long-word {
-    font-size: 0.54em !important;
-  }
-}
-@media screen and (max-width: 380px) {
-  .main-banner .banner-title { font-size: 16px !important; }
-  .main-banner .hero-text { font-size: 10px !important; }
-  .category-card-long-word { font-size: 0.50em !important; }
-}
-
-
-/* ============================================================
-   HRYVNIA HUB — CONSOLIDATED FINAL BANNER RULES
-   The four icons are HTML/SVG overlays; the background image is clean.
-   Keep existing banner dimensions and all other page layouts unchanged.
-   ============================================================ */
-
-/* Standardize category icon sizes without changing card dimensions. */
-.category-card .category-icon {
-  flex: 0 0 23px !important;
-  width: 23px !important;
-  height: 23px !important;
-}
-.category-card[data-category="Готовый бизнес"] .category-icon {
-  flex: 0 0 23px !important;
-  width: 23px !important;
-  height: 23px !important;
-  transform: translateX(6px) !important;
-}
-.category-card[data-category="Готовый бизнес"] .category-card-long-word {
-  font-size: 0.72em !important;
-  letter-spacing: -0.025em !important;
-  font-weight: 800 !important;
-  white-space: nowrap !important;
-}
-@media screen and (max-width: 720px) {
-  .category-card .category-icon,
-  .category-card[data-category="Готовый бизнес"] .category-icon {
-    flex-basis: 23px !important;
-    width: 23px !important;
-    height: 23px !important;
-  }
-  .category-card[data-category="Готовый бизнес"] .category-card-long-word {
-    font-size: 0.70em !important;
-  }
-}
-@media screen and (max-width: 380px) {
-  .category-card .category-icon,
-  .category-card[data-category="Готовый бизнес"] .category-icon {
-    flex-basis: 21px !important;
-    width: 21px !important;
-    height: 21px !important;
-  }
-  .category-card[data-category="Готовый бизнес"] .category-card-long-word {
-    font-size: 0.66em !important;
-  }
-}
-
-/* Desktop: give the real-estate label slightly more room. */
-@media screen and (min-width: 721px) {
-  .category-card[data-category="Недвижимость"] .category-card-label {
-    gap: 5px !important;
-    padding-left: 4px !important;
-    padding-right: 4px !important;
-    transform: translateX(-5px) !important;
-    white-space: nowrap !important;
-    overflow-wrap: normal !important;
-  }
-  .category-card[data-category="Недвижимость"] .category-card-label > span[data-i18n] {
-    white-space: nowrap !important;
-    letter-spacing: -0.035em !important;
-    font-size: 0.94em !important;
-  }
-}
-
-/* Banner: exactly four lime SVG icons in one centered row. */
-.main-banner .banner-icons {
-  position: absolute !important;
-  left: 50% !important;
-  right: auto !important;
-  bottom: 7px !important;
-  transform: translateX(-50%) !important;
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: clamp(13px, 2.1vw, 24px) !important;
-  width: max-content !important;
-  max-width: calc(100% - 24px) !important;
-  height: 22px !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  z-index: 4 !important;
-  pointer-events: none !important;
-}
-.main-banner .banner-icon {
-  display: block !important;
-  flex: 0 0 21px !important;
-  width: 21px !important;
-  height: 21px !important;
-  min-width: 21px !important;
-  color: #d4ff00 !important;
-  opacity: 1 !important;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55)) !important;
-}
-.main-banner .banner-content {
-  padding-bottom: 25px !important;
-}
-
-/* Banner readability: noticeably darker behind both text lines, fading to the original bright lower edge. */
-.main-banner::before {
-  background: linear-gradient(
-    180deg,
-    rgba(5, 12, 18, 0.66) 0%,
-    rgba(5, 12, 18, 0.56) 38%,
-    rgba(5, 12, 18, 0.34) 61%,
-    rgba(5, 12, 18, 0.08) 80%,
-    rgba(5, 12, 18, 0) 100%
-  ) !important;
-}
-
-/* Slightly enlarge the second banner line without changing banner dimensions. */
-.main-banner .hero-text {
-  font-size: clamp(13px, 1.45vw, 19px) !important;
-  line-height: 1.2 !important;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9) !important;
-}
-
-@media screen and (max-width: 720px) {
-  .main-banner .banner-content {
-    padding: 0 4px 19px !important;
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-  .main-banner .hero-text {
-    font-size: clamp(12px, 3.2vw, 15px) !important;
-    line-height: 1.18 !important;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95) !important;
-  }
-  .main-banner .banner-icons {
-    bottom: 3px !important;
-    height: 15px !important;
-    gap: 13px !important;
-    max-width: calc(100% - 32px) !important;
-  }
-  .main-banner .banner-icon {
-    flex-basis: 16px !important;
-    width: 16px !important;
-    height: 16px !important;
-    min-width: 16px !important;
-  }
-  .main-banner::before {
-    background: linear-gradient(
-      180deg,
-      rgba(5, 12, 18, 0.68) 0%,
-      rgba(5, 12, 18, 0.58) 40%,
-      rgba(5, 12, 18, 0.35) 64%,
-      rgba(5, 12, 18, 0.02) 83%,
-      rgba(5, 12, 18, 0) 100%
-    ) !important;
-  }
-}
-
-/* HRYVNIA HUB — final small readability adjustment (2026-10-23)
-   Keep banner dimensions, icon count/position, and text sizes unchanged. */
-.main-banner .banner-title {
-  transform: translateY(3px) !important;
-}
-
-.main-banner::before {
-  background: linear-gradient(
-    180deg,
-    rgba(5, 12, 18, 0.70) 0%,
-    rgba(5, 12, 18, 0.61) 38%,
-    rgba(5, 12, 18, 0.39) 61%,
-    rgba(5, 12, 18, 0.08) 80%,
-    rgba(5, 12, 18, 0) 100%
-  ) !important;
-}
-
-@media screen and (max-width: 720px) {
-  .main-banner .banner-title {
-    transform: translateY(3px) !important;
-  }
-
-  .main-banner::before {
-    background: linear-gradient(
-      180deg,
-      rgba(5, 12, 18, 0.72) 0%,
-      rgba(5, 12, 18, 0.63) 40%,
-      rgba(5, 12, 18, 0.40) 64%,
-      rgba(5, 12, 18, 0.03) 83%,
-      rgba(5, 12, 18, 0) 100%
-    ) !important;
-  }
-}
-
-/* HRYVNIA HUB — компактная мобильная доработка баннера и иконки авто */
-@media screen and (max-width: 720px) {
-  /* Увеличиваем только иконку автомобиля, не меняя размеры карточки. */
-  .category-card[data-category="Автомобили"] .category-icon {
-    transform: scale(1.12) !important;
-    transform-origin: center !important;
-  }
-
-  /* Баннер остаётся компактным: достаточно места для двух строк и иконок. */
   .main-banner {
-    min-height: 100px !important;
-    height: auto !important;
-    max-height: none !important;
-    padding: 8px 10px 25px !important;
+    height: 75px !important;
+    min-height: 75px !important;
+    max-height: 75px !important;
+    padding: 5px 10px 20px !important;
     box-sizing: border-box !important;
   }
   .main-banner .banner-content {
-    padding: 0 3px 15px !important;
+    padding: 0 4px 12px !important;
+    gap: 1px !important;
   }
-
-  /* Вторая строка немного крупнее, но не раздувает баннер. */
+  .main-banner .banner-title {
+    font-size: clamp(14px, 3.8vw, 17px) !important;
+    line-height: 1.04 !important;
+    margin: 0 !important;
+    transform: none !important;
+  }
   .main-banner .hero-text {
-    font-size: clamp(12px, 3.35vw, 15px) !important;
-    line-height: 1.15 !important;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95) !important;
+    font-size: clamp(9.5px, 2.6vw, 12px) !important;
+    line-height: 1.08 !important;
+    margin: 0 !important;
+    transform: none !important;
   }
+  .main-banner .banner-icons {
+    bottom: 2px !important;
+    height: 13px !important;
+    gap: 12px !important;
+  }
+  .main-banner .banner-icon {
+    flex-basis: 14px !important;
+    width: 14px !important;
+    height: 14px !important;
+    min-width: 14px !important;
+  }
+}
 
-  /* Чуть сильнее затемняем фон для контраста текста. */
-  .main-banner::before {
-    background: linear-gradient(
-      180deg,
-      rgba(5, 12, 18, 0.74) 0%,
-      rgba(5, 12, 18, 0.65) 42%,
-      rgba(5, 12, 18, 0.44) 68%,
-      rgba(5, 12, 18, 0.12) 100%
-    ) !important;
+/* Reduce mobile side gutters from 16px to 8px across shared containers. */
+@media screen and (max-width: 720px) {
+  .container {
+    width: calc(100% - 16px) !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  html, body { overflow-x: hidden !important; }
+  .main-banner,
+  .categories-section,
+  .hero,
+  .search-ai-section,
+  .market-ticker,
+  .urgent-deals,
+  .listing-section,
+  .footer {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 }

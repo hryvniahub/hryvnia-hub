@@ -4551,3 +4551,37 @@ input:focus, select:focus, textarea:focus {
     ) !important;
   }
 }
+
+/* HRYVNIA HUB — final small readability adjustment (2026-10-23)
+   Keep banner dimensions, icon count/position, and text sizes unchanged. */
+.main-banner .banner-title {
+  transform: translateY(3px) !important;
+}
+
+.main-banner::before {
+  background: linear-gradient(
+    180deg,
+    rgba(5, 12, 18, 0.70) 0%,
+    rgba(5, 12, 18, 0.61) 38%,
+    rgba(5, 12, 18, 0.39) 61%,
+    rgba(5, 12, 18, 0.08) 80%,
+    rgba(5, 12, 18, 0) 100%
+  ) !important;
+}
+
+@media screen and (max-width: 720px) {
+  .main-banner .banner-title {
+    transform: translateY(3px) !important;
+  }
+
+  .main-banner::before {
+    background: linear-gradient(
+      180deg,
+      rgba(5, 12, 18, 0.72) 0%,
+      rgba(5, 12, 18, 0.63) 40%,
+      rgba(5, 12, 18, 0.40) 64%,
+      rgba(5, 12, 18, 0.03) 83%,
+      rgba(5, 12, 18, 0) 100%
+    ) !important;
+  }
+}

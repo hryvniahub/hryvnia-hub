@@ -4398,3 +4398,34 @@ input:focus, select:focus, textarea:focus {
   .main-banner .hero-text { font-size: 10px !important; }
   .category-card-long-word { font-size: 0.50em !important; }
 }
+
+
+/* HRYVNIA HUB — balanced final correction: exactly four banner symbols from the artwork */
+/* The background artwork already contains the four lime symbols. Hide the duplicate SVG overlay. */
+.main-banner .banner-icons {
+  display: none !important;
+}
+/* Keep the banner image's original four lime symbols bright without adding another icon row. */
+.main-banner .main-banner-img {
+  filter: brightness(1.12) saturate(1.14) !important;
+}
+.main-banner::before {
+  background: linear-gradient(180deg, rgba(8, 16, 24, 0.01) 0%, rgba(8, 16, 24, 0.10) 100%) !important;
+}
+/* Slightly increase the final word from the previous overly small setting. */
+.category-card[data-category="Готовый бизнес"] .category-card-long-word {
+  font-size: 0.70em !important;
+  letter-spacing: -0.025em !important;
+  font-weight: 800 !important;
+  white-space: nowrap !important;
+}
+@media screen and (max-width: 720px) {
+  .category-card[data-category="Готовый бизнес"] .category-card-long-word {
+    font-size: 0.68em !important;
+  }
+}
+@media screen and (max-width: 380px) {
+  .category-card[data-category="Готовый бизнес"] .category-card-long-word {
+    font-size: 0.64em !important;
+  }
+}

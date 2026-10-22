@@ -3807,3 +3807,113 @@ input:focus, select:focus, textarea:focus {
     font-size: 10px !important;
   }
 }
+
+/* HRYVNIA HUB — clean final overrides for mobile category menu and navigation */
+.category-menu {
+  width: min(92vw, 430px) !important;
+  max-width: calc(100vw - 28px) !important;
+  max-height: min(82dvh, 620px) !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  box-sizing: border-box !important;
+}
+.category-menu-options {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  gap: 0 !important;
+}
+.category-menu-option {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 48px !important;
+  height: auto !important;
+  padding: 12px 8px !important;
+  box-sizing: border-box !important;
+  white-space: normal !important;
+  text-align: left !important;
+  overflow: visible !important;
+}
+.category-menu-option .category-menu-icon {
+  display: inline-flex !important;
+  flex: 0 0 28px !important;
+  width: 28px !important;
+  min-width: 28px !important;
+  justify-content: center !important;
+  text-align: center !important;
+}
+.category-menu-option .category-menu-option-label {
+  display: block !important;
+  flex: 1 1 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  white-space: normal !important;
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+  line-height: 1.3 !important;
+  text-align: left !important;
+}
+.category-menu-option > span:last-child {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  margin-left: auto !important;
+  white-space: nowrap !important;
+}
+.category-menu-option.category-menu-back { display: flex !important; }
+
+@media (max-width: 520px) {
+  .category-menu {
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: calc(100vw - 36px) !important;
+    max-width: 430px !important;
+    max-height: min(76dvh, 560px) !important;
+    padding: 18px 16px !important;
+  }
+  .category-menu-option { gap: 10px !important; padding: 11px 4px !important; font-size: 16px !important; }
+  .category-menu-option .category-menu-option-label { font-size: 16px !important; }
+}
+
+/* Remove decorative pseudo-elements that were rendering as stray lime marks in the bottom bar. */
+.bottom-nav-btn::before,
+.bottom-nav-btn::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* Keep the centered All button compact and avoid changing the category grid's row sizing. */
+.categories-section .categories-grid { position: relative !important; }
+.categories-section .categories-grid > .all-btn {
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 64px !important;
+  min-width: 64px !important;
+  max-width: 64px !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+  padding: 0 6px !important;
+  box-sizing: border-box !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+  word-break: normal !important;
+  z-index: 5 !important;
+}
+.categories-section .categories-grid > .all-btn::before,
+.categories-section .categories-grid > .all-btn::after { content: none !important; display: none !important; }
+

@@ -3917,3 +3917,17 @@ input:focus, select:focus, textarea:focus {
 .categories-section .categories-grid > .all-btn::before,
 .categories-section .categories-grid > .all-btn::after { content: none !important; display: none !important; }
 
+
+
+/* Final mobile banner sizing: compact height with both text lines readable. */
+@media screen and (max-width: 720px) {
+  .main-banner { height: 56px !important; min-height: 56px !important; max-height: 56px !important; padding: 3px 8px !important; box-sizing: border-box !important; }
+  .main-banner .banner-content { gap: 2px !important; justify-content: center !important; padding: 0 4px !important; }
+  .main-banner .banner-title { font-size: clamp(12px, 3.2vw, 17px) !important; line-height: 1.05 !important; margin: 0 !important; }
+  .main-banner .hero-text { font-size: clamp(9px, 2.3vw, 12px) !important; line-height: 1.1 !important; margin: 0 !important; }
+}
+@media screen and (max-width: 380px) {
+  .main-banner { height: 56px !important; min-height: 56px !important; max-height: 56px !important; }
+  .main-banner .banner-title { font-size: 12px !important; }
+  .main-banner .hero-text { font-size: 9px !important; }
+}

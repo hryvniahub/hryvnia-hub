@@ -3579,7 +3579,29 @@ input:focus, select:focus, textarea:focus {
   }
 }
 
-/* Retained additions for vehicle search/listing controls from the newer version. */
+/* HRYVNIA HUB — final banner position tweak only (2026-10-22).
+   Keep all wording, font sizes, and other page styles unchanged. */
+@media screen and (min-width: 721px) {
+  .main-banner .banner-title {
+    transform: translateY(3px) !important;
+  }
+  .main-banner .hero-text {
+    transform: translateY(-2px) !important;
+  }
+}
+
+@media screen and (max-width: 720px) {
+  .main-banner .banner-title {
+    transform: translateY(3px) !important;
+    margin-bottom: 0 !important;
+  }
+  .main-banner .hero-text {
+    transform: translateY(-4px) !important;
+    margin-top: -2px !important;
+    line-height: 1.08 !important;
+  }
+}
+
 /* Search category dropdown + vehicle filters, Hryvnia Hub */
 .search-input-row-stacked { grid-template-columns: minmax(0, 1fr); }
 .search-input-row-stacked > input, .search-input-row-stacked > button { width:100%; min-width:0; }
@@ -3612,40 +3634,169 @@ input:focus, select:focus, textarea:focus {
 .category-menu-option:hover,.category-menu-option:focus-visible { background:rgba(212,255,0,.1); }
 @media(max-width:520px) { .vehicle-listing-fields { grid-template-columns:1fr; gap:10px; padding:12px; } }
 
-/* HRYVNIA HUB — safe category menu row layout fix.
-   Keep the original Main category-card and banner sizing rules intact. */
-.category-menu-options {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  align-items: stretch;
-  width: 100%;
+
+/* HRYVNIA HUB — комплексная правка категорий и баннера (2026-10-22) */
+.categories-section .categories-grid {
+  align-items: stretch !important;
+  grid-auto-rows: 1fr !important;
 }
+.categories-section .categories-grid > .category-card:not(.all-btn) {
+  height: 100% !important;
+  min-height: 0 !important;
+  aspect-ratio: auto !important;
+  box-sizing: border-box !important;
+}
+.categories-section .categories-grid > .category-card:not(.all-btn) .category-card-img {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+.categories-section .categories-grid > .all-btn {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  box-sizing: border-box !important;
+}
+.category-menu-options { align-items: stretch !important; }
 .category-menu-option {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 12px;
-  width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
-  white-space: normal;
-}
-.category-menu-option .category-menu-icon {
-  flex: 0 0 28px;
-  width: 28px;
-  text-align: center;
+  display: grid !important;
+  grid-template-columns: 28px minmax(0,1fr) 18px !important;
+  align-items: center !important;
+  justify-content: initial !important;
+  gap: 10px !important;
+  width: 100% !important;
+  min-height: 48px !important;
+  text-align: left !important;
+  box-sizing: border-box !important;
 }
 .category-menu-option .category-menu-option-label {
-  display: block;
-  flex: 1 1 auto;
-  min-width: 0;
-  margin: 0;
-  overflow-wrap: break-word;
-  word-break: normal;
-  line-height: 1.25;
-  text-align: left;
+  display: block !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  text-align: left !important;
+  font-size: 16px !important;
+  line-height: 1.25 !important;
+  overflow-wrap: anywhere !important;
+  color: inherit !important;
 }
-.category-menu-option > span:last-child {
-  flex: 0 0 auto;
-  margin-left: auto;
+.category-menu-option > span:last-child { justify-self: end !important; margin-left: 0 !important; }
+.category-menu-option .category-menu-icon { width: 28px !important; text-align: center !important; }
+.category-menu-option.category-menu-back { border-bottom: 1px solid rgba(212,255,0,.22) !important; }
+.main-banner {
+  height: clamp(112px, 18vw, 190px) !important;
+  min-height: 112px !important;
+  max-height: 190px !important;
+  padding: 12px 18px !important;
+  box-sizing: border-box !important;
 }
+.main-banner .banner-content {
+  position: relative !important;
+  z-index: 2 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 100% !important;
+  padding: 0 8px !important;
+  box-sizing: border-box !important;
+  gap: 5px !important;
+}
+.main-banner .banner-title,
+.main-banner .hero-text {
+  position: static !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: none !important;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+  text-wrap: balance !important;
+  text-align: center !important;
+}
+.main-banner .banner-title { font-size: clamp(18px, 2.4vw, 32px) !important; line-height: 1.12 !important; }
+.main-banner .hero-text { font-size: clamp(12px, 1.25vw, 18px) !important; line-height: 1.25 !important; }
+@media screen and (max-width: 720px) {
+  .categories-section .categories-grid { grid-template-columns: repeat(2, minmax(0,1fr)) !important; grid-auto-rows: 104px !important; gap: 8px !important; }
+  .categories-section .categories-grid > .category-card:not(.all-btn) { min-height: 104px !important; height: 104px !important; }
+  .categories-section .categories-grid > .all-btn { min-height: 104px !important; height: 104px !important; }
+  .main-banner { height: clamp(112px, 31vw, 145px) !important; min-height: 112px !important; max-height: 145px !important; padding: 9px 10px !important; }
+  .main-banner .banner-content { gap: 5px !important; }
+  .main-banner .banner-title { font-size: clamp(16px, 4.4vw, 21px) !important; line-height: 1.15 !important; }
+  .main-banner .hero-text { font-size: clamp(11px, 3.1vw, 14px) !important; line-height: 1.22 !important; }
+  .category-menu-option .category-menu-option-label { font-size: 15px !important; }
+}
+@media screen and (max-width: 380px) {
+  .categories-section .categories-grid { grid-auto-rows: 94px !important; }
+  .categories-section .categories-grid > .category-card:not(.all-btn),
+  .categories-section .categories-grid > .all-btn { min-height: 94px !important; height: 94px !important; }
+  .main-banner { height: 112px !important; min-height: 112px !important; }
+  .main-banner .banner-title { font-size: 15px !important; }
+  .main-banner .hero-text { font-size: 11px !important; }
+}
+
+
+/* HRYVNIA HUB — restore compact mobile proportions and category controls */
+.category-select-trigger { min-height: 60px !important; height: 60px !important; box-sizing: border-box !important; }
+.category-select-trigger > span:last-child { color: #202a24 !important; font-size: 17px !important; font-weight: 400 !important; line-height: 1 !important; }
+.category-menu-options { min-width: 0 !important; width: 100% !important; }
+.category-menu-option { grid-template-columns: 28px minmax(0,1fr) 18px !important; }
+.category-menu-option-label { overflow-wrap: break-word !important; word-break: normal !important; }
+.category-menu-option.category-menu-back { display: none !important; }
+@media screen and (max-width: 720px) {
+  .categories-section .categories-grid { grid-auto-rows: 90px !important; gap: 8px !important; }
+  .categories-section .categories-grid > .category-card:not(.all-btn),
+  .categories-section .categories-grid > .all-btn { height: 90px !important; min-height: 90px !important; }
+  .main-banner { height: 90px !important; min-height: 90px !important; max-height: 90px !important; padding: 7px 10px !important; }
+  .main-banner .banner-content { gap: 3px !important; }
+  .main-banner .banner-title { font-size: clamp(15px, 3.6vw, 22px) !important; line-height: 1.1 !important; }
+  .main-banner .hero-text { font-size: clamp(10px, 2.4vw, 15px) !important; line-height: 1.15 !important; }
+}
+@media screen and (max-width: 380px) {
+  .categories-section .categories-grid { grid-auto-rows: 84px !important; }
+  .categories-section .categories-grid > .category-card:not(.all-btn),
+  .categories-section .categories-grid > .all-btn { height: 84px !important; min-height: 84px !important; }
+  .main-banner { height: 90px !important; min-height: 90px !important; max-height: 90px !important; }
+}
+
+
+/* Targeted Hryvnia Hub fixes: banner text spacing, category selector, compact dark-green menus. */
+.banner-content { display: flex; flex-direction: column; align-items: flex-start; gap: 9px; }
+.banner-title { margin: 0; line-height: 1.25; }
+.hero-text { margin: 0; line-height: 1.45; }
+
+.category-select-trigger { min-height: 48px; height: 48px; align-self: stretch; }
+.category-select-trigger > span:last-child { color: #17251d; font-size: 18px; line-height: 1; }
+
+.category-menu {
+  padding: 20px;
+  border: 1px solid #d4ff00;
+  border-radius: 16px;
+  background: #173b2b;
+  color: #fff;
+  box-shadow: 0 24px 70px rgba(0,0,0,.38);
+}
+.category-menu h2 { color: #fff; font-size: 20px; margin-bottom: 14px; }
+.category-menu-close { border-color: rgba(212,255,0,.55); color: #d4ff00; }
+.category-menu-options { gap: 6px; }
+.category-menu-option {
+  min-height: 46px;
+  padding: 10px 12px;
+  border: 0;
+  border-bottom: 1px solid rgba(212,255,0,.28);
+  border-radius: 6px;
+  background: transparent;
+  color: #fff;
+  font-size: 15px;
+}
+.category-menu-option:hover, .category-menu-option:focus-visible {
+  background: rgba(212,255,0,.10);
+  border-color: #d4ff00;
+}
+.category-menu-option span { color: #fff; font-size: 16px; }
+.category-menu-option .category-menu-icon { color: #d4ff00; font-size: 18px; }

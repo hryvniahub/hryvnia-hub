@@ -3578,3 +3578,74 @@ input:focus, select:focus, textarea:focus {
     line-height: 1.08 !important;
   }
 }
+
+/* Retained additions for vehicle search/listing controls from the newer version. */
+/* Search category dropdown + vehicle filters, Hryvnia Hub */
+.search-input-row-stacked { grid-template-columns: minmax(0, 1fr); }
+.search-input-row-stacked > input, .search-input-row-stacked > button { width:100%; min-width:0; }
+.category-select-trigger { display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:48px; padding:10px 16px; border:1px solid rgba(105,145,43,.55); border-radius:14px; background:var(--surface,#fff); color:var(--text,#20352b); font:inherit; text-align:left; cursor:pointer; }
+.category-select-trigger > span:last-child { color:var(--accent,#d4ff00); font-size:24px; line-height:1; }
+.category-menu-icon { flex:0 0 28px; color:var(--accent,#d4ff00); font-size:20px; }
+.vehicle-search-backdrop { position:fixed; inset:0; z-index:1001; background:rgba(8,18,13,.48); backdrop-filter:blur(8px) saturate(115%); }
+.vehicle-search-menu { position:fixed; z-index:1002; left:50%; top:50%; transform:translate(-50%,-50%); width:min(92vw,560px); max-height:84dvh; overflow:auto; padding:24px; border:1px solid rgba(212,255,0,.45); border-radius:22px; background:rgba(18,39,29,.96); color:#f7f9f5; box-shadow:0 24px 80px rgba(0,0,0,.38); }
+.vehicle-search-menu h2 { margin:0 40px 5px 0; font-size:24px; }
+.vehicle-search-intro { margin:0 0 18px; color:rgba(247,249,245,.72); }
+.vehicle-search-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.vehicle-search-grid label { display:grid; gap:6px; color:#f7f9f5; font-size:14px; font-weight:650; }
+.vehicle-search-grid input,.vehicle-search-grid select { width:100%; min-width:0; min-height:44px; padding:9px 10px; border:1px solid rgba(212,255,0,.38); border-radius:10px; background:rgba(255,255,255,.96); color:#20352b; font:inherit; font-weight:400; }
+.vehicle-search-actions { display:flex; gap:10px; margin-top:18px; }
+.vehicle-search-actions button { flex:1; min-height:46px; border-radius:12px; font:inherit; font-weight:700; cursor:pointer; }
+.vehicle-reset-btn { border:1px solid rgba(255,255,255,.28); background:transparent; color:#f7f9f5; }
+@media(max-width:520px) { .vehicle-search-menu { padding:20px 16px; max-height:82dvh; } .vehicle-search-grid { gap:10px; } .vehicle-search-grid label { font-size:12px; } .vehicle-search-grid input,.vehicle-search-grid select { font-size:14px; } }
+
+/* Vehicle listing fields: reuse the existing light form design. */
+.vehicle-listing-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:8px 0 14px; padding:14px; border:1px solid var(--accent-border, #cbdba8); border-radius:14px; }
+.vehicle-listing-fields[hidden] { display:none !important; }
+.vehicle-listing-fields legend { padding:0 7px; font-weight:750; color:var(--text,#20352b); }
+.vehicle-listing-fields label { display:grid; gap:6px; min-width:0; }
+.vehicle-listing-fields input,.vehicle-listing-fields select { width:100%; min-width:0; box-sizing:border-box; }
+.search-input-row-stacked { display:flex; flex-direction:column; gap:8px; }
+.search-input-row-stacked #searchInput,.search-input-row-stacked #categorySelectTrigger,.search-input-row-stacked #searchBtn { width:100%; }
+.category-menu { background:rgba(18,39,29,.97); color:#f7f9f5; border:1px solid rgba(212,255,0,.42); box-shadow:0 24px 80px rgba(0,0,0,.38); backdrop-filter:blur(16px); }
+.category-menu h2 { color:#f7f9f5; }
+.category-menu-option { color:#f7f9f5; }
+.category-menu-option:hover,.category-menu-option:focus-visible { background:rgba(212,255,0,.1); }
+@media(max-width:520px) { .vehicle-listing-fields { grid-template-columns:1fr; gap:10px; padding:12px; } }
+
+/* HRYVNIA HUB — safe category menu row layout fix.
+   Keep the original Main category-card and banner sizing rules intact. */
+.category-menu-options {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: stretch;
+  width: 100%;
+}
+.category-menu-option {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  white-space: normal;
+}
+.category-menu-option .category-menu-icon {
+  flex: 0 0 28px;
+  width: 28px;
+  text-align: center;
+}
+.category-menu-option .category-menu-option-label {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: break-word;
+  word-break: normal;
+  line-height: 1.25;
+  text-align: left;
+}
+.category-menu-option > span:last-child {
+  flex: 0 0 auto;
+  margin-left: auto;
+}

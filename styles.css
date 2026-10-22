@@ -4142,3 +4142,128 @@ input:focus, select:focus, textarea:focus {
     height: 24px;
   }
 }
+
+
+/* ============================================================
+   HRYVNIA HUB — banner refinement + multilingual business label
+   Keep the existing banner dimensions; improve text and icons only.
+   ============================================================ */
+
+/* Keep “Business” at the normal size and reduce only its final word. */
+.category-card[data-category="Готовый бизнес"] .category-card-label {
+  gap: 5px !important;
+  white-space: nowrap !important;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+.category-card[data-category="Готовый бизнес"] .category-icon {
+  flex: 0 0 21px !important;
+  width: 21px !important;
+  height: 21px !important;
+}
+.category-card-long-word {
+  display: inline-block !important;
+  flex: 0 1 auto !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  font-size: 0.70em !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  letter-spacing: -0.025em !important;
+  white-space: nowrap !important;
+  overflow-wrap: normal !important;
+}
+
+/* The banner stays the same height. Remove the heavy dark overlay so the
+   background artwork and lime category symbols are easier to see. */
+.main-banner::before {
+  background: linear-gradient(180deg, rgba(15, 20, 28, 0.015) 0%, rgba(15, 20, 28, 0.12) 100%) !important;
+}
+.main-banner {
+  isolation: isolate;
+}
+.main-banner .main-banner-img {
+  filter: brightness(1.10) saturate(1.08) !important;
+}
+.main-banner .banner-content {
+  z-index: 2 !important;
+  padding-bottom: 13px !important;
+  gap: 2px !important;
+}
+.main-banner .banner-title {
+  font-size: clamp(19px, 2.8vw, 32px) !important;
+  line-height: 1.08 !important;
+  margin: 0 !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45) !important;
+}
+.main-banner .hero-text {
+  font-size: clamp(12px, 1.35vw, 17px) !important;
+  line-height: 1.12 !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45) !important;
+}
+.main-banner .banner-icons {
+  position: absolute !important;
+  z-index: 3 !important;
+  left: 8% !important;
+  right: 8% !important;
+  bottom: 3px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-around !important;
+  gap: 8px !important;
+  height: 13px !important;
+  pointer-events: none !important;
+}
+.main-banner .banner-icon {
+  display: block !important;
+  flex: 0 0 15px !important;
+  width: 15px !important;
+  height: 15px !important;
+  min-width: 15px !important;
+  color: #d4ff00 !important;
+  opacity: 1 !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35)) !important;
+}
+@media screen and (max-width: 720px) {
+  /* Do not set height/min-height here: preserve the existing mobile banner height. */
+  .main-banner .banner-content {
+    padding: 0 5px 13px !important;
+    gap: 2px !important;
+  }
+  .main-banner .banner-title {
+    font-size: clamp(15px, 4.0vw, 19px) !important;
+    line-height: 1.04 !important;
+  }
+  .main-banner .hero-text {
+    font-size: clamp(10px, 2.75vw, 13px) !important;
+    line-height: 1.06 !important;
+  }
+  .main-banner .banner-icons {
+    left: 8% !important;
+    right: 8% !important;
+    bottom: 2px !important;
+    height: 11px !important;
+    gap: 6px !important;
+  }
+  .main-banner .banner-icon {
+    flex-basis: 13px !important;
+    width: 13px !important;
+    height: 13px !important;
+    min-width: 13px !important;
+  }
+  .category-card[data-category="Готовый бизнес"] .category-card-label {
+    gap: 4px !important;
+  }
+  .category-card[data-category="Готовый бизнес"] .category-icon {
+    flex-basis: 19px !important;
+    width: 19px !important;
+    height: 19px !important;
+  }
+  .category-card-long-word { font-size: 0.66em !important; }
+}
+@media screen and (max-width: 380px) {
+  .main-banner .banner-title { font-size: 15px !important; }
+  .main-banner .hero-text { font-size: 10px !important; }
+  .main-banner .banner-content { padding-bottom: 12px !important; }
+  .category-card-long-word { font-size: 0.62em !important; }
+}

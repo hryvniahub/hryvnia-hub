@@ -129,25 +129,27 @@
   <div class="modal hidden" id="messagesModal" role="dialog" aria-modal="true" aria-labelledby="messagesTitle"><div class="modal-card messages-card"><button class="modal-close" id="closeMessages" type="button" aria-label="Закрыть">×</button><h2 id="messagesTitle" data-i18n="Сообщения">Сообщения</h2><div id="messagesContent"><p class="muted" id="messagesGuestHint">Войдите, чтобы видеть сообщения.</p><div id="conversationsList" class="conversations-list hidden"></div><div id="messagesThread" class="messages-thread hidden"><button class="link-btn" id="backToConvs" type="button">← К списку</button><div id="threadMessages" class="thread-messages"></div><form id="sendMessageForm" class="send-message-form"><input type="text" name="body" placeholder="Ваше сообщение..." required maxlength="2000" autocomplete="off"><button class="btn btn-primary" type="submit">Отправить</button></form></div></div></div></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="app.js"></script>
   <script>
-    // Keep the final word of the long business-category label smaller in every language.
+    // Keep only the final word of the business-category label smaller in every language.
     (() => {
       const selector = '.category-card[data-category="Готовый бизнес"] .category-card-label > span[data-i18n]';
       const fitFinalWord = (target) => {
-        if (!target || target.querySelector('.category-card-long-word')) return;
+        if (!target) return;
         const text = target.textContent.trim().replace(/\s+/g, ' ');
         const splitAt = text.lastIndexOf(' ');
         if (splitAt < 1 || splitAt === text.length - 1) return;
         const prefix = text.slice(0, splitAt);
         const finalWord = text.slice(splitAt + 1);
+        const current = target.querySelector('.category-card-long-word');
+        if (current && target.childNodes.length === 2 && target.childNodes[1] === current && current.textContent === finalWord && target.childNodes[0].textContent === prefix + ' ') return;
         const smallWord = document.createElement('span');
         smallWord.className = 'category-card-long-word';
         smallWord.textContent = finalWord;
         target.replaceChildren(document.createTextNode(prefix + ' '), smallWord);
       };
+      const target = document.querySelector(selector);
       const apply = () => fitFinalWord(document.querySelector(selector));
       apply();
-      const target = document.querySelector(selector);
-      if (target) new MutationObserver(() => fitFinalWord(target)).observe(target, { childList: true, characterData: true, subtree: true });
+      if (target) new MutationObserver(() => apply()).observe(target, { childList: true, characterData: true, subtree: true });
     })();
   </script>
 </body>

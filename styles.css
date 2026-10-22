@@ -378,3 +378,91 @@ input:focus, select:focus { border-color: var(--accent-border); }
   .urgent-deals-grid { grid-template-columns: 1fr; gap: 10px; }
   .listing { grid-template-columns: 1fr; }
 }
+/* ============================================================
+   HRYVNIA HUB — ВОССТАНОВЛЕНИЕ ДИЗАЙНА МОДАЛОК И ФОРМ
+   (Добавить в конец файла, чтобы вернуть дизайн старым формам)
+   ============================================================ */
+
+/* --- Общие стили модальных окон --- */
+.modal { position: fixed; inset: 0; background: rgba(8, 10, 14, 0.56); display: grid; place-items: center; padding: 20px; z-index: 60; backdrop-filter: blur(2px); }
+.modal-card { position: relative; width: min(540px, 100%); max-height: 90dvh; overflow: auto; background: #fff; border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-lg); }
+.modal-card h2 { margin-bottom: 18px; }
+.modal-card label { display: block; font-weight: 700; margin-bottom: 12px; font-size: 14px; }
+.modal-card label input, .modal-card label select, .modal-card label textarea { margin-top: 6px; font-weight: 400; }
+.modal-close { position: absolute; right: 12px; top: 10px; border: 0; background: none; font-size: 28px; cursor: pointer; line-height: 1; color: var(--muted); padding: 4px 8px; border-radius: 8px; }
+.modal-close:hover { background: #f3f4f7; color: var(--text); }
+.form-message { min-height: 18px; color: var(--muted); font-size: 13px; margin: 8px 0 0; }
+.form-message.error { color: #c62828; }
+.form-message.success { color: #247a36; }
+
+/* --- Поля ввода и кнопки (уточнение) --- */
+input, select, textarea {
+  width: 100%; border: 2px solid var(--accent-input); border-radius: 10px; padding: 11px 12px;
+  background: #fff; color: var(--text); font: inherit; font-size: 14px; outline: none; min-width: 0;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--accent-border); box-shadow: 0 0 0 3px rgba(212, 255, 0, 0.3); }
+.btn { border: 0; border-radius: 10px; padding: 11px 16px; font: inherit; font-weight: 700; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; transition: background 0.15s, transform 0.05s, box-shadow 0.15s; }
+.btn:active { transform: translateY(1px); }
+.btn-primary { background: var(--accent); color: #12140a; box-shadow: 0 4px 14px rgba(160, 190, 0, 0.35); }
+.btn-primary:hover { background: var(--accent-hover); }
+.full { width: 100%; }
+
+/* --- Авторизация (Вкладки и пароли) --- */
+.auth-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 16px; }
+.auth-tab { min-width: 0; min-height: 46px; border: 2px solid #c6ff00; border-radius: 10px; background: #fff; color: #203b31; font: inherit; font-weight: 700; cursor: pointer; }
+.auth-tab.active { background: #c6ff00; color: #17210a; }
+.auth-tab[data-auth-tab="register"] { background: #D4FF00; border-color: #7fa800; color: #17210a; }
+.auth-tab[data-auth-tab="login"] { background: #ffffff; border-color: #9abf24; color: #17210a; }
+.password-field { position: relative; display: block; }
+.password-field > input { padding-right: 44px; }
+.password-toggle { position: absolute; top: 50%; right: 6px; transform: translateY(-50%); width: 34px; height: 34px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--muted); font-size: 16px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+.password-toggle:hover { background: #f3f4f7; }
+#authModal .auth-card { border: 1px solid #75a983; box-shadow: 0 12px 34px rgba(32, 72, 42, .12); }
+
+/* --- Форма добавления (Фото и характеристики авто) --- */
+.photo-fields { min-width: 0; margin: 0 0 14px; padding: 14px; border: 1px solid var(--line); border-radius: 12px; display: block; }
+.photo-fields legend { font-weight: 700; padding: 0 6px; font-size: 14px; }
+.photo-preview { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.photo-item { min-width: 0; border: 1px solid var(--line); border-radius: 10px; padding: 8px; }
+.photo-item img { width: 100%; height: 110px; object-fit: cover; border-radius: 6px; }
+.photo-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.photo-actions .btn { padding: 6px 8px; font-size: 12px; }
+.vehicle-listing-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 8px 0 14px; padding: 14px; border: 1px solid var(--accent-border); border-radius: 14px; }
+.vehicle-listing-fields[hidden] { display: none !important; }
+
+/* --- Меню категорий (Темная стеклянная тема) --- */
+.category-menu-backdrop { position: fixed; inset: 0; z-index: 999; background: rgba(8, 18, 13, .46); backdrop-filter: blur(8px); }
+.category-menu { position: fixed; z-index: 1000; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(92vw, 430px); max-height: min(82dvh, 620px); overflow: auto; padding: 20px; border-radius: 22px; background: rgba(18, 39, 29, .96); color: #f7f9f5; box-shadow: 0 24px 80px rgba(0,0,0,.28); }
+.category-menu h2 { margin: 0 34px 18px 0; font-size: 22px; color: #fff; }
+.category-menu-close { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border: 1px solid rgba(255, 255, 255, .22); border-radius: 50%; background: rgba(255, 255, 255, .07); color: #f7f9f5; font-size: 24px; cursor: pointer; }
+.category-menu-options { display: flex; flex-direction: column; width: 100%; }
+.category-menu-option { display: flex; align-items: center; justify-content: flex-start; gap: 12px; width: 100%; padding: 12px 8px; border: 0; border-bottom: 1px solid rgba(255, 255, 255, .16); background: transparent; color: #f7f9f5; text-align: left; font-size: 16px; cursor: pointer; }
+.category-menu-option:hover { background: rgba(212, 255, 0, .07); color: var(--accent); }
+.category-menu-option span:last-child { margin-left: auto; color: var(--accent); }
+.category-menu-icon { flex: 0 0 28px; width: 28px; text-align: center; color: var(--accent); }
+
+/* --- Выпадающие подсказки городов --- */
+.city-search, .catalog-city-search { position: relative; min-width: 0; }
+.city-suggestions, .catalog-city-suggestions { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 25; max-height: 240px; overflow: auto; padding: 4px; background: #fff; border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
+.city-suggestion, .catalog-city-suggestion { display: block; width: 100%; padding: 10px 12px; border: 0; border-radius: 8px; background: transparent; color: var(--text); font: inherit; text-align: left; cursor: pointer; }
+.city-suggestion:hover, .catalog-city-suggestion:hover { background: #f3f4f7; }
+
+/* --- Избранное (Сердечки) --- */
+.fav-btn { position: absolute; top: 10px; right: 10px; width: 36px; height: 36px; border-radius: 50%; background: rgba(255, 255, 255, .94); border: 1.5px solid #dce3df; color: #6b7570; font-size: 18px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; z-index: 3; }
+.fav-btn.active { color: #d4381e; border-color: #f0b8ad; background: #fff0ed; }
+
+/* --- Сообщения (Чаты) --- */
+.conversations-list { display: flex; flex-direction: column; gap: 8px; max-height: 62dvh; overflow: auto; padding: 2px; }
+.conversation-card { display: grid; grid-template-columns: 40px 1fr auto; align-items: center; gap: 10px; width: 100%; padding: 12px; border: 1px solid #dce3df; border-radius: 12px; background: #ffffff; cursor: pointer; }
+.conversation-card.is-unread { background: #f6ffdb; border-color: #a4c454; }
+.conv-icon { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 10px; background: #eaf3d8; color: #355320; font-size: 18px; }
+.thread-messages { display: flex; flex-direction: column; gap: 6px; max-height: 55dvh; overflow-y: auto; padding: 10px; background: #f6f8f3; border-radius: 10px; }
+.bubble { max-width: 78%; padding: 8px 12px; border-radius: 14px; font-size: 14px; line-height: 1.35; }
+.bubble-mine { align-self: flex-end; background: #c6ff00; color: #17210a; border-bottom-right-radius: 4px; }
+.bubble-theirs { align-self: flex-start; background: #ffffff; color: var(--text); border: 1px solid #dce3df; border-bottom-left-radius: 4px; }
+.send-message-form { display: flex; gap: 6px; margin-top: 6px; }
+
+/* --- Нижняя навигация (Иконки) --- */
+.bottom-nav-btn .bottom-nav-icon { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; color: #d4ff00; }
+.nav-badge { position: absolute; top: 2px; right: calc(50% - 26px); min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: #ff4d3d; color: #ffffff; font-size: 10.5px; font-weight: 800; line-height: 18px; text-align: center; box-shadow: 0 0 0 2px #203b31; }

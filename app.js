@@ -106,10 +106,12 @@ const translations = {
   "Куплю автомобиль": { ru: "Куплю автомобиль", uk: "Куплю автомобіль", en: "Buy a car", pl: "Kupię samochód" },
   "Арендую автомобиль": { ru: "Арендую автомобиль", uk: "Орендую автомобіль", en: "Rent a car", pl: "Wynajmę samochód" },
   "Обменяю автомобиль": { ru: "Обменяю автомобиль", uk: "Обміняю автомобіль", en: "Exchange a car", pl: "Zamienię samochód" },
-  "Куплю недвижимость": { ru: "Куплю недвижимость", uk: "Куплю нерухомість", en: "Buy property", pl: "Kupię nieruchomość" },
-  "Арендую недвижимость": { ru: "Арендую недвижимость", uk: "Орендую нерухомість", en: "Rent property", pl: "Wynajmę nieruchomość" },
-  "Куплю бизнес": { ru: "Куплю бизнес", uk: "Куплю бізнес", en: "Buy a business", pl: "Kupię firmę" },
-  "Продам бизнес": { ru: "Продам бизнес", uk: "Продам бізнес", en: "Sell a business", pl: "Sprzedam firmę" },
+  "Купівля": { ru: "Покупка", uk: "Купівля", en: "Buying", pl: "Kupno" },
+  "Оренда": { ru: "Аренда", uk: "Оренда", en: "Renting", pl: "Wynajem" },
+  "Куплю готовый бизнес": { ru: "Куплю готовый бизнес", uk: "Куплю готовий бізнес", en: "Buy an existing business", pl: "Kupię działającą firmę" },
+  "Продам готовый бизнес": { ru: "Продам готовый бизнес", uk: "Продам готовий бізнес", en: "Sell an existing business", pl: "Sprzedam działającą firmę" },
+  "Ищу бизнес-партнёра": { ru: "Ищу бизнес-партнёра", uk: "Шукаю бізнес-партнера", en: "Looking for a business partner", pl: "Szukam partnera biznesowego" },
+  "Услуги": { ru: "Услуги", uk: "Послуги", en: "Services", pl: "Usługi" },
   "Ищу бизнес-партнёра": { ru: "Ищу бизнес-партнёра", uk: "Шукаю бізнес-партнера", en: "Looking for a business partner", pl: "Szukam partnera biznesowego" },
   "Услуги": { ru: "Услуги", uk: "Послуги", en: "Services", pl: "Usługi" },
   "Ищу инвестора": { ru: "Ищу инвестора", uk: "Шукаю інвестора", en: "Looking for an investor", pl: "Szukam inwestora" },
@@ -2227,8 +2229,8 @@ async function loadListings() {
 
 const categorySubcategories = {
   "Автомобили": ["Купівля автомобіля", "Оренда автомобіля"],
-  "Недвижимость": ["Куплю недвижимость", "Продам недвижимость", "Арендую недвижимость", "Сдам недвижимость"],
-  "Готовый бизнес": ["Куплю готовый бизнес", "Продам готовый бизнес", "Ищу партнёра", "Предложу партнёрство"],
+  "Недвижимость": ["Купівля", "Оренда"],
+  "Готовый бизнес": ["Куплю готовый бизнес", "Продам готовый бизнес", "Ищу бизнес-партнёра", "Услуги"],
   "Инвестиции": ["Ищу инвестора", "Стану инвестором", "Стартапы"]
 };
 const categoryMenu = document.getElementById("categoryMenu");

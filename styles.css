@@ -4400,38 +4400,13 @@ input:focus, select:focus, textarea:focus {
 }
 
 
-/* HRYVNIA HUB — balanced final correction: exactly four banner symbols from the artwork */
-/* The background artwork already contains the four lime symbols. Hide the duplicate SVG overlay. */
-.main-banner .banner-icons {
-  display: none !important;
-}
-/* Keep the banner image's original four lime symbols bright without adding another icon row. */
-.main-banner .main-banner-img {
-  filter: brightness(1.12) saturate(1.14) !important;
-}
-.main-banner::before {
-  background: linear-gradient(180deg, rgba(8, 16, 24, 0.01) 0%, rgba(8, 16, 24, 0.10) 100%) !important;
-}
-/* Slightly increase the final word from the previous overly small setting. */
-.category-card[data-category="Готовый бизнес"] .category-card-long-word {
-  font-size: 0.70em !important;
-  letter-spacing: -0.025em !important;
-  font-weight: 800 !important;
-  white-space: nowrap !important;
-}
-@media screen and (max-width: 720px) {
-  .category-card[data-category="Готовый бизнес"] .category-card-long-word {
-    font-size: 0.68em !important;
-  }
-}
-@media screen and (max-width: 380px) {
-  .category-card[data-category="Готовый бизнес"] .category-card-long-word {
-    font-size: 0.64em !important;
-  }
-}
+/* ============================================================
+   HRYVNIA HUB — CONSOLIDATED FINAL BANNER RULES
+   The four icons are HTML/SVG overlays; the background image is clean.
+   Keep existing banner dimensions and all other page layouts unchanged.
+   ============================================================ */
 
-/* HRYVNIA HUB — balanced icon sizing and banner readability refinement */
-/* Keep all four category icons on one visual size standard, matching Investments. */
+/* Standardize category icon sizes without changing card dimensions. */
 .category-card .category-icon {
   flex: 0 0 23px !important;
   width: 23px !important;
@@ -4441,15 +4416,18 @@ input:focus, select:focus, textarea:focus {
   flex: 0 0 23px !important;
   width: 23px !important;
   height: 23px !important;
+  transform: translateX(6px) !important;
 }
 .category-card[data-category="Готовый бизнес"] .category-card-long-word {
   font-size: 0.72em !important;
   letter-spacing: -0.025em !important;
+  font-weight: 800 !important;
+  white-space: nowrap !important;
 }
 @media screen and (max-width: 720px) {
   .category-card .category-icon,
   .category-card[data-category="Готовый бизнес"] .category-icon {
-    flex: 0 0 23px !important;
+    flex-basis: 23px !important;
     width: 23px !important;
     height: 23px !important;
   }
@@ -4469,22 +4447,7 @@ input:focus, select:focus, textarea:focus {
   }
 }
 
-/* Darken the upper and middle banner slightly for white-text contrast;
-   leave the lower icon strip and artwork bright and unchanged. */
-.main-banner::before {
-  background: linear-gradient(
-    180deg,
-    rgba(8, 16, 24, 0.24) 0%,
-    rgba(8, 16, 24, 0.17) 42%,
-    rgba(8, 16, 24, 0.07) 66%,
-    rgba(8, 16, 24, 0) 82%,
-    rgba(8, 16, 24, 0) 100%
-  ) !important;
-}
-
-
-/* HRYVNIA HUB — final alignment pass: category labels and centered banner icons */
-/* Desktop: give the real-estate label a little more room and nudge the icon/text left. */
+/* Desktop: give the real-estate label slightly more room. */
 @media screen and (min-width: 721px) {
   .category-card[data-category="Недвижимость"] .category-card-label {
     gap: 5px !important;
@@ -4501,14 +4464,7 @@ input:focus, select:focus, textarea:focus {
   }
 }
 
-/* Mobile: move only the briefcase slightly toward the business label. */
-@media screen and (max-width: 720px) {
-  .category-card[data-category="Готовый бизнес"] .category-icon {
-    transform: translateX(6px) !important;
-  }
-}
-
-/* Four lime SVG icons in one centered row. Keep the existing banner height. */
+/* Banner: exactly four lime SVG icons in one centered row. */
 .main-banner .banner-icons {
   position: absolute !important;
   left: 50% !important;
@@ -4516,12 +4472,15 @@ input:focus, select:focus, textarea:focus {
   bottom: 7px !important;
   transform: translateX(-50%) !important;
   display: flex !important;
+  flex-direction: row !important;
   align-items: center !important;
   justify-content: center !important;
   gap: clamp(13px, 2.1vw, 24px) !important;
   width: max-content !important;
   max-width: calc(100% - 24px) !important;
   height: 22px !important;
+  margin: 0 !important;
+  padding: 0 !important;
   z-index: 4 !important;
   pointer-events: none !important;
 }
@@ -4533,21 +4492,20 @@ input:focus, select:focus, textarea:focus {
   min-width: 21px !important;
   color: #d4ff00 !important;
   opacity: 1 !important;
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,.55)) !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55)) !important;
 }
 .main-banner .banner-content {
   padding-bottom: 25px !important;
 }
 
-/* Darken the upper and middle background just enough for white text; keep the
-   lower band clear so the lime icon row remains vivid. */
+/* Slight top/middle darkening for readable white text; fade out before the icon row. */
 .main-banner::before {
   background: linear-gradient(
     180deg,
-    rgba(8, 16, 24, 0.28) 0%,
-    rgba(8, 16, 24, 0.22) 38%,
-    rgba(8, 16, 24, 0.13) 62%,
-    rgba(8, 16, 24, 0.025) 82%,
+    rgba(8, 16, 24, 0.27) 0%,
+    rgba(8, 16, 24, 0.20) 38%,
+    rgba(8, 16, 24, 0.11) 61%,
+    rgba(8, 16, 24, 0.02) 80%,
     rgba(8, 16, 24, 0) 100%
   ) !important;
 }
@@ -4573,10 +4531,10 @@ input:focus, select:focus, textarea:focus {
   .main-banner::before {
     background: linear-gradient(
       180deg,
-      rgba(8, 16, 24, 0.30) 0%,
-      rgba(8, 16, 24, 0.23) 40%,
-      rgba(8, 16, 24, 0.13) 64%,
-      rgba(8, 16, 24, 0.025) 83%,
+      rgba(8, 16, 24, 0.29) 0%,
+      rgba(8, 16, 24, 0.21) 40%,
+      rgba(8, 16, 24, 0.10) 64%,
+      rgba(8, 16, 24, 0.015) 83%,
       rgba(8, 16, 24, 0) 100%
     ) !important;
   }

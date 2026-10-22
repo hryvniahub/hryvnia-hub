@@ -3741,84 +3741,98 @@ input:focus, select:focus, textarea:focus {
 }
 
 
-/* HRYVNIA HUB — restore category card proportions and compact All button (2026-10-22).
-   Overrides the accidental full-grid sizing added in the previous patch. */
-.categories-section .categories-grid {
-  position: relative !important;
-  display: grid !important;
-  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-  grid-auto-rows: auto !important;
-  align-items: stretch !important;
-  gap: 12px !important;
+/* HRYVNIA HUB — corrective mobile layout patch (2026-10-22)
+   Fix category modal's collapsed text column; restore compact category cards/banner.
+   Keep the existing All button size and position. */
+.category-menu {
+  width: min(92vw, 460px) !important;
+  max-width: calc(100vw - 28px) !important;
+  box-sizing: border-box !important;
+  overflow-x: hidden !important;
 }
-.categories-section .categories-grid > .category-card:not(.all-btn) {
-  position: relative !important;
+.category-menu-options {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
   width: 100% !important;
-  height: auto !important;
-  min-height: 0 !important;
-  aspect-ratio: 1.75 / 1 !important;
-  padding: 14px !important;
+  min-width: 0 !important;
   box-sizing: border-box !important;
 }
-.categories-section .categories-grid > .category-card:not(.all-btn) .category-card-img {
-  position: absolute !important;
-  inset: 0 !important;
+.category-menu-option {
+  display: grid !important;
+  grid-template-columns: 28px minmax(0, 1fr) 18px !important;
   width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  gap: 10px !important;
+  align-items: center !important;
+  justify-content: initial !important;
+  box-sizing: border-box !important;
+  white-space: normal !important;
 }
-.categories-section .categories-grid > .all-btn {
-  position: absolute !important;
-  left: 50% !important;
-  top: 50% !important;
-  transform: translate(-50%, -50%) !important;
-  width: 56px !important;
-  min-width: 56px !important;
-  height: 56px !important;
-  min-height: 56px !important;
-  padding: 0 !important;
-  aspect-ratio: 1 / 1 !important;
-  border-radius: 50% !important;
-  font-size: 11px !important;
-  line-height: 1 !important;
-  z-index: 5 !important;
+.category-menu-option .category-menu-option-label {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  white-space: normal !important;
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+  text-align: left !important;
 }
-.main-banner {
-  height: auto !important;
-  min-height: 150px !important;
-  max-height: none !important;
-  aspect-ratio: 4.6 / 1 !important;
-  padding: 14px 18px !important;
-}
+.category-menu-option .category-menu-icon { width: 28px !important; min-width: 28px !important; }
+.category-menu-option > span:last-child { min-width: 18px !important; }
+
 @media screen and (max-width: 720px) {
   .categories-section .categories-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    grid-auto-rows: auto !important;
-    gap: 8px !important;
+    grid-auto-rows: 84px !important;
+    gap: 7px !important;
+    align-items: stretch !important;
   }
   .categories-section .categories-grid > .category-card:not(.all-btn) {
-    aspect-ratio: 1.75 / 1 !important;
-    height: auto !important;
-    min-height: 0 !important;
-    padding: 10px !important;
+    width: 100% !important;
+    height: 84px !important;
+    min-height: 84px !important;
+    aspect-ratio: auto !important;
   }
   .categories-section .categories-grid > .all-btn {
-    width: 56px !important; min-width: 56px !important;
-    height: 56px !important; min-height: 56px !important;
-    border-radius: 50% !important; font-size: 11px !important;
+    width: 52px !important;
+    min-width: 52px !important;
+    height: 52px !important;
+    min-height: 52px !important;
+    border-radius: 50% !important;
+    padding: 2px !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
   }
   .main-banner {
-    aspect-ratio: 3.8 / 1 !important;
+    height: 112px !important;
     min-height: 112px !important;
-    height: auto !important;
-    max-height: none !important;
-    padding: 10px 12px !important;
+    max-height: 112px !important;
+    padding: 10px 12px 26px !important;
   }
+  .main-banner .banner-content { gap: 4px !important; }
+  .main-banner .banner-title { font-size: clamp(15px, 4.1vw, 18px) !important; line-height: 1.1 !important; }
+  .main-banner .hero-text { font-size: clamp(10px, 2.9vw, 12px) !important; line-height: 1.15 !important; }
+  .category-menu {
+    left: 50% !important;
+    top: 50% !important;
+    width: calc(100vw - 36px) !important;
+    max-width: 460px !important;
+    max-height: 78dvh !important;
+    padding: 18px 16px !important;
+    transform: translate(-50%, -50%) !important;
+  }
+  .category-menu-option { grid-template-columns: 28px minmax(0, 1fr) 18px !important; gap: 8px !important; min-height: 48px !important; }
+  .category-menu-option .category-menu-option-label { font-size: 15px !important; line-height: 1.3 !important; }
 }
 @media screen and (max-width: 380px) {
-  .categories-section .categories-grid > .all-btn {
-    width: 50px !important; min-width: 50px !important;
-    height: 50px !important; min-height: 50px !important;
-  }
-  .main-banner { aspect-ratio: 3.5 / 1 !important; min-height: 108px !important; }
+  .categories-section .categories-grid { grid-auto-rows: 78px !important; }
+  .categories-section .categories-grid > .category-card:not(.all-btn) { height: 78px !important; min-height: 78px !important; }
+  .main-banner { height: 106px !important; min-height: 106px !important; max-height: 106px !important; }
+  .category-menu { width: calc(100vw - 28px) !important; padding: 16px 13px !important; }
+  .category-menu-option { grid-template-columns: 24px minmax(0, 1fr) 16px !important; gap: 7px !important; }
+  .category-menu-option .category-menu-option-label { font-size: 14px !important; }
 }

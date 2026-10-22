@@ -4429,3 +4429,55 @@ input:focus, select:focus, textarea:focus {
     font-size: 0.64em !important;
   }
 }
+
+/* HRYVNIA HUB — balanced icon sizing and banner readability refinement */
+/* Keep all four category icons on one visual size standard, matching Investments. */
+.category-card .category-icon {
+  flex: 0 0 23px !important;
+  width: 23px !important;
+  height: 23px !important;
+}
+.category-card[data-category="Готовый бизнес"] .category-icon {
+  flex: 0 0 23px !important;
+  width: 23px !important;
+  height: 23px !important;
+}
+.category-card[data-category="Готовый бизнес"] .category-card-long-word {
+  font-size: 0.72em !important;
+  letter-spacing: -0.025em !important;
+}
+@media screen and (max-width: 720px) {
+  .category-card .category-icon,
+  .category-card[data-category="Готовый бизнес"] .category-icon {
+    flex: 0 0 23px !important;
+    width: 23px !important;
+    height: 23px !important;
+  }
+  .category-card[data-category="Готовый бизнес"] .category-card-long-word {
+    font-size: 0.70em !important;
+  }
+}
+@media screen and (max-width: 380px) {
+  .category-card .category-icon,
+  .category-card[data-category="Готовый бизнес"] .category-icon {
+    flex-basis: 21px !important;
+    width: 21px !important;
+    height: 21px !important;
+  }
+  .category-card[data-category="Готовый бизнес"] .category-card-long-word {
+    font-size: 0.66em !important;
+  }
+}
+
+/* Darken the upper and middle banner slightly for white-text contrast;
+   leave the lower icon strip and artwork bright and unchanged. */
+.main-banner::before {
+  background: linear-gradient(
+    180deg,
+    rgba(8, 16, 24, 0.24) 0%,
+    rgba(8, 16, 24, 0.17) 42%,
+    rgba(8, 16, 24, 0.07) 66%,
+    rgba(8, 16, 24, 0) 82%,
+    rgba(8, 16, 24, 0) 100%
+  ) !important;
+}

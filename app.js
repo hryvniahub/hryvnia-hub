@@ -2223,7 +2223,10 @@ async function loadListings() {
 }
 
 const categorySubcategories = {
-  "Автомобили": [], "Недвижимость": [], "Готовый бизнес": [], "Инвестиции": []
+  "Автомобили": ["Куплю автомобиль", "Продам автомобиль", "Арендую автомобиль", "Сдам автомобиль", "Обменяю автомобиль"],
+  "Недвижимость": ["Куплю недвижимость", "Продам недвижимость", "Арендую недвижимость", "Сдам недвижимость"],
+  "Готовый бизнес": ["Куплю готовый бизнес", "Продам готовый бизнес", "Ищу партнёра", "Предложу партнёрство"],
+  "Инвестиции": ["Ищу инвестора", "Стану инвестором", "Стартапы"]
 };
 const categoryMenu = document.getElementById("categoryMenu");
 const categoryMenuBackdrop = document.getElementById("categoryMenuBackdrop");
@@ -2240,13 +2243,19 @@ function closeCategoryMenu() {
   categorySelectTrigger?.setAttribute("aria-expanded", "false");
 }
 function closeVehicleSearch() { vehicleSearchMenu?.classList.add("hidden"); vehicleSearchBackdrop?.classList.add("hidden"); }
-function openCategoryMenu() {
+function openCategoryMenu(parentCategory = "") {
   if (!categoryMenu || !categoryMenuOptions) return;
-  categoryMenuTitle.textContent = t("Категорії");
   const cats = [
-    ["Автомобили", "🚗"], ["Недвижимость", "⌂"], ["Готовый бизнес", "▣"], ["Инвестиции", "▥"]
+    ["", "▦", "Все категории"], ["Автомобили", "🚗"], ["Недвижимость", "⌂"], ["Готовый бизнес", "▣"], ["Инвестиции", "▥"]
   ];
-  categoryMenuOptions.innerHTML = cats.map(([key, icon]) => `<button type="button" class="category-menu-option" data-search-category="${escapeHtml(key)}"><span class="category-menu-icon" aria-hidden="true">${icon}</span>${escapeHtml(t(key === "Готовый бизнес" ? "Бизнес и предпринимательство" : key))}<span aria-hidden="true">›</span></button>`).join("");
+  if (parentCategory) {
+    categoryMenuTitle.textContent = t(parentCategory === "Готовый бизнес" ? "Бизнес и предпринимательство" : parentCategory);
+    const options = categorySubcategories[parentCategory] || [];
+    categoryMenuOptions.innerHTML = `<button type="button" class="category-menu-option category-menu-back" data-search-category="" data-category-back="1"><span class="category-menu-icon" aria-hidden="true">‹</span><span class="category-menu-option-label">${escapeHtml(t("Назад"))}</span><span aria-hidden="true"> </span></button>` + options.map(label => `<button type="button" class="category-menu-option" data-search-category="${escapeHtml(parentCategory)}" data-search-subcategory="${escapeHtml(label)}"><span class="category-menu-icon" aria-hidden="true">•</span><span class="category-menu-option-label">${escapeHtml(t(label))}</span><span aria-hidden="true">›</span></button>`).join("");
+  } else {
+    categoryMenuTitle.textContent = t("Категорії");
+    categoryMenuOptions.innerHTML = cats.map(([key, icon, label]) => `<button type="button" class="category-menu-option" data-search-category="${escapeHtml(key)}" ${key ? 'data-open-submenu="1"' : 'data-all-categories="1"'}><span class="category-menu-icon" aria-hidden="true">${icon}</span><span class="category-menu-option-label">${escapeHtml(t(label || (key === "Готовый бизнес" ? "Бизнес и предпринимательство" : key)))}</span><span aria-hidden="true">›</span></button>`).join("");
+  }
   categoryMenu.classList.remove("hidden"); categoryMenuBackdrop?.classList.remove("hidden");
   categorySelectTrigger?.setAttribute("aria-expanded", "true");
 }
@@ -2254,14 +2263,28 @@ function openVehicleSearch() {
   closeCategoryMenu(); vehicleSearchMenu?.classList.remove("hidden"); vehicleSearchBackdrop?.classList.remove("hidden");
   loadVehicleMakes();
 }
+async function fetchAllVehicleModels() {
+  if (!db) return [];
+  const all = []; const pageSize = 1000; let from = 0;
+  while (true) {
+    const {data, error} = await db.from("vehicle_models").select("make_slug,make_name,model_slug,model_name,body_types").order("make_name").order("model_name").range(from, from + pageSize - 1);
+    if (error) throw error;
+    all.push(...(data || []));
+    if (!data || data.length < pageSize) break;
+    from += pageSize;
+  }
+  return all;
+}
 async function loadVehicleMakes() {
   const makeSelect = document.getElementById("vehicleSearchMake");
   if (!makeSelect || !db || makeSelect.dataset.loaded === "1") return;
-  const {data, error} = await db.from("vehicle_models").select("make_slug,make_name,model_slug,model_name,body_types").order("make_name").order("model_name");
-  if (error || !data) return;
-  vehicleModelsCache = data; const makes = [...new Map(data.map(x => [x.make_slug, x.make_name])).entries()];
-  makeSelect.innerHTML = '<option value="">Усі марки</option>' + makes.map(([slug,name]) => `<option value="${escapeHtml(slug)}">${escapeHtml(name)}</option>`).join("");
-  makeSelect.dataset.loaded = "1";
+  try {
+    const data = await fetchAllVehicleModels();
+    vehicleModelsCache = data;
+    const makes = [...new Map(data.map(x => [x.make_slug, x.make_name])).entries()].sort((a,b) => a[1].localeCompare(b[1]));
+    makeSelect.innerHTML = '<option value="">Усі марки</option>' + makes.map(([slug,name]) => `<option value="${escapeHtml(slug)}">${escapeHtml(name)}</option>`).join("");
+    makeSelect.dataset.loaded = "1";
+  } catch (error) { console.error("Не удалось загрузить марки автомобилей", error); }
 }
 document.getElementById("vehicleSearchMake")?.addEventListener("change", event => {
   const make = event.target.value; const modelSelect = document.getElementById("vehicleSearchModel");
@@ -2282,12 +2305,13 @@ function syncVehicleListingFields() {
 }
 async function loadVehicleListingMakes() {
   if (!vehicleListingMake || !db || vehicleListingMake.dataset.loaded === "1") return;
-  const {data,error} = await db.from("vehicle_models").select("make_slug,make_name,model_slug,model_name").order("make_name").order("model_name");
-  if (error || !data) { console.error("Не удалось загрузить каталог автомобилей", error); return; }
-  vehicleModelsCache = data;
-  const makes = [...new Map(data.map(row => [row.make_slug,row.make_name])).entries()];
-  vehicleListingMake.innerHTML = '<option value="">Выберите марку</option>' + makes.map(([slug,name]) => `<option value="${escapeHtml(slug)}">${escapeHtml(name)}</option>`).join("");
-  vehicleListingMake.dataset.loaded = "1";
+  try {
+    const data = await fetchAllVehicleModels();
+    vehicleModelsCache = data;
+    const makes = [...new Map(data.map(row => [row.make_slug,row.make_name])).entries()].sort((a,b) => a[1].localeCompare(b[1]));
+    vehicleListingMake.innerHTML = '<option value="">Выберите марку</option>' + makes.map(([slug,name]) => `<option value="${escapeHtml(slug)}">${escapeHtml(name)}</option>`).join("");
+    vehicleListingMake.dataset.loaded = "1";
+  } catch (error) { console.error("Не удалось загрузить каталог автомобилей", error); }
 }
 vehicleListingMake?.addEventListener("change", () => {
   const make = vehicleListingMake.value;
@@ -2300,16 +2324,21 @@ vehicleListingMake?.addEventListener("change", () => {
 listingCategorySelect?.addEventListener("change", syncVehicleListingFields);
 syncVehicleListingFields();
 
-categorySelectTrigger?.addEventListener("click", openCategoryMenu);
+categorySelectTrigger?.addEventListener("click", () => openCategoryMenu());
 categoryMenuOptions?.addEventListener("click", event => {
   const option = event.target.closest("[data-search-category]"); if (!option) return;
-  selectedSearchCategory = option.dataset.searchCategory;
-  const label = selectedSearchCategory === "Готовый бизнес" ? "Бизнес и предпринимательство" : selectedSearchCategory;
-  if (categorySelectLabel) categorySelectLabel.textContent = t(label);
-  currentCategory = selectedSearchCategory;
-  document.querySelectorAll(".category").forEach(b => b.classList.toggle("active", b.dataset.category === selectedSearchCategory));
+  if (option.hasAttribute("data-category-back")) { openCategoryMenu(); return; }
+  const category = option.dataset.searchCategory || "";
+  if (option.hasAttribute("data-open-submenu")) {
+    if (category === "Автомобили") { selectedSearchCategory = category; currentCategory = category; if (categorySelectLabel) categorySelectLabel.textContent = t(category); openVehicleSearch(); return; }
+    openCategoryMenu(category); return;
+  }
+  const subcategory = option.dataset.searchSubcategory;
+  selectedSearchCategory = category; currentCategory = category;
+  if (subcategory && searchInput) searchInput.value = subcategory;
+  if (categorySelectLabel) categorySelectLabel.textContent = category ? t(category === "Готовый бизнес" ? "Бизнес и предпринимательство" : category) : t("Все категории");
+  document.querySelectorAll(".category").forEach(b => b.classList.toggle("active", (b.dataset.category || "") === category));
   closeCategoryMenu();
-  if (selectedSearchCategory === "Автомобили") { openVehicleSearch(); return; }
   loadListings();
 });
 document.querySelectorAll(".category").forEach(button => {
@@ -2318,12 +2347,12 @@ document.querySelectorAll(".category").forEach(button => {
     if (button.classList.contains("category-card") && category) {
       selectedSearchCategory = category; currentCategory = category;
       if (categorySelectLabel) categorySelectLabel.textContent = t(category === "Готовый бизнес" ? "Бизнес и предпринимательство" : category);
-      if (category === "Автомобили") openVehicleSearch(); else loadListings();
+      if (category === "Автомобили") openVehicleSearch(); else openCategoryMenu(category);
       return;
     }
     document.querySelectorAll(".category").forEach(b => b.classList.remove("active")); button.classList.add("active");
     currentCategory = category; selectedSearchCategory = category;
-    if (categorySelectLabel) categorySelectLabel.textContent = category ? t(category) : t("Категорії");
+    if (categorySelectLabel) categorySelectLabel.textContent = category ? t(category) : t("Все категории");
     loadListings();
   });
 });

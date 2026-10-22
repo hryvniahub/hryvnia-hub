@@ -4498,16 +4498,23 @@ input:focus, select:focus, textarea:focus {
   padding-bottom: 25px !important;
 }
 
-/* Slightly stronger top/middle darkening for readable white text; preserve the bright lower banner and icon row. */
+/* Banner readability: noticeably darker behind both text lines, fading to the original bright lower edge. */
 .main-banner::before {
   background: linear-gradient(
     180deg,
-    rgba(8, 16, 24, 0.40) 0%,
-    rgba(8, 16, 24, 0.32) 38%,
-    rgba(8, 16, 24, 0.16) 61%,
-    rgba(8, 16, 24, 0.02) 80%,
-    rgba(8, 16, 24, 0) 100%
+    rgba(5, 12, 18, 0.66) 0%,
+    rgba(5, 12, 18, 0.56) 38%,
+    rgba(5, 12, 18, 0.34) 61%,
+    rgba(5, 12, 18, 0.08) 80%,
+    rgba(5, 12, 18, 0) 100%
   ) !important;
+}
+
+/* Slightly enlarge the second banner line without changing banner dimensions. */
+.main-banner .hero-text {
+  font-size: clamp(13px, 1.45vw, 19px) !important;
+  line-height: 1.2 !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9) !important;
 }
 
 @media screen and (max-width: 720px) {
@@ -4515,6 +4522,11 @@ input:focus, select:focus, textarea:focus {
     padding: 0 4px 19px !important;
     width: 100% !important;
     max-width: 100% !important;
+  }
+  .main-banner .hero-text {
+    font-size: clamp(12px, 3.2vw, 15px) !important;
+    line-height: 1.18 !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95) !important;
   }
   .main-banner .banner-icons {
     bottom: 3px !important;
@@ -4531,11 +4543,11 @@ input:focus, select:focus, textarea:focus {
   .main-banner::before {
     background: linear-gradient(
       180deg,
-      rgba(8, 16, 24, 0.42) 0%,
-      rgba(8, 16, 24, 0.34) 40%,
-      rgba(8, 16, 24, 0.18) 64%,
-      rgba(8, 16, 24, 0.015) 83%,
-      rgba(8, 16, 24, 0) 100%
+      rgba(5, 12, 18, 0.68) 0%,
+      rgba(5, 12, 18, 0.58) 40%,
+      rgba(5, 12, 18, 0.35) 64%,
+      rgba(5, 12, 18, 0.02) 83%,
+      rgba(5, 12, 18, 0) 100%
     ) !important;
   }
 }

@@ -3739,3 +3739,86 @@ input:focus, select:focus, textarea:focus {
   .main-banner .banner-title { font-size: 15px !important; }
   .main-banner .hero-text { font-size: 11px !important; }
 }
+
+
+/* HRYVNIA HUB — restore category card proportions and compact All button (2026-10-22).
+   Overrides the accidental full-grid sizing added in the previous patch. */
+.categories-section .categories-grid {
+  position: relative !important;
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  grid-auto-rows: auto !important;
+  align-items: stretch !important;
+  gap: 12px !important;
+}
+.categories-section .categories-grid > .category-card:not(.all-btn) {
+  position: relative !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  aspect-ratio: 1.75 / 1 !important;
+  padding: 14px !important;
+  box-sizing: border-box !important;
+}
+.categories-section .categories-grid > .category-card:not(.all-btn) .category-card-img {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+.categories-section .categories-grid > .all-btn {
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 56px !important;
+  min-width: 56px !important;
+  height: 56px !important;
+  min-height: 56px !important;
+  padding: 0 !important;
+  aspect-ratio: 1 / 1 !important;
+  border-radius: 50% !important;
+  font-size: 11px !important;
+  line-height: 1 !important;
+  z-index: 5 !important;
+}
+.main-banner {
+  height: auto !important;
+  min-height: 150px !important;
+  max-height: none !important;
+  aspect-ratio: 4.6 / 1 !important;
+  padding: 14px 18px !important;
+}
+@media screen and (max-width: 720px) {
+  .categories-section .categories-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-auto-rows: auto !important;
+    gap: 8px !important;
+  }
+  .categories-section .categories-grid > .category-card:not(.all-btn) {
+    aspect-ratio: 1.75 / 1 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 10px !important;
+  }
+  .categories-section .categories-grid > .all-btn {
+    width: 56px !important; min-width: 56px !important;
+    height: 56px !important; min-height: 56px !important;
+    border-radius: 50% !important; font-size: 11px !important;
+  }
+  .main-banner {
+    aspect-ratio: 3.8 / 1 !important;
+    min-height: 112px !important;
+    height: auto !important;
+    max-height: none !important;
+    padding: 10px 12px !important;
+  }
+}
+@media screen and (max-width: 380px) {
+  .categories-section .categories-grid > .all-btn {
+    width: 50px !important; min-width: 50px !important;
+    height: 50px !important; min-height: 50px !important;
+  }
+  .main-banner { aspect-ratio: 3.5 / 1 !important; min-height: 108px !important; }
+}

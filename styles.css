@@ -4498,13 +4498,13 @@ input:focus, select:focus, textarea:focus {
   padding-bottom: 25px !important;
 }
 
-/* Slight top/middle darkening for readable white text; fade out before the icon row. */
+/* Slightly stronger top/middle darkening for readable white text; preserve the bright lower banner and icon row. */
 .main-banner::before {
   background: linear-gradient(
     180deg,
-    rgba(8, 16, 24, 0.27) 0%,
-    rgba(8, 16, 24, 0.20) 38%,
-    rgba(8, 16, 24, 0.11) 61%,
+    rgba(8, 16, 24, 0.40) 0%,
+    rgba(8, 16, 24, 0.32) 38%,
+    rgba(8, 16, 24, 0.16) 61%,
     rgba(8, 16, 24, 0.02) 80%,
     rgba(8, 16, 24, 0) 100%
   ) !important;
@@ -4531,9 +4531,9 @@ input:focus, select:focus, textarea:focus {
   .main-banner::before {
     background: linear-gradient(
       180deg,
-      rgba(8, 16, 24, 0.29) 0%,
-      rgba(8, 16, 24, 0.21) 40%,
-      rgba(8, 16, 24, 0.10) 64%,
+      rgba(8, 16, 24, 0.42) 0%,
+      rgba(8, 16, 24, 0.34) 40%,
+      rgba(8, 16, 24, 0.18) 64%,
       rgba(8, 16, 24, 0.015) 83%,
       rgba(8, 16, 24, 0) 100%
     ) !important;

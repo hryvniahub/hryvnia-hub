@@ -1676,24 +1676,6 @@ input:focus, select:focus, textarea:focus {
   }
 }
 
-/* Листик внутри круглой кнопки «Все» без изменения её положения. */
-.categories-grid .all-btn {
-  position: absolute;
-}
-.categories-grid .all-btn::after {
-  content: "";
-  position: absolute;
-  top: 5px;
-  right: 7px;
-  width: 7px;
-  height: 10px;
-  border-radius: 100% 0 100% 0;
-  background: #D4FF00;
-  box-shadow: 0 0 0 1px rgba(60,80,0,.3);
-  transform: rotate(20deg);
-  pointer-events: none;
-}
-
 /* Подписи категорий по центру; оставляем место для круглой кнопки «Все». */
 .category-card {
   align-items: flex-end;
@@ -3636,29 +3618,12 @@ input:focus, select:focus, textarea:focus {
 
 
 /* HRYVNIA HUB — комплексная правка категорий и баннера (2026-10-22) */
-.categories-section .categories-grid {
-  align-items: stretch !important;
-  grid-auto-rows: 1fr !important;
-}
-.categories-section .categories-grid > .category-card:not(.all-btn) {
-  height: 100% !important;
-  min-height: 0 !important;
-  aspect-ratio: auto !important;
-  box-sizing: border-box !important;
-}
 .categories-section .categories-grid > .category-card:not(.all-btn) .category-card-img {
   position: absolute !important;
   inset: 0 !important;
   width: 100% !important;
   height: 100% !important;
   object-fit: cover !important;
-}
-.categories-section .categories-grid > .all-btn {
-  width: 100% !important;
-  min-width: 0 !important;
-  height: 100% !important;
-  min-height: 0 !important;
-  box-sizing: border-box !important;
 }
 .category-menu-options { align-items: stretch !important; }
 .category-menu-option {
@@ -3722,19 +3687,16 @@ input:focus, select:focus, textarea:focus {
 .main-banner .banner-title { font-size: clamp(18px, 2.4vw, 32px) !important; line-height: 1.12 !important; }
 .main-banner .hero-text { font-size: clamp(12px, 1.25vw, 18px) !important; line-height: 1.25 !important; }
 @media screen and (max-width: 720px) {
-  .categories-section .categories-grid { grid-template-columns: repeat(2, minmax(0,1fr)) !important; grid-auto-rows: 104px !important; gap: 8px !important; }
-  .categories-section .categories-grid > .category-card:not(.all-btn) { min-height: 104px !important; height: 104px !important; }
-  .categories-section .categories-grid > .all-btn { min-height: 104px !important; height: 104px !important; }
-  .main-banner { height: clamp(112px, 31vw, 145px) !important; min-height: 112px !important; max-height: 145px !important; padding: 9px 10px !important; }
+  .categories-section .categories-grid { grid-template-columns: repeat(2, minmax(0,1fr)) !important; gap: 8px !important; }
+
+.main-banner { height: clamp(112px, 31vw, 145px) !important; min-height: 112px !important; max-height: 145px !important; padding: 9px 10px !important; }
   .main-banner .banner-content { gap: 5px !important; }
   .main-banner .banner-title { font-size: clamp(16px, 4.4vw, 21px) !important; line-height: 1.15 !important; }
   .main-banner .hero-text { font-size: clamp(11px, 3.1vw, 14px) !important; line-height: 1.22 !important; }
   .category-menu-option .category-menu-option-label { font-size: 15px !important; }
 }
 @media screen and (max-width: 380px) {
-  .categories-section .categories-grid { grid-auto-rows: 94px !important; }
-  .categories-section .categories-grid > .category-card:not(.all-btn),
-  .categories-section .categories-grid > .all-btn { min-height: 94px !important; height: 94px !important; }
+
   .main-banner { height: 112px !important; min-height: 112px !important; }
   .main-banner .banner-title { font-size: 15px !important; }
   .main-banner .hero-text { font-size: 11px !important; }
@@ -3749,18 +3711,15 @@ input:focus, select:focus, textarea:focus {
 .category-menu-option-label { overflow-wrap: break-word !important; word-break: normal !important; }
 .category-menu-option.category-menu-back { display: none !important; }
 @media screen and (max-width: 720px) {
-  .categories-section .categories-grid { grid-auto-rows: 90px !important; gap: 8px !important; }
-  .categories-section .categories-grid > .category-card:not(.all-btn),
-  .categories-section .categories-grid > .all-btn { height: 90px !important; min-height: 90px !important; }
+  .categories-section .categories-grid { gap: 8px !important; }
+
   .main-banner { height: 90px !important; min-height: 90px !important; max-height: 90px !important; padding: 7px 10px !important; }
   .main-banner .banner-content { gap: 3px !important; }
   .main-banner .banner-title { font-size: clamp(15px, 3.6vw, 22px) !important; line-height: 1.1 !important; }
   .main-banner .hero-text { font-size: clamp(10px, 2.4vw, 15px) !important; line-height: 1.15 !important; }
 }
 @media screen and (max-width: 380px) {
-  .categories-section .categories-grid { grid-auto-rows: 84px !important; }
-  .categories-section .categories-grid > .category-card:not(.all-btn),
-  .categories-section .categories-grid > .all-btn { height: 84px !important; min-height: 84px !important; }
+
   .main-banner { height: 90px !important; min-height: 90px !important; max-height: 90px !important; }
 }
 
@@ -3800,3 +3759,51 @@ input:focus, select:focus, textarea:focus {
 }
 .category-menu-option span { color: #fff; font-size: 16px; }
 .category-menu-option .category-menu-icon { color: #d4ff00; font-size: 18px; }
+
+
+/* HRYVNIA HUB — canonical fix for the centered “Усі” category button */
+.categories-section .categories-grid {
+  position: relative !important;
+}
+
+.categories-section .categories-grid > .all-btn {
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 72px !important;
+  min-width: 72px !important;
+  max-width: 72px !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  max-height: 40px !important;
+  padding: 0 8px !important;
+  box-sizing: border-box !important;
+  border-radius: 10px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  word-break: normal !important;
+  overflow: visible !important;
+  z-index: 5 !important;
+}
+
+.categories-section .categories-grid > .all-btn::after {
+  content: none !important;
+}
+
+@media screen and (max-width: 720px) {
+  .categories-section .categories-grid > .all-btn {
+    width: 64px !important;
+    min-width: 64px !important;
+    max-width: 64px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    padding: 0 6px !important;
+    border-radius: 9px !important;
+    font-size: 10px !important;
+  }
+}

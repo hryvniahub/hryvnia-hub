@@ -4400,38 +4400,13 @@ input:focus, select:focus, textarea:focus {
 }
 
 
-/* HRYVNIA HUB — balanced final correction: exactly four banner symbols from the artwork */
-/* The background artwork already contains the four lime symbols. Hide the duplicate SVG overlay. */
-.main-banner .banner-icons {
-  display: none !important;
-}
-/* Keep the banner image's original four lime symbols bright without adding another icon row. */
-.main-banner .main-banner-img {
-  filter: brightness(1.12) saturate(1.14) !important;
-}
-.main-banner::before {
-  background: linear-gradient(180deg, rgba(8, 16, 24, 0.01) 0%, rgba(8, 16, 24, 0.10) 100%) !important;
-}
-/* Slightly increase the final word from the previous overly small setting. */
-.category-card[data-category="Готовый бизнес"] .category-card-long-word {
-  font-size: 0.70em !important;
-  letter-spacing: -0.025em !important;
-  font-weight: 800 !important;
-  white-space: nowrap !important;
-}
-@media screen and (max-width: 720px) {
-  .category-card[data-category="Готовый бизнес"] .category-card-long-word {
-    font-size: 0.68em !important;
-  }
-}
-@media screen and (max-width: 380px) {
-  .category-card[data-category="Готовый бизнес"] .category-card-long-word {
-    font-size: 0.64em !important;
-  }
-}
+/* ============================================================
+   HRYVNIA HUB — CONSOLIDATED FINAL BANNER RULES
+   The four icons are HTML/SVG overlays; the background image is clean.
+   Keep existing banner dimensions and all other page layouts unchanged.
+   ============================================================ */
 
-/* HRYVNIA HUB — balanced icon sizing and banner readability refinement */
-/* Keep all four category icons on one visual size standard, matching Investments. */
+/* Standardize category icon sizes without changing card dimensions. */
 .category-card .category-icon {
   flex: 0 0 23px !important;
   width: 23px !important;
@@ -4441,15 +4416,18 @@ input:focus, select:focus, textarea:focus {
   flex: 0 0 23px !important;
   width: 23px !important;
   height: 23px !important;
+  transform: translateX(6px) !important;
 }
 .category-card[data-category="Готовый бизнес"] .category-card-long-word {
   font-size: 0.72em !important;
   letter-spacing: -0.025em !important;
+  font-weight: 800 !important;
+  white-space: nowrap !important;
 }
 @media screen and (max-width: 720px) {
   .category-card .category-icon,
   .category-card[data-category="Готовый бизнес"] .category-icon {
-    flex: 0 0 23px !important;
+    flex-basis: 23px !important;
     width: 23px !important;
     height: 23px !important;
   }
@@ -4469,15 +4447,107 @@ input:focus, select:focus, textarea:focus {
   }
 }
 
-/* Darken the upper and middle banner slightly for white-text contrast;
-   leave the lower icon strip and artwork bright and unchanged. */
+/* Desktop: give the real-estate label slightly more room. */
+@media screen and (min-width: 721px) {
+  .category-card[data-category="Недвижимость"] .category-card-label {
+    gap: 5px !important;
+    padding-left: 4px !important;
+    padding-right: 4px !important;
+    transform: translateX(-5px) !important;
+    white-space: nowrap !important;
+    overflow-wrap: normal !important;
+  }
+  .category-card[data-category="Недвижимость"] .category-card-label > span[data-i18n] {
+    white-space: nowrap !important;
+    letter-spacing: -0.035em !important;
+    font-size: 0.94em !important;
+  }
+}
+
+/* Banner: exactly four lime SVG icons in one centered row. */
+.main-banner .banner-icons {
+  position: absolute !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: 7px !important;
+  transform: translateX(-50%) !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: clamp(13px, 2.1vw, 24px) !important;
+  width: max-content !important;
+  max-width: calc(100% - 24px) !important;
+  height: 22px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  z-index: 4 !important;
+  pointer-events: none !important;
+}
+.main-banner .banner-icon {
+  display: block !important;
+  flex: 0 0 21px !important;
+  width: 21px !important;
+  height: 21px !important;
+  min-width: 21px !important;
+  color: #d4ff00 !important;
+  opacity: 1 !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55)) !important;
+}
+.main-banner .banner-content {
+  padding-bottom: 25px !important;
+}
+
+/* Banner readability: noticeably darker behind both text lines, fading to the original bright lower edge. */
 .main-banner::before {
   background: linear-gradient(
     180deg,
-    rgba(8, 16, 24, 0.24) 0%,
-    rgba(8, 16, 24, 0.17) 42%,
-    rgba(8, 16, 24, 0.07) 66%,
-    rgba(8, 16, 24, 0) 82%,
-    rgba(8, 16, 24, 0) 100%
+    rgba(5, 12, 18, 0.66) 0%,
+    rgba(5, 12, 18, 0.56) 38%,
+    rgba(5, 12, 18, 0.34) 61%,
+    rgba(5, 12, 18, 0.08) 80%,
+    rgba(5, 12, 18, 0) 100%
   ) !important;
+}
+
+/* Slightly enlarge the second banner line without changing banner dimensions. */
+.main-banner .hero-text {
+  font-size: clamp(13px, 1.45vw, 19px) !important;
+  line-height: 1.2 !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9) !important;
+}
+
+@media screen and (max-width: 720px) {
+  .main-banner .banner-content {
+    padding: 0 4px 19px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .main-banner .hero-text {
+    font-size: clamp(12px, 3.2vw, 15px) !important;
+    line-height: 1.18 !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95) !important;
+  }
+  .main-banner .banner-icons {
+    bottom: 3px !important;
+    height: 15px !important;
+    gap: 13px !important;
+    max-width: calc(100% - 32px) !important;
+  }
+  .main-banner .banner-icon {
+    flex-basis: 16px !important;
+    width: 16px !important;
+    height: 16px !important;
+    min-width: 16px !important;
+  }
+  .main-banner::before {
+    background: linear-gradient(
+      180deg,
+      rgba(5, 12, 18, 0.68) 0%,
+      rgba(5, 12, 18, 0.58) 40%,
+      rgba(5, 12, 18, 0.35) 64%,
+      rgba(5, 12, 18, 0.02) 83%,
+      rgba(5, 12, 18, 0) 100%
+    ) !important;
+  }
 }

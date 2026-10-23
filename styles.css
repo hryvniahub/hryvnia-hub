@@ -110,7 +110,7 @@ button { font-family: inherit; }
 /* ============================================================
    КАТЕГОРИИ (Исправлены размеры иконок)
    ============================================================ */
-.categories-section { margin-top: 12px; background: linear-gradient(180deg, #f7f9f3 0%, #f2f5ed 100%); border-radius: var(--radius); padding: 2px; }
+.categories-section { margin-top: 0; background: linear-gradient(180deg, #f7f9f3 0%, #f2f5ed 100%); border-radius: var(--radius); padding: 2px; }
 .categories-grid { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
 
 .category-card {
@@ -164,7 +164,7 @@ button { font-family: inherit; }
 /* ============================================================
    БАННЕР (Уменьшена высота и убраны конфликты)
    ============================================================ */
-.hero { margin-top: 12px; }
+.hero { margin-top: 0; }
 .main-banner {
   position: relative; border-radius: var(--radius-lg); overflow: hidden;
   height: clamp(112px, 12vw, 145px); display: flex; align-items: center; justify-content: center;

@@ -2247,7 +2247,7 @@ async function loadListings() {
     const powerTo = numberValue("vehiclePowerTo");
     const doors = value("vehicleDoors");
     const drive = value("vehicleDrive");
-    const operationalCondition = value("vehicleOperationalCondition");
+    const conditionIds = getSelectedConditionIds("vehicleSearchConditions");
     const color = value("vehicleColor");
     const sellerType = value("vehicleSellerType");
     const message = document.getElementById("vehicleSearchMessage");
@@ -2270,7 +2270,7 @@ async function loadListings() {
       }
       return;
     }
-    vehicleClientFilters = { make, model, yearFrom, yearTo, priceFrom, priceTo, currency, mileageFrom, mileageTo, engineFrom, engineTo, body, fuel, transmission, status, powerFrom, powerTo, doors, drive, operationalCondition, color, sellerType };
+    vehicleClientFilters = { make, model, yearFrom, yearTo, priceFrom, priceTo, currency, mileageFrom, mileageTo, engineFrom, engineTo, body, fuel, transmission, status, powerFrom, powerTo, doors, drive, conditionIds, color, sellerType };
     if (make) query = query.eq("vehicle_make_slug", make);
     if (model) query = query.eq("vehicle_model_slug", model);
     if (yearFrom !== null) query = query.gte("vehicle_year", yearFrom);
@@ -2285,6 +2285,7 @@ async function loadListings() {
     if (body) query = query.eq("vehicle_body_type", body);
     if (fuel) query = query.eq("vehicle_fuel_type", fuel);
     if (transmission) query = query.eq("vehicle_transmission", transmission);
+    if (status) query = query.eq("vehicle_condition", status);
   }
   isSearching = true;
   setButtonLoading(searchBtn, true, "");
@@ -2292,6 +2293,39 @@ async function loadListings() {
     const { data, error } = await query;
     if (error) { if (listing) listing.innerHTML = `<div class="empty">${escapeHtml(t("Ошибка") + ": " + error.message)}</div>`; return; }
     let rows = (data || []).slice();
+    if (currentCategory === "Автомобили" && vehicleClientFilters?.conditionIds?.length) {
+      const wanted = vehicleClientFilters.conditionIds;
+      // Проверяем только связи для объявлений, уже прошедших основные фильтры.
+      // Это не загружает из Supabase связи всех объявлений по выбранным состояниям.
+      const candidateIds = rows.map(item => item.id).filter(id => id !== null && id !== undefined);
+      if (!candidateIds.length) {
+        renderListings([]);
+        return;
+      }
+      const matches = new Map();
+      // Ограничиваем размер .in(), чтобы не создавать чрезмерно длинный запрос.
+      for (let start = 0; start < candidateIds.length; start += 500) {
+        const idChunk = candidateIds.slice(start, start + 500);
+        const { data: links, error: linksError } = await db.from("listing_vehicle_conditions")
+          .select("listing_id, condition_id")
+          .in("listing_id", idChunk)
+          .in("condition_id", wanted);
+        if (linksError) throw linksError;
+        (links || []).forEach(link => {
+          const id = String(link.listing_id);
+          if (!matches.has(id)) matches.set(id, new Set());
+          matches.get(id).add(Number(link.condition_id));
+        });
+      }
+      const matchingListingIds = new Set([...matches.entries()]
+        .filter(([, ids]) => wanted.every(id => ids.has(Number(id))))
+        .map(([id]) => id));
+      if (!matchingListingIds.size) {
+        renderListings([]);
+        return;
+      }
+      rows = rows.filter(item => matchingListingIds.has(String(item.id)));
+    }
     if (currentCategory === "Автомобили" && vehicleClientFilters) {
       const f = vehicleClientFilters;
       const within = (value, min, max) => {
@@ -2309,11 +2343,10 @@ async function loadListings() {
         (!f.body || item.vehicle_body_type === f.body) &&
         (!f.fuel || item.vehicle_fuel_type === f.fuel) &&
         (!f.transmission || item.vehicle_transmission === f.transmission) &&
-        (!f.status || item.vehicle_status === f.status) &&
+        (!f.status || item.vehicle_condition === f.status) &&
         within(item.vehicle_power_hp, f.powerFrom, f.powerTo) &&
         (!f.doors || String(item.vehicle_doors ?? "") === f.doors) &&
         (!f.drive || item.vehicle_drive === f.drive) &&
-        (!f.operationalCondition || item.vehicle_operational_condition === f.operationalCondition) &&
         (!f.color || String(item.vehicle_color || "").toLowerCase() === f.color) &&
         (!f.sellerType || item.seller_type === f.sellerType) &&
         (String(item.currency || "UAH").toUpperCase() === f.currency)
@@ -2329,6 +2362,61 @@ async function loadListings() {
     isSearching = false;
     setButtonLoading(searchBtn, false);
   }
+}
+
+// === СПРАВОЧНИК ТЕХНИЧЕСКИХ СОСТОЯНИЙ АВТО ===
+let operationalConditions = [];
+let operationalConditionsPromise = null;
+
+async function loadOperationalConditions() {
+  if (!db) return [];
+  if (operationalConditions.length) return operationalConditions;
+  if (operationalConditionsPromise) return operationalConditionsPromise;
+  operationalConditionsPromise = (async () => {
+    const { data, error } = await db.from("vehicle_operational_conditions")
+      .select("id, name_uk, name_ru, name_en, name_pl").order("id");
+    if (error) throw error;
+    operationalConditions = data || [];
+    return operationalConditions;
+  })();
+  try { return await operationalConditionsPromise; }
+  catch (error) { operationalConditionsPromise = null; console.error("Не удалось загрузить технические состояния автомобилей", error); throw error; }
+}
+function conditionDisplayName(condition) {
+  return condition?.[`name_${lang}`] || condition?.name_uk || condition?.name_ru || "";
+}
+function getSelectedConditionIds(container) {
+  if (typeof container === "string") container = document.getElementById(container);
+  return container ? [...container.querySelectorAll('input[type="checkbox"][data-condition-id]:checked')]
+    .map(input => Number(input.dataset.conditionId)).filter(Number.isFinite) : [];
+}
+function clearConditionsCheckboxes(container) {
+  if (typeof container === "string") container = document.getElementById(container);
+  if (container) container.querySelectorAll('input[type="checkbox"][data-condition-id]').forEach(input => { input.checked = false; });
+}
+function renderConditionsCheckboxes(container, selectedIds = []) {
+  if (typeof container === "string") container = document.getElementById(container);
+  if (!container) return;
+  const selected = new Set((selectedIds || []).map(Number));
+  container.innerHTML = operationalConditions.map(condition => `
+    <label class="vehicle-condition-option" style="display:flex;align-items:center;gap:8px;margin:5px 0;">
+      <input type="checkbox" data-condition-id="${Number(condition.id)}" value="${Number(condition.id)}" ${selected.has(Number(condition.id)) ? "checked" : ""}>
+      <span>${escapeHtml(conditionDisplayName(condition))}</span>
+    </label>`).join("");
+}
+async function renderAllConditionGroups() {
+  await loadOperationalConditions();
+  ["vehicleListingConditions", "vehicleSearchConditions"].forEach(id => {
+    const container = document.getElementById(id);
+    if (container) renderConditionsCheckboxes(container, getSelectedConditionIds(container));
+  });
+}
+async function rerenderConditionsOnLangChange() {
+  if (!operationalConditions.length) return;
+  ["vehicleListingConditions", "vehicleSearchConditions"].forEach(id => {
+    const container = document.getElementById(id);
+    if (container) renderConditionsCheckboxes(container, getSelectedConditionIds(container));
+  });
 }
 
 const categorySubcategories = {
@@ -2402,7 +2490,7 @@ function prepareVehicleSearchUI() {
     });
   }
 
-  const advancedIds = ["vehicleMileageFrom", "vehicleMileageTo", "vehicleEngineFrom", "vehicleEngineTo", "vehicleBodyType", "vehicleFuel", "vehicleTransmission"];
+  const advancedIds = ["vehicleMileageFrom", "vehicleMileageTo", "vehicleEngineFrom", "vehicleEngineTo", "vehicleBodyType", "vehicleFuel", "vehicleTransmission", "vehicleSearchStatus", "vehicleDoors", "vehicleDrive", "vehicleColor", "vehicleSellerType"];
   let advanced = document.getElementById("vehicleSearchAdvanced");
   if (!advanced) {
     advanced = document.createElement("div");
@@ -2583,7 +2671,8 @@ document.getElementById("vehicleSearchToggleAdvanced")?.addEventListener("click"
   setVehicleSearchAdvanced(document.getElementById("vehicleSearchAdvanced")?.classList.contains("hidden"));
 });
 document.getElementById("vehicleSearchReset")?.addEventListener("click", () => {
-  ["vehicleSearchMake","vehicleSearchModel","vehicleYearFrom","vehicleYearTo","vehiclePriceFrom","vehiclePriceTo","vehicleMileageFrom","vehicleMileageTo","vehicleEngineFrom","vehicleEngineTo","vehicleBodyType","vehicleFuel","vehicleTransmission","vehicleSearchStatus","vehiclePowerFrom","vehiclePowerTo","vehicleDoors","vehicleDrive","vehicleOperationalCondition","vehicleColor","vehicleSellerType"].forEach(id => { const el=document.getElementById(id); if(el) el.value=""; });
+  ["vehicleSearchMake","vehicleSearchModel","vehicleYearFrom","vehicleYearTo","vehiclePriceFrom","vehiclePriceTo","vehicleMileageFrom","vehicleMileageTo","vehicleEngineFrom","vehicleEngineTo","vehicleBodyType","vehicleFuel","vehicleTransmission","vehicleSearchStatus","vehiclePowerFrom","vehiclePowerTo","vehicleDoors","vehicleDrive","vehicleColor","vehicleSellerType"].forEach(id => { const el=document.getElementById(id); if(el) el.value=""; });
+  clearConditionsCheckboxes("vehicleSearchConditions");
   const currency = document.getElementById("vehiclePriceCurrency"); if (currency) currency.value = "UAH";
   const make = document.getElementById("vehicleSearchMake");
   const model = document.getElementById("vehicleSearchModel");
@@ -2680,6 +2769,7 @@ if (addForm) {
         vehicle_drive: form.get("vehicle_drive") || null,
         vehicle_mileage_km: form.get("vehicle_mileage_km") ? Number(form.get("vehicle_mileage_km")) : null,
         vehicle_condition: form.get("vehicle_condition") || null,
+        vehicle_doors: form.get("vehicle_doors") ? Number(form.get("vehicle_doors")) : null,
         vehicle_color: form.get("vehicle_color") || null,
         seller_type: form.get("seller_type") || "private"
       });
@@ -2689,6 +2779,7 @@ if (addForm) {
         return;
       }
     }
+    const selectedListingConditionIds = form.get("category") === "Автомобили" ? getSelectedConditionIds("vehicleListingConditions") : [];
     const withPhotos = selectedPhotos.length > 0;
     publishing = true;
     const controls = [...addForm.elements].map(control => [control, control.disabled]);
@@ -2699,7 +2790,7 @@ if (addForm) {
         payload.image_urls = await uploadListingPhotos();
         payload.image_url = payload.image_urls[0];
       }
-      const { error } = await db.from("listings").insert(payload);
+      const { data: insertedListings, error } = await db.from("listings").insert(payload).select("id");
       if (error) {
         // RLS-отказ или другая ошибка Supabase. Не выдаём «успех».
         const raw = String(error.message || "");
@@ -2708,7 +2799,15 @@ if (addForm) {
         }
         throw error;
       }
+      const newListingId = insertedListings?.[0]?.id;
+      if (selectedListingConditionIds.length) {
+        if (!newListingId) throw new Error("Объявление сохранено, но не удалось получить его ID для сохранения технических состояний.");
+        const links = selectedListingConditionIds.map(condition_id => ({ listing_id: newListingId, condition_id }));
+        const { error: conditionsError } = await db.from("listing_vehicle_conditions").insert(links);
+        if (conditionsError) throw new Error("Объявление сохранено, но технические состояния не сохранены: " + conditionsError.message);
+      }
       e.target.reset();
+      clearConditionsCheckboxes("vehicleListingConditions");
       resetPhotos();
       if (formMessage) formMessage.textContent = "Объявление опубликовано!";
       await loadListings();
@@ -2748,7 +2847,7 @@ function translateVehicleSearchUI() {
     vehicleEngineFrom: "Об’єм двигуна від, л", vehicleEngineTo: "Об’єм двигуна до, л", vehicleBodyType: "Тип кузова",
     vehicleFuel: "Паливо", vehicleTransmission: "Коробка передач", vehicleSearchStatus: "Стан авто",
     vehiclePowerFrom: "Потужність від, к. с.", vehiclePowerTo: "Потужність до, к. с.", vehicleDoors: "Кількість дверей",
-    vehicleDrive: "Привід", vehicleOperationalCondition: "Технічний стан", vehicleColor: "Колір", vehicleSellerType: "Продавець"
+    vehicleDrive: "Привід", vehicleColor: "Колір", vehicleSellerType: "Продавець"
   };
   Object.entries(labelKeys).forEach(([id, key]) => {
     const el = document.getElementById(id);
@@ -2761,7 +2860,7 @@ function translateVehicleSearchUI() {
   const model = document.getElementById("vehicleSearchModel");
   if (make?.options[0]) make.options[0].textContent = t("Усі марки");
   if (model?.options[0]) model.options[0].textContent = t("Усі моделі");
-  const placeholderOptions = { vehicleBodyType: "Будь-який", vehicleFuel: "Будь-яке", vehicleTransmission: "Будь-яка", vehicleSearchStatus: "Будь-який", vehicleDoors: "Будь-яка", vehicleDrive: "Будь-який", vehicleOperationalCondition: "Будь-який", vehicleColor: "Будь-який", vehicleSellerType: "Будь-хто" };
+  const placeholderOptions = { vehicleBodyType: "Будь-який", vehicleFuel: "Будь-яке", vehicleTransmission: "Будь-яка", vehicleSearchStatus: "Будь-який", vehicleDoors: "Будь-яка", vehicleDrive: "Будь-який", vehicleColor: "Будь-який", vehicleSellerType: "Будь-хто" };
   Object.entries(placeholderOptions).forEach(([id, key]) => {
     const select = document.getElementById(id);
     if (select?.options[0]) select.options[0].textContent = t(key);
@@ -2803,6 +2902,7 @@ function translatePage(selectedLanguage) {
   updatePhotoFields();
   prepareVehicleSearchUI();
   translateVehicleSearchUI();
+  if (typeof rerenderConditionsOnLangChange === "function") rerenderConditionsOnLangChange();
   translateTextElement(document.getElementById("openAdd"), "+ Добавить объявление");
   const heroTitle = document.querySelector(".hero h1");
   if (heroTitle) {
@@ -2926,6 +3026,7 @@ setInterval(loadMarketQuotes, 5 * 60 * 1000);
 loadListings();
 loadCities();
 initAuth();
+if (typeof renderAllConditionGroups === "function") renderAllConditionGroups().catch(error => console.error("Ошибка инициализации технических состояний", error));
 
 // === КОНЕЦ ФАЙЛА ===
 

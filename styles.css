@@ -1033,3 +1033,23 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 
 /* Remove the extra currency-ticker caption to save vertical space. */
 .ticker-note { display: none !important; }
+
+/* Hryvnia Hub: расширенный поиск автомобилей */
+.vehicle-search-toggle {
+  border: 1px solid rgba(212,255,0,.55);
+  background: transparent;
+  color: var(--accent);
+  font-weight: 700;
+}
+.vehicle-search-toggle:hover {
+  background: rgba(212,255,0,.12);
+}
+@media (max-width: 420px) {
+  .vehicle-search-actions {
+    flex-wrap: wrap;
+  }
+  .vehicle-search-actions .vehicle-search-toggle {
+    flex: 1 1 100%;
+    order: -1;
+  }
+}

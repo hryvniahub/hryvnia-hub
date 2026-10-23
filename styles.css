@@ -1,16 +1,20 @@
+/* ============================================================
+   HRYVNIA HUB — ЕДИНЫЙ STYLES.CSS (основа Fix + необходимые компоненты Main)
+   ============================================================ */
+
 :root {
   --bg: #f3f5f4;
   --card: #ffffff;
   --text: #202824;
   --muted: #707a75;
   --line: #dce3df;
-  --accent: #caff00;
-  --accent-hover: #b6e600;
+  --accent: #d4ff00;
+  --accent-hover: #c3ed00;
   --accent-soft: #f0f6d9;
   --accent-light: #e8f3c8;
-  --accent-border: #9abf24;
+  --accent-border: #7fa800;
   --accent-input: #c4d7a0;
-  --dark: #202b27;
+  --dark: #203b31;
   --radius: 14px;
   --radius-lg: 20px;
   --radius-btn: 12px;
@@ -37,252 +41,353 @@ button { font-family: inherit; }
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
 }
+.full {
+  width: 100%;
+}
 
-/* ==== HEADER ==== */
+.hidden { display: none !important; }
+
+/* ============================================================
+   HEADER
+   ============================================================ */
 .header {
   position: sticky; top: 0; z-index: 40;
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: saturate(160%) blur(10px);
-  border-bottom: 1px solid var(--line);
+  background: #ffffff;
+  border-bottom: 1px solid #e4e8e1;
+  box-shadow: 0 2px 7px rgba(30, 42, 16, .055);
 }
-.nav { min-height: 68px; display: flex; align-items: center; gap: 12px; }
+.nav { min-height: 58px; display: flex; align-items: center; gap: 10px; padding: 3px 0; }
+
+/* Логотип */
 .brand {
-  display: inline-flex; align-items: center; gap: 10px;
-  text-decoration: none; color: var(--text);
-  font-weight: 800; font-size: 17px; letter-spacing: -0.01em; flex: 0 0 auto;
+  display: inline-flex; align-items: center; gap: 8px;
+  text-decoration: none; color: #111111;
+  font-weight: 800; font-size: 17px; letter-spacing: -0.01em;
+  border: 2px solid var(--accent); border-radius: 12px;
+  padding: 4px 10px 4px 6px; background: #ffffff;
+  position: relative; flex: 0 0 auto;
 }
 .brand .logo {
-  width: 36px; height: 36px; border-radius: 10px;
-  object-fit: contain; background: var(--accent); padding: 4px;
+  width: 32px; height: 32px; border-radius: 8px;
+  object-fit: contain; background: var(--accent); padding: 2px;
 }
-.brand-hub { color: var(--accent-border); }
-.auth-menu-btn {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 100%; height: 40px; margin: 10px 0;
-  border: 1px solid var(--line); background: #f3f4f7; border-radius: 10px;
-  font: inherit; font-weight: 700; font-size: 14px; color: var(--text); cursor: pointer;
-}
-.auth-menu-btn:hover { background: #e8ebf0; }
-.header-actions { display: flex; align-items: center; gap: 10px; margin-left: auto; flex-wrap: nowrap; }
-.header-action {
-  height: 44px; padding: 0 16px; background: var(--accent-light);
-  border: var(--btn-border) solid var(--accent-border); border-radius: var(--radius-btn);
-  font: inherit; font-weight: 700; font-size: 14px; color: var(--text);
+.brand .brand-text { transform: scale(1.05, 1.25); transform-origin: left center; white-space: nowrap; }
+.brand .brand-hub { color: #426b16; }
+
+/* Кнопки шапки */
+.header-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-wrap: nowrap; }
+.header-action, .lang-btn {
+  height: 44px; padding: 0 16px; background: var(--accent);
+  border: 3px solid var(--accent-border); border-radius: var(--radius-btn);
+  font: inherit; font-weight: 700; font-size: 14px; color: #17210a;
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  cursor: pointer; white-space: nowrap; transition: background 0.15s ease, transform 0.05s ease;
+  cursor: pointer; white-space: nowrap; transition: background 0.15s ease;
+  position: relative;
 }
-.header-action:hover { background: #dcf98a; }
-.header-action:active { transform: translateY(1px); }
-.header-action.all-btn.active { background: var(--accent); }
-.lang-btn {
-  position: relative; height: 44px; display: inline-flex;
-  background: var(--accent-light); border: var(--btn-border) solid var(--accent-border);
-  border-radius: var(--radius-btn);
-}
+.header-action:hover { background: var(--accent-hover); }
+
+/* Язык */
+.lang-btn { padding: 0; display: inline-flex; }
 .lang-trigger {
-  height: 100%; padding: 0 14px; background: transparent; border: 0;
-  font: inherit; font-weight: 700; font-size: 14px; color: var(--text);
-  display: inline-flex; align-items: center; gap: 8px; cursor: pointer; white-space: nowrap;
+  height: 100%; padding: 0 12px; background: transparent; border: 0;
+  font: inherit; font-weight: 700; font-size: 14px; color: #17210a;
+  display: flex; align-items: center; gap: 6px; cursor: pointer;
 }
-.lang-flag { font-size: 16px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; }
-.lang-city { font-weight: 700; }
-.lang-clock { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text); }
-.flag-ru {
-  display: inline-block; width: 18px; height: 12px;
-  background: linear-gradient(to bottom, #ffffff 0 33.33%, #a8a8a8 33.33% 66.66%, #2a2a2a 66.66% 100%);
-  border-radius: 2px; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12); vertical-align: middle;
-}
+.lang-flag { font-size: 16px; }
 .lang-dropdown {
   position: absolute; top: calc(100% + 6px); left: 0; min-width: 200px;
-  max-width: calc(100vw - 32px); background: #fff; border: 2.5px solid var(--accent-border);
+  background: #fff; border: 2px solid var(--accent-border);
   border-radius: var(--radius-btn); box-shadow: var(--shadow); padding: 6px; z-index: 50;
   display: flex; flex-direction: column; gap: 2px;
 }
-.lang-dropdown.hidden { display: none; }
 .lang-option {
   display: flex; align-items: center; gap: 10px; padding: 10px 12px;
   background: transparent; border: 0; border-radius: 8px; font: inherit;
   font-weight: 600; font-size: 14px; color: var(--text); cursor: pointer; text-align: left;
 }
 .lang-option:hover { background: var(--accent-light); }
-.lang-option .flag { font-size: 16px; line-height: 1; }
-.settings-btn {
-  flex: 0 0 auto; width: 44px; height: 44px; border-radius: var(--radius-btn);
-  background: var(--accent); border: var(--btn-border) solid var(--accent-border);
-  color: #12140a; font-size: 20px; font-weight: 700;
-  display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; line-height: 1;
-}
-.settings-btn:hover { background: var(--accent-hover); }
-.menu-toggle { display: none; }
 
-/* ==== MOBILE MENU ==== */
-.mobile-menu-overlay {
-  position: fixed; inset: 0; background: rgba(10, 12, 16, 0.5);
-  opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
-  z-index: 45; cursor: pointer; display: block;
-}
-.mobile-menu {
-  position: fixed; top: 0; right: 0; height: 100%; width: min(320px, 86vw);
-  background: #fff; z-index: 50; transform: translateX(105%); transition: transform 0.25s ease;
-  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.2); padding: 18px;
-  display: flex; flex-direction: column; gap: 14px;
-}
-body:has(.menu-toggle:checked) .mobile-menu { transform: translateX(0); }
-body:has(.menu-toggle:checked) .mobile-menu-overlay { opacity: 1; pointer-events: auto; }
-.mobile-menu-header { display: flex; align-items: center; justify-content: space-between; font-weight: 700; font-size: 16px; }
-.mobile-menu-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
-.mobile-menu-list a {
-  display: block; padding: 12px 10px; border-radius: 10px;
-  color: var(--text); text-decoration: none; font-weight: 600; font-size: 15px;
-}
-.mobile-menu-list a:hover { background: #f3f4f7; }
+/* ============================================================
+   КАТЕГОРИИ (Исправлены размеры иконок)
+   ============================================================ */
+.categories-section { margin-top: 12px; background: linear-gradient(180deg, #f7f9f3 0%, #f2f5ed 100%); border-radius: var(--radius); padding: 2px; }
+.categories-grid { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
 
-/* ==== CATEGORIES ==== */
-.categories-section { margin-top: 14px; }
-.categories-grid { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
 .category-card {
-  position: relative; min-height: 132px; border: 0; border-radius: var(--radius); overflow: hidden; cursor: pointer;
-  padding: 14px; display: flex; align-items: flex-end; text-align: left; color: #fff; font-family: inherit;
-  transition: transform 0.18s ease, box-shadow 0.18s ease; box-shadow: var(--shadow-sm);
-  background: linear-gradient(135deg, #2c5364, #203a43);
+  position: relative; border: 0; border-radius: var(--radius); overflow: hidden; cursor: pointer;
+  padding: 12px; display: flex; align-items: center; justify-content: center;
+  text-align: center; color: #fff; aspect-ratio: 1.85 / 1;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  box-shadow: 0 2px 5px rgba(24,35,15,.07);
 }
-.category-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+.category-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
 .category-card::before {
   content: ''; position: absolute; inset: 0; z-index: 1;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.7) 100%);
+  background: linear-gradient(180deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.6) 100%);
 }
 .category-card-img {
-  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
-  object-position: center; z-index: 0; display: block; pointer-events: none;
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;
 }
 .category-card-label {
-  position: relative; z-index: 2; font-weight: 800; font-size: 20px;
-  line-height: 1.15; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
+  position: relative; z-index: 2; font-weight: 800; font-size: clamp(16px, 1.5vw, 22px);
+  line-height: 1.1; text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  width: 100%;
 }
-.category-card[data-category="Автомобили"] { background: linear-gradient(135deg, #1c3a52, #2f6f8b); }
-.category-card[data-category="Недвижимость"] { background: linear-gradient(135deg, #1c3b2d, #4a8a5f); }
-.category-card[data-category="Готовый бизнес"] { background: linear-gradient(135deg, #2a2c3d, #4d4a72); }
-.category-card[data-category="Инвестиции"] { background: linear-gradient(135deg, #4b3900, #c29312); }
-.category-card.active { box-shadow: 0 0 0 3px var(--accent-border), 0 8px 24px rgba(20, 22, 26, 0.15); }
+
+.category-card-long-word {
+  font-size: 0.7em;
+  white-space: nowrap;
+}
+
+/* Иконки категорий (уменьшены) */
+.category-icon {
+  flex: 0 0 24px; width: 24px; height: 24px;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
+}
+
+/* Кнопка "Усі" по центру */
+.categories-section .categories-grid { position: relative; }
 .all-btn {
   position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-  width: 52px; height: 52px; min-width: 52px; min-height: 52px; padding: 2px;
-  border-radius: 50%; background: #d4ff00; border: var(--btn-border) solid var(--accent-border);
-  color: #12140a; font-weight: 800; font-size: 9.5px; line-height: 1.05; letter-spacing: -0.01em;
-  text-align: center; overflow: hidden; word-break: break-word; cursor: pointer; z-index: 5;
-  box-shadow: 0 4px 12px rgba(20, 22, 26, 0.18); display: inline-flex; align-items: center;
-  justify-content: center; font-family: inherit;
+  width: 64px; height: 36px; border-radius: 10px;
+  background: var(--accent); border: 3px solid #426B16; color: #17210a;
+  font-weight: 800; font-size: 11px; z-index: 5;
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
-.all-btn:hover { background: var(--accent-hover); }
-.all-btn.active { box-shadow: 0 4px 12px rgba(20, 22, 26, 0.18), 0 0 0 3px rgba(212, 255, 0, 0.35); }
 
-/* ==== HERO / BANNER ==== */
-.hero { margin-top: 14px; }
+/* ============================================================
+   ОСНОВНЫЕ СТИЛИ ИНТЕРФЕЙСА
+   ============================================================ */
+
+/* ============================================================
+   БАННЕР (Уменьшена высота и убраны конфликты)
+   ============================================================ */
+.hero { margin-top: 12px; }
 .main-banner {
-  position: relative; border-radius: var(--radius-lg); overflow: hidden; min-height: 150px;
-  padding: 22px 26px; color: #fff;
-  background: linear-gradient(135deg, rgba(15, 20, 28, 0.72), rgba(15, 20, 28, 0.35)),
-    radial-gradient(ellipse at 70% 40%, #6f9ecb 0%, #41648f 60%, #223a5c 100%);
-  background-size: cover; background-position: center; display: flex; align-items: flex-end;
+  position: relative; border-radius: var(--radius-lg); overflow: hidden;
+  height: clamp(112px, 12vw, 145px); display: flex; align-items: center; justify-content: center;
+  padding: 14px 20px 28px; color: #fff;
 }
-.main-banner-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 35%; z-index: 0; display: block; }
+.main-banner-img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 52%; z-index: 0;
+}
 .main-banner::before {
   content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  background: linear-gradient(180deg, rgba(15, 20, 28, 0.20) 0%, rgba(15, 20, 28, 0.75) 100%);
+  background: linear-gradient(180deg, rgba(5,12,18,0.7) 0%, rgba(5,12,18,0.5) 60%, rgba(5,12,18,0.1) 100%);
 }
-.banner-content { position: relative; z-index: 2; max-width: 620px; }
-.banner-title { margin: 0 0 6px; font-size: clamp(20px, 3vw, 30px); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; color: #fff; }
-.hero-text { margin: 0; font-size: 13.5px; color: rgba(255, 255, 255, 0.9); max-width: 560px; }
+.banner-content {
+  position: relative; z-index: 2; text-align: center; max-width: 100%; padding-bottom: 12px;
+  display: flex; flex-direction: column; gap: 4px; align-items: center;
+}
+.banner-title {
+  margin: 0; font-size: clamp(18px, 2vw, 26px); font-weight: 800; line-height: 1.1;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+}
+.banner-title::after {
+  content: ""; display: block; width: 40px; height: 3px; margin: 4px auto 0;
+  border-radius: 2px; background: var(--accent);
+}
+.hero-text {
+  margin: 0; font-size: clamp(12px, 1.2vw, 15px); font-weight: 600; line-height: 1.2;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+}
+.banner-icons {
+  position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 20px; z-index: 2; pointer-events: none;
+}
+.banner-icon { width: 18px; height: 18px; color: var(--accent); filter: drop-shadow(0 1px 2px rgba(0,0,0,0.6)); }
 
-/* ==== CURRENCY TICKER ==== */
+/* ============================================================
+   ВАЛЮТНАЯ ЛЕНТА
+   ============================================================ */
 .market-ticker {
-  position: relative; z-index: 3; margin: -18px 12px 12px; padding: 12px 14px;
-  background: rgba(255,255,255,.97); border: 1px solid var(--accent-border); border-radius: 18px;
-  box-shadow: 0 8px 24px rgba(23,35,24,.13), inset 0 1px 0 rgba(255,255,255,.9);
-  display: flex; align-items: center; gap: 12px;
+  margin-top: 6px; padding: 6px 8px;
+  background: rgba(255,255,255,.97); border: 1px solid var(--accent-border);
+  border-radius: 10px; box-shadow: var(--shadow-sm);
 }
-.ticker-scroll { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); width: 100%; min-width: 0; overflow: hidden; }
-.ticker-item { display: flex; align-items: center; gap: 12px; min-width: 0; padding: 2px 16px; white-space: nowrap; }
-.ticker-item + .ticker-item { border-left: 1px solid #d8dfd9; }
-.ticker-icon { display: inline-flex; flex: 0 0 42px; width: 42px; height: 42px; align-items: center; justify-content: center; border-radius: 50%; background: #f1f4ef; font-size: 26px; line-height: 1; }
-.ticker-icon-btc { background: #ff951b; color: #fff; font-size: 29px; font-weight: 800; }
-.ticker-details { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-.ticker-label { font-weight: 800; color: #202824; font-size: 12px; letter-spacing: .025em; }
-.ticker-main { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.ticker-value { font-weight: 800; color: #18231d; font-size: clamp(15px,1.45vw,20px); line-height: 1.1; }
-.ticker-arrow { font-size: 11px; font-weight: 700; }
-.ticker-arrow.up { color: #159447; }
-.ticker-arrow.down { color: #e32f3d; }
-.ticker-arrow.flat { color: var(--muted); }
-.ticker-source { color: var(--muted); font-size: 10.5px; line-height: 1.25; }
-.ticker-note { display: none; font-size: 10px; color: var(--muted); white-space: nowrap; }
-/* ==== SEARCH + AI ==== */
-.search-ai-section { margin-top: 12px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; align-items: stretch; }
+.ticker-scroll { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
+.ticker-item {
+  display: flex; align-items: center; gap: 6px; min-width: 0;
+  padding: 0 4px; border-left: 1px solid var(--line);
+}
+.ticker-item:first-child { border-left: 0; padding-left: 0; }
+.ticker-icon {
+  flex: 0 0 22px; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; background: #f1f4ef; font-size: 12px;
+}
+.ticker-icon-btc { background: #ff951b; color: #fff; font-weight: 800; }
+.ticker-details { display: flex; flex-direction: column; gap: 2px; overflow: hidden; }
+.ticker-label { font-size: 9px; font-weight: 800; color: var(--text); }
+.ticker-value { font-size: 12px; font-weight: 800; white-space: nowrap; }
+.ticker-source {
+  display: block;
+  color: var(--muted);
+  font-size: 8px;
+  line-height: 1.2;
+}
+.ticker-note { display: block; margin-top: 2px; color: var(--muted); font-size: 10px; }
+
+/* ============================================================
+   ПОИСК И AI
+   ============================================================ */
+.search-ai-section { margin-top: 6px; display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 8px; }
 .search-panel {
-  background: #fff; border: 2.5px solid var(--accent-border); border-radius: var(--radius); padding: 14px;
-  box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 10px;
+  background: #fff; border: 2px solid var(--accent-border); border-radius: var(--radius);
+  padding: 12px; display: flex; flex-direction: column; gap: 8px;
 }
-.search-input-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
-.search-input-row input { min-width: 0; }
-.search-filters-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-.search-filters-row > * { min-width: 0; }
+.search-input-row { display: grid; grid-template-columns: 1fr; gap: 8px; }
+.search-filters-row { display: grid; grid-template-columns: 1.5fr 1fr; gap: 8px; }
+
+/* Выпадающий список категорий */
+.category-select-trigger {
+  display: flex; align-items: center; gap: 10px; width: 100%; height: 42px;
+  padding: 0 12px; background: #f5fbdc; border: 1.5px solid #bfd68e;
+  border-radius: 12px; color: #194b39; font-weight: 700; font-size: 14px; cursor: pointer;
+}
+.category-select-icon { width: 22px; height: 22px; }
+.category-select-arrow { margin-left: auto; width: 16px; height: 16px;
+  flex: 0 0 16px;
+}
+
 input, select, textarea {
-  width: 100%; border: 2px solid var(--accent-input); border-radius: 10px; padding: 11px 12px;
-  background: #fff; color: var(--text); font: inherit; font-size: 14px; outline: none; min-width: 0;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  width: 100%; border: 2px solid var(--accent-input); border-radius: 10px;
+  padding: 11px 12px; font: inherit; font-size: 14px; color: var(--text); outline: none; min-width: 0; background: #fff; transition: border-color 0.15s, box-shadow 0.15s;
 }
 input:focus, select:focus, textarea:focus { border-color: var(--accent-border); box-shadow: 0 0 0 3px rgba(212, 255, 0, 0.3); }
+
 .btn {
   border: 0; border-radius: 10px; padding: 11px 16px; font: inherit; font-weight: 700; font-size: 14px;
-  cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap;
-  transition: background 0.15s, transform 0.05s, box-shadow 0.15s;
+  cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; transition: background 0.15s, transform 0.05s, box-shadow 0.15s;
 }
 .btn:active { transform: translateY(1px); }
 .btn-primary { background: var(--accent); color: #12140a; box-shadow: 0 4px 14px rgba(160, 190, 0, 0.35); }
 .btn-primary:hover { background: var(--accent-hover); }
-.btn-dark { background: var(--dark); color: #fff; }
-.full { width: 100%; }
+
+/* AI Панель */
 .ai-panel {
-  position: relative; background: linear-gradient(135deg, #fbffea 0%, #ffffff 100%); color: var(--text);
-  border: 2.5px solid var(--accent-border); border-radius: var(--radius); padding: 18px 18px 16px;
-  display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; overflow: hidden; box-shadow: var(--shadow-sm);
+  background: linear-gradient(135deg, #fbffea 0%, #ffffff 100%);
+  border: 2px solid var(--accent-border); border-radius: var(--radius);
+  padding: 12px; display: flex; flex-direction: column; justify-content: space-between;
 }
-.ai-panel::before {
-  content: ''; position: absolute; width: 220px; height: 220px; right: -60px; top: -60px;
-  background: radial-gradient(circle, rgba(212, 255, 0, 0.35) 0%, rgba(212, 255, 0, 0) 70%); pointer-events: none;
+.ai-badge { background: var(--accent); color: #12140a; font-weight: 800; font-size: 10px; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 6px; }
+.ai-panel h3 { margin: 0 0 4px; font-size: 15px; line-height: 1.2; color: #556300; }
+.ai-subtitle { margin: 0 0 8px; font-size: 11px; color: var(--muted); }
+.btn-ai { background: var(--accent); color: #12140a; font-weight: 800; padding: 8px; border-radius: 8px; border: 0; cursor: pointer; width: 100%; height: 42px; font-size: 13px; }
+
+/* Поля поиска с иконками */
+.input-with-icon, .select-with-icon { position: relative; width: 100%; display: flex; align-items: center; min-width: 0; }
+.input-icon { position: absolute; left: 10px; width: 16px; height: 16px; color: #4a6354; pointer-events: none; z-index: 5; }
+.input-with-icon input, .select-with-icon select { padding: 8px 28px 8px 34px; height: 40px; font-size: 13px; border-width: 1.5px; background-color: #fff; }
+.select-with-icon select { appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234a6354' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 10px center; background-size: 14px; }
+.search-panel .btn-primary { height: 42px; font-size: 14px; }
+
+/* ============================================================
+   СПИСКИ ОБЪЯВЛЕНИЙ
+   ============================================================ */
+.urgent-deals { padding-top: 20px; }
+.urgent-deals-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.listing-section { padding: 20px 0 40px; }
+.listing { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.empty { grid-column: 1 / -1; padding: 30px; text-align: center; color: var(--muted); background: #fff; border: 1px dashed var(--line); border-radius: var(--radius); }
+
+
+/* ============================================================
+   МОДАЛЬНЫЕ ОКНА, ФОРМЫ И КОМПОНЕНТЫ
+   ============================================================ */
+
+/* ============================================================
+   МОДАЛЬНЫЕ ОКНА
+   ============================================================ */
+
+/* ============================================================
+   ПОДВАЛ И НИЖНЯЯ НАВИГАЦИЯ
+   ============================================================ */
+.footer { border-top: 1px solid var(--line); padding: 20px 0; color: var(--muted); font-size: 13px; text-align: center; }
+
+.bottom-nav { display: none; }
+@media (max-width: 720px) {
+  .bottom-nav {
+    display: grid; grid-template-columns: repeat(3, 1fr); position: fixed; bottom: 0; left: 0; right: 0;
+    background: #203b31; border-top: 2px solid var(--accent-border); z-index: 55; padding-bottom: env(safe-area-inset-bottom);
+  }
+  .bottom-nav-btn {
+  position: relative;
+    display: flex; flex-direction: column; align-items: center; padding: 8px 0; background: none; border: 0; color: #c8d5c0; cursor: pointer;
+  }
+  .bottom-nav-icon { font-size: 22px; color: var(--accent); }
+  .bottom-nav-label { font-size: 10px; font-weight: 700; margin-top: 2px; }
+  .bottom-nav-btn.active .bottom-nav-label { color: var(--accent); }
 }
-.ai-text { position: relative; z-index: 1; max-width: 100%; }
-.ai-badge { display: inline-block; background: var(--accent); color: #12140a; font-weight: 800; font-size: 11px; padding: 3px 8px; border-radius: 6px; margin: 0 0 8px; letter-spacing: 0.08em; }
-.ai-panel h3 { margin: 0 0 6px; font-size: 18px; color: #556300; letter-spacing: -0.01em; }
-.ai-subtitle { margin: 0 0 12px; font-size: 12px; color: var(--muted); line-height: 1.4; }
-.ai-features { list-style: none; padding: 0; margin: 0 0 14px; font-size: 12.5px; color: var(--text); }
-.ai-features li { margin-bottom: 4px; padding-left: 16px; position: relative; }
-.ai-features li::before { content: '✓'; color: #556300; position: absolute; left: 0; top: 0; font-weight: 800; }
-.btn-ai { background: var(--accent); color: #12140a; border: 0; border-radius: 10px; padding: 10px 14px; font-weight: 800; cursor: not-allowed; font-size: 13px; opacity: 0.92; }
-.ai-visual { font-size: 56px; line-height: 1; position: relative; z-index: 1; flex-shrink: 0; filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.15)); }
-.urgent-deals { padding-top: 24px; }
-.urgent-deals-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
-.badge-soft { background: var(--accent-light); color: #556000; font-size: 12px; font-weight: 700; padding: 6px 10px; border-radius: 999px; }
-.listing-section { padding: 24px 0 0; }
-.section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
-.eyebrow { margin: 0 0 6px; text-transform: uppercase; letter-spacing: 0.12em; font-size: 11px; font-weight: 800; color: #76840a; }
-h1 { font-size: clamp(32px, 5vw, 52px); line-height: 1; letter-spacing: -0.04em; margin: 0; }
-h2 { font-size: 22px; margin: 0; letter-spacing: -0.02em; }
-.muted { color: var(--muted); font-size: 13px; }
-.listing { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; padding-bottom: 40px; }
-.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow-sm); transition: transform 0.15s, box-shadow 0.15s; }
-.card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
-.card-top { display: flex; justify-content: space-between; gap: 10px; align-items: center; }
-.badge { display: inline-block; background: var(--accent-soft); color: #556000; border-radius: 999px; padding: 5px 10px; font-size: 11.5px; font-weight: 700; }
-.card h3 { margin: 14px 0 6px; font-size: 18px; letter-spacing: -0.01em; }
-.price { font-size: 21px; font-weight: 850; margin: 0 0 6px; }
-.city { color: var(--muted); font-size: 13px; }
-.desc { color: #4f555d; line-height: 1.5; font-size: 14px; margin: 0; }
-.listing-photo { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 12px; }
-.empty { grid-column: 1 / -1; padding: 40px; text-align: center; color: var(--muted); background: #fff; border: 1px dashed var(--line); border-radius: var(--radius); }
-.footer { border-top: 1px solid var(--line); padding: 24px 0; color: var(--muted); font-size: 13px; margin-top: 24px; }
+
+/* ============================================================
+   МОБИЛЬНАЯ АДАПТАЦИЯ (≤ 720px)
+   ============================================================ */
+@media (max-width: 720px) {
+  .container { width: calc(100% - 16px); } /* Уменьшили отступы по краям с 16 до 8 пикселей */
+
+  /* Шапка */
+  .nav { gap: 6px; }
+  .brand { padding: 2px 6px; gap: 4px; }
+  .brand .logo { width: 24px; height: 24px; }
+  .brand .brand-text { transform: scale(1, 1.15); font-size: 13px; }
+
+  .header-action, .lang-btn { height: 36px; padding: 0 8px; font-size: 11px; border-width: 2px; }
+  .lang-trigger { padding: 0 6px; font-size: 11px; }
+  .lang-flag { font-size: 12px; }
+  #openAdd { padding: 0 6px; font-size: 10px; white-space: normal; line-height: 1.1; text-align: center; }
+  .account-btn .account-label { display: none; }
+
+  /* Категории */
+  .categories-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .category-card { aspect-ratio: 3 / 1; padding: 8px; }
+  .category-card-label { font-size: 14px; gap: 4px; flex-direction: column; }
+  .category-icon { width: 20px; height: 20px; flex: 0 0 20px; }
+
+  .all-btn { width: 54px; height: 30px; font-size: 10px; }
+
+  /* Баннер (Высота уменьшена на 20%) */
+  .main-banner {
+    height: 60px; /* 75px (было) - 20% = 60px */
+    padding: 6px 10px 16px;
+  }
+  .banner-title { font-size: 14px; }
+  .banner-title::after { width: 25px; height: 2px; margin-top: 2px; }
+  .hero-text { font-size: 10px; }
+  .banner-icons { bottom: 3px; gap: 12px; }
+  .banner-icon { width: 14px; height: 14px; }
+
+  /* Валюты */
+  .market-ticker { margin-top: 6px; padding: 6px 8px; }
+  .ticker-scroll { gap: 4px; }
+  .ticker-item { padding: 0 4px; gap: 4px; }
+  .ticker-icon { flex-basis: 20px; width: 20px; height: 20px; font-size: 12px; }
+  .ticker-label { font-size: 8px; }
+  .ticker-value { font-size: 10px; }
+  .ticker-source { display: none; font-size: 7px; }
+
+  /* Поиск и AI */
+  .search-ai-section { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 8px; }
+  .search-panel { padding: 10px; gap: 6px; }
+  .search-filters-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .ai-panel { padding: 10px; }
+  .ai-panel h3 { font-size: 14px; }
+  .ai-panel .ai-features { display: none; } /* Скрываем лишний текст для компактности */
+  .btn-ai { font-size: 11px; padding: 6px; }
+
+  /* Списки */
+  .urgent-deals { padding-top: 14px; }
+  .urgent-deals-grid { grid-template-columns: 1fr; gap: 10px; }
+  .listing { grid-template-columns: 1fr; }
+}
+/* ============================================================
+   HRYVNIA HUB — ВОССТАНОВЛЕНИЕ ДИЗАЙНА МОДАЛОК И ФОРМ
+   (Объединённые базовые стили модальных окон и форм)
+   ============================================================ */
+
+/* --- Общие стили модальных окон --- */
 .modal { position: fixed; inset: 0; background: rgba(8, 10, 14, 0.56); display: grid; place-items: center; padding: 20px; z-index: 60; backdrop-filter: blur(2px); }
-.hidden { display: none !important; }
 .modal-card { position: relative; width: min(540px, 100%); max-height: 90dvh; overflow: auto; background: #fff; border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-lg); }
 .modal-card h2 { margin-bottom: 18px; }
 .modal-card label { display: block; font-weight: 700; margin-bottom: 12px; font-size: 14px; }
@@ -290,2629 +395,236 @@ h2 { font-size: 22px; margin: 0; letter-spacing: -0.02em; }
 .modal-close { position: absolute; right: 12px; top: 10px; border: 0; background: none; font-size: 28px; cursor: pointer; line-height: 1; color: var(--muted); padding: 4px 8px; border-radius: 8px; }
 .modal-close:hover { background: #f3f4f7; color: var(--text); }
 .form-message { min-height: 18px; color: var(--muted); font-size: 13px; margin: 8px 0 0; }
+.form-message.error { color: #c62828; }
+.form-message.success { color: #247a36; }
+
+/* --- Авторизация (Вкладки и пароли) --- */
+.auth-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 16px; }
+.auth-tab { min-width: 0; min-height: 46px; border: 2px solid var(--accent); border-radius: 10px; background: #fff; color: #203b31; font: inherit; font-weight: 700; cursor: pointer; }
+.auth-tab.active { background: var(--accent); color: #17210a; }
+.auth-tab[data-auth-tab="register"] { background: var(--accent); border-color: #7fa800; color: #17210a; }
+.auth-tab[data-auth-tab="login"] { background: #ffffff; border-color: #9abf24; color: #17210a; }
+.password-field { position: relative; display: block; }
+.password-field > input { padding-right: 44px; }
+.password-toggle { position: absolute; top: 50%; right: 6px; transform: translateY(-50%); width: 34px; height: 34px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--muted); font-size: 16px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+.password-toggle:hover { background: #f3f4f7; }
+#authModal .auth-card { border: 1px solid #75a983; box-shadow: 0 12px 34px rgba(32, 72, 42, .12); }
+
+/* --- Форма добавления (Фото и характеристики авто) --- */
 .photo-fields { min-width: 0; margin: 0 0 14px; padding: 14px; border: 1px solid var(--line); border-radius: 12px; display: block; }
 .photo-fields legend { font-weight: 700; padding: 0 6px; font-size: 14px; }
-.photo-fields .form-message:empty { display: none; }
-.photo-fields .muted { font-size: 12.5px; line-height: 1.45; margin: 8px 0; color: var(--muted); }
 .photo-preview { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .photo-item { min-width: 0; border: 1px solid var(--line); border-radius: 10px; padding: 8px; }
 .photo-item img { width: 100%; height: 110px; object-fit: cover; border-radius: 6px; }
-.photo-item > span { display: block; font-size: 12px; margin: 6px 0; }
 .photo-actions { display: flex; flex-wrap: wrap; gap: 6px; }
 .photo-actions .btn { padding: 6px 8px; font-size: 12px; }
-.photo-fields:disabled { opacity: 0.7; }
-.city-search, .catalog-city-search { position: relative; min-width: 0; }
-.city-search { margin-top: 6px; }
-.city-search > input[type="search"] { margin-top: 0; }
+.vehicle-listing-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 8px 0 14px; padding: 14px; border: 1px solid var(--accent-border); border-radius: 14px; }
+.vehicle-listing-fields[hidden] {
+  display: none;
+}
+
+/* --- Меню категорий (Темная стеклянная тема) --- */
+.category-menu-backdrop { position: fixed; inset: 0; z-index: 999; background: rgba(8, 18, 13, .46); backdrop-filter: blur(8px); }
+.category-menu { position: fixed; z-index: 1000; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(92vw, 430px); max-height: min(82dvh, 620px); overflow: auto; padding: 20px; border-radius: 22px; background: rgba(18, 39, 29, .96); color: #f7f9f5; box-shadow: 0 24px 80px rgba(0,0,0,.28); }
+.category-menu h2 { margin: 0 34px 18px 0; font-size: 22px; color: #fff; }
+.category-menu-close { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border: 1px solid rgba(255, 255, 255, .22); border-radius: 50%; background: rgba(255, 255, 255, .07); color: #f7f9f5; font-size: 24px; cursor: pointer; }
+.category-menu-options { display: flex; flex-direction: column; width: 100%; }
+.category-menu-option { display: flex; align-items: center; justify-content: flex-start; gap: 12px; width: 100%; padding: 12px 8px; border: 0; border-bottom: 1px solid rgba(255, 255, 255, .16); background: transparent; color: #f7f9f5; text-align: left; font-size: 16px; cursor: pointer; }
+.category-menu-option:hover { background: rgba(212, 255, 0, .07); color: var(--accent); }
+.category-menu-option span:last-child { margin-left: auto; color: var(--accent); }
+.category-menu-icon { flex: 0 0 28px; width: 28px; text-align: center; color: var(--accent); }
+
+/* --- Выпадающие подсказки городов --- */
+.city-search { position: relative; min-width: 0; margin-top: 6px; }
+.catalog-city-search { position: relative; min-width: 0; }
 .city-suggestions, .catalog-city-suggestions { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 25; max-height: 240px; overflow: auto; padding: 4px; background: #fff; border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
 .city-suggestion, .catalog-city-suggestion { display: block; width: 100%; padding: 10px 12px; border: 0; border-radius: 8px; background: transparent; color: var(--text); font: inherit; text-align: left; cursor: pointer; }
-.city-suggestion:hover, .city-suggestion:focus, .catalog-city-suggestion:hover, .catalog-city-suggestion:focus { background: #f3f4f7; outline: none; }
-.city-suggestion-name { display: block; font-weight: 600; font-size: 14px; }
-.city-suggestion-region { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
-.city-suggestion-empty { padding: 10px 12px; color: var(--muted); font-size: 13px; }
-.icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--line); background: #fff; cursor: pointer; font-size: 16px; color: var(--text); padding: 0; }
-.icon-btn:hover { background: #f3f4f7; }
 
-/* ==== ПЛАНШЕТ (≤1000px) ==== */
-@media (max-width: 1000px) {
-  .search-ai-section { grid-template-columns: 1fr; }
-  .search-filters-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .listing { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .urgent-deals-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
+/* --- Избранное (Сердечки) --- */
+.fav-btn { position: absolute; top: 10px; right: 10px; width: 36px; height: 36px; border-radius: 50%; background: rgba(255, 255, 255, .94); border: 1.5px solid #dce3df; color: #6b7570; font-size: 18px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; z-index: 3; }
+.fav-btn.active { color: #d4381e; border-color: #f0b8ad; background: #fff0ed; }
 
-/* ==== МОБИЛЬНЫЙ (≤720px) — единый блок ==== */
-@media (max-width: 720px) {
-  /* --- HEADER: одна строка --- */
-  .nav {
-    min-height: 46px;
-    gap: 5px;
-    flex-wrap: nowrap;
-    padding-top: 5px;
-    padding-bottom: 5px;
-  }
-  .brand { flex: 0 1 auto; min-width: 0; gap: 4px; white-space: nowrap; }
-  .brand .logo {
-    width: 28px; height: 28px; padding: 3px;
-    border-radius: 8px; flex: 0 0 28px;
-  }
-  .brand .brand-text {
-    display: inline;
-    font-size: clamp(8.5px, 2.4vw, 11px);
-    line-height: 1;
-    letter-spacing: -0.02em;
-    white-space: nowrap;
-    color: var(--text);
-  }
-  .header-actions {
-    order: initial;
-    flex: 1 1 auto;
-    width: auto;
-    min-width: 0;
-    margin-left: auto;
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: center;
-    gap: 3px;
-  }
-  .header-action {
-    box-sizing: border-box;
-    height: 30px;
-    min-height: 30px;
-    padding: 0 5px;
-    font-size: 11px;
-    line-height: 1.1;
-    gap: 3px;
-    border-width: 2px;
-    border-radius: 8px;
-    flex: 0 0 auto;
-    width: auto;
-    min-width: 0;
-  }
-  .lang-btn {
-    flex: 0 1 auto;
-    width: clamp(60px, 18vw, 72px);
-    min-width: 0;
-    height: 30px;
-    box-sizing: border-box;
-    border-width: 2px;
-    border-radius: 8px;
-  }
-  .lang-trigger {
-    width: 100%;
-    min-width: 0;
-    padding: 0 4px;
-    display: grid;
-    grid-template-columns: auto 1fr;
-    grid-template-rows: 1fr 1fr;
-    column-gap: 4px;
-    align-items: center;
-    font-size: 9px;
-    line-height: 1;
-    justify-content: stretch;
-  }
-  .lang-flag {
-    grid-row: 1 / span 2;
-    grid-column: 1;
-    font-size: 13px;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .lang-city {
-    display: block;
-    grid-row: 1;
-    grid-column: 2;
-    font-size: 9.5px;
-    line-height: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-align: left;
-  }
-  .lang-clock {
-    grid-row: 2;
-    grid-column: 2;
-    font-size: 9px;
-    line-height: 1;
-    text-align: left;
-  }
-  .btn-add {
-    order: 2;
-    width: 30px;
-    min-width: 30px;
-    padding: 0;
-    font-size: 0;
-  }
-  .btn-add::before {
-    content: "+";
-    font-size: 17px;
-    font-weight: 800;
-    line-height: 1;
-  }
-  .account-btn {
-    order: 3;
-    width: 30px;
-    min-width: 30px;
-    padding: 0;
-    justify-content: center;
-    gap: 0;
-  }
-  .account-btn .account-label { display: none; }
-  .account-btn .account-icon { font-size: 14px; line-height: 1; }
-
-  /* Старая мобильная кнопка настроек больше не используется */
-  .settings-btn { display: none !important; }
-
-  /* --- КАТЕГОРИИ: −10% по высоте (84 → 76) --- */
-  .categories-section { margin-top: 10px; }
-  .categories-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
-  .category-card { min-height: 76px; padding: 10px; }
-  .category-card-img { object-position: center 40%; }
-  .category-card-label { font-size: 17px; }
-
-  /* --- БАННЕР: ниже, текст поднят вверх --- */
-  .hero { margin-top: 4px; }
-  .main-banner {
-    min-height: 80px;
-    padding: 10px 14px;
-    align-items: flex-start;
-  }
-  .main-banner-img { object-position: center 40%; }
-  .banner-title { font-size: 16px; line-height: 1.15; margin-bottom: 4px; }
-  .hero-text { font-size: 11.5px; line-height: 1.3; }
-
-  /* --- ОСТАЛЬНОЕ БЕЗ ИЗМЕНЕНИЙ --- */
-  .market-ticker { margin: -10px 4px 8px; padding: 8px 5px; border-radius: 14px; }
-  .ticker-item { gap: 6px; padding: 2px 7px; }
-  .ticker-icon { flex-basis: 28px; width: 28px; height: 28px; font-size: 17px; }
-  .ticker-icon-btc { font-size: 19px; }
-  .ticker-label { font-size: 9px; letter-spacing: 0; }
-  .ticker-value { font-size: clamp(11px,3vw,14px); }
-  .ticker-main { gap: 3px; }
-  .ticker-arrow { font-size: 9px; }
-  .ticker-source { font-size: 8px; }
-  .ticker-note { display: none; }
-  .search-ai-section { margin-top: 8px; gap: 8px; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); }
-  .search-panel { padding: 10px; width: auto; justify-self: stretch; }
-  .search-input-row { grid-template-columns: 1fr; }
-  .search-filters-row { grid-template-columns: 1fr; }
-  .ai-panel { flex-direction: column; align-items: flex-start; padding: 12px; }
-  .ai-visual { align-self: flex-end; font-size: 40px; }
-  .urgent-deals { padding-top: 16px; }
-  .urgent-deals-grid { grid-template-columns: 1fr; }
-  .listing-section { padding: 16px 0 0; }
-  .listing { grid-template-columns: 1fr; }
-  .section-head { flex-direction: column; align-items: flex-start; gap: 4px; }
-  h2 { font-size: 20px; }
-  .photo-preview { grid-template-columns: 1fr; }
-  .modal { padding: 12px; }
-  .modal-card { padding: 18px; border-radius: var(--radius); }
-}
-
-/* ==== ≤480px ==== */
-@media (max-width: 480px) {
-  .header-action { padding-left: 4px; padding-right: 4px; font-size: 10px; }
-  .lang-trigger { padding-left: 3px; padding-right: 3px; }
-  .lang-city { font-size: 9px; }
-  .lang-clock { font-size: 8.5px; }
-  .header-actions { gap: 3px; }
-  .brand .brand-text { font-size: 9px; }
-}
-
-/* ==== ≤420px ==== */
-@media (max-width: 420px) {
-  #openAdd { font-size: 0; padding: 0; min-width: 30px; }
-  #openAdd::before { content: "+"; font-size: 18px; line-height: 1; font-weight: 800; }
-}
-
-/* ==== ≤380px ==== */
-@media (max-width: 380px) {
-  .search-ai-section { grid-template-columns: 1fr; }
-  .search-panel { width: auto; }
-  .search-filters-row { grid-template-columns: 1fr; }
-  .category-card-label { font-size: 16px; }
-
-  .header-actions { gap: 2px; }
-  .header-action { padding-left: 3px; padding-right: 3px; font-size: 9px; }
-  .brand .brand-text { font-size: 8.5px; }
-  .brand .logo { width: 24px; height: 24px; flex-basis: 24px; }
-  .lang-btn { width: 54px; }
-}
-
-/* ==== Индикаторы загрузки кнопок ==== */
-.spinner { display: inline-block; width: 1em; height: 1em; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: hh-spin .7s linear infinite; vertical-align: -0.12em; flex: 0 0 auto; }
-.is-loading { display: inline-flex; align-items: center; justify-content: center; gap: .55em; cursor: wait; }
-.is-loading:disabled { opacity: .85; }
-@keyframes hh-spin { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 1.5s; } }
-
-/* Сообщения авторизации */
-.form-message.error {
-  color: #c62828;
-}
-.form-message.success {
-  color: #247a36;
-}
-
-/* ==== АКТУАЛЬНЫЕ ПРАВКИ ВЕРХНЕЙ ПАНЕЛИ HRYVNIA HUB ==== */
-/* Название бренда: +15% по ширине и +50% по высоте */
-.brand .brand-text {
-  display: inline-block;
-  transform: scale(1.15, 1.5);
-  transform-origin: left center;
-  padding-right: 8px;
-}
-
-/* Ширина кнопок на больших экранах */
-@media (min-width: 1200px) {
-  .header-actions .account-btn { width: 318px; min-width: 318px; flex: 0 0 auto; justify-content: center; }
-  .header-actions .btn-add { width: 515px; min-width: 515px; flex: 0 0 auto; justify-content: center; }
-}
-@media (min-width: 1000px) and (max-width: 1199px) {
-  .header-actions .account-btn { width: 254px; min-width: 254px; flex: 0 0 auto; justify-content: center; }
-  .header-actions .btn-add { width: 412px; min-width: 412px; flex: 0 0 auto; justify-content: center; }
-}
-@media (min-width: 900px) and (max-width: 999px) {
-  .header-actions .account-btn { width: 220px; min-width: 220px; flex: 0 0 auto; justify-content: center; }
-  .header-actions .btn-add { width: 360px; min-width: 360px; flex: 0 0 auto; justify-content: center; }
-}
-@media (min-width: 781px) and (max-width: 899px) {
-  .header-actions .account-btn { width: 190px; min-width: 190px; flex: 0 0 auto; justify-content: center; }
-  .header-actions .btn-add { width: 310px; min-width: 310px; flex: 0 0 auto; justify-content: center; }
-}
-@media (min-width: 721px) and (max-width: 780px) {
-  .header-actions .account-btn, .header-actions .btn-add {
-    flex: 1 1 0; width: auto; min-width: 0; justify-content: center;
-  }
-}
-@media (max-width: 720px) {
-  .header-actions .btn-add {
-    order: 2;
-    width: auto;
-    min-width: 124px;
-    flex: 1 1 auto;
-    padding: 0 7px;
-    font-size: 10px;
-    line-height: 1.1;
-    white-space: nowrap;
-    justify-content: center;
-  }
-  .header-actions .btn-add::before { content: none; display: none; }
-  .header-actions .account-btn {
-    width: 75px; min-width: 75px; flex: 0 0 75px;
-    padding: 0; justify-content: center; gap: 0;
-  }
-  .header-actions .account-btn .account-label { display: none; }
-  .brand .brand-text {
-    transform: scale(1.15, 1.5);
-    transform-origin: left center;
-    padding-right: 8px;
-  }
-}
-@media (max-width: 380px) {
-  .header-actions .btn-add { min-width: 108px; padding: 0 4px; font-size: 9px; }
-  .header-actions .account-btn { width: 58px; min-width: 58px; flex-basis: 58px; }
-  .brand .brand-text { transform: scale(1.15, 1.5); padding-right: 5px; }
-}
-
-
-/* ==== PREMIUM COLOR FINISH + MOBILE HEADER FIX ==== */
-:root {
-  --premium-forest: #203b31;
-  --premium-forest-deep: #172b24;
-  --premium-gold: #b4a16a;
-}
-
-.header {
-  background: rgba(250, 251, 249, 0.97);
-  border-bottom-color: #d8e0da;
-}
-.brand { color: var(--premium-forest-deep); }
-.brand-hub { color: #78951d; }
-.header-action, .lang-btn {
-  background: #edf4d9;
-  border-color: #9abf24;
-}
-.header-action:hover { background: #e2efbd; }
-.btn-primary, .btn-ai {
-  background: var(--accent);
-  color: #1c2922;
-}
-.ai-panel {
-  background: linear-gradient(145deg, #f0f4e4 0%, #ffffff 72%);
-  border-color: #a4bd53;
-}
-.ai-panel h3 { color: var(--premium-forest); }
-.ai-features li::before { color: #527343; }
-.market-ticker { border-color: #9abf24; background: #fcfdfb; }
-.search-panel, .card { border-color: #dce3df; }
-input, select, textarea { border-color: #c4d7a0; }
-input:focus, select:focus, textarea:focus {
-  border-color: #8eae2b;
-  box-shadow: 0 0 0 3px rgba(154, 191, 36, 0.18);
-}
-.category-card[data-category="Автомобили"] { background: linear-gradient(135deg, #203b4b, #436f7c); }
-.category-card[data-category="Недвижимость"] { background: linear-gradient(135deg, #203b31, #66816a); }
-.category-card[data-category="Готовый бизнес"] { background: linear-gradient(135deg, #252f35, #59656a); }
-.category-card[data-category="Инвестиции"] { background: linear-gradient(135deg, #263a32, #8b793e); }
-
-/* Keep the requested brand scaling. */
-.brand .brand-text {
-  display: inline-block;
-  transform: scale(1.15, 1.5);
-  transform-origin: left center;
-  padding-right: 8px;
-}
-
-/* The HTML already contains “+ Добавить объявление”; do not replace it with a pseudo-element. */
-@media (max-width: 720px) {
-  .header-actions .btn-add, #openAdd {
-    order: 2; width: auto; min-width: 124px; flex: 1 1 auto;
-    padding: 0 7px; font-size: 10px; line-height: 1.1;
-    white-space: nowrap; justify-content: center;
-  }
-  .header-actions .btn-add::before, #openAdd::before { content: none !important; display: none !important; }
-  .header-actions .account-btn { order: 3; width: 58px; min-width: 58px; flex: 0 0 58px; }
-  .brand .brand-text { transform: scale(1.15, 1.5); padding-right: 8px; }
-}
-@media (max-width: 420px) {
-  #openAdd { min-width: 108px; font-size: 9px; padding: 0 4px; }
-  #openAdd::before { content: none !important; display: none !important; }
-}
-@media (max-width: 380px) {
-  .header-actions .btn-add, #openAdd { min-width: 102px; font-size: 8.5px; padding: 0 3px; }
-  .header-actions .account-btn { width: 50px; min-width: 50px; flex-basis: 50px; }
-  .brand .brand-text { transform: scale(1.08, 1.35); padding-right: 4px; }
-}
-
-
-/* ==== HERO BANNER LAYOUT FIX: balanced text and icon row ==== */
-.main-banner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 150px;
-  padding: 20px 24px 34px;
-}
-.main-banner::before {
-  background: linear-gradient(
-    180deg,
-    rgba(15, 20, 28, 0.32) 0%,
-    rgba(15, 20, 28, 0.58) 100%
-  );
-}
-.banner-content {
-  position: relative;
-  z-index: 2;
-  width: 100%;
-  max-width: 760px;
-  margin: 0 auto;
-  text-align: center;
-}
-.banner-title {
-  margin: 0 0 6px;
-  font-size: clamp(20px, 3vw, 29px);
-  line-height: 1.12;
-  text-wrap: balance;
-}
-.hero-text {
-  max-width: 650px;
-  margin: 0 auto;
-  font-size: 14px;
-  line-height: 1.35;
-  text-wrap: pretty;
-}
-.banner-icons {
-  position: absolute;
-  z-index: 2;
-  left: 18px;
-  right: 18px;
-  bottom: 9px;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  gap: 12px;
-  pointer-events: none;
-}
-.banner-icon {
+/* --- Нижняя навигация (Иконки) --- */
+.bottom-nav-btn .bottom-nav-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 22px;
-  font-size: 16px;
-  line-height: 1;
-  opacity: 0.82;
-  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.55));
-}
-
-@media (max-width: 720px) {
-  .main-banner {
-    min-height: 124px;
-    padding: 12px 14px 32px;
-    align-items: center;
-  }
-  .main-banner-img { object-position: center 40%; }
-  .banner-content {
-    width: 100%;
-    max-width: none;
-    margin: 0;
-    text-align: center;
-  }
-  .banner-title {
-    font-size: 16px;
-    line-height: 1.12;
-    margin-bottom: 4px;
-  }
-  .hero-text {
-    max-width: 100%;
-    font-size: 11.5px;
-    line-height: 1.25;
-  }
-  .banner-icons {
-    left: 20px;
-    right: 20px;
-    bottom: 8px;
-    gap: 8px;
-  }
-  .banner-icon { font-size: 14px; }
-}
-
-/* ==== FINAL HEADER: ONE BRIGHT, DEEP LIME TONE ==== */
-:root {
-  --accent: #c6ff00;
-  --accent-hover: #b4eb00;
-  --accent-soft: #e9ff9a;
-  --accent-light: #c6ff00;
-  --accent-border: #7fa800;
-  --accent-input: #c6df80;
-}
-
-.header {
-  background: #c6ff00;
-  border-bottom: 1px solid #7fa800;
-  backdrop-filter: none;
-}
-
-.header .nav {
-  min-height: 50px;
-  padding-top: 3px;
-  padding-bottom: 3px;
-  align-items: center;
-}
-
-.header .brand,
-.header .brand-text,
-.header .brand-name,
-.header .brand-hub {
-  color: #17210a;
-}
-
-.header .header-actions { align-items: center; }
-
-.header .header-action,
-.header .lang-btn,
-.header .settings-btn,
-.header-actions .btn-add,
-.header-actions .account-btn,
-#openAdd,
-#accountBtn {
-  background-color: #c6ff00;
-  border-color: #7fa800;
-  color: #17210a;
-  box-shadow: none;
-}
-
-.header .header-action:hover,
-.header-actions .btn-add:hover,
-#openAdd:hover,
-.header .lang-option:hover {
-  background-color: #b4eb00;
-}
-
-.header .lang-trigger,
-.header .lang-city,
-.header .lang-clock,
-.header .lang-option {
-  color: #17210a;
-}
-
-.header .lang-dropdown {
-  background: #c6ff00;
-  border-color: #7fa800;
-}
-
-@media (max-width: 720px) {
-  .header .nav {
-    min-height: 50px;
-    padding-top: 3px;
-    padding-bottom: 3px;
-  }
-
-  .header .header-action,
-  .header .lang-btn,
-  .header-actions .btn-add,
-  .header-actions .account-btn,
-  #openAdd,
-  #accountBtn {
-    background-color: #c6ff00;
-    border-color: #7fa800;
-  }
-}
-
-/* Hide colorful emoji overlay; keep the lime icons built into the banner image. */
-.main-banner .banner-icons {
-  display: none !important;
-}
-
-
-/* ==== FINAL MOBILE HEADER HEIGHT: LIME STRIP ALIGNED TO BUTTONS ==== */
-.header {
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-  min-height: 0 !important;
-  box-sizing: border-box;
-}
-
-.header .nav {
-  min-height: 0 !important;
-  height: 58px !important;
-  padding-top: 3px !important;
-  padding-bottom: 3px !important;
-  box-sizing: border-box;
-  align-items: center !important;
-}
-
-@media (max-width: 720px) {
-  .header {
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-  }
-
-  .header .nav {
-    height: 58px !important;
-    min-height: 0 !important;
-    padding-top: 3px !important;
-    padding-bottom: 3px !important;
-  }
-}
-
-
-/* ==== FINAL APPROVED HEADER + ALL BUTTON: WHITE HEADER, LIME BUTTONS, YELLOW OUTLINE ==== */
-.header {
-  background: #ffffff !important;
-  border-bottom: 1px solid #e4e8e1 !important;
-  backdrop-filter: none !important;
-}
-
-.header .nav { background: transparent !important; }
-
-/* Brand: clean lime frame, HRYVNIA black, HUB lime */
-.header .brand {
-  border: 2px solid #c6ff00 !important;
-  border-radius: 12px !important;
-  padding: 3px 7px !important;
-  background: #ffffff !important;
-  color: #111111 !important;
-  gap: 7px !important;
-}
-.header .brand .brand-text,
-.header .brand .brand-name { color: #111111 !important; }
-.header .brand .brand-hub { color: #c6ff00 !important; }
-
-/* Keep language, add-listing and account buttons exactly the same lime */
-.header .lang-btn,
-.header-actions .btn-add,
-.header-actions .account-btn,
-.header .header-action,
-.header .settings-btn,
-#openAdd,
-#accountBtn {
-  background: #c6ff00 !important;
-  border-color: #7fa800 !important;
-  color: #17210a !important;
-  box-shadow: none !important;
-}
-.header .lang-trigger,
-.header .lang-city,
-.header .lang-clock { color: #17210a !important; }
-.header .lang-dropdown {
-  background: #ffffff !important;
-  border-color: #c6ff00 !important;
-}
-.header .lang-option:hover,
-.header .header-action:hover,
-.header-actions .btn-add:hover,
-#openAdd:hover { background: #b4eb00 !important; }
-
-/* Central All/Усі button: dark-green outline, no glow or leaf */
-.all-btn,
-.all-btn.active,
-.all-btn:hover {
-  border: 3px solid #426B16 !important;
-  box-shadow: none !important;
-}
-.all-btn {
-  background: #c6ff00 !important;
-  color: #17210a !important;
-}
-
-
-/* ==== FINAL: remove the gap between the header and category panel ==== */
-.categories-section {
-  margin-top: 0 !important;
-}
-
-@media (max-width: 720px) {
-  .categories-section {
-    margin-top: 0 !important;
-  }
-}
-
-
-/* ==== Согласованные точечные правки мобильной версии Hryvnia Hub ==== */
-/* Более солидный цвет HUB, не меняя остальную структуру логотипа. */
-.header .brand .brand-hub {
-  color: #426b16 !important;
-}
-
-/* Кнопка языка/города немного шире; элементы в одну строку на мобильном. */
-@media (max-width: 720px) {
-  .header .lang-btn {
-    width: clamp(84px, 23vw, 104px);
-    flex: 0 1 auto;
-  }
-  .header .lang-trigger {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    gap: 4px;
-    padding: 0 4px;
-    white-space: nowrap;
-    min-width: 0;
-  }
-  .header .lang-flag { flex: 0 0 auto; font-size: 12px; }
-  .header .lang-city {
-    flex: 0 1 auto;
-    font-size: 9px;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .header .lang-clock {
-    flex: 0 0 auto;
-    font-size: 8.5px;
-    white-space: nowrap;
-  }
-  .header-actions .btn-add, #openAdd {
-    min-width: 108px;
-    flex: 0 1 auto;
-    padding-left: 5px;
-    padding-right: 5px;
-    font-size: 9px;
-  }
-}
-
-/* На узких экранах сохраняем читабельность шапки без горизонтального вылета. */
-@media (max-width: 420px) {
-  .header .lang-btn { width: 82px; }
-  .header .lang-trigger { gap: 3px; padding-left: 3px; padding-right: 3px; }
-  .header .lang-city { font-size: 8px; }
-  .header .lang-clock { font-size: 8px; }
-  .header-actions .btn-add, #openAdd { min-width: 100px; font-size: 8.5px; }
-}
-
-/* Компактная AI-карточка: три ключевые возможности и меньше пустого места. */
-.ai-panel {
-  padding: 12px 14px;
-  gap: 8px;
-}
-.ai-badge { margin-bottom: 5px; }
-.ai-panel h3 { margin-bottom: 4px; }
-.ai-subtitle { margin-bottom: 8px; line-height: 1.3; }
-.ai-features { margin-bottom: 9px; }
-.ai-features li { margin-bottom: 3px; }
-.btn-ai { padding: 8px 11px; }
-@media (max-width: 720px) {
-  .ai-panel { padding: 10px; gap: 6px; }
-  .ai-panel h3 { font-size: 16px; }
-  .ai-subtitle { margin-bottom: 6px; font-size: 11px; }
-  .ai-features { font-size: 11.5px; margin-bottom: 7px; }
-  .ai-visual { font-size: 30px; }
-}
-
-
-/* Фінальні точкові правки шапки та компактності AI-панелі */
-.header .brand .brand-hub { color: #426b16 !important; }
-@media (min-width: 421px) and (max-width: 720px) {
-  .header .lang-btn { width: clamp(86px, 23vw, 104px); }
-  .header .lang-trigger { display: flex; flex-direction: row; align-items: center; gap: 4px; white-space: nowrap; }
-  .header .lang-city, .header .lang-clock { white-space: nowrap; }
-  .header-actions .btn-add, #openAdd { min-width: 104px; padding-left: 5px; padding-right: 5px; }
-}
-@media (max-width: 420px) {
-  .header .lang-btn { width: 78px; }
-  .header .lang-trigger { gap: 2px; }
-  .header .lang-city { font-size: 8px; }
-  .header .lang-clock { font-size: 7.5px; }
-  .header-actions .btn-add, #openAdd { min-width: 96px; padding-left: 3px; padding-right: 3px; }
-}
-.ai-panel { padding: 10px 12px; gap: 6px; }
-.ai-panel h3 { margin: 0 0 4px; }
-.ai-subtitle { margin: 0 0 7px; line-height: 1.3; }
-.ai-features { margin: 0 0 7px; padding-left: 18px; }
-.ai-features li { margin-bottom: 2px; line-height: 1.25; }
-@media (max-width: 720px) {
-  .ai-panel { padding: 9px; gap: 5px; }
-  .ai-panel h3 { font-size: 15px; }
-  .ai-subtitle { font-size: 11px; }
-  .ai-features { font-size: 11px; }
-  .btn-ai { padding: 7px 9px; font-size: 11px; }
-}
-
-
-/* Верхняя панель: увеличиваем только переключатель языка/города/времени
-   и уменьшаем только кнопку добавления объявления. Остальные кнопки не меняем. */
-@media (min-width: 421px) and (max-width: 720px) {
-  .header .lang-btn {
-    width: clamp(104px, 27.6vw, 125px); /* примерно +20% */
-    height: 46px;
-    flex: 0 0 auto;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.72), inset 0 -2px 0 rgba(48,65,15,.12);
-  }
-  .header-actions .btn-add, #openAdd {
-    min-width: 83px; /* примерно -20% */
-    width: 83px;
-    flex: 0 0 83px;
-    height: 36px;
-    padding-left: 3px;
-    padding-right: 3px;
-    font-size: 8.5px;
-  }
-}
-@media (max-width: 420px) {
-  .header .lang-btn {
-    width: 94px; /* 78px + около 20% */
-    height: 46px;
-    flex: 0 0 94px;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.72), inset 0 -2px 0 rgba(48,65,15,.12);
-  }
-  .header .lang-trigger { gap: 2px; padding-left: 2px; padding-right: 2px; }
-  .header .lang-city { font-size: 7.5px; }
-  .header .lang-clock { font-size: 7px; }
-  .header-actions .btn-add, #openAdd {
-    min-width: 77px; /* 96px - около 20% */
-    width: 77px;
-    flex: 0 0 77px;
-    height: 36px;
-    padding-left: 2px;
-    padding-right: 2px;
-    font-size: 8px;
-  }
-}
-/* Едва заметный верхний блик добавляет глубину, не меняя палитру шапки. */
-.header .lang-btn, .header-actions .btn-add {
-  border-top-color: rgba(255,255,255,.58);
-}
-
-/* Деликатная статусная отделка верхней и второй панели без изменения размеров и палитры */
-.header {
-  background-image: linear-gradient(180deg, rgba(255,255,255,.98) 0%, rgba(248,250,244,.98) 100%) !important;
-  border-bottom-color: #dfe5d5 !important;
-  box-shadow: 0 2px 7px rgba(30, 42, 16, .055) !important;
-}
-.header .brand,
-.header .lang-btn,
-.header-actions .btn-add,
-.header-actions .account-btn,
-.header .header-action,
-.header .settings-btn,
-#openAdd,
-#accountBtn {
-  position: relative;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.68), inset 0 -1px 0 rgba(42,57,14,.10) !important;
-}
-.header .brand::after {
-  content: "";
-  position: absolute;
-  left: 10px;
-  right: 10px;
-  top: 3px;
-  height: 1px;
-  background: rgba(255,255,255,.56);
-  border-radius: 1px;
-  pointer-events: none;
-}
-/* Вторая панель: лёгкая общая тональность и тонкая окантовка карточек категорий */
-.categories-section {
-  background: linear-gradient(180deg, #f7f9f3 0%, #f2f5ed 100%);
-}
-.category,
-.category-card,
-.categories-section .category-item {
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.28), 0 2px 5px rgba(24,35,15,.07);
-}
-.market-ticker,
-#marketTicker,
-.market-ticker-wrap {
-  border-color: rgba(127,168,0,.72) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 2px 5px rgba(24,35,15,.045) !important;
-}
-
-/* Финальная подгонка высоты: язык/город/часы на одной высоте с Add listing и авторизацией */
-@media (max-width: 720px) {
-  .header .lang-btn,
-  .header-actions .btn-add,
-  .header-actions .account-btn,
-  #openAdd,
-  #accountBtn {
-    height: 36px !important;
-    min-height: 36px !important;
-    max-height: 36px !important;
-    box-sizing: border-box !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    align-self: center !important;
-  }
-  .header .lang-trigger {
-    height: 100% !important;
-    min-height: 0 !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    align-items: center !important;
-  }
-}
-
-
-/* ==== Точечная доработка мобильной шапки: город/время и перенос надписи ==== */
-@media (max-width: 720px) {
-  /* Размеры и габариты самой кнопки языка не меняем. */
-  .header .lang-city {
-    font-size: 10.5px !important;
-    line-height: 1.05 !important;
-  }
-  .header .lang-clock {
-    font-size: 9.8px !important;
-    line-height: 1.05 !important;
-  }
-
-  /* Оставляем текущие размеры кнопки, разрешаем надписи занять две строки. */
-  .header-actions .btn-add,
-  #openAdd {
-    white-space: normal !important;
-    overflow-wrap: normal !important;
-    word-break: normal !important;
-    text-align: center !important;
-    line-height: 1.02 !important;
-    padding-left: 4px !important;
-    padding-right: 4px !important;
-  }
-
-  /* Чуть светлее само изображение баннера; размер и положение не меняются. */
-  .main-banner-img {
-    filter: brightness(1.07) saturate(1.08);
-  }
-}
-
-@media (max-width: 420px) {
-  /* На узких телефонах — умеренное увеличение, чтобы город и время не обрезались. */
-  .header .lang-city { font-size: 9px !important; }
-  .header .lang-clock { font-size: 8.8px !important; }
-  .header-actions .btn-add,
-  #openAdd { line-height: 1 !important; }
+  width: 28px;
+  height: 28px;
 }
 
 /* ============================================================
-   HRYVNIA HUB — ДОПОЛНЕНИЕ для согласованной версии
-   (ticker arrows, compact mobile search, compact AI panel,
-    bottom nav with safe-area, favorites, messages)
+   HRYVNIA HUB — ВОССТАНОВЛЕННЫЕ КОМПОНЕНТЫ MAIN
+   Добавлены только компоненты, используемые HTML или app.js.
    ============================================================ */
 
-/* --- 1. Стрелки изменения котировок --- */
-.ticker-arrow {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  line-height: 1;
-  margin-left: 2px;
-  min-width: 10px;
-  opacity: 0;
-  transition: opacity .15s;
-}
-.ticker-arrow.up   { color: #2e9c4a; opacity: 1; }
-.ticker-arrow.down { color: #d4381e; opacity: 1; }
-.ticker-arrow.flat { color: #909a95; opacity: 1; font-size: 9px; }
-
-/* --- 2. Компактная мобильная поисковая панель --- */
-@media (max-width: 720px) {
-  .search-panel {
-    padding: 8px 10px !important;
-    gap: 6px !important;
-  }
-  .search-input-row {
-    gap: 6px !important;
-  }
-  .search-filters-row {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 6px !important;
-  }
-  .search-input-row input,
-  .search-input-row .btn,
-  .search-filters-row input,
-  .search-filters-row select {
-    padding: 8px 10px !important;
-    font-size: 12.5px !important;
-  }
-  .search-filters-row select {
-    font-size: 12px !important;
-  }
-}
-
-/* --- 3. Компактная AI-панель --- */
-.ai-panel {
-  padding: 10px 12px;
-  gap: 6px;
-}
-.ai-panel h3 { margin: 0 0 4px; }
-.ai-subtitle { margin: 0 0 7px; line-height: 1.3; }
-.ai-features { margin: 0 0 7px; padding-left: 18px; }
-.ai-features li { margin-bottom: 2px; line-height: 1.25; }
-.btn-ai {
-  cursor: pointer;
-  transition: background .15s, transform .05s;
-}
-.btn-ai:hover  { background: var(--accent-hover); }
-.btn-ai:active { transform: translateY(1px); }
-.btn-ai[disabled] {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-@media (max-width: 720px) {
-  .ai-panel { padding: 9px; gap: 5px; }
-  .ai-panel h3 { font-size: 15px; }
-  .ai-subtitle { font-size: 11px; }
-  .ai-features { font-size: 11px; }
-  .btn-ai { padding: 7px 9px; font-size: 11px; }
-  .ai-visual { font-size: 30px; }
-}
-
-/* --- 4. Кнопка «сердце» на карточках объявлений --- */
-.card { position: relative; }
-.fav-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, .94);
-  border: 1.5px solid #dce3df;
-  color: #6b7570;
-  font-size: 18px;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  padding: 0;
-  z-index: 3;
-  transition: background .15s, color .15s, transform .1s;
-}
-.fav-btn:hover  { background: #edf4d9; color: #426b16; }
-.fav-btn:active { transform: scale(.94); }
-.fav-btn.active {
-  color: #d4381e;
-  border-color: #f0b8ad;
-  background: #fff0ed;
-}
-.fav-btn span { display: inline-block; }
-
-/* --- 5. Модалка «Избранное» --- */
-.favorites-list {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-@media (max-width: 520px) {
-  .favorites-list { grid-template-columns: 1fr; }
-}
-.favorites-list .fav-card { cursor: pointer; }
-.favorites-list .fav-card .listing-photo { height: 140px; }
-
-/* --- 6. Модалка «Сообщения» --- */
-.messages-card { max-width: 640px; }
-
-.conversations-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  max-height: 60dvh;
-  overflow: auto;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 6px;
-}
-.conversation-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  background: transparent;
-  border: 0;
-  border-radius: 8px;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-  color: var(--text);
-}
-.conversation-item:hover { background: #edf4d9; }
-.conv-title { font-weight: 600; font-size: 14px; }
-.conv-time  { font-size: 11px; color: var(--muted); white-space: nowrap; }
-
-.messages-thread {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.thread-messages {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  max-height: 55dvh;
-  overflow-y: auto;
-  padding: 10px;
-  background: #f6f8f3;
-  border-radius: 10px;
-}
-.bubble {
-  max-width: 78%;
-  padding: 8px 12px;
-  border-radius: 14px;
-  font-size: 14px;
-  line-height: 1.35;
-  word-wrap: break-word;
-  white-space: pre-wrap;
-}
-.bubble-mine {
-  align-self: flex-end;
-  background: #c6ff00;
-  color: #17210a;
-  border-bottom-right-radius: 4px;
-}
-.bubble-theirs {
-  align-self: flex-start;
-  background: #ffffff;
-  color: var(--text);
-  border: 1px solid #dce3df;
-  border-bottom-left-radius: 4px;
-}
-
-.send-message-form {
-  display: flex;
-  gap: 6px;
-  margin-top: 6px;
-}
-.send-message-form input {
-  flex: 1 1 auto;
-  padding: 10px 12px;
-  border-radius: 10px;
-}
-.send-message-form .btn { padding: 10px 14px; }
-
+/* Точечные элементы из HTML */
+.brand-name { font-weight: 800; }
+.flag { display: inline-flex; align-items: center; justify-content: center; font-size: 16px; line-height: 1; }
+.flag-ru { display: inline-block; width: 18px; height: 12px; border-radius: 2px; background: linear-gradient(to bottom, #f7f7f7 0 33.33%, #a7a7a7 33.33% 66.66%, #222 66.66% 100%); box-shadow: 0 0 0 1px rgba(0,0,0,.12); vertical-align: middle; }
+.lang-city { font-size: 11px; }
+.lang-clock { font-size: 10px; font-variant-numeric: tabular-nums; }
+.icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; padding: 0; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--text); font: inherit; font-size: 16px; cursor: pointer; }
+.icon-btn:hover { background: var(--accent-soft); }
+.search-input-row-stacked { grid-template-columns: minmax(0, 1fr); }
+.search-input-row-stacked > input, .search-input-row-stacked > button { width: 100%; min-width: 0; }
+.ticker-main { display: flex; align-items: center; gap: 4px; min-width: 0; }
+.ticker-icon-usd { background: #edf2fb; }
+.ticker-icon-pln { background: #f8e8e8; }
+.ticker-icon-xau { background: #fff2c7; }
+.category-menu-option .category-menu-option-label { flex: 1 1 auto; min-width: 0; font-size: 15px; font-weight: 650; line-height: 1.25; overflow-wrap: anywhere; }
+.password-toggle-icon { display: inline-flex; align-items: center; justify-content: center; line-height: 1; }
+.password-field.is-visible .password-toggle-icon { font-size: 15px; }
 #listingDialog .btn-contact { margin-top: 12px; }
 
-/* --- 7. Нижняя навигация (только мобильные) --- */
-.bottom-nav { display: none; }
-
-@media (max-width: 720px) {
-  .bottom-nav {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: #203b31;
-    border-top: 2px solid #7fa800;
-    padding: 4px 0 calc(4px + env(safe-area-inset-bottom, 0px));
-    z-index: 55;
-    box-shadow: 0 -4px 14px rgba(20, 22, 26, .10);
-    transition: transform .2s ease;
-  }
-  .bottom-nav.keyboard-open { transform: translateY(120%); }
-
-  .bottom-nav-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
-    padding: 6px 4px;
-    background: transparent;
-    border: 0;
-    color: #c8d5c0;
-    font: inherit;
-    cursor: pointer;
-    transition: color .15s;
-  }
-  .bottom-nav-btn .bottom-nav-icon {
-    font-size: 18px;
-    line-height: 1;
-    color: #e8f3c8;
-    transition: color .15s;
-  }
-  .bottom-nav-btn .bottom-nav-label {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: .01em;
-  }
-  .bottom-nav-btn.active { color: #c6ff00; }
-  .bottom-nav-btn.active .bottom-nav-icon { color: #c6ff00; }
-
-  /* Отступ под контент, чтобы панель не перекрывала низ страницы */
-  body { padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px)); }
-  .footer { padding-bottom: calc(24px + 68px + env(safe-area-inset-bottom, 0px)); }
-  .modal {
-    padding: 12px;
-    padding-bottom: calc(12px + 68px + env(safe-area-inset-bottom, 0px));
-  }
-  .modal-card { max-height: calc(88dvh - 68px); }
-  .messages-card .thread-messages,
-  .messages-card .conversations-list { max-height: 45dvh; }
-}
-
-/* ==== HRYVNIA HUB: единый визуальный размер иконок нижней панели ==== */
-@media (max-width: 720px) {
-  .bottom-nav-btn .bottom-nav-icon {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex: 0 0 28px !important;
-    width: 28px !important;
-    height: 28px !important;
-    max-width: 28px !important;
-    max-height: 28px !important;
-    line-height: 1 !important;
-    font-size: 22px !important;
-    color: #d4ff00 !important;
-    filter: grayscale(1) brightness(0) saturate(100%) invert(89%) sepia(100%) saturate(1700%) hue-rotate(19deg) brightness(103%) contrast(104%);
-    transition: color .15s, filter .15s;
-  }
-
-  /* Ограничиваем размеры SVG/изображений, если иконка задана не символом шрифта. */
-  .bottom-nav-btn .bottom-nav-icon svg,
-  .bottom-nav-btn .bottom-nav-icon img {
-    width: 26px !important;
-    height: 26px !important;
-    max-width: 26px !important;
-    max-height: 26px !important;
-    object-fit: contain !important;
-  }
-
-  /* Домик немного компактнее, чтобы крыша не делала его визуально крупнее сердца. */
-  .bottom-nav-btn:nth-child(1) .bottom-nav-icon {
-    font-size: 20px !important;
-  }
-
-  /* Сердечко увеличиваем, чтобы визуально соответствовало домику. */
-  .bottom-nav-btn:nth-child(2) .bottom-nav-icon {
-    font-size: 28px !important;
-  }
-  .bottom-nav-btn:nth-child(2) .bottom-nav-icon svg,
-  .bottom-nav-btn:nth-child(2) .bottom-nav-icon img {
-    width: 28px !important;
-    height: 28px !important;
-    max-width: 28px !important;
-    max-height: 28px !important;
-  }
-
-  /* Конверт уменьшен примерно на 10%; лаймовая заливка и тёмный сгиб сохранены. */
-  .bottom-nav-btn:nth-child(3) .bottom-nav-icon {
-    font-size: 0 !important;
-    color: transparent !important;
-    filter: none !important;
-    position: relative !important;
-    display: inline-block !important;
-    flex: 0 0 21px !important;
-    width: 21px !important;
-    height: 16px !important;
-    max-width: 21px !important;
-    max-height: 16px !important;
-    border-radius: 3px;
-    background-color: #d4ff00 !important;
-    overflow: hidden;
-  }
-  .bottom-nav-btn:nth-child(3) .bottom-nav-icon::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(140deg, transparent 46%, #203b31 48%, #203b31 52%, transparent 54%) left top / 51% 76% no-repeat,
-      linear-gradient(220deg, transparent 46%, #203b31 48%, #203b31 52%, transparent 54%) right top / 51% 76% no-repeat;
-    pointer-events: none;
-  }
-
-  /* Все подписи остаются светло-серо-белыми, включая активную вкладку. */
-  .bottom-nav-btn,
-  .bottom-nav-btn.active,
-  .bottom-nav-btn .bottom-nav-label,
-  .bottom-nav-btn.active .bottom-nav-label {
-    color: #c8d5c0 !important;
-  }
-}
-
-
-/* Компактная валютная панель на очень узких экранах */
-@media (max-width: 380px) {
-  .market-ticker { margin-left: 0; margin-right: 0; padding-left: 2px; padding-right: 2px; }
-  .ticker-item { gap: 4px; padding-left: 4px; padding-right: 4px; }
-  .ticker-icon { flex-basis: 23px; width: 23px; height: 23px; font-size: 14px; }
-  .ticker-icon-btc { font-size: 16px; }
-  .ticker-value { font-size: 10px; }
-  .ticker-source { font-size: 7px; }
-}
-
-/* ==== ТОЧЕЧНАЯ ПРАВКА: компактная лента курсов валют ==== */
-/* Уменьшаем вертикальную высоту, не меняя расположение блоков сайта. */
-.market-ticker {
-  padding-top: 6px !important;
-  padding-bottom: 6px !important;
-  gap: 8px !important;
-}
-.ticker-item {
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-  gap: 8px !important;
-}
-.ticker-icon {
-  flex-basis: 34px !important;
-  width: 34px !important;
-  height: 34px !important;
-  font-size: 21px !important;
-}
-.ticker-icon-btc { font-size: 23px !important; }
-.ticker-details { gap: 2px !important; }
-.ticker-value { font-size: clamp(13px, 1.25vw, 17px) !important; line-height: 1.05 !important; }
-.ticker-label { font-size: 10.5px !important; }
-.ticker-source { font-size: 9px !important; line-height: 1.15 !important; }
-
-@media (max-width: 720px) {
-  .market-ticker {
-    padding-top: 4px !important;
-    padding-bottom: 4px !important;
-    margin-bottom: 6px !important;
-  }
-  .ticker-item { gap: 5px !important; padding-top: 0 !important; padding-bottom: 0 !important; }
-  .ticker-icon {
-    flex-basis: 24px !important;
-    width: 24px !important;
-    height: 24px !important;
-    font-size: 15px !important;
-  }
-  .ticker-icon-btc { font-size: 17px !important; }
-  .ticker-details { gap: 1px !important; }
-  .ticker-label { font-size: 8.5px !important; }
-  .ticker-value { font-size: clamp(10px, 2.8vw, 12px) !important; line-height: 1 !important; }
-  .ticker-arrow { font-size: 8px !important; }
-  .ticker-source { font-size: 7.5px !important; line-height: 1.1 !important; }
-}
-
-@media (max-width: 380px) {
-  .market-ticker { padding-top: 3px !important; padding-bottom: 3px !important; }
-  .ticker-item { gap: 3px !important; padding-left: 3px !important; padding-right: 3px !important; }
-  .ticker-icon {
-    flex-basis: 21px !important;
-    width: 21px !important;
-    height: 21px !important;
-    font-size: 13px !important;
-  }
-  .ticker-icon-btc { font-size: 15px !important; }
-  .ticker-value { font-size: 9.5px !important; }
-  .ticker-source { font-size: 7px !important; }
-}
-
-/* ============================================================
-   ОБЪЕДИНЁННЫЕ ТОЧЕЧНЫЕ ПРАВКИ HRYVNIA HUB
-   Добавлены поверх исходного styles.css; исходные стили сохранены.
-   ============================================================ */
-
-/* Карточка без фотографии: сердечко не должно наезжать на город. */
-.card:not(:has(.listing-photo)) .fav-btn {
-  top: 6px;
-  right: 6px;
-}
-.card:not(:has(.listing-photo)) .card-top {
-  padding-right: 44px;
-}
-
-/* Небольшой дополнительный отступ справа у логотипа на компьютере. */
-@media (min-width: 721px) {
-  .header .brand {
-    padding-right: 6px;
-  }
-  .header .brand .brand-text {
-    padding-right: 10px;
-  }
-}
-
-/* Небольшие лаймовые листики внутри верхних кнопок.
-   Не меняем размеры и позиционирование самих кнопок. */
-.header .lang-btn,
-.header-actions .btn-add,
-.header-actions .account-btn,
-#openAdd,
-#accountBtn {
-  position: relative;
-}
-.header .lang-btn::after,
-.header-actions .btn-add::after,
-.header-actions .account-btn::after,
-#openAdd::after,
-#accountBtn::after {
-  content: "";
-  position: absolute;
-  left: 5px;
-  top: 5px;
-  width: 7px;
-  height: 10px;
-  border-radius: 100% 0 100% 0;
-  background: #D4FF00;
-  box-shadow: 0 0 0 1px rgba(60,80,0,.3);
-  transform: rotate(-25deg);
-  pointer-events: none;
-  z-index: 2;
-}
-@media (max-width: 720px) {
-  .header .lang-btn::after,
-  .header-actions .btn-add::after,
-  .header-actions .account-btn::after,
-  #openAdd::after,
-  #accountBtn::after {
-    width: 5px;
-    height: 7px;
-    left: 3px;
-    top: 3px;
-  }
-}
-
-/* Подписи категорий по центру; оставляем место для круглой кнопки «Все». */
-.category-card {
-  align-items: flex-end;
-  justify-content: center;
-}
-.category-card-label {
-  width: 100%;
-  text-align: center;
-  padding: 0 36px 2px;
-}
-@media (max-width: 720px) {
-  .category-card-label {
-    padding: 0 8px 2px;
-  }
-}
-
-/* Компактная сетка фильтров: две колонки, без увеличения высоты панели.
-   Если в HTML используются классы полей, город получает больше места. */
-.search-filters-row {
-  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
-}
-.search-filters-row > .city-filter,
-.search-filters-row > .filter-city,
-.search-filters-row > [name="city"],
-.search-filters-row > #cityFilter {
-  min-width: 0;
-}
-@media (max-width: 720px) {
-  .search-filters-row {
-    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
-  }
-}
-@media (max-width: 380px) {
-  .search-filters-row {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-/* Четыре показателя валютной ленты в одну строку, где позволяет ширина. */
-.ticker-scroll {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-.ticker-item {
-  min-width: 0;
-  gap: 7px;
-  padding-left: 8px;
-  padding-right: 8px;
-}
-@media (max-width: 720px) {
-  .ticker-scroll {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-  .ticker-item {
-    gap: 3px;
-    padding-left: 3px;
-    padding-right: 3px;
-  }
-}
-
-/* Заголовок баннера: чуть крупнее, акцентный штрих лаймового цвета. */
-.banner-title {
-  font-size: clamp(22px, 3.4vw, 33px);
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-}
-.banner-title::after {
-  content: "";
-  display: block;
-  width: 52px;
-  height: 3px;
-  margin: 7px auto 0;
-  border-radius: 3px;
-  background: #c6ff00;
-}
-.banner-content {
-  padding-bottom: 6px;
-}
-@media (max-width: 720px) {
-  .banner-title {
-    font-size: 16px;
-  }
-  .banner-title::after {
-    width: 36px;
-    height: 2px;
-    margin-top: 5px;
-  }
-}
-
-/* Вкладки авторизации: одинаковый размер, аккуратный премиальный вид. */
-.auth-tabs {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-}
-.auth-tabs button,
-.auth-tab {
-  min-width: 0;
-  min-height: 46px;
-  border: 2px solid #c6ff00;
-  border-radius: 10px;
-  background: #fff;
-  color: #203b31;
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-}
-.auth-tabs button.active,
-.auth-tab.active {
-  background: #c6ff00;
-  color: #17210a;
-}
-
-/* Фиксируем оформление по назначению вкладки, а не по active-состоянию. */
-.auth-tab[data-auth-tab="register"] {
-  background: #D4FF00;
-  border-color: #7fa800;
-  color: #17210a;
-}
-.auth-tab[data-auth-tab="login"] {
-  background: #ffffff;
-  border-color: #9abf24;
-  color: #17210a;
-}
-
-
-/* ==== FINAL POLISH: Hryvnia Hub UI ==== */
-
-/* Desktop only: slightly reduce wordmark width without changing the HUB letters.
-   Mobile logo sizing remains as it was. */
-@media (min-width: 721px) {
-  .header .brand .brand-text {
-    transform: scale(1.06, 1.35) !important;
-    transform-origin: left center;
-    padding-right: 5px !important;
-  }
-}
-
-/* Decorative filled lime leaves: one shared style, varied corner and angle per button.
-   They are purely decorative and never intercept taps/clicks. */
-.header .lang-btn::after,
-.header-actions .account-btn::after,
-.header-actions .btn-add::after,
-#openAdd::after,
-#accountBtn::after,
-.categories-grid .all-btn::after {
-  width: 9px !important;
-  height: 13px !important;
-  background: linear-gradient(135deg, #eaff7a 0%, #d4ff00 45%, #a9d900 100%) !important;
-  border: 1px solid rgba(75, 105, 0, .65);
-  border-radius: 100% 0 100% 0 !important;
-  box-shadow: 0 1px 2px rgba(22, 35, 0, .22) !important;
-  pointer-events: none !important;
-}
-.header .lang-btn::after {
-  left: auto !important; right: 6px !important; top: 5px !important;
-  transform: rotate(24deg) !important;
-}
-.header-actions .account-btn::after,
-#accountBtn::after {
-  left: 6px !important; right: auto !important; top: auto !important; bottom: 5px !important;
-  transform: rotate(-42deg) !important;
-}
-.header-actions .btn-add::after,
-#openAdd::after {
-  left: auto !important; right: 7px !important; top: 5px !important;
-  transform: rotate(58deg) !important;
-}
-.categories-grid .all-btn::after {
-  top: 5px !important; right: 7px !important; left: auto !important; bottom: auto !important;
-  transform: rotate(-20deg) !important;
-  z-index: 1;
-}
-@media (max-width: 720px) {
-  .header .lang-btn::after {
-    width: 7px !important; height: 10px !important; right: 3px !important; top: 3px !important;
-  }
-  .header-actions .account-btn::after,
-  #accountBtn::after {
-    width: 7px !important; height: 10px !important; left: 3px !important; bottom: 3px !important;
-  }
-  .header-actions .btn-add::after,
-  #openAdd::after {
-    width: 7px !important; height: 10px !important; right: 3px !important; top: 3px !important;
-  }
-  .categories-grid .all-btn::after {
-    width: 8px !important; height: 11px !important;
-  }
-}
-
-/* City first, region second. City gets 60% of the first two filter columns. */
-.search-filters-row {
-  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) !important;
-}
-@media (max-width: 720px) {
-  .search-filters-row {
-    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) !important;
-  }
-  .search-filters-row > * {
-    min-width: 0;
-  }
-}
-
-/* Four ticker values stay on one row on mobile; tighter icons and typography. */
-.ticker-scroll {
-  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-}
-.ticker-item {
-  gap: 6px;
-  padding-left: 6px;
-  padding-right: 6px;
-}
-@media (max-width: 720px) {
-  .market-ticker {
-    padding: 6px 3px !important;
-    margin-left: 4px !important;
-    margin-right: 4px !important;
-    gap: 2px !important;
-  }
-  .ticker-scroll {
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-  }
-  .ticker-item {
-    gap: 2px !important;
-    padding: 1px 2px !important;
-    overflow: hidden;
-  }
-  .ticker-icon {
-    flex: 0 0 22px !important;
-    width: 22px !important;
-    height: 22px !important;
-    font-size: 13px !important;
-  }
-  .ticker-icon-btc { font-size: 15px !important; }
-  .ticker-details { gap: 1px !important; }
-  .ticker-label { font-size: 8px !important; letter-spacing: 0 !important; }
-  .ticker-value { font-size: clamp(9px, 2.5vw, 12px) !important; }
-  .ticker-source { font-size: 7px !important; line-height: 1.1 !important; }
-}
-@media (max-width: 380px) {
-  .ticker-item { gap: 1px !important; padding-left: 1px !important; padding-right: 1px !important; }
-  .ticker-icon { flex-basis: 19px !important; width: 19px !important; height: 19px !important; font-size: 11px !important; }
-  .ticker-icon-btc { font-size: 13px !important; }
-  .ticker-label { font-size: 7px !important; }
-  .ticker-value { font-size: 9px !important; }
-  .ticker-source { font-size: 6px !important; }
-}
-
-/* Keep the banner headline unchanged; make only the descriptive line clearer. */
-.hero-text {
-  font-size: 15px !important;
-  line-height: 1.45 !important;
-  color: rgba(255, 255, 255, .98) !important;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, .55);
-}
-@media (max-width: 720px) {
-  .hero-text {
-    font-size: 12.5px !important;
-    line-height: 1.35 !important;
-  }
-}
-
-/* Make key header glyphs more vivid lime where the interface uses icon glyphs. */
-.header .account-icon {
-  color: #c6ff00 !important;
-  filter: saturate(1.35) brightness(1.05);
-}
-
-
-/* ==== FINAL MOBILE/DETAIL TUNING ==== */
-
-/* Keep the decorative leaves hollow and subtle; add two small leaves to the bottom navigation. */
-.header .lang-btn::after,
-.header-actions .account-btn::after,
-.header-actions .btn-add::after,
-#openAdd::after,
-#accountBtn::after,
-.categories-grid .all-btn::after {
-  background: transparent !important;
-  border: 1.5px solid #a9d900 !important;
-  box-shadow: none !important;
-}
-.bottom-nav-btn {
-  position: relative;
-}
-.bottom-nav-btn::after {
-  content: "";
-  position: absolute;
-  width: 8px;
-  height: 11px;
-  border: 1.5px solid #caff00;
-  border-radius: 100% 0 100% 0;
-  background: transparent;
-  pointer-events: none;
-  opacity: .9;
-}
-.bottom-nav-btn[data-nav="home"]::after {
-  top: 7px;
-  right: calc(50% - 25px);
-  transform: rotate(28deg);
-}
-.bottom-nav-btn[data-nav="messages"]::after {
-  top: 7px;
-  left: calc(50% - 25px);
-  transform: rotate(-38deg);
-}
-
-/* Give the market ticker the same usable width as the banner. */
-.market-ticker {
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-}
-@media (max-width: 720px) {
-  .market-ticker {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    padding-left: 3px !important;
-    padding-right: 3px !important;
-  }
-  /* Flags/icons ~20% smaller; ticker text ~10% smaller than the previous tuning. */
-  .ticker-icon {
-    flex-basis: 18px !important;
-    width: 18px !important;
-    height: 18px !important;
-    font-size: 10.5px !important;
-  }
-  .ticker-icon-btc { font-size: 12px !important; }
-  .ticker-label { font-size: 7.2px !important; }
-  .ticker-value { font-size: clamp(8.5px, 2.25vw, 10.8px) !important; }
-  .ticker-source { font-size: 6.3px !important; }
-}
-@media (max-width: 380px) {
-  .ticker-icon {
-    flex-basis: 16px !important;
-    width: 16px !important;
-    height: 16px !important;
-    font-size: 9px !important;
-  }
-  .ticker-icon-btc { font-size: 10.5px !important; }
-  .ticker-label { font-size: 6.5px !important; }
-  .ticker-value { font-size: 8px !important; }
-  .ticker-source { font-size: 5.8px !important; }
-}
-
-/* Make area/radius select labels a little smaller on mobile so they fit. */
-@media (max-width: 720px) {
-  #catalogRegionSelect,
-  .search-filters-row > select,
-  .search-filters-row > input[type="number"] {
-    font-size: 11.2px !important;
-    padding-left: 7px !important;
-    padding-right: 5px !important;
-  }
-}
-
-/* Slightly increase both banner text lines, preserving the title text itself. */
-.banner-title {
-  font-size: clamp(21px, 3.15vw, 31px) !important;
-}
-.hero-text {
-  font-size: 15.5px !important;
-}
-@media (max-width: 720px) {
-  .banner-title { font-size: clamp(17px, 3.5vw, 19px) !important; }
-  .hero-text { font-size: 13px !important; }
-}
-
-/* Bottom navigation and the three decorative quick-navigation glyphs use a brighter lime. */
-.bottom-nav-icon {
-  color: #caff00 !important;
-  filter: brightness(1.12) saturate(1.2);
-}
-
-
-/* ==== FINAL FIX: EXACTLY TWO FILLED LIME LEAVES BESIDE FAVORITES ==== */
-@media (max-width: 720px) {
-  /* Remove the three incorrectly placed leaves from the previous version. */
-  .bottom-nav-btn::before,
-  .bottom-nav-btn::after {
-    content: none !important;
-    display: none !important;
-  }
-
-  /* The heart is the second button: place one filled leaf on each side. */
-  .bottom-nav-btn:nth-child(2)::before,
-  .bottom-nav-btn:nth-child(2)::after {
-    content: "" !important;
-    display: block !important;
-    position: absolute !important;
-    top: 13px !important;
-    width: 7px !important;
-    height: 10px !important;
-    border: 0 !important;
-    border-radius: 100% 0 100% 0 !important;
-    background: #d4ff00 !important;
-    box-shadow: none !important;
-    opacity: 1 !important;
-    pointer-events: none !important;
-  }
-  .bottom-nav-btn:nth-child(2)::before {
-    left: calc(50% - 35px) !important;
-    transform: rotate(-35deg) !important;
-  }
-  .bottom-nav-btn:nth-child(2)::after {
-    right: calc(50% - 35px) !important;
-    transform: rotate(35deg) !important;
-  }
-}
-
-/* ==== FINAL MOBILE TUNING: COMPACT AI SEARCH + AREA/RADIUS FIELDS ==== */
-@media (max-width: 720px) {
-  /* Keep the AI card visually compact; leave the title, short description and action visible. */
-  .ai-panel {
-    padding: 8px !important;
-    gap: 4px !important;
-    min-height: 0 !important;
-    justify-content: center !important;
-  }
-  .ai-panel .ai-badge {
-    margin: 0 0 2px !important;
-    font-size: 9px !important;
-    line-height: 1.1 !important;
-  }
-  .ai-panel h3 {
-    margin: 0 0 3px !important;
-    font-size: 13px !important;
-    line-height: 1.15 !important;
-  }
-  .ai-panel .ai-subtitle {
-    margin: 0 0 4px !important;
-    font-size: 10px !important;
-    line-height: 1.2 !important;
-  }
-  /* The feature list adds height and repeats the message on a narrow screen. */
-  .ai-panel .ai-features {
-    display: none !important;
-  }
-  .ai-panel .ai-visual {
-    font-size: 22px !important;
-    line-height: 1 !important;
-  }
-  .ai-panel .btn-ai {
-    padding: 6px 8px !important;
-    font-size: 10px !important;
-    line-height: 1.15 !important;
-    margin-top: 2px !important;
-  }
-
-  /* Reduce only the area and radius controls; keep city and other fields unchanged. */
-  #catalogRegionSelect,
-  .search-filters-row > select,
-  .search-filters-row > input[type="number"] {
-    font-size: 10.5px !important;
-    padding-left: 6px !important;
-    padding-right: 4px !important;
-  }
-}
-
-/* ==== MOBILE FINAL: ONE SUBTLE LEAF + EVEN TICKER SPACING ==== */
-@media (max-width: 720px) {
-  /* One subtle lime leaf on the LEFT of the heart, farther from the icon. */
-  .bottom-nav-btn::before,
-  .bottom-nav-btn::after {
-    content: none !important;
-    display: none !important;
-  }
-  .bottom-nav-btn:nth-child(2)::before {
-    content: "" !important;
-    display: block !important;
-    position: absolute !important;
-    top: 20px !important;
-    left: calc(50% - 55px) !important;
-    right: auto !important;
-    width: 8px !important;
-    height: 11px !important;
-    border: 0 !important;
-    border-radius: 100% 0 100% 0 !important;
-    background: #d4ff00 !important;
-    box-shadow: none !important;
-    opacity: 1 !important;
-    transform: rotate(-28deg) !important;
-    pointer-events: none !important;
-  }
-
-  /* Four evenly sized ticker columns, with compact icons/text and no oversized gaps. */
-  .ticker-scroll {
-    display: grid !important;
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-    width: 100% !important;
-    gap: 0 !important;
-  }
-  .ticker-item {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-    min-width: 0 !important;
-    gap: 3px !important;
-    padding-left: 3px !important;
-    padding-right: 3px !important;
-    box-sizing: border-box !important;
-    overflow: hidden !important;
-  }
-  .ticker-item img,
-  .ticker-item svg,
-  .ticker-icon {
-    width: 22px !important;
-    height: 22px !important;
-    flex: 0 0 22px !important;
-  }
-  .ticker-details {
-    min-width: 0 !important;
-    flex: 1 1 0 !important;
-    overflow: hidden !important;
-  }
-  .ticker-item strong,
-  .ticker-item b,
-  .ticker-item .ticker-value,
-  .ticker-item .ticker-label {
-    max-width: 100% !important;
-    overflow: hidden !important;
-    text-overflow: clip !important;
-  }
-}
-@media (max-width: 380px) {
-  .ticker-item { gap: 2px !important; padding-left: 2px !important; padding-right: 2px !important; }
-  .ticker-item img, .ticker-item svg, .ticker-icon { width: 19px !important; height: 19px !important; flex-basis: 19px !important; }
-}
-
-/* ==== MOBILE: TIGHTER VERTICAL SPACING BETWEEN SECTIONS ==== */
-@media (max-width: 720px) {
-  /* Bring the urgent-deals heading closer to the AI/search cards. */
-  .urgent-deals {
-    padding-top: 8px !important;
-    margin-top: 0 !important;
-  }
-  .urgent-deals .eyebrow {
-    margin-bottom: 3px !important;
-  }
-  .urgent-deals h2 {
-    margin-bottom: 5px !important;
-  }
-  .urgent-deals .badge-soft {
-    display: inline-block;
-    margin-bottom: 0 !important;
-    padding-top: 5px !important;
-    padding-bottom: 5px !important;
-    line-height: 1.2 !important;
-  }
-  /* Reduce the gap after the urgent-deals placeholder before latest listings. */
-  .listing-section {
-    padding-top: 8px !important;
-    margin-top: 0 !important;
-  }
-  .listing-section .section-head {
-    margin-bottom: 8px !important;
-  }
-  .listing-section .eyebrow {
-    margin-bottom: 3px !important;
-  }
-  .listing-section h2 {
-    margin-bottom: 3px !important;
-  }
-  .urgent-deals-grid {
-    gap: 8px !important;
-  }
-}
-
-/* ==== HRYVNIA HUB: COMPACT MOBILE HERO BANNER ONLY ==== */
-/* Keep desktop styling unchanged; reduce banner height on phones. */
-@media (max-width: 720px) {
-  .main-banner {
-    height: 112px !important;
-    min-height: 112px !important;
-    max-height: 112px !important;
-    padding: 8px 12px !important;
-    align-items: center !important;
-  }
-
-  .main-banner-img {
-    object-fit: cover !important;
-    object-position: center 42% !important;
-  }
-
-  .banner-content {
-    padding-bottom: 0 !important;
-    max-width: 100% !important;
-  }
-
-  .banner-title {
-    font-size: clamp(16px, 4vw, 19px) !important;
-    line-height: 1.1 !important;
-    margin-bottom: 3px !important;
-  }
-
-  .banner-title::after {
-    width: 34px !important;
-    height: 2px !important;
-    margin-top: 3px !important;
-  }
-
-  .hero-text {
-    font-size: 11.5px !important;
-    line-height: 1.2 !important;
-    max-width: 100% !important;
-  }
-}
-
-/* ============================================================
-   HRYVNIA HUB — FIX 2026-10-20
-   Banner becomes more compact on desktop and mobile without
-   cropping the banner artwork; desktop header stays in bounds.
-   ============================================================ */
-
-/* Compact banner: fill the banner width and remove the empty side bands.
-   Keep the source image proportional; the banner clips only the excess vertically. */
-.main-banner {
-  position: relative !important;
-  height: 105px !important;
-  min-height: 105px !important;
-  max-height: 105px !important;
-  padding: 10px 22px 26px !important;
-  overflow: hidden !important;
-  align-items: center !important;
-  background-color: #263b36 !important;
-  background-size: cover !important;
-  background-repeat: no-repeat !important;
-  background-position: center 52% !important;
-}
-
-.main-banner-img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  object-position: center 52% !important;
-}
-
-.banner-content {
-  max-width: 100% !important;
-  padding: 0 8px !important;
-  text-align: center !important;
-}
-
-.banner-title {
-  font-size: clamp(18px, 2.2vw, 27px) !important;
-  line-height: 1.08 !important;
-  margin-bottom: 4px !important;
-  text-wrap: balance !important;
-}
-
-.hero-text {
-  font-size: clamp(11px, 1.25vw, 14px) !important;
-  line-height: 1.2 !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-}
-
-/* Desktop/tablet header: keep all controls inside the viewport. */
-@media (min-width: 721px) {
-  .nav {
-    gap: 8px !important;
-    min-width: 0 !important;
-  }
-
-  .header-actions {
-    gap: 8px !important;
-    min-width: 0 !important;
-    flex: 0 1 auto !important;
-  }
-
-  .header-actions .btn-add,
-  #openAdd {
-    min-width: 0 !important;
-    max-width: 280px !important;
-    flex: 0 1 280px !important;
-    padding-left: 12px !important;
-    padding-right: 12px !important;
-    white-space: normal !important;
-    text-align: center !important;
-    line-height: 1.1 !important;
-  }
-
-  .header .brand .brand-text {
-    padding-right: 0 !important;
-  }
-}
-
-/* Mobile: keep the existing header/category/search layout; only compact the banner. */
-@media (max-width: 720px) {
-  .main-banner {
-    height: 76px !important;
-    min-height: 76px !important;
-    max-height: 76px !important;
-    padding: 5px 8px !important;
-    align-items: center !important;
-  }
-
-  .main-banner-img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    object-position: center 52% !important;
-  }
-
-  .main-banner::before {
-    background: linear-gradient(180deg, rgba(15,20,28,.30), rgba(15,20,28,.62)) !important;
-  }
-
-  .banner-content {
-    width: 100% !important;
-    max-width: 100% !important;
-    padding: 0 2px !important;
-  }
-
-  .banner-title {
-    font-size: clamp(14px, 3.9vw, 18px) !important;
-    line-height: 1.05 !important;
-    margin-bottom: 2px !important;
-  }
-
-  .banner-title::after {
-    width: 28px !important;
-    height: 2px !important;
-    margin-top: 2px !important;
-  }
-
-  .hero-text {
-    font-size: clamp(9px, 2.8vw, 11px) !important;
-    line-height: 1.08 !important;
-    max-width: 100% !important;
-  }
-
-  .main-banner .banner-icons {
-    display: none !important;
-  }
-}
-
-/* HRYVNIA HUB — category cards 20% shorter, without scaling the text or images */
-.categories-grid > .category-card:not(.all-btn) {
-  height: auto !important;
-  min-height: 0 !important;
-  aspect-ratio: 1.85 / 1 !important;
-}
-
-@media (max-width: 720px) {
-  .categories-grid > .category-card:not(.all-btn) {
-    aspect-ratio: 2.98 / 1 !important;
-    min-height: 0 !important;
-    padding: 8px !important;
-  }
-}
-
-/* HRYVNIA HUB — stronger text contrast on category cards and hero banner */
-.category-card::before {
-  background: linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0.08) 0%,
-    rgba(0, 0, 0, 0.20) 38%,
-    rgba(0, 0, 0, 0.76) 100%
-  ) !important;
-}
-
-.category-card-label {
-  color: #fff !important;
-  font-weight: 900 !important;
-  -webkit-text-stroke: 0.25px rgba(0, 0, 0, 0.45);
-  text-shadow:
-    0 2px 3px rgba(0, 0, 0, 0.95),
-    0 0 8px rgba(0, 0, 0, 0.85),
-    0 1px 14px rgba(0, 0, 0, 0.65) !important;
-}
-
-.main-banner::before {
-  background: linear-gradient(
-    90deg,
-    rgba(8, 16, 24, 0.52) 0%,
-    rgba(8, 16, 24, 0.28) 50%,
-    rgba(8, 16, 24, 0.52) 100%
-  ), linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0.12) 0%,
-    rgba(0, 0, 0, 0.42) 100%
-  ) !important;
-}
-
-.banner-title {
-  color: #fff !important;
-  font-weight: 900 !important;
-  -webkit-text-stroke: 0.25px rgba(0, 0, 0, 0.5);
-  text-shadow:
-    0 2px 3px rgba(0, 0, 0, 0.98),
-    0 0 9px rgba(0, 0, 0, 0.95),
-    0 1px 16px rgba(0, 0, 0, 0.8) !important;
-}
-
-.hero-text {
-  color: #fff !important;
-  font-weight: 600 !important;
-  text-shadow:
-    0 1px 3px rgba(0, 0, 0, 1),
-    0 0 7px rgba(0, 0, 0, 0.95),
-    0 1px 12px rgba(0, 0, 0, 0.8) !important;
-}
-
-/* HRYVNIA HUB — shorter hero banner, matching the compact reference proportions. */
-.main-banner {
-  height: 60px !important;
-  min-height: 60px !important;
-  max-height: 60px !important;
-  border-radius: 12px !important;
-  box-shadow: none !important;
-  margin-top: 10px !important;
-  margin-bottom: 8px !important;
-  overflow: hidden !important;
-}
-
-.main-banner-img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  object-position: center 52% !important;
-}
-
-.banner-content {
-  padding: 0 10px !important;
-}
-
-.banner-title {
-  font-size: clamp(16px, 1.8vw, 22px) !important;
-  line-height: 1.02 !important;
-  margin-top: 0 !important;
-  margin-bottom: 2px !important;
-}
-
-.banner-title::after {
-  margin-top: 2px !important;
-}
-
-.hero-text {
-  font-size: clamp(9px, 1vw, 12px) !important;
-  line-height: 1.05 !important;
-}
-
-@media (max-width: 720px) {
-  .main-banner {
-    height: 45px !important;
-    min-height: 45px !important;
-    max-height: 45px !important;
-    border-radius: 10px !important;
-    margin-top: 7px !important;
-    margin-bottom: 7px !important;
-    padding: 2px 5px !important;
-  }
-
-  .main-banner-img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    object-position: center 52% !important;
-  }
-
-  .banner-content {
-    padding: 0 2px !important;
-  }
-
-  .banner-title {
-    font-size: clamp(11px, 3vw, 14px) !important;
-    line-height: 1 !important;
-    margin-bottom: 1px !important;
-  }
-
-  .banner-title::after {
-    width: 20px !important;
-    height: 2px !important;
-    margin-top: 1px !important;
-  }
-
-  .hero-text {
-    font-size: clamp(7px, 2.2vw, 9px) !important;
-    line-height: 1 !important;
-  }
-}
-
-/* ==== HRYVNIA HUB: MOBILE HERO TEXT + SHORTER MARKET TICKER ==== */
-/* Only mobile styling is changed. Header and desktop layout stay untouched. */
-@media (max-width: 720px) {
-  /* Increase the main banner title and subtitle by approximately 20%. */
-  .banner-title {
-    font-size: clamp(19.2px, 4.8vw, 22.8px) !important;
-    line-height: 1.1 !important;
-  }
-
-  .hero-text {
-    font-size: 13.8px !important;
-    line-height: 1.15 !important;
-  }
-
-  /* Reduce ticker height while preserving its width and four-column layout. */
-  .market-ticker {
-    padding-top: 3px !important;
-    padding-bottom: 3px !important;
-  }
-
-  .ticker-icon {
-    height: 19px !important;
-  }
-
-  .ticker-details {
-    gap: 0 !important;
-  }
-
-  .ticker-label,
-  .ticker-value,
-  .ticker-source {
-    line-height: 1 !important;
-  }
-}
-
-@media (max-width: 380px) {
-  .banner-title {
-    font-size: clamp(18px, 4.8vw, 20px) !important;
-  }
-
-  .hero-text {
-    font-size: 12.5px !important;
-  }
-
-  .ticker-icon {
-    height: 18px !important;
-  }
-}
-
-/* ==== FINAL FIX: MOBILE MAIN BANNER TEXT FIT ==== */
-/* Correct only mobile banner typography; preserve banner height,
-   ticker dimensions, header and desktop typography. */
-@media (max-width: 720px) {
-  .main-banner .banner-content {
-    width: 100% !important;
-    max-width: 100% !important;
-    padding: 0 6px !important;
-    box-sizing: border-box !important;
-    text-align: center !important;
-  }
-
-  .main-banner .banner-title {
-    font-size: clamp(14px, 3.7vw, 16px) !important;
-    line-height: 1.08 !important;
-    margin: 0 0 3px !important;
-    max-width: 100% !important;
-    overflow-wrap: normal !important;
-    word-break: normal !important;
-  }
-
-  .main-banner .banner-title::after {
-    width: 26px !important;
-    height: 2px !important;
-    margin: 2px auto 0 !important;
-  }
-
-  .main-banner .hero-text {
-    font-size: clamp(9px, 2.5vw, 10.5px) !important;
-    line-height: 1.12 !important;
-    margin: 0 auto !important;
-    max-width: 100% !important;
-    overflow-wrap: normal !important;
-    word-break: normal !important;
-  }
-}
-
-@media (max-width: 380px) {
-  .main-banner .banner-title {
-    font-size: 14px !important;
-  }
-
-  .main-banner .hero-text {
-    font-size: 9px !important;
-  }
-}
-
-/* ==== STAGE A: password toggle + HEIC/HEIF hint ==== */
-.password-field {
-  position: relative;
-  display: block;
-}
-.password-field > input[type="password"],
-.password-field > input[type="text"] {
-  padding-right: 44px; /* место под кнопку-глаз */
-}
-.password-toggle {
-  position: absolute;
-  top: 50%;
-  right: 6px;
-  transform: translateY(-50%);
-  width: 34px;
-  height: 34px;
-  border: 1px solid transparent;
-  border-radius: 8px;
-  background: transparent;
-  color: var(--muted);
-  font-size: 16px;
-  line-height: 1;
+/* Заголовки секций и общие текстовые элементы */
+.badge-soft {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  padding: 0;
-  z-index: 2;
+  max-width: 100%;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--accent-light);
+  color: #43551b;
+  font-size: 12px;
+  font-weight: 700;
 }
-.password-toggle:hover { background: #f3f4f7; color: var(--text); }
-.password-toggle:focus-visible {
-  outline: none;
-  border-color: var(--accent-border);
-  box-shadow: 0 0 0 3px rgba(154, 191, 36, 0.25);
+.section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
 }
-.password-toggle[aria-pressed="true"] { color: var(--accent-border); }
-.password-field.is-visible .password-toggle-icon { font-size: 15px; }
+.eyebrow {
+  margin: 0 0 6px;
+  color: #65751a;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  font-size: 11px;
+  font-weight: 800;
+}
+.muted { color: var(--muted); font-size: 13px; }
+h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
+.ai-text { position: relative; z-index: 1; min-width: 0; max-width: 100%; }
+.ai-visual { position: relative; z-index: 1; flex: 0 0 auto; font-size: 40px; line-height: 1; }
 
-@media (max-width: 720px) {
-  .password-toggle { width: 30px; height: 30px; font-size: 14px; right: 4px; }
-  .password-field > input[type="password"],
-  .password-field > input[type="text"] { padding-right: 38px; }
+/* Карточки объявлений: классы создаются динамически в app.js */
+.card {
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px;
+  box-shadow: var(--shadow-sm);
+  transition: transform .15s ease, box-shadow .15s ease;
 }
+.card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; }
+.badge {
+  display: inline-block;
+  max-width: 100%;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: #43551b;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+.card h3 { margin: 12px 0 6px; font-size: 18px; letter-spacing: -.01em; overflow-wrap: anywhere; }
+.price { margin: 0 0 6px; font-size: 21px; font-weight: 850; overflow-wrap: anywhere; }
+.city { color: var(--muted); font-size: 13px; }
+.desc { margin: 0; color: #4f555d; font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+.listing-photo { width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; }
+.old-price { margin-right: 4px; color: var(--muted); text-decoration: line-through; opacity: .6; font-size: .82em; font-weight: 500; }
+.price-change-note { margin: -8px 0 8px; color: var(--muted); font-size: 12px; line-height: 1.35; opacity: .8; }
+.listing-published-date { margin: 6px 0 10px; color: var(--muted); font-size: 12px; }
+.card .card-top .city { min-width: 0; text-align: right; overflow-wrap: anywhere; }
+.card .card-top .badge,
+.card .card-top .hot-listing-badge,
+.card .card-top .urgent-listing-badge,
+.card .card-top .owner-listing-badge { flex: 0 0 auto; }
+.card.no-cover .listing-photo { display: none; }
 
-/* ==== HRYVNIA HUB: компактное улучшение кнопок возврата ==== */
-/* Кнопка «Назад до меню» в разделах аккаунта. */
-.account-menu-back {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  gap: 9px !important;
-  min-height: 46px !important;
-  padding: 10px 16px !important;
-  margin: 0 0 14px !important;
-  border: 1px solid #86ad00 !important;
-  border-radius: 12px !important;
-  background: #d4ff00 !important;
-  color: #202a12 !important;
-  box-shadow: 0 3px 0 rgba(66, 107, 22, .16) !important;
-  font-size: 17px !important;
-  font-weight: 750 !important;
-  line-height: 1.25 !important;
-  text-decoration: none !important;
-  cursor: pointer !important;
-  transition: background .15s ease, transform .15s ease, box-shadow .15s ease !important;
-}
-.account-menu-back:hover {
-  background: #c6f000 !important;
-  box-shadow: 0 4px 0 rgba(66, 107, 22, .18) !important;
-}
-.account-menu-back:active {
-  transform: translateY(1px) !important;
-  box-shadow: 0 1px 0 rgba(66, 107, 22, .16) !important;
-}
-
-/* Кнопка «До списку» у вікні переписки. */
-#backToConvs {
-  min-height: 44px !important;
-  padding: 10px 15px !important;
-  border: 1px solid #86ad00 !important;
-  border-radius: 12px !important;
-  background: #d4ff00 !important;
-  color: #202a12 !important;
-  font-size: 17px !important;
-  font-weight: 750 !important;
-  line-height: 1.25 !important;
-  box-shadow: 0 3px 0 rgba(66, 107, 22, .16) !important;
-  cursor: pointer !important;
-  transition: background .15s ease, transform .15s ease, box-shadow .15s ease !important;
-}
-#backToConvs:hover { background: #c6f000 !important; }
-#backToConvs:active {
-  transform: translateY(1px) !important;
-  box-shadow: 0 1px 0 rgba(66, 107, 22, .16) !important;
-}
-@media (max-width: 520px) {
-  .account-menu-back, #backToConvs {
-    min-height: 46px !important;
-    font-size: 17px !important;
-  }
-}
-
-
-/* Hryvnia Hub: understated green account outlines */
-#authModal .auth-card { border: 1px solid #75a983; box-shadow: 0 12px 34px rgba(32, 72, 42, .12); }
-#authModal .auth-tabs { border-color: #83b18e; }
-#authModal .auth-tab { border-color: #83b18e; }
-#authModal input:not([type="checkbox"]), #authModal select, #authModal textarea { border-color: #83b18e; }
-#authModal input:focus, #authModal select:focus, #authModal textarea:focus { border-color: #39834d; box-shadow: 0 0 0 3px rgba(79, 153, 97, .14); outline: none; }
-#authModal .auth-menu-btn { border-color: #75a983; background: #f8fcf8; }
-#authModal .auth-menu-btn:hover { background: #edf7ee; }
-#accountMenuRoot .account-menu-item { border-color: #8eb89a; box-shadow: 0 2px 7px rgba(42,105,58,.06); }
-#accountMenuRoot .account-menu-item:hover { border-color: #4f9961; background: #f7fbf7; }
-#accountMenuRoot .account-menu-panel { border-color: #75a983; box-shadow: 0 3px 12px rgba(42,105,58,.07); }
-
-/* ============================================================
-   HRYVNIA HUB PATCH 2026-10-21
-   Badges (hot / urgent / owner), conversations cards, nav badges
-   ============================================================ */
-
-/* --- Метки объявлений --- */
+/* Бейджи горячих, срочных и частных объявлений */
 .hot-listing-badge,
 .urgent-listing-badge,
 .owner-listing-badge {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 800;
-  line-height: 1.25;
-  white-space: nowrap;
   max-width: 100%;
+  padding: 4px 6px;
+  border-radius: 5px;
+  font-size: 10px;
+  line-height: 1.25;
+  font-weight: 800;
 }
-.hot-listing-badge {
-  background: #ff4d3d;
-  color: #ffffff;
-  border: 1px solid #d63324;
-  box-shadow: 0 1px 2px rgba(214, 51, 36, .28);
-}
-.urgent-listing-badge {
-  background: #ffb23d;
-  color: #332000;
-  border: 1px solid #d98f1e;
-  box-shadow: 0 1px 2px rgba(217, 143, 30, .22);
-}
-.owner-listing-badge {
-  background: rgba(198, 255, 0, .18);
-  color: #17210a;
-  border: 1px solid #7fa800;
-}
+.hot-listing-badge { background: #ff941f; color: #203b31; }
+.urgent-listing-badge { background: #ffe0a3; color: #583800; }
+.owner-listing-badge { background: var(--accent-soft); color: var(--text); }
 
-/* --- Метки в карточке: перенос строк без наложений --- */
-.card .card-top {
-  display: flex;
-  flex-wrap: wrap;
+/* Городские подсказки — название и область */
+.city-search > input[type="search"] { margin-top: 0; }
+.city-suggestion:hover,
+.city-suggestion:focus,
+.catalog-city-suggestion:hover,
+.catalog-city-suggestion:focus { background: #f0f5e7; outline: none; }
+.city-suggestion-name { display: block; font-size: 14px; font-weight: 700; }
+.city-suggestion-region { display: block; margin-top: 2px; color: var(--muted); font-size: 12px; }
+.city-suggestion-empty { padding: 10px 12px; color: var(--muted); font-size: 13px; }
+.photo-fields .form-message:empty { display: none; }
+.photo-fields .muted { margin: 8px 0; font-size: 12.5px; line-height: 1.45; }
+
+/* Форма входа и вспомогательные кнопки */
+.auth-form { display: grid; gap: 10px; }
+.auth-form label { display: grid; gap: 5px; min-width: 0; }
+.auth-form label > span { font-size: 13px; font-weight: 650; }
+.auth-user-email { overflow-wrap: anywhere; font-weight: 700; }
+.auth-menu-btn,
+.link-btn {
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  row-gap: 6px;
-  justify-content: flex-start;
-}
-.card .card-top .badge,
-.card .card-top .hot-listing-badge,
-.card .card-top .urgent-listing-badge,
-.card .card-top .owner-listing-badge { flex: 0 0 auto; }
-.card .card-top .city {
-  flex: 1 1 100%;
-  text-align: left;
-  margin-top: 2px;
-  color: var(--muted);
-  font-size: 12.5px;
-}
-
-/* --- Горизонтальная лента «Термінові пропозиції» --- */
-.hot-listings-row {
-  display: flex;
-  gap: 14px;
-  overflow-x: auto;
-  padding: 4px 2px 14px;
-  scroll-snap-type: x proximity;
-}
-.hot-listing-card {
-  flex: 0 0 230px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  text-align: left;
-  border: 1px solid #7fa800;
-  border-radius: 14px;
-  padding: 10px;
-  background: var(--card, #fff);
-  color: var(--text);
-  scroll-snap-align: start;
-  cursor: pointer;
-  box-shadow: var(--shadow-sm);
-  transition: transform .15s, box-shadow .15s;
-}
-.hot-listing-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
-.hot-listing-card .listing-photo,
-.hot-listing-card .listing-placeholder {
-  width: 100%;
-  height: 120px;
-  min-height: 120px;
-  object-fit: cover;
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 1px solid var(--accent-border);
   border-radius: 10px;
-}
-.hot-listing-card .hot-card-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-top: 2px;
-}
-.hot-listing-card .hot-card-title {
+  background: #fff;
+  color: var(--dark);
+  font: inherit;
   font-weight: 700;
-  font-size: 14px;
-  color: var(--text);
-  overflow-wrap: anywhere;
+  cursor: pointer;
 }
-.hot-listing-card strong { font-size: 15px; color: var(--text); }
-.hot-listing-card small { color: var(--muted); font-size: 12px; }
+.auth-menu-btn { width: 100%; margin: 8px 0; }
+.link-btn { border-color: transparent; background: transparent; color: #426b16; padding-inline: 4px; }
+.link-btn:hover { background: var(--accent-soft); }
+.account-icon { display: inline-flex; align-items: center; justify-content: center; line-height: 1; }
+.hot-toggle { display: flex; align-items: center; gap: 8px; min-width: 0; margin: 8px 0; }
+.hot-toggle input { width: auto; flex: 0 0 auto; }
 
-/* --- Бейдж непрочитанных на нижней навигации --- */
-.bottom-nav-btn { position: relative; }
-.nav-badge {
-  position: absolute;
-  top: 2px;
-  right: calc(50% - 26px);
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  border-radius: 9px;
-  background: #ff4d3d;
-  color: #ffffff;
-  font-size: 10.5px;
-  font-weight: 800;
-  line-height: 18px;
-  text-align: center;
-  box-shadow: 0 0 0 2px #203b31, 0 2px 4px rgba(0,0,0,.25);
-  pointer-events: none;
-  z-index: 3;
+/* Стрелки направления котировок */
+.ticker-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 10px;
+  margin-left: 2px;
+  font-size: 10px;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity .15s ease;
 }
-.nav-badge[hidden] { display: none !important; }
-.unread-count {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  border-radius: 9px;
-  background: #ff4d3d;
-  color: #fff;
-  font-size: 10.5px;
-  font-weight: 800;
-  line-height: 18px;
-  text-align: center;
-  box-shadow: 0 0 0 2px #203b31;
-}
+.ticker-arrow.up { color: #198a43; opacity: 1; }
+.ticker-arrow.down { color: #d4381e; opacity: 1; }
+.ticker-arrow.flat { color: #909a95; opacity: 1; font-size: 9px; }
 
-/* --- Окно «Повідомлення» --- */
+/* Избранное */
+.favorites-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.favorites-list .fav-card { min-width: 0; cursor: pointer; }
+.favorites-list .fav-card .listing-photo { height: 140px; }
+
+/* Сообщения и переписка — DOM создаётся в app.js */
 .messages-card { max-width: 660px; }
 .messages-card .modal-close {
   display: inline-flex;
@@ -2921,16 +633,14 @@ input:focus, select:focus, textarea:focus {
   width: 34px;
   height: 34px;
   padding: 0;
+  border: 1px solid #cfe0b0;
   border-radius: 50%;
   background: #f0f4ec;
-  border: 1px solid #cfe0b0;
   color: #355320;
   font-size: 22px;
   line-height: 1;
-  transition: background .15s, transform .1s, border-color .15s;
 }
-.messages-card .modal-close:hover { background: #e2efbd; border-color: #7fa800; }
-.messages-card .modal-close:active { transform: scale(.94); }
+.messages-card .modal-close:hover { background: #e2efbd; border-color: var(--accent-border); }
 .conversations-list {
   display: flex;
   flex-direction: column;
@@ -2941,1613 +651,367 @@ input:focus, select:focus, textarea:focus {
 }
 .conversation-card {
   display: grid;
-  grid-template-columns: 40px 1fr auto;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
   align-items: center;
   gap: 10px;
   width: 100%;
   padding: 12px;
-  border: 1px solid #dce3df;
+  border: 1px solid var(--line);
   border-radius: 12px;
-  background: #ffffff;
+  background: #fff;
   color: var(--text);
   text-align: left;
   font: inherit;
   cursor: pointer;
-  transition: background .15s, border-color .15s, box-shadow .15s, transform .1s;
+  transition: background .15s ease, border-color .15s ease, box-shadow .15s ease;
 }
-.conversation-card:hover {
-  background: #f7fbe9;
-  border-color: #7fa800;
-  box-shadow: 0 2px 6px rgba(127, 168, 0, .12);
-}
+.conversation-card:hover { background: #f7fbe9; border-color: var(--accent-border); box-shadow: 0 2px 6px rgba(127,168,0,.12); }
 .conversation-card:active { transform: translateY(1px); }
 .conversation-card.is-unread { background: #f6ffdb; border-color: #a4c454; }
 .conversation-card.is-unread .conv-title { font-weight: 800; }
-.conversation-card.is-unread .conv-icon { background: #c6ff00; }
+.conversation-card.is-unread .conv-icon { background: var(--accent); color: #17210a; }
 .conv-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 40px;
   height: 40px;
+  flex: 0 0 40px;
   border-radius: 10px;
   background: #eaf3d8;
   color: #355320;
   font-size: 18px;
   line-height: 1;
-  flex: 0 0 40px;
 }
-.conversation-card.is-unread .conv-icon { color: #17210a; }
 .conv-main { min-width: 0; }
-.conv-title {
-  display: block;
-  font-weight: 700;
-  font-size: 14px;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.conv-last {
-  display: block;
-  margin-top: 3px;
-  font-size: 12.5px;
-  color: var(--muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.conv-side {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
-  flex: 0 0 auto;
-}
-.conv-time { font-size: 11px; color: var(--muted); white-space: nowrap; }
-.conv-unread {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 6px;
-  border-radius: 10px;
+.conv-title { display: block; overflow: hidden; color: var(--text); font-size: 14px; font-weight: 700; white-space: nowrap; text-overflow: ellipsis; }
+.conv-last { display: block; overflow: hidden; margin-top: 3px; color: var(--muted); font-size: 12.5px; white-space: nowrap; text-overflow: ellipsis; }
+.conv-side { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; min-width: 0; }
+.conv-time { color: var(--muted); font-size: 11px; white-space: nowrap; }
+.conv-unread { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: #ff4d3d; color: #fff; font-size: 11px; font-weight: 800; line-height: 20px; text-align: center; }
+.messages-thread { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.thread-messages { overflow-y: auto; overflow-wrap: anywhere; }
+.bubble { overflow-wrap: anywhere; white-space: pre-wrap; }
+.send-message-form input { flex: 1 1 auto; min-width: 0; padding: 10px 12px; border-radius: 10px; }
+.send-message-form .btn { padding: 10px 14px; }
+.messages-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 30px 16px; border: 1px dashed #cfe0b0; border-radius: 12px; background: #f9fdf1; color: var(--muted); text-align: center; }
+.messages-empty-icon { color: var(--accent-border); font-size: 40px; line-height: 1; }
+
+/* Индикатор новых сообщений и нижняя навигация */
+.bottom-nav-btn { position: relative; }
+.bottom-nav-btn .bottom-nav-icon svg,
+.bottom-nav-btn .bottom-nav-icon img { display: block; width: 22px; height: 22px; }
+.bottom-nav-btn.active { color: var(--accent); }
+.bottom-nav-btn.active .bottom-nav-label { color: var(--accent); }
+.nav-badge {
+  position: absolute;
+  top: 2px;
+  right: calc(50% - 26px);
+  z-index: 3;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
   background: #ff4d3d;
   color: #fff;
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 800;
-  line-height: 20px;
+  line-height: 18px;
   text-align: center;
+  box-shadow: 0 0 0 2px var(--dark), 0 2px 4px rgba(0,0,0,.2);
+  pointer-events: none;
 }
-.messages-empty {
+.new-message-toast {
+  position: fixed;
+  z-index: 1100;
+  left: 50%;
+  bottom: calc(78px + env(safe-area-inset-bottom, 0px));
+  transform: translate(-50%, 12px);
+  max-width: calc(100vw - 28px);
+  padding: 13px 18px;
+  border: 1px solid var(--accent-border);
+  border-radius: 14px;
+  background: #183b2c;
+  color: #fff;
+  box-shadow: 0 10px 34px rgba(0,0,0,.25);
+  font: inherit;
+  font-weight: 700;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease, transform .2s ease;
+}
+.new-message-toast.visible { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; cursor: pointer; }
+
+/* Загрузка кнопок */
+.spinner { display: inline-block; width: 1em; height: 1em; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: hh-spin .7s linear infinite; vertical-align: -.12em; flex: 0 0 auto; }
+.is-loading { display: inline-flex; align-items: center; justify-content: center; gap: .55em; cursor: wait; }
+.is-loading:disabled { opacity: .85; }
+@keyframes hh-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 1.5s; } }
+
+/* Мобильное меню — переключается существующим checkbox #menuToggle */
+.menu-toggle { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.mobile-menu-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  display: block;
+  background: rgba(10,12,16,.5);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease;
+  cursor: pointer;
+}
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 50;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 30px 16px;
-  text-align: center;
-  border: 1px dashed #cfe0b0;
-  border-radius: 12px;
-  background: #f9fdf1;
-  color: var(--muted);
+  gap: 14px;
+  width: min(320px, 86vw);
+  height: 100dvh;
+  padding: 18px;
+  background: #fff;
+  box-shadow: -10px 0 40px rgba(0,0,0,.2);
+  transform: translateX(105%);
+  transition: transform .25s ease;
 }
-.messages-empty-icon {
-  font-size: 40px;
-  line-height: 1;
-  color: #7fa800;
-  filter: drop-shadow(0 2px 4px rgba(127, 168, 0, .2));
-}
-@media (max-width: 520px) {
-  .conversation-card {
-    padding: 10px;
-    grid-template-columns: 34px 1fr auto;
-    gap: 8px;
-  }
-  .conv-icon { width: 34px; height: 34px; flex-basis: 34px; font-size: 16px; }
-  .conv-title { font-size: 13.5px; }
-  .conv-last { font-size: 12px; }
-  .conv-time { font-size: 10.5px; }
-  .messages-empty { padding: 22px 12px; }
-  .messages-empty-icon { font-size: 34px; }
-}
-@media (max-width: 720px) {
-  .nav-badge {
-    top: 0;
-    right: calc(50% - 22px);
-    min-width: 16px;
-    height: 16px;
-    padding: 0 4px;
-    font-size: 9.5px;
-    line-height: 16px;
-    border-radius: 8px;
-  }
-}
+.mobile-menu-header { display: flex; align-items: center; justify-content: space-between; font-size: 16px; font-weight: 700; }
+.mobile-menu-list { display: flex; flex-direction: column; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.mobile-menu-list a { display: block; padding: 12px 10px; border-radius: 10px; color: var(--text); text-decoration: none; font-size: 15px; font-weight: 600; }
+.mobile-menu-list a:hover { background: #f3f4f7; }
+body:has(#menuToggle:checked) .mobile-menu { display: flex; transform: translateX(0); }
+body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1; pointer-events: auto; }
 
-
-/* HOT BADGE CONTRAST FIX: orange fill, dark readable text, keep red border */
-.hot-listing-badge {
-  background: #ff8a00 !important;
-  color: #203f32 !important;
-  border: 1px solid #d63324 !important;
-  box-shadow: none !important;
-}
-
-
-/* Requested refinements: orange hot-offers heading and category submenus */
-.urgent-deals .eyebrow { color: #f28a24; }
-.category-menu-backdrop { position: fixed; inset: 0; z-index: 999; background: rgba(8, 18, 13, .46); backdrop-filter: blur(2px); }
-.category-menu { position: fixed; z-index: 1000; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(92vw, 430px); max-height: min(82dvh, 620px); overflow: auto; padding: 24px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface, #fff); color: var(--text); box-shadow: 0 24px 80px rgba(0,0,0,.28); }
-.category-menu h2 { margin: 0 34px 18px 0; font-size: 22px; line-height: 1.25; }
-.category-menu-close { position: absolute; top: 10px; right: 12px; width: 34px; height: 34px; border: 1px solid var(--line); border-radius: 10px; background: transparent; color: inherit; font-size: 24px; cursor: pointer; }
-.category-menu-options { display: grid; gap: 9px; }
-.category-menu-option { display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%; padding: 13px 14px; border: 1px solid var(--line); border-radius: 11px; background: var(--surface, #fff); color: var(--text); text-align: left; font: inherit; cursor: pointer; }
-.category-menu-option:hover, .category-menu-option:focus-visible { border-color: var(--accent, #d4ff00); background: rgba(212,255,0,.12); outline: none; }
-.category-menu-option span { font-size: 22px; color: var(--muted); }
-.new-message-toast { position: fixed; z-index: 1100; left: 50%; bottom: calc(78px + env(safe-area-inset-bottom)); transform: translate(-50%, 12px); opacity: 0; pointer-events: none; border: 1px solid var(--accent-border, #d4ff00); border-radius: 14px; padding: 13px 18px; background: #183b2c; color: #fff; box-shadow: 0 10px 34px rgba(0,0,0,.25); font: inherit; font-weight: 700; max-width: calc(100vw - 28px); transition: opacity .2s ease, transform .2s ease; }
-.new-message-toast.visible { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; cursor: pointer; }
-@media (max-width: 520px) { .category-menu { padding: 20px 16px; } .category-menu h2 { font-size: 20px; } }
-
-
-/* Hryvnia Hub: compact frosted-glass category menus */
-.category-menu-backdrop {
-  background: rgba(8, 18, 13, .38);
+/* Фильтры автомобилей — диалог, который открывает app.js */
+.vehicle-search-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1001;
+  background: rgba(8,18,13,.48);
   -webkit-backdrop-filter: blur(8px) saturate(115%);
   backdrop-filter: blur(8px) saturate(115%);
 }
-.category-menu {
-  top: 42%;
-  width: min(88vw, 390px);
-  max-height: min(40dvh, 390px);
-  overflow-y: auto;
-  padding: 20px 20px 16px;
-  border: 1px solid rgba(212, 255, 0, .38);
+.vehicle-search-menu {
+  position: fixed;
+  z-index: 1002;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(92vw, 560px);
+  max-height: 84dvh;
+  overflow: auto;
+  padding: 24px;
+  border: 1px solid rgba(212,255,0,.45);
   border-radius: 22px;
-  background: rgba(18, 39, 29, .76);
+  background: rgba(18,39,29,.97);
   color: #f7f9f5;
-  -webkit-backdrop-filter: blur(18px) saturate(135%);
-  backdrop-filter: blur(18px) saturate(135%);
-  box-shadow: 0 18px 55px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(255, 255, 255, .12);
-  scrollbar-width: thin;
-  scrollbar-color: rgba(212, 255, 0, .45) transparent;
-  animation: categoryMenuEnter .18s ease-out;
-}
-.category-menu h2 {
-  margin: 0 42px 10px 0;
-  color: #f7f9f5;
-  font-size: 21px;
-  line-height: 1.25;
-}
-.category-menu-close {
-  top: 12px;
-  right: 12px;
-  width: 32px;
-  height: 32px;
-  border: 1px solid rgba(255, 255, 255, .22);
-  border-radius: 50%;
-  background: rgba(255, 255, 255, .07);
-  color: #f7f9f5;
-}
-.category-menu-options { gap: 0; }
-.category-menu-option {
-  position: relative;
-  min-height: 48px;
-  padding: 11px 4px;
-  border: 0;
-  border-bottom: 1px solid rgba(255, 255, 255, .16);
-  border-radius: 0;
-  background: transparent;
-  color: #f7f9f5;
-  font-size: 16px;
-  text-align: left;
-  transition: color .16s ease, padding .16s ease, background .16s ease;
-}
-.category-menu-option:last-child { border-bottom: 0; }
-.category-menu-option::before {
-  content: "";
-  flex: 0 0 7px;
-  width: 7px;
-  height: 7px;
-  margin-right: 4px;
-  border: 1.5px solid var(--accent, #d4ff00);
-  border-radius: 50%;
-  box-shadow: 0 0 10px rgba(212, 255, 0, .18);
-}
-.category-menu-option:hover,
-.category-menu-option:focus-visible {
-  padding-left: 8px;
-  border-bottom-color: rgba(212, 255, 0, .34);
-  background: rgba(212, 255, 0, .07);
-  color: var(--accent, #d4ff00);
-  outline: none;
-}
-.category-menu-option span { margin-left: auto; color: var(--accent, #d4ff00); font-size: 23px; }
-@keyframes categoryMenuEnter {
-  from { opacity: 0; transform: translate(-50%, -47%) scale(.985); }
-  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-}
-@media (max-width: 520px) {
-  .category-menu { top: 40%; width: min(88vw, 390px); max-height: min(40dvh, 390px); padding: 17px 17px 13px; border-radius: 20px; }
-  .category-menu h2 { margin-bottom: 8px; font-size: 20px; }
-  .category-menu-option { min-height: 44px; padding-top: 9px; padding-bottom: 9px; font-size: 15px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .category-menu { animation: none; }
-  .category-menu-option { transition: none; }
-}
-
-/* HRYVNIA HUB — final mobile polish: fit region/radius labels and slightly enlarge banner text. */
-@media (max-width: 720px) {
-  #catalogRegionSelect,
-  .search-filters-row > select {
-    font-size: 9.5px !important;
-    letter-spacing: -0.15px !important;
-    padding-left: 5px !important;
-    padding-right: 3px !important;
-  }
-
-  .main-banner .banner-title {
-    font-size: clamp(15px, 4.1vw, 17px) !important;
-    line-height: 1.06 !important;
-  }
-
-  .main-banner .hero-text {
-    font-size: clamp(10px, 2.9vw, 11.5px) !important;
-    line-height: 1.1 !important;
-  }
-}
-
-
-/* ============================================================
-   HRYVNIA HUB — MOBILE HOMEPAGE FINAL MOCKUP IMPLEMENTATION
-   Compact categories; banner height matches one category card;
-   slight gap before ticker; narrower AI panel; wider main search.
-   Intended for Stylus on hryvniahub.vercel.app.
-   ============================================================ */
-@media screen and (max-width: 720px) {
-  /* Categories: reduce vertical gaps and keep all four cards compact. */
-  .categories-section {
-    margin-top: 3px !important;
-    margin-bottom: 0 !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-  }
-
-  .categories-grid {
-    gap: 4px !important;
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  }
-
-  .categories-grid > .category-card:not(.all-btn) {
-    /* Keep the two-column cards approximately 15% shorter than before. */
-    aspect-ratio: 3.45 / 1 !important;
-    min-height: 0 !important;
-    padding: 5px !important;
-    margin: 0 !important;
-    box-sizing: border-box !important;
-  }
-
-  .category-card-label {
-    padding: 0 6px 1px !important;
-    line-height: 1.05 !important;
-  }
-
-  /* Banner: height approximately equals one category card, not taller.
-     Its own bottom margin and ticker top margin preserve a visible gap. */
-  .main-banner {
-    height: clamp(50px, calc((100vw - 42px) / 6.9), 58px) !important;
-    min-height: clamp(50px, calc((100vw - 42px) / 6.9), 58px) !important;
-    max-height: clamp(50px, calc((100vw - 42px) / 6.9), 58px) !important;
-    margin-top: 5px !important;
-    margin-bottom: 5px !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-    box-sizing: border-box !important;
-  }
-
-  .main-banner-img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    object-position: center 52% !important;
-  }
-
-  .main-banner .banner-content {
-    padding: 0 6px !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-  }
-
-  .main-banner .banner-title {
-    font-size: clamp(14px, 3.7vw, 16px) !important;
-    line-height: 1.05 !important;
-    margin: 0 0 2px !important;
-  }
-
-  .main-banner .banner-title::after {
-    margin: 2px auto 0 !important;
-  }
-
-  .main-banner .hero-text {
-    font-size: clamp(9px, 2.5vw, 10.5px) !important;
-    line-height: 1.08 !important;
-    margin: 0 auto !important;
-  }
-
-  /* Currency ticker: distinct from banner, no overlay onto its text/image. */
-  .market-ticker,
-  #marketTicker,
-  .market-ticker-wrap {
-    position: relative !important;
-    z-index: 1 !important;
-    margin-top: 5px !important;
-    margin-bottom: 7px !important;
-  }
-
-  /* Transfer width from AI to the search panel, not from city/price fields. */
-  .search-ai-section {
-    display: grid !important;
-    grid-template-columns: minmax(0, 2.25fr) minmax(0, 0.8fr) !important;
-    gap: 8px !important;
-    align-items: stretch !important;
-    width: 100% !important;
-    margin-top: 8px !important;
-    box-sizing: border-box !important;
-  }
-
-  .search-panel {
-    width: 100% !important;
-    min-width: 0 !important;
-    justify-self: stretch !important;
-    padding: 10px !important;
-    box-sizing: border-box !important;
-  }
-
-  .ai-panel {
-    width: 100% !important;
-    min-width: 0 !important;
-    justify-self: stretch !important;
-    padding: 8px !important;
-    gap: 4px !important;
-    box-sizing: border-box !important;
-    overflow-wrap: anywhere !important;
-  }
-
-  .ai-panel h3 {
-    font-size: 13px !important;
-    line-height: 1.15 !important;
-  }
-
-  .ai-panel .ai-subtitle {
-    font-size: 10px !important;
-    line-height: 1.2 !important;
-  }
-
-  .ai-panel .btn-ai {
-    width: 100% !important;
-    max-width: 100% !important;
-    padding: 6px 5px !important;
-    font-size: 10px !important;
-    line-height: 1.15 !important;
-    white-space: normal !important;
-    box-sizing: border-box !important;
-  }
-
-  /* With the main panel wider, keep city and price at least as wide as
-     the area/radius controls; the second column gets a small extra share. */
-  .search-filters-row {
-    display: grid !important;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr) !important;
-    gap: 7px !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-  }
-
-  .search-filters-row > *,
-  .search-filters-row input,
-  .search-filters-row select,
-  .search-panel input,
-  .search-panel select,
-  .search-panel button {
-    min-width: 0 !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-  }
-
-  .search-filters-row > select,
-  .search-filters-row > input[type="number"],
-  #catalogRegionSelect {
-    padding-left: 8px !important;
-    padding-right: 6px !important;
-    font-size: 11.5px !important;
-  }
-}
-
-/* Very narrow phones: avoid squeezing the AI card and keep labels legible. */
-@media screen and (max-width: 360px) {
-  .search-ai-section {
-    grid-template-columns: minmax(0, 2fr) minmax(0, 0.85fr) !important;
-    gap: 6px !important;
-  }
-  .search-panel { padding: 8px !important; }
-  .ai-panel { padding: 6px !important; }
-  .search-filters-row { gap: 5px !important; }
-  .search-filters-row > select,
-  .search-filters-row > input[type="number"],
-  #catalogRegionSelect { font-size: 10.5px !important; }
-}
-
-
-/* ============================================================
-   HRYVNIA HUB — RESPONSIVE ALIGNMENT & READABILITY PATCH
-   Requested: centered category labels, desktop logo fit, larger banner text.
-   Append-only overrides for Stylus; no HTML/JS changes.
-   ============================================================ */
-
-/* Category names: center horizontally and vertically, and wrap within each card. */
-.categories-grid > .category-card:not(.all-btn),
-.category-card:not(.all-btn) {
-  position: relative !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  min-width: 0 !important;
-  overflow: hidden !important;
-}
-
-.category-card-label {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  margin: 0 auto !important;
-  padding: 4px 12px !important;
-  box-sizing: border-box !important;
-  text-align: center !important;
-  white-space: normal !important;
-  overflow-wrap: anywhere !important;
-  word-break: normal !important;
-  line-height: 1.08 !important;
-  transform: none !important;
-}
-
-/* Desktop/tablet: keep long category labels inside their own card. */
-@media screen and (min-width: 721px) {
-  .category-card-label {
-    font-size: clamp(16px, 1.65vw, 24px) !important;
-    line-height: 1.08 !important;
-    padding: 5px 10px !important;
-  }
-
-  /* Logo: fit the full “HRYVNIA HUB” wordmark inside its green frame. */
-  .header .brand {
-    min-width: 0 !important;
-    flex: 0 1 auto !important;
-    overflow: visible !important;
-    box-sizing: border-box !important;
-    padding-right: 12px !important;
-  }
-
-  .header .brand .brand-text,
-  .header .brand .brand-name {
-    display: inline-block !important;
-    transform: none !important;
-    font-size: clamp(19px, 1.55vw, 25px) !important;
-    line-height: 1 !important;
-    letter-spacing: -0.45px !important;
-    white-space: nowrap !important;
-    padding-right: 0 !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-  }
-
-  /* Larger, readable two-line banner message on desktop. */
-  .main-banner .banner-title {
-    font-size: clamp(27px, 2.35vw, 36px) !important;
-    line-height: 1.08 !important;
-    margin: 0 0 5px !important;
-    text-align: center !important;
-    text-wrap: balance !important;
-  }
-
-  .main-banner .hero-text {
-    font-size: clamp(15px, 1.2vw, 19px) !important;
-    line-height: 1.2 !important;
-    max-width: 100% !important;
-    margin: 0 auto !important;
-    text-align: center !important;
-  }
-}
-
-/* Mobile: center all category names and make both banner lines easier to read. */
-@media screen and (max-width: 720px) {
-  .category-card-label {
-    font-size: clamp(16px, 4.3vw, 21px) !important;
-    line-height: 1.08 !important;
-    padding: 3px 8px !important;
-    text-align: center !important;
-  }
-
-  .main-banner .banner-content {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    text-align: center !important;
-  }
-
-  .main-banner .banner-title {
-    width: 100% !important;
-    font-size: clamp(16px, 4.6vw, 20px) !important;
-    line-height: 1.08 !important;
-    margin: 0 0 3px !important;
-    text-align: center !important;
-    text-wrap: balance !important;
-  }
-
-  .main-banner .hero-text {
-    width: 100% !important;
-    max-width: 100% !important;
-    font-size: clamp(11px, 3.2vw, 14px) !important;
-    line-height: 1.12 !important;
-    margin: 0 auto !important;
-    text-align: center !important;
-  }
-}
-
-/* Extra-narrow phones: preserve centered labels without clipping. */
-@media screen and (max-width: 380px) {
-  .category-card-label {
-    font-size: clamp(14px, 4.2vw, 17px) !important;
-    padding-left: 5px !important;
-    padding-right: 5px !important;
-  }
-  .main-banner .banner-title {
-    font-size: clamp(15px, 4.5vw, 17px) !important;
-  }
-  .main-banner .hero-text {
-    font-size: clamp(10px, 3vw, 11.5px) !important;
-  }
-}
-
-
-/* HRYVNIA HUB — final banner typography adjustment (2026-10-22).
-   Slightly reduce the top headline so it stays comfortably inside the banner. */
-@media screen and (min-width: 721px) {
-  .main-banner .banner-title {
-    font-size: clamp(25px, 2.2vw, 33px) !important;
-    line-height: 1.12 !important;
-  }
-}
-
-@media screen and (max-width: 720px) {
-  .main-banner .banner-title {
-    font-size: clamp(15px, 4.3vw, 18.5px) !important;
-    line-height: 1.12 !important;
-    padding-top: 1px !important;
-  }
-}
-
-@media screen and (max-width: 380px) {
-  .main-banner .banner-title {
-    font-size: clamp(14.5px, 4.2vw, 16px) !important;
-    line-height: 1.12 !important;
-  }
-}
-
-
-/* HRYVNIA HUB — final hero banner spacing refinement. Keep headline typography unchanged. */
-@media screen and (min-width: 721px) {
-  .main-banner .banner-title {
-    transform: translateY(2px) !important;
-    margin-bottom: 2px !important;
-  }
-}
-
-@media screen and (max-width: 720px) {
-  .main-banner .banner-title {
-    transform: translateY(2px) !important;
-    margin-bottom: 0 !important;
-  }
-  .main-banner .hero-text {
-    transform: translateY(-2px) !important;
-    margin-top: -1px !important;
-    line-height: 1.08 !important;
-  }
-}
-
-/* HRYVNIA HUB — final banner position tweak only (2026-10-22).
-   Keep all wording, font sizes, and other page styles unchanged. */
-@media screen and (min-width: 721px) {
-  .main-banner .banner-title {
-    transform: translateY(3px) !important;
-  }
-  .main-banner .hero-text {
-    transform: translateY(-2px) !important;
-  }
-}
-
-@media screen and (max-width: 720px) {
-  .main-banner .banner-title {
-    transform: translateY(3px) !important;
-    margin-bottom: 0 !important;
-  }
-  .main-banner .hero-text {
-    transform: translateY(-4px) !important;
-    margin-top: -2px !important;
-    line-height: 1.08 !important;
-  }
-}
-
-/* Search category dropdown + vehicle filters, Hryvnia Hub */
-.search-input-row-stacked { grid-template-columns: minmax(0, 1fr); }
-.search-input-row-stacked > input, .search-input-row-stacked > button { width:100%; min-width:0; }
-.category-select-trigger { display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:48px; padding:10px 16px; border:1px solid rgba(105,145,43,.55); border-radius:14px; background:var(--surface,#fff); color:var(--text,#20352b); font:inherit; text-align:left; cursor:pointer; }
-.category-select-trigger > span:last-child { color:var(--accent,#d4ff00); font-size:24px; line-height:1; }
-.category-menu-icon { flex:0 0 28px; color:var(--accent,#d4ff00); font-size:20px; }
-.vehicle-search-backdrop { position:fixed; inset:0; z-index:1001; background:rgba(8,18,13,.48); backdrop-filter:blur(8px) saturate(115%); }
-.vehicle-search-menu { position:fixed; z-index:1002; left:50%; top:50%; transform:translate(-50%,-50%); width:min(92vw,560px); max-height:84dvh; overflow:auto; padding:24px; border:1px solid rgba(212,255,0,.45); border-radius:22px; background:rgba(18,39,29,.96); color:#f7f9f5; box-shadow:0 24px 80px rgba(0,0,0,.38); }
-.vehicle-search-menu h2 { margin:0 40px 5px 0; font-size:24px; }
-.vehicle-search-intro { margin:0 0 18px; color:rgba(247,249,245,.72); }
-.vehicle-search-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
-.vehicle-search-grid label { display:grid; gap:6px; color:#f7f9f5; font-size:14px; font-weight:650; }
-.vehicle-search-grid input,.vehicle-search-grid select { width:100%; min-width:0; min-height:44px; padding:9px 10px; border:1px solid rgba(212,255,0,.38); border-radius:10px; background:rgba(255,255,255,.96); color:#20352b; font:inherit; font-weight:400; }
-.vehicle-search-actions { display:flex; gap:10px; margin-top:18px; }
-.vehicle-search-actions button { flex:1; min-height:46px; border-radius:12px; font:inherit; font-weight:700; cursor:pointer; }
-.vehicle-reset-btn { border:1px solid rgba(255,255,255,.28); background:transparent; color:#f7f9f5; }
-@media(max-width:520px) { .vehicle-search-menu { padding:20px 16px; max-height:82dvh; } .vehicle-search-grid { gap:10px; } .vehicle-search-grid label { font-size:12px; } .vehicle-search-grid input,.vehicle-search-grid select { font-size:14px; } }
-
-/* Vehicle listing fields: reuse the existing light form design. */
-.vehicle-listing-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:8px 0 14px; padding:14px; border:1px solid var(--accent-border, #cbdba8); border-radius:14px; }
-.vehicle-listing-fields[hidden] { display:none !important; }
-.vehicle-listing-fields legend { padding:0 7px; font-weight:750; color:var(--text,#20352b); }
-.vehicle-listing-fields label { display:grid; gap:6px; min-width:0; }
-.vehicle-listing-fields input,.vehicle-listing-fields select { width:100%; min-width:0; box-sizing:border-box; }
-.search-input-row-stacked { display:flex; flex-direction:column; gap:8px; }
-.search-input-row-stacked #searchInput,.search-input-row-stacked #categorySelectTrigger,.search-input-row-stacked #searchBtn { width:100%; }
-.category-menu { background:rgba(18,39,29,.97); color:#f7f9f5; border:1px solid rgba(212,255,0,.42); box-shadow:0 24px 80px rgba(0,0,0,.38); backdrop-filter:blur(16px); }
-.category-menu h2 { color:#f7f9f5; }
-.category-menu-option { color:#f7f9f5; }
-.category-menu-option:hover,.category-menu-option:focus-visible { background:rgba(212,255,0,.1); }
-@media(max-width:520px) { .vehicle-listing-fields { grid-template-columns:1fr; gap:10px; padding:12px; } }
-
-
-/* HRYVNIA HUB — комплексная правка категорий и баннера (2026-10-22) */
-.categories-section .categories-grid > .category-card:not(.all-btn) .category-card-img {
-  position: absolute !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-}
-.category-menu-options { align-items: stretch !important; }
-.category-menu-option {
-  display: grid !important;
-  grid-template-columns: 28px minmax(0,1fr) 18px !important;
-  align-items: center !important;
-  justify-content: initial !important;
-  gap: 10px !important;
-  width: 100% !important;
-  min-height: 48px !important;
-  text-align: left !important;
-  box-sizing: border-box !important;
-}
-.category-menu-option .category-menu-option-label {
-  display: block !important;
-  min-width: 0 !important;
-  margin: 0 !important;
-  text-align: left !important;
-  font-size: 16px !important;
-  line-height: 1.25 !important;
-  overflow-wrap: anywhere !important;
-  color: inherit !important;
-}
-.category-menu-option > span:last-child { justify-self: end !important; margin-left: 0 !important; }
-.category-menu-option .category-menu-icon { width: 28px !important; text-align: center !important; }
-.category-menu-option.category-menu-back { border-bottom: 1px solid rgba(212,255,0,.22) !important; }
-.main-banner {
-  height: clamp(112px, 18vw, 190px) !important;
-  min-height: 112px !important;
-  max-height: 190px !important;
-  padding: 12px 18px !important;
-  box-sizing: border-box !important;
-}
-.main-banner .banner-content {
-  position: relative !important;
-  z-index: 2 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  height: 100% !important;
-  padding: 0 8px !important;
-  box-sizing: border-box !important;
-  gap: 5px !important;
-}
-.main-banner .banner-title,
-.main-banner .hero-text {
-  position: static !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  transform: none !important;
-  word-break: normal !important;
-  overflow-wrap: normal !important;
-  text-wrap: balance !important;
-  text-align: center !important;
-}
-.main-banner .banner-title { font-size: clamp(18px, 2.4vw, 32px) !important; line-height: 1.12 !important; }
-.main-banner .hero-text { font-size: clamp(12px, 1.25vw, 18px) !important; line-height: 1.25 !important; }
-@media screen and (max-width: 720px) {
-  .categories-section .categories-grid { grid-template-columns: repeat(2, minmax(0,1fr)) !important; gap: 8px !important; }
-
-.main-banner { height: clamp(112px, 31vw, 145px) !important; min-height: 112px !important; max-height: 145px !important; padding: 9px 10px !important; }
-  .main-banner .banner-content { gap: 5px !important; }
-  .main-banner .banner-title { font-size: clamp(16px, 4.4vw, 21px) !important; line-height: 1.15 !important; }
-  .main-banner .hero-text { font-size: clamp(11px, 3.1vw, 14px) !important; line-height: 1.22 !important; }
-  .category-menu-option .category-menu-option-label { font-size: 15px !important; }
-}
-@media screen and (max-width: 380px) {
-
-  .main-banner { height: 112px !important; min-height: 112px !important; }
-  .main-banner .banner-title { font-size: 15px !important; }
-  .main-banner .hero-text { font-size: 11px !important; }
-}
-
-
-/* HRYVNIA HUB — restore compact mobile proportions and category controls */
-.category-select-trigger { min-height: 60px !important; height: 60px !important; box-sizing: border-box !important; }
-.category-select-trigger > span:last-child { color: #202a24 !important; font-size: 17px !important; font-weight: 400 !important; line-height: 1 !important; }
-.category-menu-options { min-width: 0 !important; width: 100% !important; }
-.category-menu-option { grid-template-columns: 28px minmax(0,1fr) 18px !important; }
-.category-menu-option-label { overflow-wrap: break-word !important; word-break: normal !important; }
-.category-menu-option.category-menu-back { display: none !important; }
-@media screen and (max-width: 720px) {
-  .categories-section .categories-grid { gap: 8px !important; }
-
-  .main-banner { height: 90px !important; min-height: 90px !important; max-height: 90px !important; padding: 7px 10px !important; }
-  .main-banner .banner-content { gap: 3px !important; }
-  .main-banner .banner-title { font-size: clamp(15px, 3.6vw, 22px) !important; line-height: 1.1 !important; }
-  .main-banner .hero-text { font-size: clamp(10px, 2.4vw, 15px) !important; line-height: 1.15 !important; }
-}
-@media screen and (max-width: 380px) {
-
-  .main-banner { height: 90px !important; min-height: 90px !important; max-height: 90px !important; }
-}
-
-
-/* Targeted Hryvnia Hub fixes: banner text spacing, category selector, compact dark-green menus. */
-.banner-content { display: flex; flex-direction: column; align-items: flex-start; gap: 9px; }
-.banner-title { margin: 0; line-height: 1.25; }
-.hero-text { margin: 0; line-height: 1.45; }
-
-.category-select-trigger { min-height: 48px; height: 48px; align-self: stretch; }
-.category-select-trigger > span:last-child { color: #17251d; font-size: 18px; line-height: 1; }
-
-.category-menu {
-  padding: 20px;
-  border: 1px solid #d4ff00;
-  border-radius: 16px;
-  background: #173b2b;
-  color: #fff;
-  box-shadow: 0 24px 70px rgba(0,0,0,.38);
-}
-.category-menu h2 { color: #fff; font-size: 20px; margin-bottom: 14px; }
-.category-menu-close { border-color: rgba(212,255,0,.55); color: #d4ff00; }
-.category-menu-options { gap: 6px; }
-.category-menu-option {
-  min-height: 46px;
-  padding: 10px 12px;
-  border: 0;
-  border-bottom: 1px solid rgba(212,255,0,.28);
-  border-radius: 6px;
-  background: transparent;
-  color: #fff;
-  font-size: 15px;
-}
-.category-menu-option:hover, .category-menu-option:focus-visible {
-  background: rgba(212,255,0,.10);
-  border-color: #d4ff00;
-}
-.category-menu-option span { color: #fff; font-size: 16px; }
-.category-menu-option .category-menu-icon { color: #d4ff00; font-size: 18px; }
-
-
-/* HRYVNIA HUB — canonical fix for the centered “Усі” category button */
-.categories-section .categories-grid {
-  position: relative !important;
-}
-
-.categories-section .categories-grid > .all-btn {
-  position: absolute !important;
-  left: 50% !important;
-  top: 50% !important;
-  transform: translate(-50%, -50%) !important;
-  width: 72px !important;
-  min-width: 72px !important;
-  max-width: 72px !important;
-  height: 40px !important;
-  min-height: 40px !important;
-  max-height: 40px !important;
-  padding: 0 8px !important;
-  box-sizing: border-box !important;
-  border-radius: 10px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  text-align: center !important;
-  white-space: nowrap !important;
-  word-break: normal !important;
-  overflow: visible !important;
-  z-index: 5 !important;
-}
-
-.categories-section .categories-grid > .all-btn::after {
-  content: none !important;
-}
-
-@media screen and (max-width: 720px) {
-  .categories-section .categories-grid > .all-btn {
-    width: 64px !important;
-    min-width: 64px !important;
-    max-width: 64px !important;
-    height: 36px !important;
-    min-height: 36px !important;
-    max-height: 36px !important;
-    padding: 0 6px !important;
-    border-radius: 9px !important;
-    font-size: 10px !important;
-  }
-}
-
-/* HRYVNIA HUB — clean final overrides for mobile category menu and navigation */
-.category-menu {
-  width: min(92vw, 430px) !important;
-  max-width: calc(100vw - 28px) !important;
-  max-height: min(82dvh, 620px) !important;
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
-  box-sizing: border-box !important;
-}
-.category-menu-options {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: stretch !important;
-  width: 100% !important;
-  min-width: 0 !important;
-  gap: 0 !important;
-}
-.category-menu-option {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  gap: 12px !important;
-  width: 100% !important;
-  min-width: 0 !important;
-  min-height: 48px !important;
-  height: auto !important;
-  padding: 12px 8px !important;
-  box-sizing: border-box !important;
-  white-space: normal !important;
-  text-align: left !important;
-  overflow: visible !important;
-}
-.category-menu-option .category-menu-icon {
-  display: inline-flex !important;
-  flex: 0 0 28px !important;
-  width: 28px !important;
-  min-width: 28px !important;
-  justify-content: center !important;
-  text-align: center !important;
-}
-.category-menu-option .category-menu-option-label {
-  display: block !important;
-  flex: 1 1 auto !important;
-  width: auto !important;
-  min-width: 0 !important;
-  max-width: 100% !important;
-  margin: 0 !important;
-  white-space: normal !important;
-  word-break: normal !important;
-  overflow-wrap: break-word !important;
-  line-height: 1.3 !important;
-  text-align: left !important;
-}
-.category-menu-option > span:last-child {
-  flex: 0 0 auto !important;
-  width: auto !important;
-  min-width: 0 !important;
-  margin-left: auto !important;
-  white-space: nowrap !important;
-}
-.category-menu-option.category-menu-back { display: flex !important; }
-
-@media (max-width: 520px) {
-  .category-menu {
-    left: 50% !important;
-    top: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    width: calc(100vw - 36px) !important;
-    max-width: 430px !important;
-    max-height: min(76dvh, 560px) !important;
-    padding: 18px 16px !important;
-  }
-  .category-menu-option { gap: 10px !important; padding: 11px 4px !important; font-size: 16px !important; }
-  .category-menu-option .category-menu-option-label { font-size: 16px !important; }
-}
-
-/* Remove decorative pseudo-elements that were rendering as stray lime marks in the bottom bar. */
-.bottom-nav-btn::before,
-.bottom-nav-btn::after {
-  content: none !important;
-  display: none !important;
-}
-
-/* Keep the centered All button compact and avoid changing the category grid's row sizing. */
-.categories-section .categories-grid { position: relative !important; }
-.categories-section .categories-grid > .all-btn {
-  position: absolute !important;
-  left: 50% !important;
-  top: 50% !important;
-  transform: translate(-50%, -50%) !important;
-  width: 64px !important;
-  min-width: 64px !important;
-  max-width: 64px !important;
-  height: 36px !important;
-  min-height: 36px !important;
-  max-height: 36px !important;
-  padding: 0 6px !important;
-  box-sizing: border-box !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  white-space: nowrap !important;
-  word-break: normal !important;
-  z-index: 5 !important;
-}
-.categories-section .categories-grid > .all-btn::before,
-.categories-section .categories-grid > .all-btn::after { content: none !important; display: none !important; }
-
-
-
-/* Final mobile banner sizing: compact height with both text lines readable. */
-@media screen and (max-width: 720px) {
-  .main-banner { height: 56px !important; min-height: 56px !important; max-height: 56px !important; padding: 3px 8px !important; box-sizing: border-box !important; }
-  .main-banner .banner-content { gap: 2px !important; justify-content: center !important; padding: 0 4px !important; }
-  .main-banner .banner-title { font-size: clamp(12px, 3.2vw, 17px) !important; line-height: 1.05 !important; margin: 0 !important; }
-  .main-banner .hero-text { font-size: clamp(9px, 2.3vw, 12px) !important; line-height: 1.1 !important; margin: 0 !important; }
-}
-@media screen and (max-width: 380px) {
-  .main-banner { height: 56px !important; min-height: 56px !important; max-height: 56px !important; }
-  .main-banner .banner-title { font-size: 12px !important; }
-  .main-banner .hero-text { font-size: 9px !important; }
-}
-
-/* Fix: compact the “All categories” selector in the search text menu only. */
-.search-panel .search-input-row-stacked > #categorySelectTrigger,
-.search-input-row-stacked > #categorySelectTrigger.category-select-trigger {
-  height: 60px !important;
-  min-height: 60px !important;
-  max-height: 60px !important;
-  padding: 0 16px !important;
-  box-sizing: border-box !important;
-  flex: 0 0 60px !important;
-  align-self: stretch !important;
-}
-
-/* FIX: compact only the “All categories” dropdown in the search form.
-   Do not affect the separate “Усі” button over the category cards. */
-.search-panel .search-input-row-stacked #categorySelectTrigger.category-select-trigger {
-  display: flex !important;
-  height: 60px !important;
-  min-height: 60px !important;
-  max-height: 60px !important;
-  padding: 0 16px !important;
-  margin: 0 !important;
-  box-sizing: border-box !important;
-  flex: 0 0 60px !important;
-  align-self: stretch !important;
-  line-height: 1.2 !important;
-  overflow: hidden !important;
-}
-.search-panel .search-input-row-stacked #categorySelectTrigger #categorySelectLabel {
-  display: block !important;
-  min-width: 0 !important;
-  line-height: 1.2 !important;
-}
-.search-panel .search-input-row-stacked #categorySelectTrigger > span:last-child {
-  flex: 0 0 auto !important;
-  line-height: 1 !important;
-}
-
-
-
-/* HRYVNIA HUB — search-field icons (design-only, no layout/functionality changes) */
-.search-panel .search-input-row-stacked #categorySelectTrigger {
-  gap: 12px !important;
-}
-.search-panel .search-input-row-stacked #categorySelectTrigger::before {
-  content: "";
-  display: block;
-  flex: 0 0 26px;
-  width: 26px;
-  height: 26px;
-  background: center / contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d4937' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='7' height='7' rx='1'/%3E%3Crect x='14' y='3' width='7' height='7' rx='1'/%3E%3Crect x='3' y='14' width='7' height='7' rx='1'/%3E%3Crect x='14' y='14' width='7' height='7' rx='1'/%3E%3C/svg%3E");
-}
-.search-panel #searchBtn {
-  position: relative !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 10px !important;
-}
-.search-panel #searchBtn::before {
-  content: "";
-  display: inline-block;
-  width: 23px;
-  height: 23px;
-  flex: 0 0 23px;
-  background: center / contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d4937' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='10.8' cy='10.8' r='6.8'/%3E%3Cpath d='m16 16 5 5'/%3E%3C/svg%3E");
-}
-.search-panel #catalogCitySearchInput {
-  padding-left: 42px !important;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d4937' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z'/%3E%3Ccircle cx='12' cy='10' r='2.5'/%3E%3C/svg%3E") !important;
-  background-repeat: no-repeat !important;
-  background-position: 13px center !important;
-  background-size: 20px 20px !important;
-}
-.search-panel #catalogRegionSelect {
-  padding-left: 42px !important;
-  background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d4937' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z'/%3E%3Ccircle cx='12' cy='10' r='2.5'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%230d4937' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m1 1 5 5 5-5'/%3E%3C/svg%3E") !important;
-  background-repeat: no-repeat, no-repeat !important;
-  background-position: 13px center, right 12px center !important;
-  background-size: 20px 20px, 12px 8px !important;
-  appearance: none !important;
-}
-.search-panel .search-filters-row > input[type="number"] {
-  padding-left: 42px !important;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d4937' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cellipse cx='12' cy='5' rx='8' ry='3'/%3E%3Cpath d='M4 5v5c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 10v5c0 1.7 3.6 3 8 3s8-1.3 8-3v-5M4 15v4c0 1.7 3.6 3 8 3s8-1.3 8-3v-4'/%3E%3C/svg%3E") !important;
-  background-repeat: no-repeat !important;
-  background-position: 13px center !important;
-  background-size: 20px 20px !important;
-}
-.search-panel .search-filters-row > select[aria-label="Радиус поиска"] {
-  padding-left: 42px !important;
-  background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d4937' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Ccircle cx='12' cy='12' r='5'/%3E%3Ccircle cx='12' cy='12' r='1'/%3E%3Cpath d='M12 1v3M12 20v3M1 12h3M20 12h3'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%230d4937' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m1 1 5 5 5-5'/%3E%3C/svg%3E") !important;
-  background-repeat: no-repeat, no-repeat !important;
-  background-position: 13px center, right 12px center !important;
-  background-size: 20px 20px, 12px 8px !important;
-  appearance: none !important;
-}
-
-
-/* ============================================================
-   HRYVNIA HUB — CATEGORY ICONS + SEARCH CATEGORY SELECTOR
-   Added without changing the existing layout or JavaScript hooks.
-   ============================================================ */
-.category-card-label {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: clamp(6px, 1vw, 10px) !important;
-}
-.category-card-label > span[data-i18n] {
+  box-shadow: 0 24px 80px rgba(0,0,0,.38);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+.vehicle-search-menu h2 { margin: 0 40px 5px 0; color: #fff; font-size: 24px; }
+.vehicle-search-intro { margin: 0 0 18px; color: rgba(247,249,245,.75); }
+.vehicle-search-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.vehicle-search-grid label { display: grid; gap: 6px; min-width: 0; color: #f7f9f5; font-size: 14px; font-weight: 650; }
+.vehicle-search-grid input,
+.vehicle-search-grid select {
+  width: 100%;
   min-width: 0;
+  min-height: 44px;
+  padding: 9px 10px;
+  border: 1px solid rgba(212,255,0,.38);
+  border-radius: 10px;
+  background: rgba(255,255,255,.97);
+  color: #20352b;
+  font: inherit;
+  font-weight: 400;
 }
-.category-icon {
-  display: block;
-  flex: 0 0 26px;
-  width: 26px;
-  height: 26px;
-  color: #fff;
-  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, .55));
+.vehicle-search-actions { display: flex; gap: 10px; margin-top: 18px; }
+.vehicle-search-actions button { flex: 1 1 0; min-width: 0; min-height: 44px; border-radius: 12px; font: inherit; font-weight: 700; cursor: pointer; }
+.vehicle-reset-btn { border: 1px solid rgba(255,255,255,.3); background: transparent; color: #f7f9f5; }
+
+
+/* ============================================================
+   КОМПОНЕНТЫ, РАНЬШЕ СТИЛИЗОВАВШИЕСЯ ИЗ app.js
+   ============================================================ */
+.listing-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 150px;
+  background: linear-gradient(135deg, rgba(212,255,0,.20), rgba(13,70,43,.08));
+  color: #24583c;
+  border-radius: 12px;
 }
+.listing-placeholder svg { width: 76px; height: 76px; }
+.hot-listings-row {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding: 4px 2px 14px;
+  scroll-snap-type: x proximity;
+}
+.hot-listing-card {
+  flex: 0 0 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--accent-border);
+  border-radius: 14px;
+  background: var(--card);
+  color: var(--text);
+  cursor: pointer;
+  scroll-snap-align: start;
+  text-align: left;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.hot-listing-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.hot-listing-card .listing-photo,
+.hot-listing-card .listing-placeholder { width: 100%; height: 120px; min-height: 120px; object-fit: cover; }
+.hot-card-badges { display: flex; flex-wrap: wrap; gap: 4px; }
+.hot-card-title { font-weight: 700; font-size: 14px; }
+.hot-listing-card strong { font-size: 15px; }
+.hot-listing-card small { color: var(--muted); font-size: 12px; }
+.hot-listing-card .old-price { font-size: inherit; }
+.hot-listing-card .hot-listing-badge { display: inline-flex; padding: 4px 7px; border-radius: 6px; background: rgba(212,255,0,.25); font-size: 11px; font-weight: 700; }
+.listing-edit-dialog::backdrop { background: rgba(0,0,0,.55); }
+.listing-edit-form { display: grid; gap: 12px; }
+.listing-edit-form label { display: grid; gap: 5px; }
+.listing-edit-form input:not([type="checkbox"]),
+.listing-edit-form select,
+.listing-edit-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--card);
+  color: inherit;
+  font: inherit;
+}
+.listing-edit-form .hot-toggle { display: flex; align-items: center; gap: 8px; }
+.edit-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.listing-edit-form .form-message { overflow-wrap: anywhere; }
+
+/* Меню аккаунта — единый источник стилей в styles.css */
+#accountMenuRoot { margin: 18px 0 22px; }
+.account-menu-list { display: grid; gap: 8px; }
+.account-menu-item {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) 16px;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  padding: 11px 13px;
+  border: 1px solid #8eb89a;
+  border-radius: 13px;
+  background: #fff;
+  color: #252a27;
+  box-shadow: 0 2px 7px rgba(42,105,58,.06);
+  text-align: left;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.account-menu-item > span:first-child { font-size: 19px; text-align: center; }
+.account-menu-item > span:last-child { font-size: 22px; color: #7b827b; }
+.account-menu-item:hover { border-color: #4f9961; background: #f7fbf7; box-shadow: 0 3px 10px rgba(42,105,58,.09); }
+.account-menu-item:focus-visible { outline: 2px solid #4f9961; outline-offset: 2px; }
+.account-menu-item:active { background: #edf7ee; border-color: #39834d; }
+.account-menu-panel { padding: 16px; margin-top: 10px; border: 1px solid #75a983; border-radius: 14px; background: #fbfdfb; box-shadow: 0 3px 12px rgba(42,105,58,.07); }
+.account-menu-panel h3 { margin: 0 0 12px; font-size: 20px; }
+.account-menu-panel p { overflow-wrap: anywhere; }
+.account-menu-back { margin: 0 0 12px; padding: 10px 14px; border: 1px solid #75a983; border-radius: 10px; background: #f4faf5; color: #285b35; font: inherit; font-weight: 700; cursor: pointer; }
+.account-menu-panel label { display: block; margin: 10px 0; }
+.account-menu-panel label span { display: block; margin-bottom: 5px; font-size: 14px; }
+.account-menu-panel input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px; border: 1px solid #83b18e; border-radius: 10px; background: #fff; font: inherit; transition: border-color .15s, box-shadow .15s; }
+.account-menu-panel input:focus { outline: none; border-color: #39834d; box-shadow: 0 0 0 3px rgba(79,153,97,.15); }
+.account-menu-panel .account-save { width: 100%; min-height: 46px; margin-top: 8px; border: 1px solid #4f9961; border-radius: 12px; background: var(--accent); color: #20251e; font: inherit; font-weight: 750; cursor: pointer; box-shadow: 0 2px 0 rgba(42,105,58,.12); }
+.account-signout-btn { margin-top: 10px; min-height: 48px; border-radius: 12px; background: var(--accent); color: #20251e; font-weight: 700; }
+#authLoggedIn .muted { margin-bottom: 4px; }
+#authLoggedIn .auth-user-email { overflow-wrap: anywhere; }
+.account-listing-row { display: block; width: 100%; padding: 12px 0; border: 0; border-bottom: 1px solid #e4e7e2; background: none; text-align: left; font: inherit; cursor: pointer; }
+.account-listing-row strong { display: block; margin-bottom: 4px; }
+
+/* Адаптация восстановленных компонентов */
 @media (max-width: 720px) {
-  .category-icon {
-    flex-basis: 23px;
-    width: 23px;
-    height: 23px;
-  }
-  .category-card-label {
-    gap: 7px !important;
-  }
+  body { padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px)); }
+  .main-banner { height: 56px; padding: 4px 10px 15px; }
+  .banner-content { gap: 2px; padding-bottom: 17px; }
+  .banner-title { font-size: 12.5px; line-height: 1.05; }
+  .banner-title::after { width: 25px; height: 2px; margin-top: 2px; }
+  .hero-text { font-size: 9.5px; line-height: 1.05; }
+  .banner-icons { bottom: 3px; gap: 12px; }
+  .banner-icon { width: 14px; height: 14px; }
+  .ticker-icon { flex-basis: 18px; width: 18px; height: 18px; font-size: 11px; }
+  .ticker-label { font-size: 8px; }
+  .ticker-value { font-size: 10px; }
+  .ticker-arrow { font-size: 9px; }
+  .search-panel { padding: 8px 10px; gap: 6px; }
+  .search-filters-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .ai-panel { padding: 8px; }
+  .ai-panel h3 { font-size: 14px; }
+  .ai-panel .ai-features { display: none; }
+  .ai-visual { font-size: 30px; }
+  .bottom-nav { transition: transform .2s ease; }
+  .bottom-nav.keyboard-open { transform: translateY(120%); }
+  .nav-badge { top: 0; right: calc(50% - 22px); min-width: 16px; height: 16px; padding: 0 4px; font-size: 9.5px; line-height: 16px; border-radius: 8px; }
+  .section-head { align-items: flex-start; }
+  .badge-soft { font-size: 10px; padding: 5px 7px; }
+  .lang-city { font-size: 9px; }
+  .lang-clock { font-size: 8.5px; }
+  .lang-trigger { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: 1fr 1fr; align-items: center; column-gap: 4px; padding-inline: 5px; }
+  .lang-trigger .lang-flag { grid-row: 1 / 3; }
+  .lang-city, .lang-clock { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+@media (max-width: 520px) {
+  .favorites-list { grid-template-columns: 1fr; }
+  .conversation-card { grid-template-columns: 34px minmax(0, 1fr) auto; gap: 8px; padding: 10px; }
+  .conv-icon { width: 34px; height: 34px; flex-basis: 34px; font-size: 16px; }
+  .conv-title { font-size: 13px; }
+  .conv-last { font-size: 12px; }
+  .conv-time { font-size: 10px; }
+  .messages-empty { padding: 22px 12px; }
+  .messages-empty-icon { font-size: 34px; }
+  .vehicle-search-menu { padding: 20px 16px; max-height: 82dvh; }
+  .vehicle-search-grid { gap: 10px; }
+  .vehicle-search-grid label { font-size: 12px; }
+  .vehicle-search-grid input, .vehicle-search-grid select { font-size: 14px; }
+  .section-head { flex-direction: column; align-items: flex-start; gap: 4px; }
 }
 @media (max-width: 380px) {
-  .category-icon {
-    flex-basis: 20px;
-    width: 20px;
-    height: 20px;
-  }
-  .category-card-label {
-    gap: 5px !important;
-  }
+  .search-ai-section { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+  .search-panel { min-width: 0; padding: 7px; }
+  .search-filters-row { grid-template-columns: 1fr; }
+  .ai-panel { padding: 7px; }
+  .ai-panel h3 { font-size: 12px; }
+  .ai-subtitle { font-size: 10px; }
+  .btn-ai { font-size: 10px; }
 }
-
-/* Light lime tint, dark green text and a crisp four-square icon. */
-.search-panel .search-input-row-stacked #categorySelectTrigger.category-select-trigger {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  gap: 12px !important;
-  width: 100% !important;
-  min-height: 60px !important;
-  height: 60px !important;
-  max-height: 60px !important;
-  padding: 0 16px !important;
-  border: 1.5px solid #bfd68e !important;
-  border-radius: 16px !important;
-  background: linear-gradient(110deg, #f5fbdc 0%, #eaf6c8 100%) !important;
-  color: #194b39 !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 2px 5px rgba(26,76,53,.07) !important;
-  box-sizing: border-box !important;
-  overflow: hidden !important;
-}
-.search-panel .search-input-row-stacked #categorySelectTrigger .category-select-icon {
-  display: block;
-  flex: 0 0 27px;
-  width: 27px;
-  height: 27px;
-  color: #194b39;
-}
-.search-panel .search-input-row-stacked #categorySelectTrigger #categorySelectLabel {
-  display: block !important;
-  flex: 1 1 auto !important;
-  min-width: 0 !important;
-  color: #194b39 !important;
-  font-size: inherit;
-  font-weight: 750;
-  line-height: 1.2 !important;
-  text-align: left;
-}
-.search-panel .search-input-row-stacked #categorySelectTrigger .category-select-arrow {
-  display: block;
-  flex: 0 0 20px;
-  width: 20px;
-  height: 20px;
-  color: #194b39;
-  transition: transform .18s ease;
-}
-.search-panel .search-input-row-stacked #categorySelectTrigger[aria-expanded="true"] .category-select-arrow {
-  transform: rotate(180deg);
-}
-.search-panel .search-input-row-stacked #categorySelectTrigger:hover {
-  border-color: #a9cc46 !important;
-  background: linear-gradient(110deg, #eff9c8 0%, #e0f2a5 100%) !important;
-}
-.search-panel .search-input-row-stacked #categorySelectTrigger:focus-visible {
-  outline: 3px solid rgba(212,255,0,.6);
-  outline-offset: 2px;
-}
-@media (max-width: 720px) {
-  .search-panel .search-input-row-stacked #categorySelectTrigger.category-select-trigger {
-    gap: 10px !important;
-    padding: 0 13px !important;
-  }
-  .search-panel .search-input-row-stacked #categorySelectTrigger .category-select-icon {
-    flex-basis: 24px;
-    width: 24px;
-    height: 24px;
-  }
+@media (max-width: 340px) {
+  .search-ai-section { grid-template-columns: 1fr; }
+  .search-filters-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 
-/* ============================================================
-   HRYVNIA HUB — banner refinement + multilingual business label
-   Keep the existing banner dimensions; improve text and icons only.
-   ============================================================ */
-
-/* Keep “Business” at the normal size and reduce only its final word. */
-.category-card[data-category="Готовый бизнес"] .category-card-label {
-  gap: 5px !important;
-  white-space: nowrap !important;
-  overflow-wrap: normal !important;
-  word-break: normal !important;
-}
-.category-card[data-category="Готовый бизнес"] .category-icon {
-  flex: 0 0 21px !important;
-  width: 21px !important;
-  height: 21px !important;
-}
-.category-card-long-word {
-  display: inline-block !important;
-  flex: 0 1 auto !important;
-  min-width: 0 !important;
-  max-width: 100% !important;
-  font-size: 0.70em !important;
-  font-weight: 800 !important;
-  line-height: 1 !important;
-  letter-spacing: -0.025em !important;
-  white-space: nowrap !important;
-  overflow-wrap: normal !important;
+/* Узкие телефоны: шапка не должна выходить за экран */
+@media (max-width: 360px) {
+  .brand { gap: 3px; padding: 2px 4px; }
+  .brand .logo { width: 20px; height: 20px; flex-basis: 20px; }
+  .brand .brand-text { font-size: 8px; transform: none; }
+  .header-actions { gap: 3px; }
+  .header-action, .lang-btn { padding-inline: 3px; }
+  #openAdd { width: 32px; min-width: 32px; padding: 0; font-size: 0; }
+  #openAdd::before { content: "+"; font-size: 18px; line-height: 1; font-weight: 800; }
 }
 
-/* The banner stays the same height. Remove the heavy dark overlay so the
-   background artwork and lime category symbols are easier to see. */
-.main-banner::before {
-  background: linear-gradient(180deg, rgba(15, 20, 28, 0.015) 0%, rgba(15, 20, 28, 0.12) 100%) !important;
-}
-.main-banner {
-  isolation: isolate;
-}
-.main-banner .main-banner-img {
-  filter: brightness(1.10) saturate(1.08) !important;
-}
-.main-banner .banner-content {
-  z-index: 2 !important;
-  padding-bottom: 13px !important;
-  gap: 2px !important;
-}
-.main-banner .banner-title {
-  font-size: clamp(19px, 2.8vw, 32px) !important;
-  line-height: 1.08 !important;
-  margin: 0 !important;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45) !important;
-}
-.main-banner .hero-text {
-  font-size: clamp(12px, 1.35vw, 17px) !important;
-  line-height: 1.12 !important;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45) !important;
-}
-.main-banner .banner-icons {
-  position: absolute !important;
-  z-index: 3 !important;
-  left: 8% !important;
-  right: 8% !important;
-  bottom: 3px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-around !important;
-  gap: 8px !important;
-  height: 13px !important;
-  pointer-events: none !important;
-}
-.main-banner .banner-icon {
-  display: block !important;
-  flex: 0 0 15px !important;
-  width: 15px !important;
-  height: 15px !important;
-  min-width: 15px !important;
-  color: #d4ff00 !important;
-  opacity: 1 !important;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35)) !important;
-}
-@media screen and (max-width: 720px) {
-  /* Do not set height/min-height here: preserve the existing mobile banner height. */
-  .main-banner .banner-content {
-    padding: 0 5px 13px !important;
-    gap: 2px !important;
-  }
-  .main-banner .banner-title {
-    font-size: clamp(15px, 4.0vw, 19px) !important;
-    line-height: 1.04 !important;
-  }
-  .main-banner .hero-text {
-    font-size: clamp(10px, 2.75vw, 13px) !important;
-    line-height: 1.06 !important;
-  }
-  .main-banner .banner-icons {
-    left: 8% !important;
-    right: 8% !important;
-    bottom: 2px !important;
-    height: 11px !important;
-    gap: 6px !important;
-  }
-  .main-banner .banner-icon {
-    flex-basis: 13px !important;
-    width: 13px !important;
-    height: 13px !important;
-    min-width: 13px !important;
-  }
-  .category-card[data-category="Готовый бизнес"] .category-card-label {
-    gap: 4px !important;
-  }
-  .category-card[data-category="Готовый бизнес"] .category-icon {
-    flex-basis: 19px !important;
-    width: 19px !important;
-    height: 19px !important;
-  }
-  .category-card-long-word { font-size: 0.66em !important; }
-}
-@media screen and (max-width: 380px) {
-  .main-banner .banner-title { font-size: 15px !important; }
-  .main-banner .hero-text { font-size: 10px !important; }
-  .main-banner .banner-content { padding-bottom: 12px !important; }
-  .category-card-long-word { font-size: 0.62em !important; }
-}
-
-
-/* ============================================================
-   HRYVNIA HUB — FINAL OVERRIDES AFTER ALL LEGACY MOBILE RULES
-   Keep the existing banner height unchanged.
-   ============================================================ */
-.category-card[data-category="Готовый бизнес"] .category-card-label {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  flex-wrap: nowrap !important;
-  white-space: nowrap !important;
-  gap: 5px !important;
-  max-width: 100% !important;
-}
-.category-card[data-category="Готовый бизнес"] .category-card-label > span[data-i18n] {
-  display: block !important;
-  min-width: 0 !important;
-  max-width: 100% !important;
-  white-space: normal !important;
-  overflow-wrap: normal !important;
-  word-break: normal !important;
-  line-height: 1.05 !important;
-}
-.category-card-long-word {
-  display: inline-block !important;
-  flex: 0 0 auto !important;
-  white-space: nowrap !important;
-  font-size: 0.62em !important;
-  line-height: 1 !important;
-  letter-spacing: -0.035em !important;
-  vertical-align: baseline !important;
-}
-.category-card[data-category="Готовый бизнес"] .category-icon {
-  flex: 0 0 19px !important;
-  width: 19px !important;
-  height: 19px !important;
-}
-
-.main-banner::before {
-  background: linear-gradient(
-    180deg,
-    rgba(8, 16, 24, 0.02) 0%,
-    rgba(8, 16, 24, 0.14) 100%
-  ) !important;
-}
-.main-banner .main-banner-img {
-  filter: brightness(1.12) saturate(1.12) !important;
-}
-.main-banner .banner-title {
-  font-size: clamp(20px, 3vw, 32px) !important;
-  line-height: 1.08 !important;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35) !important;
-}
-.main-banner .hero-text {
-  font-size: clamp(12px, 1.5vw, 17px) !important;
-  line-height: 1.12 !important;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35) !important;
-}
-.main-banner .banner-icons {
-  display: flex !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  left: 8% !important;
-  right: 8% !important;
-  bottom: 2px !important;
-  height: 17px !important;
-  overflow: visible !important;
-  z-index: 5 !important;
-}
-.main-banner .banner-icon {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  flex: 0 0 17px !important;
-  width: 17px !important;
-  height: 17px !important;
-  min-width: 17px !important;
-  color: #d4ff00 !important;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25)) !important;
-}
-@media screen and (max-width: 720px) {
-  /* Preserve the current banner height; only change text and icon visibility. */
-  .main-banner .banner-content {
-    padding: 0 5px 18px !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-  }
-  .main-banner .banner-title {
-    font-size: clamp(17px, 4.6vw, 21px) !important;
-    line-height: 1.05 !important;
-    margin: 0 0 2px !important;
-  }
-  .main-banner .hero-text {
-    font-size: clamp(10px, 3.1vw, 13px) !important;
-    line-height: 1.08 !important;
-  }
-  .main-banner .banner-icons {
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    left: 8% !important;
-    right: 8% !important;
-    bottom: 2px !important;
-    height: 16px !important;
-    gap: 6px !important;
-  }
-  .main-banner .banner-icon {
-    flex-basis: 15px !important;
-    width: 15px !important;
-    height: 15px !important;
-    min-width: 15px !important;
-  }
-  .category-card[data-category="Готовый бизнес"] .category-card-label {
-    gap: 3px !important;
-  }
-  .category-card[data-category="Готовый бизнес"] .category-icon {
-    flex-basis: 17px !important;
-    width: 17px !important;
-    height: 17px !important;
-  }
-  .category-card-long-word {
-    font-size: 0.54em !important;
-  }
-}
-@media screen and (max-width: 380px) {
-  .main-banner .banner-title { font-size: 16px !important; }
-  .main-banner .hero-text { font-size: 10px !important; }
-  .category-card-long-word { font-size: 0.50em !important; }
-}
-
-
-/* ============================================================
-   HRYVNIA HUB — CONSOLIDATED FINAL BANNER RULES
-   The four icons are HTML/SVG overlays; the background image is clean.
-   Keep existing banner dimensions and all other page layouts unchanged.
-   ============================================================ */
-
-/* Standardize category icon sizes without changing card dimensions. */
-.category-card .category-icon {
-  flex: 0 0 23px !important;
-  width: 23px !important;
-  height: 23px !important;
-}
-.category-card[data-category="Готовый бизнес"] .category-icon {
-  flex: 0 0 23px !important;
-  width: 23px !important;
-  height: 23px !important;
-  transform: translateX(6px) !important;
-}
-.category-card[data-category="Готовый бизнес"] .category-card-long-word {
-  font-size: 0.72em !important;
-  letter-spacing: -0.025em !important;
-  font-weight: 800 !important;
-  white-space: nowrap !important;
-}
-@media screen and (max-width: 720px) {
-  .category-card .category-icon,
-  .category-card[data-category="Готовый бизнес"] .category-icon {
-    flex-basis: 23px !important;
-    width: 23px !important;
-    height: 23px !important;
-  }
-  .category-card[data-category="Готовый бизнес"] .category-card-long-word {
-    font-size: 0.70em !important;
-  }
-}
-@media screen and (max-width: 380px) {
-  .category-card .category-icon,
-  .category-card[data-category="Готовый бизнес"] .category-icon {
-    flex-basis: 21px !important;
-    width: 21px !important;
-    height: 21px !important;
-  }
-  .category-card[data-category="Готовый бизнес"] .category-card-long-word {
-    font-size: 0.66em !important;
-  }
-}
-
-/* Desktop: give the real-estate label slightly more room. */
-@media screen and (min-width: 721px) {
-  .category-card[data-category="Недвижимость"] .category-card-label {
-    gap: 5px !important;
-    padding-left: 4px !important;
-    padding-right: 4px !important;
-    transform: translateX(-5px) !important;
-    white-space: nowrap !important;
-    overflow-wrap: normal !important;
-  }
-  .category-card[data-category="Недвижимость"] .category-card-label > span[data-i18n] {
-    white-space: nowrap !important;
-    letter-spacing: -0.035em !important;
-    font-size: 0.94em !important;
-  }
-}
-
-/* Banner: exactly four lime SVG icons in one centered row. */
-.main-banner .banner-icons {
-  position: absolute !important;
-  left: 50% !important;
-  right: auto !important;
-  bottom: 7px !important;
-  transform: translateX(-50%) !important;
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: clamp(13px, 2.1vw, 24px) !important;
-  width: max-content !important;
-  max-width: calc(100% - 24px) !important;
-  height: 22px !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  z-index: 4 !important;
-  pointer-events: none !important;
-}
-.main-banner .banner-icon {
-  display: block !important;
-  flex: 0 0 21px !important;
-  width: 21px !important;
-  height: 21px !important;
-  min-width: 21px !important;
-  color: #d4ff00 !important;
-  opacity: 1 !important;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55)) !important;
-}
-.main-banner .banner-content {
-  padding-bottom: 25px !important;
-}
-
-/* Banner readability: noticeably darker behind both text lines, fading to the original bright lower edge. */
-.main-banner::before {
-  background: linear-gradient(
-    180deg,
-    rgba(5, 12, 18, 0.66) 0%,
-    rgba(5, 12, 18, 0.56) 38%,
-    rgba(5, 12, 18, 0.34) 61%,
-    rgba(5, 12, 18, 0.08) 80%,
-    rgba(5, 12, 18, 0) 100%
-  ) !important;
-}
-
-/* Slightly enlarge the second banner line without changing banner dimensions. */
-.main-banner .hero-text {
-  font-size: clamp(13px, 1.45vw, 19px) !important;
-  line-height: 1.2 !important;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9) !important;
-}
-
-@media screen and (max-width: 720px) {
-  .main-banner .banner-content {
-    padding: 0 4px 19px !important;
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-  .main-banner .hero-text {
-    font-size: clamp(12px, 3.2vw, 15px) !important;
-    line-height: 1.18 !important;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95) !important;
-  }
-  .main-banner .banner-icons {
-    bottom: 3px !important;
-    height: 15px !important;
-    gap: 13px !important;
-    max-width: calc(100% - 32px) !important;
-  }
-  .main-banner .banner-icon {
-    flex-basis: 16px !important;
-    width: 16px !important;
-    height: 16px !important;
-    min-width: 16px !important;
-  }
-  .main-banner::before {
-    background: linear-gradient(
-      180deg,
-      rgba(5, 12, 18, 0.68) 0%,
-      rgba(5, 12, 18, 0.58) 40%,
-      rgba(5, 12, 18, 0.35) 64%,
-      rgba(5, 12, 18, 0.02) 83%,
-      rgba(5, 12, 18, 0) 100%
-    ) !important;
-  }
+@media (max-width: 420px) {
+  .brand { gap: 4px; padding: 2px 5px; }
+  .brand .logo { width: 22px; height: 22px; flex-basis: 22px; }
+  .brand .brand-text { font-size: 11px; }
 }

@@ -10,88 +10,276 @@
 </head>
 <body>
   <input type="checkbox" id="menuToggle" class="menu-toggle" hidden aria-hidden="true">
-  <header class="header"><div class="container nav">
-    <a class="brand" href="#"><img class="logo" src="hryvnia-hub-logo.png" alt="Hryvnia Hub"><span class="brand-text"><span class="brand-name">HRYVNIA</span> <span class="brand-hub">HUB</span></span></a>
-    <div class="header-actions">
-      <div class="lang-btn" id="langBtn"><button type="button" class="lang-trigger" id="langTrigger" aria-haspopup="menu" aria-expanded="false" aria-label="Language and time"><span class="lang-flag" id="langFlag" aria-hidden="true">🇬🇧</span><span class="lang-city" id="langCity">London</span><span class="lang-clock" id="langClock">--:--</span></button>
-        <div class="lang-dropdown hidden" id="langDropdown" role="menu" aria-label="Language">
-          <button type="button" class="lang-option" data-lang-value="en" role="menuitem"><span class="flag" aria-hidden="true">🇬🇧</span> English</button><button type="button" class="lang-option" data-lang-value="uk" role="menuitem"><span class="flag" aria-hidden="true">🇺🇦</span> Українська</button><button type="button" class="lang-option" data-lang-value="pl" role="menuitem"><span class="flag" aria-hidden="true">🇵🇱</span> Polski</button><button type="button" class="lang-option" data-lang-value="ru" role="menuitem"><span class="flag-ru" aria-hidden="true"></span> Русский</button>
-        </div><select id="languageSwitcher" class="sr-only" tabindex="-1" aria-hidden="true"><option value="ru">Русский</option><option value="uk">Українська</option><option value="en">English</option><option value="pl">Polski</option></select>
-      </div>
-      <button class="header-action account-btn" id="accountBtn" type="button" aria-label="Аккаунт"><span class="account-icon" aria-hidden="true">👤</span><span class="account-label" id="accountLabel">Аккаунт</span></button>
-      <button class="header-action btn-add" id="openAdd" type="button">+ Добавить объявление</button>
-    </div>
-  </div></header>
-  <label for="menuToggle" class="mobile-menu-overlay" aria-hidden="true"></label>
-  <nav class="mobile-menu" aria-label="Mobile menu"><div class="mobile-menu-header"><span>Menu</span><label for="menuToggle" class="icon-btn" aria-label="Close">×</label></div><ul class="mobile-menu-list"><li><a href="#">♡ Favorites</a></li><li><a href="#">👤 Profile</a></li></ul></nav>
-  <section class="categories-section container" aria-label="Categories"><div class="categories-grid">
-    <button class="category all-btn active" data-category="" id="allBtn" type="button"><span data-i18n="Все">Все</span></button>
-    <button class="category category-card" data-category="Автомобили" type="button"><img class="category-card-img" src="assets/images/01_automobiles_no_text.png" alt="" loading="lazy" width="400" height="260"><span class="category-card-label"><svg class="category-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11l1.8-5h10.4L19 11l2 2v5h-2v-2H5v2H3v-5l2-2z" fill="currentColor"/><path d="M7 11h10l-1.1-3H8.1L7 11z" fill="#24513f"/><circle cx="7" cy="15" r="1.5" fill="#24513f"/><circle cx="17" cy="15" r="1.5" fill="#24513f"/></svg><span data-i18n="Автомобили">Автомобілі</span></span></button>
-    <button class="category category-card" data-category="Недвижимость" type="button"><img class="category-card-img" src="assets/images/02_real_estate_no_text.png" alt="" loading="lazy" width="400" height="260"><span class="category-card-label"><svg class="category-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.2L12 3l9 8.2-1.5 1.6L18 11.5V21H6v-9.5l-1.5 1.3L3 11.2z" fill="currentColor"/><path d="M10 14h4v7h-4z" fill="#24513f"/></svg><span data-i18n="Недвижимость">Нерухомість</span></span></button>
-    <button class="category category-card" data-category="Готовый бизнес" type="button"><img class="category-card-img" src="assets/images/03_ready_business_no_text.png" alt="" loading="lazy" width="400" height="260"><span class="category-card-label"><svg class="category-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="8" width="18" height="12" rx="2" fill="currentColor"/><path d="M9 8V5h6v3M3 12h18M10 12v2h4v-2" fill="none" stroke="#24513f" stroke-width="1.7" stroke-linejoin="round"/></svg><span data-i18n="Бизнес и предпринимательство">Бізнес і підприємництво</span></span></button>
-    <button class="category category-card" data-category="Инвестиции" type="button"><img class="category-card-img" src="assets/images/04_investments_no_text.png" alt="" loading="lazy" width="400" height="260"><span class="category-card-label"><svg class="category-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19h18v2H3z" fill="currentColor"/><rect x="4" y="13" width="4" height="6" rx="1" fill="currentColor"/><rect x="10" y="9" width="4" height="10" rx="1" fill="currentColor"/><rect x="16" y="4" width="4" height="15" rx="1" fill="currentColor"/><path d="M4 10l6-4 4 2 6-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="Инвестиции">Інвестиції</span></span></button>
-  </div></section>
-  <main>
-    <section class="hero"><h1 class="sr-only">Найди выгодное предложение</h1><div class="container">
-      <div class="main-banner"><img class="main-banner-img" src="assets/images/00_hero_banner_no_text.png" alt="" fetchpriority="high" width="1180" height="400"><div class="banner-content"><p class="banner-title">Find the best deals in Ukraine</p><p class="hero-text">Автомобілі, нерухомість і бізнес — в одному місці.</p></div><div class="banner-icons" aria-hidden="true"><svg class="banner-icon" viewBox="0 0 24 24"><path d="M5 11l1.8-5h10.4L19 11l2 2v5h-2v-2H5v2H3v-5l2-2z" fill="currentColor"/><circle cx="7" cy="15" r="1.5" fill="#174a38"/><circle cx="17" cy="15" r="1.5" fill="#174a38"/></svg><svg class="banner-icon" viewBox="0 0 24 24"><path d="M2 11.2L12 2l10 9.2-1.7 1.8L18 10.9V22H6V10.9l-2.3 2.1L2 11.2z" fill="currentColor"/></svg><svg class="banner-icon" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="13" rx="2" fill="currentColor"/><path d="M9 8V5h6v3M3 12h18M10 12v2h4v-2" fill="none" stroke="#174a38" stroke-width="1.7" stroke-linejoin="round"/></svg><svg class="banner-icon" viewBox="0 0 24 24"><path d="M2 20h20v2H2z" fill="currentColor"/><rect x="4" y="13" width="4" height="7" rx="1" fill="currentColor"/><rect x="10" y="9" width="4" height="11" rx="1" fill="currentColor"/><rect x="16" y="4" width="4" height="16" rx="1" fill="currentColor"/></svg></div></div>
-      <div class="market-ticker" aria-label="Currency rates">
-        <div class="ticker-scroll">
-          <div class="ticker-item" data-ticker-item="usd"><span class="ticker-icon ticker-icon-usd" data-ticker-icon="usd" aria-hidden="true">🇺🇸</span><div class="ticker-details"><span class="ticker-label" data-ticker-label="usd">USD/UAH</span><div class="ticker-main"><span class="ticker-value" data-ticker="usd">…</span><span class="ticker-arrow" data-ticker-arrow="usd" aria-hidden="true"></span></div><span class="ticker-source" data-ticker-source="usd">НБУ · …</span></div></div>
-          <div class="ticker-item" data-ticker-item="pln"><span class="ticker-icon ticker-icon-pln" data-ticker-icon="pln" aria-hidden="true">🇵🇱</span><div class="ticker-details"><span class="ticker-label" data-ticker-label="pln">PLN/UAH</span><div class="ticker-main"><span class="ticker-value" data-ticker="pln">…</span><span class="ticker-arrow" data-ticker-arrow="pln" aria-hidden="true"></span></div><span class="ticker-source" data-ticker-source="pln">НБУ · …</span></div></div>
-          <div class="ticker-item" data-ticker-item="btc"><span class="ticker-icon ticker-icon-btc" data-ticker-icon="btc" aria-hidden="true">₿</span><div class="ticker-details"><span class="ticker-label" data-ticker-label="btc">BTC/UAH</span><div class="ticker-main"><span class="ticker-value" data-ticker="btc">…</span><span class="ticker-arrow" data-ticker-arrow="btc" aria-hidden="true"></span></div><span class="ticker-source" data-ticker-source="btc">CoinGecko · …</span></div></div>
-          <div class="ticker-item" data-ticker-item="xau"><span class="ticker-icon ticker-icon-xau" data-ticker-icon="xau" aria-hidden="true">🥇</span><div class="ticker-details"><span class="ticker-label" data-ticker-label="xau">XAU/USD</span><div class="ticker-main"><span class="ticker-value" data-ticker="xau">…</span><span class="ticker-arrow" data-ticker-arrow="xau" aria-hidden="true"></span></div><span class="ticker-source" data-ticker-source="xau">Gold · …</span></div></div>
-        </div>
-        <span class="ticker-note" id="tickerNote">Курсы валют · данные загружаются</span>
-      </div>
-    </div></section>
-    <section class="search-ai-section container" aria-label="Search and AI">
-      <div class="search-panel"><div class="search-input-row search-input-row-stacked"><input id="searchInput" type="search" placeholder="Что ищете? Например: Skoda Octavia" aria-label="Поиск" data-i18n-placeholder="Что ищете? Например: Skoda Octavia" data-i18n-aria="Поиск"><button class="category-select-trigger" id="categorySelectTrigger" type="button" aria-haspopup="dialog" aria-expanded="false"><svg class="category-select-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="14" y="3" width="7" height="7" rx="1.5" fill="#d4ff00"/><rect x="3" y="14" width="7" height="7" rx="1.5" fill="#d4ff00"/><rect x="14" y="14" width="7" height="7" rx="1.5" fill="currentColor"/></svg><span id="categorySelectLabel">Категорії</span><svg class="category-select-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="btn btn-primary" id="searchBtn" type="button">Найти</button></div>
-        <div class="search-filters-row">
-          <div class="catalog-city-search"><input id="catalogCitySearchInput" type="search" autocomplete="off" placeholder="Введите название города" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="catalogCitySuggestions" data-i18n-placeholder="Введите название города"><div id="catalogCitySuggestions" class="catalog-city-suggestions" role="listbox" hidden></div></div>
-          <select id="catalogRegionSelect" aria-label="Область" data-i18n-aria="Область"><option value="">Все области</option></select>
-          <input type="number" placeholder="Цена (любая)" aria-label="Цена" data-i18n-placeholder="Цена (любая)" data-i18n-aria="Цена">
-          <select aria-label="Радиус поиска" data-i18n-aria="Радиус поиска">
-            <option value="30" data-i18n="Радиус: 30 км">Радиус: 30 км</option><option value="50" data-i18n="Радиус: 50 км">Радиус: 50 км</option><option value="100" data-i18n="Радиус: 100 км">Радиус: 100 км</option><option value="200" data-i18n="Радиус: 200 км">Радиус: 200 км</option>
+
+  <header class="header">
+    <div class="container nav">
+      <a class="brand" href="#">
+        <img class="logo" src="hryvnia-hub-logo.png" alt="Hryvnia Hub">
+        <span class="brand-text"><span class="brand-name">HRYVNIA</span> <span class="brand-hub">HUB</span></span>
+      </a>
+      <div class="header-actions">
+        <div class="lang-btn" id="langBtn">
+          <button type="button" class="lang-trigger" id="langTrigger" aria-haspopup="menu" aria-expanded="false" aria-label="Language and time">
+            <span class="lang-flag" id="langFlag" aria-hidden="true">🇬🇧</span>
+            <span class="lang-city" id="langCity">London</span>
+            <span class="lang-clock" id="langClock">--:--</span>
+          </button>
+          <div class="lang-dropdown hidden" id="langDropdown" role="menu" aria-label="Language">
+            <button type="button" class="lang-option" data-lang-value="en" role="menuitem"><span class="flag" aria-hidden="true">🇬🇧</span> English</button>
+            <button type="button" class="lang-option" data-lang-value="uk" role="menuitem"><span class="flag" aria-hidden="true">🇺🇦</span> Українська</button>
+            <button type="button" class="lang-option" data-lang-value="pl" role="menuitem"><span class="flag" aria-hidden="true">🇵🇱</span> Polski</button>
+            <button type="button" class="lang-option" data-lang-value="ru" role="menuitem"><span class="flag-ru" aria-hidden="true"></span> Русский</button>
+          </div>
+          <select id="languageSwitcher" class="sr-only" tabindex="-1" aria-hidden="true">
+            <option value="ru">Русский</option><option value="uk">Українська</option><option value="en">English</option><option value="pl">Polski</option>
           </select>
         </div>
+        <button class="header-action account-btn" id="accountBtn" type="button" aria-label="Аккаунт">
+          <span class="account-icon" aria-hidden="true">👤</span>
+          <span class="account-label" id="accountLabel">Аккаунт</span>
+        </button>
+        <button class="header-action btn-add" id="openAdd" type="button">+ Добавить объявление</button>
       </div>
-      <aside class="ai-panel" aria-label="AI Deal Finder"><div class="ai-text"><p class="ai-badge">AI</p><h3 data-i18n="AI Deal Finder">AI-пошук вигідних пропозицій</h3><p class="ai-subtitle" data-i18n="Find better offers with artificial intelligence">Знаходьте вигідні пропозиції за допомогою ШІ.</p><ul class="ai-features"><li data-i18n="Analyze market prices">Аналіз ринкових цін</li><li data-i18n="Find urgent deals">Пошук термінових продажів</li></ul><button class="btn-ai" id="aiSearchBtn" type="button" data-i18n="✨ Try AI Search">✨ Спробувати AI-пошук</button></div><div class="ai-visual" aria-hidden="true">🤖</div></aside>
-    </section>
-    <section class="urgent-deals container" aria-label="Urgent deals"><div class="section-head"><div><p class="eyebrow">⚡ <span data-i18n="HOT OFFERS">HOT OFFERS</span></p><h2 data-i18n="Urgent deals">Urgent deals</h2></div><span class="badge-soft" data-i18n="Best offers below market price">Best offers below market price</span></div><div class="urgent-deals-grid"><div class="empty" data-i18n="Urgent deals will appear here once listings are flagged as urgent in the database.">Urgent deals will appear here once listings are flagged as urgent in the database.</div></div></section>
-    <section class="listing-section container"><div class="section-head"><div><p id="listingLabel" class="eyebrow">Листинг</p><h2 id="latestListingsTitle">Последние объявления</h2></div><span id="resultCount" class="muted"></span></div><div id="listing" class="listing"><div class="empty">Загрузка объявлений…</div></div></section>
-  </main>
-  <footer class="footer"><div class="container">© 2026 Hryvnia Hub · MVP</div></footer>
-  <nav class="bottom-nav" aria-label="Bottom navigation">
-    <button class="bottom-nav-btn active" data-nav="home" type="button" aria-label="Главная"><span class="bottom-nav-icon" aria-hidden="true">🏠</span><span class="bottom-nav-label" data-i18n="Главная">Главная</span></button>
-    <button class="bottom-nav-btn" data-nav="favorites" type="button" aria-label="Избранное"><span class="bottom-nav-icon" aria-hidden="true">♥</span><span class="bottom-nav-label" data-i18n="Избранное">Избранное</span></button>
-    <button class="bottom-nav-btn" data-nav="messages" type="button" aria-label="Сообщения"><span class="bottom-nav-icon" aria-hidden="true">✉</span><span class="bottom-nav-label" data-i18n="Сообщения">Сообщения</span><span class="nav-badge" id="messagesBadge" hidden aria-live="polite"></span></button>
+    </div>
+  </header>
+
+  <!-- Скрытые элементы мобильного меню (добавлен класс hidden) -->
+  <label for="menuToggle" class="mobile-menu-overlay hidden" aria-hidden="true"></label>
+  <nav class="mobile-menu hidden" aria-label="Mobile menu">
+    <div class="mobile-menu-header">
+      <span>Menu</span>
+      <label for="menuToggle" class="icon-btn" aria-label="Close">×</label>
+    </div>
+    <ul class="mobile-menu-list">
+      <li><a href="#">♡ Favorites</a></li>
+      <li><a href="#">👤 Profile</a></li>
+    </ul>
   </nav>
-  <div class="category-menu-backdrop hidden" id="categoryMenuBackdrop"></div><section class="category-menu hidden" id="categoryMenu" role="dialog" aria-modal="true" aria-labelledby="categoryMenuTitle"><button class="category-menu-close" id="categoryMenuClose" type="button" aria-label="Close">×</button><h2 id="categoryMenuTitle"></h2><div id="categoryMenuOptions" class="category-menu-options"></div></section>
-  <div class="vehicle-search-backdrop hidden" id="vehicleSearchBackdrop"></div><section class="vehicle-search-menu hidden" id="vehicleSearchMenu" role="dialog" aria-modal="true" aria-labelledby="vehicleSearchTitle"><button class="category-menu-close" id="vehicleSearchClose" type="button" aria-label="Close">×</button><h2 id="vehicleSearchTitle">Автомобілі</h2><p class="vehicle-search-intro">Оберіть параметри автомобіля</p><div class="vehicle-search-grid"><label>Марка<select id="vehicleSearchMake"><option value="">Усі марки</option></select></label><label>Модель<select id="vehicleSearchModel" disabled><option value="">Усі моделі</option></select></label><label>Рік від<input id="vehicleYearFrom" type="number" min="1900" max="2100" placeholder="2010"></label><label>Рік до<input id="vehicleYearTo" type="number" min="1900" max="2100" placeholder="2026"></label><label>Ціна від<input id="vehiclePriceFrom" type="number" min="0" placeholder="0"></label><label>Ціна до<input id="vehiclePriceTo" type="number" min="0" placeholder="Будь-яка"></label><label>Пробіг до, км<input id="vehicleMileageTo" type="number" min="0" placeholder="Будь-який"></label><label>Тип кузова<select id="vehicleBodyType"><option value="">Будь-який</option><option>Седан</option><option>Хетчбек</option><option>Універсал</option><option>Позашляховик</option><option>Купе</option><option>Мінівен</option><option>Пікап</option><option>Інший</option></select></label><label>Паливо<select id="vehicleFuel"><option value="">Будь-яке</option><option value="Бензин">Бензин</option><option value="Дизель">Дизель</option><option value="Газ/бензин">Газ/бензин</option><option value="Електро">Електро</option><option value="Гібрид">Гібрид</option></select></label><label>Коробка передач<select id="vehicleTransmission"><option value="">Будь-яка</option><option value="Механічна">Механічна</option><option value="Автоматична">Автоматична</option><option value="Варіатор">Варіатор</option><option value="Робот">Робот</option></select></label></div><div class="vehicle-search-actions"><button type="button" class="vehicle-reset-btn" id="vehicleSearchReset">Скинути</button><button type="button" class="btn btn-primary" id="vehicleSearchApply">Знайти автомобілі</button></div></section>
-  <div class="modal hidden" id="addModal"><div class="modal-card"><button class="modal-close" id="closeAdd" type="button">×</button><p class="eyebrow">Новое объявление</p><h2>Добавить объявление</h2><form id="addForm">
-    <label>Категория<select name="category" required><option value="Автомобили">Автомобили</option><option value="Недвижимость">Недвижимость</option><option value="Готовый бизнес">Готовый бизнес</option><option value="Инвестиции">Инвестиции</option></select></label>
-    <label>Название<input name="title" required placeholder="Например: Skoda Octavia 1.6"></label>
-    <fieldset id="vehicleListingFields" class="vehicle-listing-fields" hidden><legend>Характеристики автомобиля</legend>
-      <label>Марка<select name="vehicle_make_slug" id="vehicleListingMake"><option value="">Выберите марку</option></select></label>
-      <label>Модель<select name="vehicle_model_slug" id="vehicleListingModel" disabled><option value="">Сначала выберите марку</option></select></label>
-      <label>Год выпуска<input name="vehicle_year" type="number" min="1900" max="2100" placeholder="2018"></label>
-      <label>Тип кузова<select name="vehicle_body_type"><option value="">Выберите тип кузова</option><option value="Седан">Седан</option><option value="Хетчбек">Хетчбек</option><option value="Универсал">Универсал</option><option value="Позашляховик">Внедорожник / SUV</option><option value="Купе">Купе</option><option value="Мінівен">Минивэн</option><option value="Пікап">Пикап</option><option value="Інший">Другой</option></select></label>
-      <label>Топливо<select name="vehicle_fuel_type"><option value="">Выберите топливо</option><option value="Бензин">Бензин</option><option value="Дизель">Дизель</option><option value="Газ/бензин">Газ/бензин</option><option value="Електро">Электро</option><option value="Гібрид">Гибрид</option></select></label>
-      <label>Объём двигателя, л<input name="vehicle_engine_liters" type="number" min="0" max="20" step="0.1" placeholder="1.6"></label>
-      <label>Мощность, л.с.<input name="vehicle_power_hp" type="number" min="1" max="3000" placeholder="110"></label>
-      <label>Коробка передач<select name="vehicle_transmission"><option value="">Выберите коробку</option><option value="Механічна">Механическая</option><option value="Автоматична">Автоматическая</option><option value="Варіатор">Вариатор</option><option value="Робот">Робот</option></select></label>
-      <label>Привод<select name="vehicle_drive"><option value="">Выберите привод</option><option value="Передній">Передний</option><option value="Задній">Задний</option><option value="Повний">Полный</option></select></label>
-      <label>Пробег, км<input name="vehicle_mileage_km" type="number" min="0" placeholder="125000"></label>
-      <label>Состояние<select name="vehicle_condition"><option value="">Выберите состояние</option><option value="Новий">Новый</option><option value="Вживаний">С пробегом</option><option value="Після ДТП">После ДТП</option></select></label>
-      <label>Цвет<input name="vehicle_color" type="text" placeholder="Серый"></label>
-      <label>Тип продавца<select name="seller_type"><option value="private">Частное лицо</option><option value="business">Компания / бизнес</option></select></label>
-    </fieldset>
-    <label>Город<div class="city-search"><input id="citySearchInput" type="search" required autocomplete="off" placeholder="Введите название города" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="citySuggestions"><div id="citySuggestions" class="city-suggestions" role="listbox" hidden></div><input type="hidden" name="city_id" id="citySelect"></div></label><label>Область / регион<select id="cityRegionSelect" aria-label="Область"><option value="">Все области</option></select></label>
-    <label>Цена, грн<input name="price" type="number" min="0" required placeholder="450000"></label><label>Описание<textarea name="description" rows="4" placeholder="Коротко опишите предложение"></textarea></label>
-    <label class="hot-toggle"><input type="checkbox" name="is_hot"> ⚡ Горячее объявление</label>
-    <label class="hot-toggle"><input type="checkbox" name="is_urgent"> ⏱ Срочное объявление</label>
-    <fieldset id="photoFields" class="photo-fields"><legend id="photoLabel">Фотографии</legend><button id="photoPickerButton" class="btn" type="button">Добавить фотографии</button><input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple hidden aria-labelledby="photoLabel" aria-describedby="photoHint photoMessage"><p id="photoHint" class="muted">До 10 фото: JPEG, PNG или WebP, до 10 МБ каждое. Первое фото — главное.</p><p id="photoMessage" class="form-message" role="status" aria-live="polite"></p><div id="photoPreview" class="photo-preview"></div></fieldset>
-    <button class="btn btn-primary full" type="submit">Опубликовать</button><p id="formMessage" class="form-message"></p></form></div></div>
+
+  <section class="categories-section container" aria-label="Categories">
+    <div class="categories-grid">
+      <button class="category all-btn active" data-category="" id="allBtn" type="button"><span data-i18n="Все">Все</span></button>
+      <button class="category category-card" data-category="Автомобили" type="button">
+        <img class="category-card-img" src="assets/images/01_automobiles_no_text.png" alt="" loading="lazy" width="400" height="260">
+        <span class="category-card-label">
+          <svg class="category-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11l1.8-5h10.4L19 11l2 2v5h-2v-2H5v2H3v-5l2-2z" fill="currentColor"/><path d="M7 11h10l-1.1-3H8.1L7 11z" fill="#24513f"/><circle cx="7" cy="15" r="1.5" fill="#24513f"/><circle cx="17" cy="15" r="1.5" fill="#24513f"/></svg>
+          <span data-i18n="Автомобили">Автомобілі</span>
+        </span>
+      </button>
+      <button class="category category-card" data-category="Недвижимость" type="button">
+        <img class="category-card-img" src="assets/images/02_real_estate_no_text.png" alt="" loading="lazy" width="400" height="260">
+        <span class="category-card-label">
+          <svg class="category-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.2L12 3l9 8.2-1.5 1.6L18 11.5V21H6v-9.5l-1.5 1.3L3 11.2z" fill="currentColor"/><path d="M10 14h4v7h-4z" fill="#24513f"/></svg>
+          <span data-i18n="Недвижимость">Нерухомість</span>
+        </span>
+      </button>
+      <button class="category category-card" data-category="Готовый бизнес" type="button">
+        <img class="category-card-img" src="assets/images/03_ready_business_no_text.png" alt="" loading="lazy" width="400" height="260">
+        <span class="category-card-label">
+          <svg class="category-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="8" width="18" height="12" rx="2" fill="currentColor"/><path d="M9 8V5h6v3M3 12h18M10 12v2h4v-2" fill="none" stroke="#24513f" stroke-width="1.7" stroke-linejoin="round"/></svg>
+          <span data-i18n="Бизнес и предпринимательство">Бізнес і підприємництво</span>
+        </span>
+      </button>
+      <button class="category category-card" data-category="Инвестиции" type="button">
+        <img class="category-card-img" src="assets/images/04_investments_no_text.png" alt="" loading="lazy" width="400" height="260">
+        <span class="category-card-label">
+          <svg class="category-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19h18v2H3z" fill="currentColor"/><rect x="4" y="13" width="4" height="6" rx="1" fill="currentColor"/><rect x="10" y="9" width="4" height="10" rx="1" fill="currentColor"/><rect x="16" y="4" width="4" height="15" rx="1" fill="currentColor"/><path d="M4 10l6-4 4 2 6-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span data-i18n="Инвестиции">Інвестиції</span>
+        </span>
+      </button>
+    </div>
+  </section>
+
+  <main>
+    <section class="hero">
+      <h1 class="sr-only">Найди выгодное предложение</h1>
+      <div class="container">
+        <div class="main-banner">
+          <img class="main-banner-img" src="assets/images/00_hero_banner_no_text.png" alt="" fetchpriority="high" width="1180" height="400">
+          <div class="banner-content">
+            <p class="banner-title">Find the best deals in Ukraine</p>
+            <p class="hero-text">Автомобілі, нерухомість і бізнес — в одному місці.</p>
+          </div>
+          <div class="banner-icons" aria-hidden="true">
+            <svg class="banner-icon" viewBox="0 0 24 24"><path d="M5 11l1.8-5h10.4L19 11l2 2v5h-2v-2H5v2H3v-5l2-2z" fill="currentColor"/><circle cx="7" cy="15" r="1.5" fill="#174a38"/><circle cx="17" cy="15" r="1.5" fill="#174a38"/></svg>
+            <svg class="banner-icon" viewBox="0 0 24 24"><path d="M2 11.2L12 2l10 9.2-1.7 1.8L18 10.9V22H6V10.9l-2.3 2.1L2 11.2z" fill="currentColor"/></svg>
+            <svg class="banner-icon" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="13" rx="2" fill="currentColor"/><path d="M9 8V5h6v3M3 12h18M10 12v2h4v-2" fill="none" stroke="#174a38" stroke-width="1.7" stroke-linejoin="round"/></svg>
+            <svg class="banner-icon" viewBox="0 0 24 24"><path d="M2 20h20v2H2z" fill="currentColor"/><rect x="4" y="13" width="4" height="7" rx="1" fill="currentColor"/><rect x="10" y="9" width="4" height="11" rx="1" fill="currentColor"/><rect x="16" y="4" width="4" height="16" rx="1" fill="currentColor"/></svg>
+          </div>
+        </div>
+
+        <div class="market-ticker" aria-label="Currency rates">
+          <div class="ticker-scroll">
+            <div class="ticker-item" data-ticker-item="usd"><span class="ticker-icon ticker-icon-usd" data-ticker-icon="usd" aria-hidden="true">🇺🇸</span><div class="ticker-details"><span class="ticker-label" data-ticker-label="usd">USD/UAH</span><div class="ticker-main"><span class="ticker-value" data-ticker="usd">…</span><span class="ticker-arrow" data-ticker-arrow="usd" aria-hidden="true"></span></div><span class="ticker-source" data-ticker-source="usd">НБУ · …</span></div></div>
+            <div class="ticker-item" data-ticker-item="pln"><span class="ticker-icon ticker-icon-pln" data-ticker-icon="pln" aria-hidden="true">🇵🇱</span><div class="ticker-details"><span class="ticker-label" data-ticker-label="pln">PLN/UAH</span><div class="ticker-main"><span class="ticker-value" data-ticker="pln">…</span><span class="ticker-arrow" data-ticker-arrow="pln" aria-hidden="true"></span></div><span class="ticker-source" data-ticker-source="pln">НБУ · …</span></div></div>
+            <div class="ticker-item" data-ticker-item="btc"><span class="ticker-icon ticker-icon-btc" data-ticker-icon="btc" aria-hidden="true">₿</span><div class="ticker-details"><span class="ticker-label" data-ticker-label="btc">BTC/UAH</span><div class="ticker-main"><span class="ticker-value" data-ticker="btc">…</span><span class="ticker-arrow" data-ticker-arrow="btc" aria-hidden="true"></span></div><span class="ticker-source" data-ticker-source="btc">CoinGecko · …</span></div></div>
+            <div class="ticker-item" data-ticker-item="xau"><span class="ticker-icon ticker-icon-xau" data-ticker-icon="xau" aria-hidden="true">🥇</span><div class="ticker-details"><span class="ticker-label" data-ticker-label="xau">XAU/USD</span><div class="ticker-main"><span class="ticker-value" data-ticker="xau">…</span><span class="ticker-arrow" data-ticker-arrow="xau" aria-hidden="true"></span></div><span class="ticker-source" data-ticker-source="xau">Gold · …</span></div></div>
+          </div>
+          <span class="ticker-note" id="tickerNote">Курсы валют · данные загружаются</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="search-ai-section container" aria-label="Search and AI">
+      <div class="search-panel">
+        <div class="search-input-row search-input-row-stacked">
+          <input id="searchInput" type="search" placeholder="Что ищете? Например: Skoda Octavia" aria-label="Поиск" data-i18n-placeholder="Что ищете? Например: Skoda Octavia" data-i18n-aria="Поиск">
+          <button class="category-select-trigger" id="categorySelectTrigger" type="button" aria-haspopup="dialog" aria-expanded="false">
+            <svg class="category-select-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="14" y="3" width="7" height="7" rx="1.5" fill="#d4ff00"/><rect x="3" y="14" width="7" height="7" rx="1.5" fill="#d4ff00"/><rect x="14" y="14" width="7" height="7" rx="1.5" fill="currentColor"/></svg>
+            <span id="categorySelectLabel">Категорії</span>
+            <svg class="category-select-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="btn btn-primary" id="searchBtn" type="button">Найти</button>
+        </div>
+        <div class="search-filters-row">
+  <div class="catalog-city-search">
+    <div class="input-with-icon">
+      <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+      <input id="catalogCitySearchInput" type="search" autocomplete="off" placeholder="Введіть назву міста" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="catalogCitySuggestions" data-i18n-placeholder="Введите название города">
+    </div>
+    <div id="catalogCitySuggestions" class="catalog-city-suggestions" role="listbox" hidden></div>
+  </div>
+  
+  <div class="select-with-icon">
+    <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+    <select id="catalogRegionSelect" aria-label="Область" data-i18n-aria="Область"><option value="">Всі області</option></select>
+  </div>
+
+  <div class="input-with-icon">
+    <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+    <input type="number" placeholder="Ціна (будь-яка)" aria-label="Цена" data-i18n-placeholder="Цена (любая)" data-i18n-aria="Цена">
+  </div>
+
+  <div class="select-with-icon">
+    <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+    <select aria-label="Радиус поиска" data-i18n-aria="Радиус поиска">
+      <option value="30" data-i18n="Радиус: 30 км">Радіус: 30 км</option>
+      <option value="50" data-i18n="Радиус: 50 км">Радіус: 50 км</option>
+      <option value="100" data-i18n="Радиус: 100 км">Радіус: 100 км</option>
+      <option value="200" data-i18n="Радиус: 200 км">Радіус: 200 км</option>
+    </select>
+  </div>
+        </div>
+      </div>
+      <aside class="ai-panel" aria-label="AI Deal Finder">
+        <div class="ai-text">
+          <p class="ai-badge">AI</p>
+          <h3 data-i18n="AI Deal Finder">AI-пошук вигідних пропозицій</h3>
+          <p class="ai-subtitle" data-i18n="Find better offers with artificial intelligence">Знаходьте вигідні пропозиції за допомогою ШІ.</p>
+          <ul class="ai-features">
+            <li data-i18n="Analyze market prices">Аналіз ринкових цін</li>
+            <li data-i18n="Find urgent deals">Пошук термінових продажів</li>
+          </ul>
+          <button class="btn-ai" id="aiSearchBtn" type="button" data-i18n="✨ Try AI Search">✨ Спробувати AI-пошук</button>
+        </div>
+        <div class="ai-visual" aria-hidden="true">🤖</div>
+      </aside>
+    </section>
+
+    <section class="urgent-deals container" aria-label="Urgent deals">
+      <div class="section-head">
+        <div><p class="eyebrow">⚡ <span data-i18n="HOT OFFERS">HOT OFFERS</span></p><h2 data-i18n="Urgent deals">Urgent deals</h2></div>
+        <span class="badge-soft" data-i18n="Best offers below market price">Best offers below market price</span>
+      </div>
+      <div class="urgent-deals-grid">
+        <div class="empty" data-i18n="Urgent deals will appear here once listings are flagged as urgent in the database.">Urgent deals will appear here once listings are flagged as urgent in the database.</div>
+      </div>
+    </section>
+
+    <section class="listing-section container">
+      <div class="section-head">
+        <div><p id="listingLabel" class="eyebrow">Листинг</p><h2 id="latestListingsTitle">Последние объявления</h2></div>
+        <span id="resultCount" class="muted"></span>
+      </div>
+      <div id="listing" class="listing"><div class="empty">Загрузка объявлений…</div></div>
+    </section>
+  </main>
+
+  <footer class="footer"><div class="container">© 2026 Hryvnia Hub · MVP</div></footer>
+
+  <!-- Нижняя навигация с нормальными SVG иконками -->
+  <nav class="bottom-nav" aria-label="Bottom navigation">
+    <button class="bottom-nav-btn active" data-nav="home" type="button" aria-label="Главная">
+      <span class="bottom-nav-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </span>
+      <span class="bottom-nav-label" data-i18n="Главная">Главная</span>
+    </button>
+    <button class="bottom-nav-btn" data-nav="favorites" type="button" aria-label="Избранное">
+      <span class="bottom-nav-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </span>
+      <span class="bottom-nav-label" data-i18n="Избранное">Избранное</span>
+    </button>
+    <button class="bottom-nav-btn" data-nav="messages" type="button" aria-label="Сообщения">
+      <span class="bottom-nav-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      </span>
+      <span class="bottom-nav-label" data-i18n="Сообщения">Сообщения</span>
+      <span class="nav-badge" id="messagesBadge" hidden aria-live="polite"></span>
+    </button>
+  </nav>
+
+  <div class="category-menu-backdrop hidden" id="categoryMenuBackdrop"></div>
+  <section class="category-menu hidden" id="categoryMenu" role="dialog" aria-modal="true" aria-labelledby="categoryMenuTitle">
+    <button class="category-menu-close" id="categoryMenuClose" type="button" aria-label="Close">×</button>
+    <h2 id="categoryMenuTitle"></h2>
+    <div id="categoryMenuOptions" class="category-menu-options"></div>
+  </section>
+
+  <div class="vehicle-search-backdrop hidden" id="vehicleSearchBackdrop"></div>
+  <section class="vehicle-search-menu hidden" id="vehicleSearchMenu" role="dialog" aria-modal="true" aria-labelledby="vehicleSearchTitle">
+    <button class="category-menu-close" id="vehicleSearchClose" type="button" aria-label="Close">×</button>
+    <h2 id="vehicleSearchTitle">Автомобілі</h2>
+    <p class="vehicle-search-intro">Оберіть параметри автомобіля</p>
+    <div class="vehicle-search-grid">
+      <label>Марка<select id="vehicleSearchMake"><option value="">Усі марки</option></select></label>
+      <label>Модель<select id="vehicleSearchModel" disabled><option value="">Усі моделі</option></select></label>
+      <label>Рік від<input id="vehicleYearFrom" type="number" min="1900" max="2100" placeholder="2010"></label>
+      <label>Рік до<input id="vehicleYearTo" type="number" min="1900" max="2100" placeholder="2026"></label>
+      <label>Ціна від<input id="vehiclePriceFrom" type="number" min="0" placeholder="0"></label>
+      <label>Ціна до<input id="vehiclePriceTo" type="number" min="0" placeholder="Будь-яка"></label>
+      <label>Пробіг до, км<input id="vehicleMileageTo" type="number" min="0" placeholder="Будь-який"></label>
+      <label>Тип кузова<select id="vehicleBodyType"><option value="">Будь-який</option><option>Седан</option><option>Хетчбек</option><option>Універсал</option><option>Позашляховик</option><option>Купе</option><option>Мінівен</option><option>Пікап</option><option>Інший</option></select></label>
+      <label>Паливо<select id="vehicleFuel"><option value="">Будь-яке</option><option value="Бензин">Бензин</option><option value="Дизель">Дизель</option><option value="Газ/бензин">Газ/бензин</option><option value="Електро">Электро</option><option value="Гибрид">Гибрид</option></select></label>
+      <label>Коробка передач<select id="vehicleTransmission"><option value="">Будь-яка</option><option value="Механічна">Механічна</option><option value="Автоматична">Автоматична</option><option value="Варіатор">Варіатор</option><option value="Робот">Робот</option></select></label>
+    </div>
+    <div class="vehicle-search-actions">
+      <button type="button" class="vehicle-reset-btn" id="vehicleSearchReset">Скинути</button>
+      <button type="button" class="btn btn-primary" id="vehicleSearchApply">Знайти автомобілі</button>
+    </div>
+  </section>
+
+  <div class="modal hidden" id="addModal">
+    <div class="modal-card">
+      <button class="modal-close" id="closeAdd" type="button">×</button>
+      <p class="eyebrow">Новое объявление</p>
+      <h2>Добавить объявление</h2>
+      <form id="addForm">
+        <label>Категория<select name="category" required><option value="Автомобили">Автомобили</option><option value="Недвижимость">Недвижимость</option><option value="Готовый бизнес">Готовый бизнес</option><option value="Инвестиции">Инвестиции</option></select></label>
+        <label>Название<input name="title" required placeholder="Например: Skoda Octavia 1.6"></label>
+        <fieldset id="vehicleListingFields" class="vehicle-listing-fields" hidden>
+          <legend>Характеристики автомобиля</legend>
+          <label>Марка<select name="vehicle_make_slug" id="vehicleListingMake"><option value="">Выберите марку</option></select></label>
+          <label>Модель<select name="vehicle_model_slug" id="vehicleListingModel" disabled><option value="">Сначала выберите марку</option></select></label>
+          <label>Год выпуска<input name="vehicle_year" type="number" min="1900" max="2100" placeholder="2018"></label>
+          <label>Тип кузова<select name="vehicle_body_type"><option value="">Выберите тип кузова</option><option value="Седан">Седан</option><option value="Хетчбек">Хетчбек</option><option value="Универсал">Универсал</option><option value="Позашляховик">Внедорожник / SUV</option><option value="Купе">Купе</option><option value="Мінівен">Минивэн</option><option value="Пікап">Пикап</option><option value="Інший">Другой</option></select></label>
+          <label>Топливо<select name="vehicle_fuel_type"><option value="">Выберите топливо</option><option value="Бензин">Бензин</option><option value="Дизель">Дизель</option><option value="Газ/бензин">Газ/бензин</option><option value="Електро">Электро</option><option value="Гібрид">Гибрид</option></select></label>
+          <label>Объём двигателя, л<input name="vehicle_engine_liters" type="number" min="0" max="20" step="0.1" placeholder="1.6"></label>
+          <label>Мощность, л.с.<input name="vehicle_power_hp" type="number" min="1" max="3000" placeholder="110"></label>
+          <label>Коробка передач<select name="vehicle_transmission"><option value="">Выберите коробку</option><option value="Механічна">Механическая</option><option value="Автоматична">Автоматическая</option><option value="Варіатор">Вариатор</option><option value="Робот">Робот</option></select></label>
+          <label>Привод<select name="vehicle_drive"><option value="">Выберите привод</option><option value="Передній">Передний</option><option value="Задній">Задний</option><option value="Повний">Полный</option></select></label>
+          <label>Пробег, км<input name="vehicle_mileage_km" type="number" min="0" placeholder="125000"></label>
+          <label>Состояние<select name="vehicle_condition"><option value="">Выберите состояние</option><option value="Новий">Новый</option><option value="Вживаний">С пробегом</option><option value="Після ДТП">После ДТП</option></select></label>
+          <label>Цвет<input name="vehicle_color" type="text" placeholder="Серый"></label>
+          <label>Тип продавца<select name="seller_type"><option value="private">Частное лицо</option><option value="business">Компания / бизнес</option></select></label>
+        </fieldset>
+        <label>Город<div class="city-search"><input id="citySearchInput" type="search" required autocomplete="off" placeholder="Введите название города" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="citySuggestions"><div id="citySuggestions" class="city-suggestions" role="listbox" hidden></div><input type="hidden" name="city_id" id="citySelect"></div></label><label>Область / регион<select id="cityRegionSelect" aria-label="Область"><option value="">Все области</option></select></label>
+        <label>Цена, грн<input name="price" type="number" min="0" required placeholder="450000"></label><label>Описание<textarea name="description" rows="4" placeholder="Коротко опишите предложение"></textarea></label>
+        <label class="hot-toggle"><input type="checkbox" name="is_hot"> ⚡ Горячее объявление</label>
+        <label class="hot-toggle"><input type="checkbox" name="is_urgent"> ⏱ Срочное объявление</label>
+        <fieldset id="photoFields" class="photo-fields"><legend id="photoLabel">Фотографии</legend><button id="photoPickerButton" class="btn" type="button">Добавить фотографии</button><input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple hidden aria-labelledby="photoLabel" aria-describedby="photoHint photoMessage"><p id="photoHint" class="muted">До 10 фото: JPEG, PNG или WebP, до 10 МБ каждое. Первое фото — главное.</p><p id="photoMessage" class="form-message" role="status" aria-live="polite"></p><div id="photoPreview" class="photo-preview"></div></fieldset>
+        <button class="btn btn-primary full" type="submit">Опубликовать</button><p id="formMessage" class="form-message"></p></form></div></div>
   <div class="modal hidden" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authTitle"><div class="modal-card auth-card"><button class="modal-close" id="authClose" type="button" aria-label="Закрыть">×</button><p class="eyebrow" id="authEyebrow">Аккаунт</p><h2 id="authTitle">Настройки аккаунта</h2>
     <section id="authGuest"><div class="auth-tabs" role="tablist" aria-label="Авторизация"><button class="auth-tab active" type="button" data-auth-tab="login" role="tab" aria-selected="true">Вход</button><button class="auth-tab" type="button" data-auth-tab="register" role="tab" aria-selected="false">Регистрация</button></div>
       <form id="authLoginForm" class="auth-form"><label><span>Электронная почта</span><input type="email" name="email" autocomplete="email" required></label><label><span>Пароль</span>

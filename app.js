@@ -2449,14 +2449,49 @@ async function fetchAllVehicleModels() {
 }
 async function loadVehicleMakes() {
   const makeSelect = document.getElementById("vehicleSearchMake");
-  if (!makeSelect || !db || makeSelect.dataset.loaded === "1") return;
+  const spinner = document.getElementById("vehicleMakeSpinner");
+  const status = document.getElementById("vehicleMakeLoadStatus");
+  if (!makeSelect || makeSelect.dataset.loaded === "1" || makeSelect.dataset.loading === "1") return;
+  if (!db) {
+    if (status) status.textContent = vehicleMakeStatusText("unavailable");
+    return;
+  }
+  makeSelect.dataset.loading = "1";
+  makeSelect.disabled = true;
+  spinner?.classList.remove("hidden");
+  if (status) status.textContent = vehicleMakeStatusText("loading");
   try {
     const data = await fetchAllVehicleModels();
     vehicleModelsCache = data;
     const makes = [...new Map(data.map(x => [x.make_slug, x.make_name])).entries()].sort((a,b) => a[1].localeCompare(b[1]));
-    makeSelect.innerHTML = '<option value="">Усі марки</option>' + makes.map(([slug,name]) => `<option value="${escapeHtml(slug)}">${escapeHtml(name)}</option>`).join("");
+    makeSelect.innerHTML = `<option value="">${escapeHtml(t("Усі марки"))}</option>` + makes.map(([slug,name]) => `<option value="${escapeHtml(slug)}">${escapeHtml(name)}</option>`).join("");
     makeSelect.dataset.loaded = "1";
-  } catch (error) { console.error("Не удалось загрузить марки автомобилей", error); }
+    if (status) status.textContent = makes.length ? "" : vehicleMakeStatusText("empty");
+  } catch (error) {
+    console.error("Не удалось загрузить марки автомобилей", error);
+    if (status) {
+      status.textContent = vehicleMakeStatusText("error") + " ";
+      const retry = document.createElement("button");
+      retry.type = "button";
+      retry.textContent = vehicleMakeStatusText("retry");
+      retry.addEventListener("click", () => { if (status) status.textContent = ""; loadVehicleMakes(); });
+      status.appendChild(retry);
+    }
+  } finally {
+    delete makeSelect.dataset.loading;
+    makeSelect.disabled = makeSelect.dataset.loaded !== "1";
+    spinner?.classList.add("hidden");
+  }
+}
+function vehicleMakeStatusText(state) {
+  const messages = {
+    loading: { ru: "Загружаем марки автомобилей…", uk: "Завантажуємо марки автомобілів…", en: "Loading car makes…", pl: "Ładowanie marek samochodów…" },
+    error: { ru: "Не удалось загрузить марки.", uk: "Не вдалося завантажити марки.", en: "Could not load car makes.", pl: "Nie udało się załadować marek." },
+    retry: { ru: "Повторить", uk: "Повторити", en: "Retry", pl: "Ponów" },
+    empty: { ru: "Список марок пока пуст.", uk: "Список марок поки порожній.", en: "No car makes found yet.", pl: "Nie znaleziono jeszcze marek." },
+    unavailable: { ru: "Загрузка марок временно недоступна.", uk: "Завантаження марок тимчасово недоступне.", en: "Car makes are temporarily unavailable.", pl: "Ładowanie marek jest chwilowo niedostępne." }
+  };
+  return messages[state]?.[lang] || messages[state]?.ru || "";
 }
 document.getElementById("vehicleSearchMake")?.addEventListener("change", event => {
   const make = event.target.value; const modelSelect = document.getElementById("vehicleSearchModel");

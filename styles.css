@@ -557,3 +557,105 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
   .category-select-trigger { height: 38px !important; font-size: 13px !important; }
   .search-panel .btn-primary { height: 38px !important; font-size: 13px !important; }
 }
+
+
+/* ============================================================
+   HRYVNIA HUB — MOBILE TUNING (2026-10-23)
+   Валюты компактнее, поиск шире AI-блока, фильтры 60/40,
+   карточки категорий немного выше.
+   ============================================================ */
+
+/* Валютная лента: уменьшаем типографику и вертикальные отступы */
+.market-ticker {
+  padding: 4px 6px !important;
+  margin-top: 6px !important;
+}
+.ticker-scroll {
+  gap: 3px !important;
+}
+.ticker-item {
+  gap: 4px !important;
+  padding: 0 3px !important;
+  min-width: 0 !important;
+}
+.ticker-icon {
+  flex: 0 0 18px !important;
+  width: 18px !important;
+  height: 18px !important;
+  font-size: 10px !important;
+}
+.ticker-details {
+  min-width: 0 !important;
+  gap: 1px !important;
+}
+.ticker-label {
+  font-size: 7.5px !important;
+  line-height: 1.1 !important;
+}
+.ticker-value {
+  font-size: 9.5px !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.2px !important;
+}
+.ticker-note {
+  margin-top: 1px !important;
+  font-size: 8px !important;
+  line-height: 1.1 !important;
+}
+
+/* Поиск занимает около 68%, AI-блок — около 32% */
+.search-ai-section {
+  grid-template-columns: minmax(0, 2.125fr) minmax(0, 1fr) !important;
+  gap: 8px !important;
+}
+.search-panel,
+.ai-panel {
+  min-width: 0 !important;
+}
+
+/* Поля фильтров: город/цена — 60%, область/радиус — 40% */
+.search-filters-row {
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) !important;
+}
+.search-filters-row > :nth-child(1),
+.search-filters-row > :nth-child(3) {
+  min-width: 0 !important;
+}
+.search-filters-row > :nth-child(2),
+.search-filters-row > :nth-child(4) {
+  min-width: 0 !important;
+}
+
+/* Немного увеличиваем высоту четырёх карточек категорий на телефоне */
+@media (max-width: 720px) {
+  .category-card {
+    aspect-ratio: 2.5 / 1 !important;
+    padding: 8px !important;
+  }
+
+  /* Компактная валютная лента на узком экране */
+  .ticker-scroll {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+
+  /* Сохраняем пропорции фильтров 60/40 на мобильном */
+  .search-filters-row {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) !important;
+    gap: 6px !important;
+  }
+
+  .search-ai-section {
+    grid-template-columns: minmax(0, 2.125fr) minmax(0, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  .ticker-icon {
+    flex-basis: 16px !important;
+    width: 16px !important;
+    height: 16px !important;
+    font-size: 9px !important;
+  }
+  .ticker-label { font-size: 7px !important; }
+  .ticker-value { font-size: 9px !important; }
+  .ticker-note { font-size: 7.5px !important; }
+}

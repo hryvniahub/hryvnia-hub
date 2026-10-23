@@ -614,21 +614,6 @@ function ensureAccountMenuUI() {
   }
   if (signOutMessage && signOut) signOut.insertAdjacentElement("afterend", signOutMessage);
 
-  const style = document.createElement("style");
-  style.id = "accountMenuStyles";
-  style.textContent = `
-    #accountMenuRoot{margin:18px 0 22px} .account-menu-list{display:grid;gap:8px}
-    .account-menu-item{display:grid;grid-template-columns:28px 1fr 16px;align-items:center;gap:10px;width:100%;min-height:48px;padding:11px 13px;border:1px solid #8eb89a;border-radius:13px;background:#fff;color:#252a27;box-shadow:0 2px 7px rgba(42,105,58,.06);text-align:left;font:inherit;font-weight:600;cursor:pointer}
-    .account-menu-item>span:first-child{font-size:19px;text-align:center}.account-menu-item>span:last-child{font-size:22px;color:#7b827b}
-    .account-menu-item:hover{border-color:#4f9961;background:#f7fbf7;box-shadow:0 3px 10px rgba(42,105,58,.09)}.account-menu-item:focus-visible{outline:2px solid #4f9961;outline-offset:2px}.account-menu-item:active{background:#edf7ee;border-color:#39834d}.account-menu-panel{padding:16px;margin-top:10px;border:1px solid #75a983;border-radius:14px;background:#fbfdfb;box-shadow:0 3px 12px rgba(42,105,58,.07)}
-    .account-menu-panel h3{margin:0 0 12px;font-size:20px}.account-menu-panel p{overflow-wrap:anywhere}.account-menu-back{margin:0 0 12px;padding:10px 14px;border:1px solid #75a983;border-radius:10px;background:#f4faf5;color:#285b35;font:inherit;font-weight:700;cursor:pointer}
-    .account-menu-panel label{display:block;margin:10px 0}.account-menu-panel label span{display:block;margin-bottom:5px;font-size:14px}.account-menu-panel input{box-sizing:border-box;width:100%;min-height:44px;padding:10px;border:1px solid #83b18e;border-radius:10px;background:#fff;font:inherit;transition:border-color .15s,box-shadow .15s}.account-menu-panel input:focus{outline:none;border-color:#39834d;box-shadow:0 0 0 3px rgba(79,153,97,.15)}
-    .account-menu-panel .account-save{width:100%;min-height:46px;margin-top:8px;border:1px solid #4f9961;border-radius:12px;background:#d4ff00;color:#20251e;font:inherit;font-weight:750;cursor:pointer;box-shadow:0 2px 0 rgba(42,105,58,.12)}
-    .account-signout-btn{margin-top:10px!important;min-height:48px;border-radius:12px!important;background:#d4ff00!important;color:#20251e!important;font-weight:700!important}
-    #authLoggedIn .muted{margin-bottom:4px} #authLoggedIn .auth-user-email{overflow-wrap:anywhere}
-    .account-listing-row{display:block;width:100%;padding:12px 0;border:0;border-bottom:1px solid #e4e7e2;background:none;text-align:left;font:inherit;cursor:pointer}.account-listing-row strong{display:block;margin-bottom:4px}
-  `;
-  document.head.appendChild(style);
   updateAccountMenuLabels();
   accountMenuRoot.addEventListener("click", handleAccountMenuClick);
 }
@@ -2655,4 +2640,3 @@ initAuth();
 
 // === КОНЕЦ ФАЙЛА ===
 
-;(()=>{const s=document.createElement("style");s.textContent='\n/* Hryvnia Hub listing enhancements */\n.listing-placeholder{display:flex;align-items:center;justify-content:center;min-height:150px;background:linear-gradient(135deg,rgba(212,255,0,.20),rgba(13,70,43,.08));color:#24583c;border-radius:12px}.listing-placeholder svg{width:76px;height:76px}.hot-listings-row{display:flex;gap:14px;overflow-x:auto;padding:4px 2px 14px;scroll-snap-type:x proximity}.hot-listing-card{flex:0 0 220px;display:flex;flex-direction:column;gap:8px;text-align:left;border:1px solid rgba(212,255,0,.75);border-radius:14px;padding:10px;background:var(--surface,#fff);color:var(--text,#1b2b20);scroll-snap-align:start;cursor:pointer}.hot-listing-card .listing-photo,.hot-listing-card .listing-placeholder{width:100%;height:120px;min-height:120px;object-fit:cover}.hot-card-title{font-weight:700}.hot-listing-badge{display:inline-flex;padding:4px 7px;border-radius:6px;background:rgba(212,255,0,.25);font-size:11px;font-weight:700}.old-price{text-decoration:line-through;opacity:.6;font-size:inherit}.price-change-note{font-size:12px;opacity:.8;margin-top:-8px}.listing-edit-dialog::backdrop{background:rgba(0,0,0,.55)}.listing-edit-form{display:grid;gap:12px}.listing-edit-form label{display:grid;gap:5px}.listing-edit-form input:not([type=checkbox]),.listing-edit-form select,.listing-edit-form textarea{width:100%;box-sizing:border-box;padding:10px;border:1px solid var(--border,#d9e0d9);border-radius:8px;background:var(--surface,#fff);color:inherit}.listing-edit-form .hot-toggle{display:flex;align-items:center;gap:8px}.edit-actions{display:flex;gap:10px;flex-wrap:wrap}.listing-edit-form .form-message{overflow-wrap:anywhere}\n';document.head.appendChild(s);})();

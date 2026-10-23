@@ -262,7 +262,36 @@ const translations = {
   "Описание не указано.": { ru: "Описание не указано.", uk: "Опис не вказано.", en: "No description provided.", pl: "Brak opisu." },
   "В избранное": { ru: "В избранное", uk: "В обране", en: "Add to favorites", pl: "Dodaj do ulubionych" },
   "Убрать из избранного": { ru: "Убрать из избранного", uk: "Прибрати з обраного", en: "Remove from favorites", pl: "Usuń z ulubionych" },
-  "Объявление": { ru: "Объявление", uk: "Оголошення", en: "Listing", pl: "Ogłoszenie" }
+  "Объявление": { ru: "Объявление", uk: "Оголошення", en: "Listing", pl: "Ogłoszenie" },
+  "Розширений пошук": { ru: "Расширенный поиск", uk: "Розширений пошук", en: "Advanced search", pl: "Wyszukiwanie zaawansowane" },
+  "Згорнути розширений пошук": { ru: "Свернуть расширенный поиск", uk: "Згорнути розширений пошук", en: "Hide advanced search", pl: "Ukryj wyszukiwanie zaawansowane" },
+  "Скинути": { ru: "Сбросить", uk: "Скинути", en: "Reset", pl: "Wyczyść" },
+  "Знайти автомобілі": { ru: "Найти автомобили", uk: "Знайти автомобілі", en: "Find cars", pl: "Znajdź samochody" },
+  "Оберіть параметри автомобіля": { ru: "Выберите параметры автомобиля", uk: "Оберіть параметри автомобіля", en: "Choose car parameters", pl: "Wybierz parametry samochodu" },
+  "Марка": { ru: "Марка", uk: "Марка", en: "Make", pl: "Marka" },
+  "Модель": { ru: "Модель", uk: "Модель", en: "Model", pl: "Model" },
+  "Рік від": { ru: "Год от", uk: "Рік від", en: "Year from", pl: "Rok od" },
+  "Рік до": { ru: "Год до", uk: "Рік до", en: "Year to", pl: "Rok do" },
+  "Ціна від": { ru: "Цена от", uk: "Ціна від", en: "Price from", pl: "Cena od" },
+  "Ціна до": { ru: "Цена до", uk: "Ціна до", en: "Price to", pl: "Cena do" },
+  "Пробіг від, км": { ru: "Пробег от, км", uk: "Пробіг від, км", en: "Mileage from, km", pl: "Przebieg od, km" },
+  "Пробіг до, км": { ru: "Пробег до, км", uk: "Пробіг до, км", en: "Mileage to, km", pl: "Przebieg do, km" },
+  "Об’єм двигуна від, л": { ru: "Объём двигателя от, л", uk: "Об’єм двигуна від, л", en: "Engine size from, L", pl: "Pojemność silnika od, l" },
+  "Об’єм двигуна до, л": { ru: "Объём двигателя до, л", uk: "Об’єм двигуна до, л", en: "Engine size to, L", pl: "Pojemność silnika do, l" },
+  "Тип кузова": { ru: "Тип кузова", uk: "Тип кузова", en: "Body type", pl: "Typ nadwozia" },
+  "Паливо": { ru: "Топливо", uk: "Паливо", en: "Fuel", pl: "Paliwo" },
+  "Коробка передач": { ru: "Коробка передач", uk: "Коробка передач", en: "Transmission", pl: "Skrzynia biegów" },
+  "Усі марки": { ru: "Все марки", uk: "Усі марки", en: "All makes", pl: "Wszystkie marki" },
+  "Усі моделі": { ru: "Все модели", uk: "Усі моделі", en: "All models", pl: "Wszystkie modele" },
+  "Будь-який": { ru: "Любой", uk: "Будь-який", en: "Any", pl: "Dowolny" },
+  "Будь-яка": { ru: "Любая", uk: "Будь-яка", en: "Any", pl: "Dowolna" },
+  "Будь-яке": { ru: "Любое", uk: "Будь-яке", en: "Any", pl: "Dowolne" },
+  "Перевірте числові значення фільтрів.": { ru: "Проверьте числовые значения фильтров.", uk: "Перевірте числові значення фільтрів.", en: "Check the numeric filter values.", pl: "Sprawdź wartości liczbowe filtrów." },
+  "Перевірте діапазони фільтрів.": { ru: "Проверьте диапазоны фильтров.", uk: "Перевірте діапазони фільтрів.", en: "Check the filter ranges.", pl: "Sprawdź zakresy filtrów." },
+  "Рік «від» не може бути більшим за рік «до».": { ru: "Год «от» не может быть больше года «до».", uk: "Рік «від» не може бути більшим за рік «до».", en: "Year from cannot be greater than year to.", pl: "Rok początkowy nie może być większy od końcowego." },
+  "Ціна «від» не може бути більшою за ціну «до».": { ru: "Цена «от» не может быть больше цены «до».", uk: "Ціна «від» не може бути більшою за ціну «до».", en: "Price from cannot be greater than price to.", pl: "Cena minimalna nie może być większa od maksymalnej." },
+  "Пробіг «від» не може бути більшим за пробіг «до».": { ru: "Пробег «от» не может быть больше пробега «до».", uk: "Пробіг «від» не може бути більшим за пробіг «до».", en: "Mileage from cannot be greater than mileage to.", pl: "Przebieg od nie może być większy od przebiegu do." },
+  "Об’єм двигуна «від» не може бути більшим за «до».": { ru: "Объём двигателя «от» не может быть больше «до».", uk: "Об’єм двигуна «від» не може бути більшим за «до».", en: "Engine size from cannot be greater than engine size to.", pl: "Pojemność silnika od nie może być większa od pojemności do." }
 };
 
 // === ЧАСТЬ 3 END ===
@@ -1880,6 +1909,8 @@ document.addEventListener("click", event => {
 let currentCategory = "";
 let visibleListings = [];
 let isSearching = false;
+// Used by loadListings() before the vehicle-search UI helpers are declared.
+let vehicleClientFilters = null;
 
 function categoryLabel(item) { return escapeHtml(translations[item.category]?.[lang] || item.category); }
 
@@ -1922,18 +1953,6 @@ function openListing(item, galleryOnly = false) {
       ${item.created_at ? `<p class="listing-published-date">${escapeHtml(({ru:"Опубликовано",uk:"Опубліковано",en:"Published",pl:"Opublikowano"})[lang] || "Published")}: ${escapeHtml(new Date(item.created_at).toLocaleDateString(({ru:"ru-RU",uk:"uk-UA",en:"en-GB",pl:"pl-PL"})[lang] || "uk-UA"))}</p>` : ""}
       <p class="price">${item.previous_price != null && Number(item.previous_price) !== Number(item.price) ? `<span class="old-price">${money(item.previous_price, item.currency || "UAH")}</span> ` : ""}${money(item.price, item.currency || "UAH")}</p>
       ${item.previous_price != null && Number(item.previous_price) !== Number(item.price) ? `<p class="price-change-note">${escapeHtml(({ru:"Цена изменена",uk:"Ціну змінено",en:"Price changed",pl:"Zmieniono cenę"})[lang] || "Price changed")}: ${money(Math.abs(Number(item.previous_price)-Number(item.price)), item.currency || "UAH")} (${Number(item.price)<Number(item.previous_price)?"−":"+"}${(Math.abs(Number(item.previous_price)-Number(item.price))/Math.max(1,Number(item.previous_price))*100).toFixed(1)}%)</p>` : ""}
-      ${item.category === "Автомобили" ? (() => {
-        const attrs = [];
-        const addAttr = (label, value) => { if (value !== null && value !== undefined && value !== "") attrs.push(`<span class="badge-soft">${escapeHtml(label)}: ${escapeHtml(String(value))}</span>`); };
-        addAttr(({ru:"Год",uk:"Рік",en:"Year",pl:"Rok"})[lang] || "Year", item.vehicle_year);
-        addAttr(({ru:"Пробег, км",uk:"Пробіг, км",en:"Mileage, km",pl:"Przebieg, km"})[lang] || "Mileage, km", item.vehicle_mileage_km);
-        addAttr(({ru:"Объём двигателя, л",uk:"Об’єм двигуна, л",en:"Engine, L",pl:"Pojemność silnika, l"})[lang] || "Engine, L", item.vehicle_engine_liters);
-        addAttr(({ru:"Мощность, л.с.",uk:"Потужність, к.с.",en:"Power, hp",pl:"Moc, KM"})[lang] || "Power, hp", item.vehicle_power_hp);
-        addAttr(({ru:"Кузов",uk:"Кузов",en:"Body",pl:"Nadwozie"})[lang] || "Body", item.vehicle_body_type);
-        addAttr(({ru:"Топливо",uk:"Пальне",en:"Fuel",pl:"Paliwo"})[lang] || "Fuel", item.vehicle_fuel_type);
-        addAttr(({ru:"Коробка передач",uk:"Коробка передач",en:"Transmission",pl:"Skrzynia biegów"})[lang] || "Transmission", item.vehicle_transmission);
-        return attrs.length ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin:10px 0">${attrs.join("")}</div>` : "";
-      })() : ""}
       <p class="desc" style="white-space:pre-wrap">${escapeHtml(item.description || "")}</p>
       ${isOwner ? `<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
         <button type="button" class="btn btn-primary" data-owner-edit="${escapeHtml(String(item.id))}">${escapeHtml(ownerLabels.edit)}</button>
@@ -2188,21 +2207,21 @@ async function loadListings() {
   else if (activeRegionCode) query = query.eq("cities.region_katottg_code", activeRegionCode);
   const term = searchInput?.value.trim();
   if (term) query = query.or(`title.ilike.%${term}%,description.ilike.%${term}%`);
-  let vehicleClientFilters = null;
+
+  vehicleClientFilters = null;
   if (currentCategory === "Автомобили") {
-    const value = id => document.getElementById(id)?.value ?? "";
-    const checked = id => Boolean(document.getElementById(id)?.checked);
-    const numeric = id => value(id).trim() === "" ? null : Number(value(id));
+    const value = id => document.getElementById(id)?.value?.trim() ?? "";
+    const numberValue = id => value(id) === "" ? null : Number(value(id));
     const make = value("vehicleSearchMake");
     const model = value("vehicleSearchModel");
-    const yearFrom = numeric("vehicleYearFrom");
-    const yearTo = numeric("vehicleYearTo");
-    const priceFrom = numeric("vehiclePriceFrom");
-    const priceTo = numeric("vehiclePriceTo");
-    const mileageFrom = numeric("vehicleMileageFrom");
-    const mileageTo = numeric("vehicleMileageTo");
-    const engineFrom = numeric("vehicleEngineFrom");
-    const engineTo = numeric("vehicleEngineTo");
+    const yearFrom = numberValue("vehicleYearFrom");
+    const yearTo = numberValue("vehicleYearTo");
+    const priceFrom = numberValue("vehiclePriceFrom");
+    const priceTo = numberValue("vehiclePriceTo");
+    const mileageFrom = numberValue("vehicleMileageFrom");
+    const mileageTo = numberValue("vehicleMileageTo");
+    const engineFrom = numberValue("vehicleEngineFrom");
+    const engineTo = numberValue("vehicleEngineTo");
     const body = value("vehicleBodyType");
     const fuel = value("vehicleFuel");
     const transmission = value("vehicleTransmission");
@@ -2214,16 +2233,18 @@ async function loadListings() {
       [mileageFrom, mileageTo, "Пробіг «від» не може бути більшим за пробіг «до»."],
       [engineFrom, engineTo, "Об’єм двигуна «від» не може бути більшим за «до»."]
     ];
-    const invalidNumber = [yearFrom, yearTo, priceFrom, priceTo, mileageFrom, mileageTo, engineFrom, engineTo]
-      .some(n => n !== null && (!Number.isFinite(n) || n < 0));
+    const numbers = [yearFrom, yearTo, priceFrom, priceTo, mileageFrom, mileageTo, engineFrom, engineTo];
+    const invalidNumber = numbers.some(n => n !== null && (!Number.isFinite(n) || n < 0));
     const invalidRange = ranges.some(([from, to]) => from !== null && to !== null && from > to);
     if (invalidNumber || invalidRange) {
       if (message) {
-        message.textContent = invalidNumber ? "Перевірте числові значення фільтрів." : ranges.find(([from, to]) => from !== null && to !== null && from > to)?.[2] || "Перевірте діапазони фільтрів.";
+        const rangeError = ranges.find(([from, to]) => from !== null && to !== null && from > to)?.[2];
+        message.textContent = t(invalidNumber ? "Перевірте числові значення фільтрів." : (rangeError || "Перевірте діапазони фільтрів."));
         message.classList.add("error");
       }
       return;
     }
+    vehicleClientFilters = { make, model, yearFrom, yearTo, priceFrom, priceTo, mileageFrom, mileageTo, engineFrom, engineTo, body, fuel, transmission };
     if (make) query = query.eq("vehicle_make_slug", make);
     if (model) query = query.eq("vehicle_model_slug", model);
     if (yearFrom !== null) query = query.gte("vehicle_year", yearFrom);
@@ -2237,16 +2258,35 @@ async function loadListings() {
     if (body) query = query.eq("vehicle_body_type", body);
     if (fuel) query = query.eq("vehicle_fuel_type", fuel);
     if (transmission) query = query.eq("vehicle_transmission", transmission);
-    vehicleClientFilters = { urgent: checked("vehicleOnlyUrgent"), hot: checked("vehicleOnlyHot") };
   }
   isSearching = true;
   setButtonLoading(searchBtn, true, "");
   try {
     const { data, error } = await query;
     if (error) { if (listing) listing.innerHTML = `<div class="empty">${escapeHtml(t("Ошибка") + ": " + error.message)}</div>`; return; }
-    let rows = data || [];
-    if (vehicleClientFilters?.urgent) rows = rows.filter(item => item.is_urgent === true);
-    if (vehicleClientFilters?.hot) rows = rows.filter(item => item.is_hot === true);
+    let rows = (data || []).slice();
+    if (currentCategory === "Автомобили" && vehicleClientFilters) {
+      const f = vehicleClientFilters;
+      const within = (value, min, max) => {
+        const n = Number(value);
+        if (!Number.isFinite(n)) return min === null && max === null;
+        return (min === null || n >= min) && (max === null || n <= max);
+      };
+      rows = rows.filter(item =>
+        (!f.make || item.vehicle_make_slug === f.make) &&
+        (!f.model || item.vehicle_model_slug === f.model) &&
+        within(item.vehicle_year, f.yearFrom, f.yearTo) &&
+        within(item.price, f.priceFrom, f.priceTo) &&
+        within(item.vehicle_mileage_km, f.mileageFrom, f.mileageTo) &&
+        within(item.vehicle_engine_liters, f.engineFrom, f.engineTo) &&
+        (!f.body || item.vehicle_body_type === f.body) &&
+        (!f.fuel || item.vehicle_fuel_type === f.fuel) &&
+        (!f.transmission || item.vehicle_transmission === f.transmission)
+      );
+    }
+    rows.sort((a, b) =>
+      Number(Boolean(b.is_urgent || b.is_hot)) - Number(Boolean(a.is_urgent || a.is_hot))
+    );
     renderListings(rows);
   } catch (error) {
     if (listing) listing.innerHTML = `<div class="empty">${escapeHtml(t("Ошибка") + ": " + (error.message || String(error)))}</div>`;
@@ -2257,7 +2297,6 @@ async function loadListings() {
 }
 
 const categorySubcategories = {
-  "Автомобили": ["Купівля автомобіля", "Оренда автомобіля"],
   "Недвижимость": ["Купівля", "Оренда"],
   "Готовый бизнес": ["Куплю готовый бизнес", "Продам готовый бизнес", "Ищу бизнес-партнёра", "Услуги"],
   "Инвестиции": ["Ищу инвестора", "Стану инвестором", "Стартапы"]
@@ -2294,25 +2333,83 @@ function openCategoryMenu(parentCategory = "") {
   categoryMenu.classList.remove("hidden"); categoryMenuBackdrop?.classList.remove("hidden");
   categorySelectTrigger?.setAttribute("aria-expanded", "true");
 }
+function setVehicleSearchAdvanced(isOpen) {
+  const advanced = document.getElementById("vehicleSearchAdvanced");
+  const toggle = document.getElementById("vehicleSearchToggleAdvanced");
+  if (advanced) advanced.classList.toggle("hidden", !isOpen);
+  if (toggle) {
+    toggle.setAttribute("aria-expanded", String(Boolean(isOpen)));
+    toggle.textContent = t(isOpen ? "Згорнути розширений пошук" : "Розширений пошук");
+  }
+}
+function prepareVehicleSearchUI() {
+  const menu = document.getElementById("vehicleSearchMenu");
+  // The advanced filters already exist in index.html. Select only the primary grid;
+  // otherwise querySelector() can accidentally return #vehicleSearchAdvanced itself.
+  const grid = menu?.querySelector(".vehicle-search-grid:not(#vehicleSearchAdvanced)");
+  if (!menu || !grid || menu.dataset.searchUiPrepared === "1") return;
+
+  // Hide legacy urgent/hot checkboxes: results are prioritized automatically.
+  menu.querySelectorAll("#vehicleOnlyUrgent, #vehicleOnlyHot").forEach(input => input.closest("label")?.remove());
+
+  let toggle = document.getElementById("vehicleSearchToggleAdvanced");
+  if (!toggle) {
+    toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.id = "vehicleSearchToggleAdvanced";
+    toggle.className = "btn vehicle-search-toggle";
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.setAttribute("aria-controls", "vehicleSearchAdvanced");
+    toggle.style.cssText = "width:100%; margin:0 0 12px; padding:10px 14px; border:1px solid var(--accent-border, #d4ff00); border-radius:10px; background:var(--accent-soft, rgba(212,255,0,.08)); color:inherit; font:inherit; font-weight:600; cursor:pointer;";
+    grid.insertAdjacentElement("afterend", toggle);
+    toggle.addEventListener("click", () => {
+      setVehicleSearchAdvanced(document.getElementById("vehicleSearchAdvanced")?.classList.contains("hidden"));
+    });
+  }
+
+  const advancedIds = ["vehicleMileageFrom", "vehicleMileageTo", "vehicleEngineFrom", "vehicleEngineTo", "vehicleBodyType", "vehicleFuel", "vehicleTransmission"];
+  let advanced = document.getElementById("vehicleSearchAdvanced");
+  if (!advanced) {
+    advanced = document.createElement("div");
+    advanced.id = "vehicleSearchAdvanced";
+    advanced.className = "vehicle-search-grid vehicle-search-advanced hidden";
+    advanced.style.cssText = "grid-column:1 / -1; display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px;";
+    grid.insertAdjacentElement("afterend", advanced);
+  } else {
+    // Keep the existing HTML structure and its labels intact; do not create a duplicate
+    // or move controls around on every language switch.
+    advancedIds.forEach(id => {
+      const input = document.getElementById(id);
+      const label = input?.closest("label");
+      if (label && !advanced.contains(label)) advanced.appendChild(label);
+    });
+  }
+
+  menu.dataset.searchUiPrepared = "1";
+  setVehicleSearchAdvanced(false);
+}
 function openVehicleSearch() {
-  closeCategoryMenu(); vehicleSearchMenu?.classList.remove("hidden"); vehicleSearchBackdrop?.classList.remove("hidden");
+  closeCategoryMenu();
+  prepareVehicleSearchUI();
+  vehicleSearchMenu?.classList.remove("hidden");
+  vehicleSearchBackdrop?.classList.remove("hidden");
   loadVehicleMakes();
 }
 async function fetchAllVehicleModels() {
   if (!db) return [];
   if (vehicleModelsPromise) return vehicleModelsPromise;
   vehicleModelsPromise = (async () => {
-    const all = []; const pageSize = 1000; let from = 0;
-    while (true) {
-      const {data, error} = await db.from("vehicle_models").select("make_slug,make_name,model_slug,model_name,body_types").order("make_name").order("model_name").range(from, from + pageSize - 1);
-      if (error) throw error;
-      all.push(...(data || []));
-      if (!data || data.length < pageSize) break;
-      from += pageSize;
-    }
-    return all;
+  const all = []; const pageSize = 1000; let from = 0;
+  while (true) {
+    const {data, error} = await db.from("vehicle_models").select("make_slug,make_name,model_slug,model_name,body_types").order("make_name").order("model_name").range(from, from + pageSize - 1);
+    if (error) throw error;
+    all.push(...(data || []));
+    if (!data || data.length < pageSize) break;
+    from += pageSize;
+  }
+  return all;
   })();
-  try { return await vehicleModelsPromise; }
+  try { vehicleModelsCache = await vehicleModelsPromise; return vehicleModelsCache; }
   catch (error) { vehicleModelsPromise = null; throw error; }
 }
 async function loadVehicleMakes() {
@@ -2324,11 +2421,7 @@ async function loadVehicleMakes() {
     const makes = [...new Map(data.map(x => [x.make_slug, x.make_name])).entries()].sort((a,b) => a[1].localeCompare(b[1]));
     makeSelect.innerHTML = '<option value="">Усі марки</option>' + makes.map(([slug,name]) => `<option value="${escapeHtml(slug)}">${escapeHtml(name)}</option>`).join("");
     makeSelect.dataset.loaded = "1";
-  } catch (error) {
-    console.error("Не удалось загрузить марки автомобилей", error);
-    const message = document.getElementById("vehicleSearchMessage");
-    if (message) { message.textContent = "Не вдалося завантажити каталог марок. Спробуйте ще раз."; message.classList.add("error"); }
-  }
+  } catch (error) { console.error("Не удалось загрузить марки автомобилей", error); }
 }
 document.getElementById("vehicleSearchMake")?.addEventListener("change", event => {
   const make = event.target.value; const modelSelect = document.getElementById("vehicleSearchModel");
@@ -2373,7 +2466,13 @@ categoryMenuOptions?.addEventListener("click", event => {
   const option = event.target.closest("[data-search-category]"); if (!option) return;
   const category = option.dataset.searchCategory || "";
   if (option.hasAttribute("data-open-submenu")) {
-    if (category === "Автомобили") { selectedSearchCategory = category; currentCategory = category; if (categorySelectLabel) categorySelectLabel.textContent = t(category); openCategoryMenu(category); return; }
+    if (category === "Автомобили") {
+      selectedSearchCategory = category; currentCategory = category;
+      if (categorySelectLabel) categorySelectLabel.textContent = t(category);
+      document.querySelectorAll(".category").forEach(b => b.classList.toggle("active", (b.dataset.category || "") === category));
+      openVehicleSearch();
+      return;
+    }
     openCategoryMenu(category); return;
   }
   const subcategory = option.dataset.searchSubcategory;
@@ -2396,6 +2495,7 @@ document.querySelectorAll(".category").forEach(button => {
     if (button.classList.contains("category-card") && category) {
       selectedSearchCategory = category; currentCategory = category;
       if (categorySelectLabel) categorySelectLabel.textContent = t(category === "Готовый бизнес" ? "Бизнес и предпринимательство" : category);
+      if (category === "Автомобили") { openVehicleSearch(); return; }
       openCategoryMenu(category);
       return;
     }
@@ -2409,11 +2509,22 @@ document.getElementById("categoryMenuClose")?.addEventListener("click", closeCat
 categoryMenuBackdrop?.addEventListener("click", closeCategoryMenu);
 document.getElementById("vehicleSearchClose")?.addEventListener("click", closeVehicleSearch);
 vehicleSearchBackdrop?.addEventListener("click", closeVehicleSearch);
+document.getElementById("vehicleSearchToggleAdvanced")?.addEventListener("click", () => {
+  setVehicleSearchAdvanced(document.getElementById("vehicleSearchAdvanced")?.classList.contains("hidden"));
+});
 document.getElementById("vehicleSearchReset")?.addEventListener("click", () => {
   ["vehicleSearchMake","vehicleSearchModel","vehicleYearFrom","vehicleYearTo","vehiclePriceFrom","vehiclePriceTo","vehicleMileageFrom","vehicleMileageTo","vehicleEngineFrom","vehicleEngineTo","vehicleBodyType","vehicleFuel","vehicleTransmission"].forEach(id => { const el=document.getElementById(id); if(el) el.value=""; });
-  ["vehicleOnlyUrgent","vehicleOnlyHot"].forEach(id => { const el=document.getElementById(id); if(el) el.checked=false; });
-  const message=document.getElementById("vehicleSearchMessage"); if(message) { message.textContent=""; message.classList.remove("error"); }
-  const model=document.getElementById("vehicleSearchModel"); if(model) { model.innerHTML='<option value="">Усі моделі</option>'; model.disabled=true; }
+  const make = document.getElementById("vehicleSearchMake");
+  const model = document.getElementById("vehicleSearchModel");
+  if (model) {
+    model.innerHTML = `<option value="">${t("Усі моделі")}</option>`;
+    model.disabled = true;
+  }
+  if (make) make.value = "";
+  vehicleClientFilters = null;
+  const message = document.getElementById("vehicleSearchMessage");
+  if (message) { message.textContent = ""; message.classList.remove("error"); }
+  setVehicleSearchAdvanced(false);
 });
 document.getElementById("vehicleSearchApply")?.addEventListener("click", () => {
   currentCategory = "Автомобили"; closeVehicleSearch(); loadListings();
@@ -2553,6 +2664,45 @@ function translateTextElement(element, original) {
   const item = translations[original];
   if (item && item[lang]) element.textContent = item[lang];
 }
+function translateVehicleSearchUI() {
+  const menu = document.getElementById("vehicleSearchMenu");
+  if (!menu) return;
+  const title = document.getElementById("vehicleSearchTitle");
+  if (title) title.textContent = t("Автомобили");
+  const intro = menu.querySelector(".vehicle-search-intro");
+  if (intro) intro.textContent = t("Оберіть параметри автомобіля");
+  const labelKeys = {
+    vehicleSearchMake: "Марка", vehicleSearchModel: "Модель", vehicleYearFrom: "Рік від", vehicleYearTo: "Рік до",
+    vehiclePriceFrom: "Ціна від", vehiclePriceTo: "Ціна до", vehicleMileageFrom: "Пробіг від, км", vehicleMileageTo: "Пробіг до, км",
+    vehicleEngineFrom: "Об’єм двигуна від, л", vehicleEngineTo: "Об’єм двигуна до, л", vehicleBodyType: "Тип кузова",
+    vehicleFuel: "Паливо", vehicleTransmission: "Коробка передач"
+  };
+  Object.entries(labelKeys).forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    const label = el?.closest("label");
+    if (!label) return;
+    const textNode = [...label.childNodes].find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
+    if (textNode) textNode.textContent = t(key) + " ";
+  });
+  const make = document.getElementById("vehicleSearchMake");
+  const model = document.getElementById("vehicleSearchModel");
+  if (make?.options[0]) make.options[0].textContent = t("Усі марки");
+  if (model?.options[0]) model.options[0].textContent = t("Усі моделі");
+  const placeholderOptions = {
+    vehicleBodyType: "Будь-який",
+    vehicleFuel: "Будь-яке",
+    vehicleTransmission: "Будь-яка"
+  };
+  Object.entries(placeholderOptions).forEach(([id, key]) => {
+    const select = document.getElementById(id);
+    if (select?.options[0]) select.options[0].textContent = t(key);
+  });
+  const reset = document.getElementById("vehicleSearchReset");
+  const apply = document.getElementById("vehicleSearchApply");
+  if (reset) reset.textContent = t("Скинути");
+  if (apply) apply.textContent = t("Знайти автомобілі");
+  setVehicleSearchAdvanced(Boolean(document.getElementById("vehicleSearchAdvanced") && !document.getElementById("vehicleSearchAdvanced").classList.contains("hidden")));
+}
 function translatePage(selectedLanguage) {
   lang = selectedLanguage;
   if (typeof loadMarketQuotes === "function") loadMarketQuotes();
@@ -2570,6 +2720,8 @@ function translatePage(selectedLanguage) {
     if (item && item[lang]) el.setAttribute("aria-label", item[lang]);
   });
   updatePhotoFields();
+  prepareVehicleSearchUI();
+  translateVehicleSearchUI();
   translateTextElement(document.getElementById("openAdd"), "+ Добавить объявление");
   const heroTitle = document.querySelector(".hero h1");
   if (heroTitle) {

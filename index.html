@@ -132,15 +132,33 @@
           <button class="btn btn-primary" id="searchBtn" type="button">Найти</button>
         </div>
         <div class="search-filters-row">
-          <div class="catalog-city-search">
-            <input id="catalogCitySearchInput" type="search" autocomplete="off" placeholder="Введите название города" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="catalogCitySuggestions" data-i18n-placeholder="Введите название города">
-            <div id="catalogCitySuggestions" class="catalog-city-suggestions" role="listbox" hidden></div>
-          </div>
-          <select id="catalogRegionSelect" aria-label="Область" data-i18n-aria="Область"><option value="">Все области</option></select>
-          <input type="number" placeholder="Цена (любая)" aria-label="Цена" data-i18n-placeholder="Цена (любая)" data-i18n-aria="Цена">
-          <select aria-label="Радиус поиска" data-i18n-aria="Радиус поиска">
-            <option value="30" data-i18n="Радиус: 30 км">Радиус: 30 км</option><option value="50" data-i18n="Радиус: 50 км">Радиус: 50 км</option><option value="100" data-i18n="Радиус: 100 км">Радиус: 100 км</option><option value="200" data-i18n="Радиус: 200 км">Радиус: 200 км</option>
-          </select>
+  <div class="catalog-city-search">
+    <div class="input-with-icon">
+      <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+      <input id="catalogCitySearchInput" type="search" autocomplete="off" placeholder="Введіть назву міста" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="catalogCitySuggestions" data-i18n-placeholder="Введите название города">
+    </div>
+    <div id="catalogCitySuggestions" class="catalog-city-suggestions" role="listbox" hidden></div>
+  </div>
+  
+  <div class="select-with-icon">
+    <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+    <select id="catalogRegionSelect" aria-label="Область" data-i18n-aria="Область"><option value="">Всі області</option></select>
+  </div>
+
+  <div class="input-with-icon">
+    <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+    <input type="number" placeholder="Ціна (будь-яка)" aria-label="Цена" data-i18n-placeholder="Цена (любая)" data-i18n-aria="Цена">
+  </div>
+
+  <div class="select-with-icon">
+    <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+    <select aria-label="Радиус поиска" data-i18n-aria="Радиус поиска">
+      <option value="30" data-i18n="Радиус: 30 км">Радіус: 30 км</option>
+      <option value="50" data-i18n="Радиус: 50 км">Радіус: 50 км</option>
+      <option value="100" data-i18n="Радиус: 100 км">Радіус: 100 км</option>
+      <option value="200" data-i18n="Радиус: 200 км">Радіус: 200 км</option>
+    </select>
+  </div>
         </div>
       </div>
       <aside class="ai-panel" aria-label="AI Deal Finder">

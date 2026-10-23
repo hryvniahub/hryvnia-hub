@@ -291,7 +291,23 @@ const translations = {
   "Рік «від» не може бути більшим за рік «до».": { ru: "Год «от» не может быть больше года «до».", uk: "Рік «від» не може бути більшим за рік «до».", en: "Year from cannot be greater than year to.", pl: "Rok początkowy nie może być większy od końcowego." },
   "Ціна «від» не може бути більшою за ціну «до».": { ru: "Цена «от» не может быть больше цены «до».", uk: "Ціна «від» не може бути більшою за ціну «до».", en: "Price from cannot be greater than price to.", pl: "Cena minimalna nie może być większa od maksymalnej." },
   "Пробіг «від» не може бути більшим за пробіг «до».": { ru: "Пробег «от» не может быть больше пробега «до».", uk: "Пробіг «від» не може бути більшим за пробіг «до».", en: "Mileage from cannot be greater than mileage to.", pl: "Przebieg od nie może być większy od przebiegu do." },
-  "Об’єм двигуна «від» не може бути більшим за «до».": { ru: "Объём двигателя «от» не может быть больше «до».", uk: "Об’єм двигуна «від» не може бути більшим за «до».", en: "Engine size from cannot be greater than engine size to.", pl: "Pojemność silnika od nie może być większa od pojemności do." }
+  "Об’єм двигуна «від» не може бути більшим за «до».": { ru: "Объём двигателя «от» не может быть больше «до».", uk: "Об’єм двигуна «від» не може бути більшим за «до».", en: "Engine size from cannot be greater than engine size to.", pl: "Pojemność silnika od nie może być większa od pojemności do." },
+  "Оберіть параметри автомобіля": { ru:"Выберите параметры автомобиля", uk:"Оберіть параметри автомобіля", en:"Choose vehicle filters", pl:"Wybierz parametry pojazdu" },
+  "Валюта": {ru:"Валюта",uk:"Валюта",en:"Currency",pl:"Waluta"}, "Стан авто": {ru:"Состояние авто",uk:"Стан авто",en:"Vehicle status",pl:"Stan pojazdu"},
+  "Потужність від, к. с.": {ru:"Мощность от, л. с.",uk:"Потужність від, к. с.",en:"Power from, hp",pl:"Moc od, KM"}, "Потужність до, к. с.": {ru:"Мощность до, л. с.",uk:"Потужність до, к. с.",en:"Power to, hp",pl:"Moc do, KM"},
+  "Кількість дверей": {ru:"Количество дверей",uk:"Кількість дверей",en:"Number of doors",pl:"Liczba drzwi"}, "Привід": {ru:"Привод",uk:"Привід",en:"Drive type",pl:"Napęd"},
+  "Технічний стан": {ru:"Техническое состояние",uk:"Технічний стан",en:"Technical condition",pl:"Stan techniczny"}, "Колір": {ru:"Цвет",uk:"Колір",en:"Color",pl:"Kolor"}, "Продавець": {ru:"Продавец",uk:"Продавець",en:"Seller",pl:"Sprzedawca"},
+  "Нове": {ru:"Новое",uk:"Нове",en:"New",pl:"Nowy"}, "Вживане": {ru:"С пробегом",uk:"Вживане",en:"Used",pl:"Używany"}, "Білий": {ru:"Белый",uk:"Білий",en:"White",pl:"Biały"}, "Чорний": {ru:"Чёрный",uk:"Чорний",en:"Black",pl:"Czarny"},
+  "Сірий": {ru:"Серый",uk:"Сірий",en:"Gray",pl:"Szary"}, "Сріблястий": {ru:"Серебристый",uk:"Сріблястий",en:"Silver",pl:"Srebrny"}, "Червоний": {ru:"Красный",uk:"Червоний",en:"Red",pl:"Czerwony"}, "Синій": {ru:"Синий",uk:"Синій",en:"Blue",pl:"Niebieski"},
+  "Зелений": {ru:"Зелёный",uk:"Зелений",en:"Green",pl:"Zielony"}, "Коричневий": {ru:"Коричневый",uk:"Коричневий",en:"Brown",pl:"Brązowy"}, "Жовтий": {ru:"Жёлтый",uk:"Жовтий",en:"Yellow",pl:"Żółty"}, "Інший": {ru:"Другой",uk:"Інший",en:"Other",pl:"Inny"},
+  "Будь-хто": {ru:"Любой",uk:"Будь-хто",en:"Any",pl:"Dowolny"}, "Приватна особа": {ru:"Частное лицо",uk:"Приватна особа",en:"Private seller",pl:"Osoba prywatna"}, "Компанія / автосалон": {ru:"Компания / автосалон",uk:"Компанія / автосалон",en:"Company / dealer",pl:"Firma / dealer"},
+  "Повний, що підключається": {ru:"Подключаемый полный привод",uk:"Повний, що підключається",en:"Selectable all-wheel drive",pl:"Dołączany napęd 4x4"}, "На ходу, технически исправен": {ru:"На ходу, технически исправен",uk:"На ходу, технічно справний",en:"Running, mechanically sound",pl:"Sprawny technicznie, jeździ"}, "Требует ремонта": {ru:"Требует ремонта",uk:"Потребує ремонту",en:"Needs repair",pl:"Wymaga naprawy"}, "Не на ходу": {ru:"Не на ходу",uk:"Не на ходу",en:"Not running",pl:"Niesprawny, nie jeździ"}, "Проблемы с документами": {ru:"Проблемы с документами",uk:"Проблеми з документами",en:"Document issues",pl:"Problemy z dokumentami"},
+  "Потужність «від» не може бути більшою за «до». ": {ru:"Мощность «от» не может быть больше «до».",uk:"Потужність «від» не може бути більшою за «до».",en:"Power from cannot be greater than power to.",pl:"Moc od nie może być większa od mocy do."},
+  "Седан": {ru:"Седан",uk:"Седан",en:"Sedan",pl:"Sedan"}, "Хетчбек": {ru:"Хэтчбек",uk:"Хетчбек",en:"Hatchback",pl:"Hatchback"}, "Універсал": {ru:"Универсал",uk:"Універсал",en:"Wagon",pl:"Kombi"}, "Позашляховик": {ru:"Внедорожник",uk:"Позашляховик",en:"SUV",pl:"SUV"}, "Купе": {ru:"Купе",uk:"Купе",en:"Coupe",pl:"Coupe"}, "Мінівен": {ru:"Минивэн",uk:"Мінівен",en:"Minivan",pl:"Minivan"}, "Пікап": {ru:"Пикап",uk:"Пікап",en:"Pickup",pl:"Pickup"},
+  "Бензин": {ru:"Бензин",uk:"Бензин",en:"Petrol",pl:"Benzyna"}, "Дизель": {ru:"Дизель",uk:"Дизель",en:"Diesel",pl:"Diesel"}, "Газ/бензин": {ru:"Газ/бензин",uk:"Газ/бензин",en:"LPG/petrol",pl:"LPG/benzyna"}, "Електро": {ru:"Электро",uk:"Електро",en:"Electric",pl:"Elektryczny"}, "Гібрид": {ru:"Гибрид",uk:"Гібрид",en:"Hybrid",pl:"Hybryda"},
+  "Механічна": {ru:"Механическая",uk:"Механічна",en:"Manual",pl:"Manualna"}, "Автоматична": {ru:"Автоматическая",uk:"Автоматична",en:"Automatic",pl:"Automatyczna"}, "Варіатор": {ru:"Вариатор",uk:"Варіатор",en:"CVT",pl:"CVT"}, "Робот": {ru:"Робот",uk:"Робот",en:"Automated manual",pl:"Automatyczna zautomatyzowana"},
+  "Усі марки": {ru:"Все марки",uk:"Усі марки",en:"All makes",pl:"Wszystkie marki"}, "Усі моделі": {ru:"Все модели",uk:"Усі моделі",en:"All models",pl:"Wszystkie modele"},
+  "Передній": {ru:"Передний",uk:"Передній",en:"Front-wheel drive",pl:"Napęd na przednie koła"}, "Задній": {ru:"Задний",uk:"Задній",en:"Rear-wheel drive",pl:"Napęd na tylne koła"}, "Повний": {ru:"Полный",uk:"Повний",en:"All-wheel drive",pl:"Napęd na wszystkie koła"}
 };
 
 // === ЧАСТЬ 3 END ===
@@ -2218,6 +2234,7 @@ async function loadListings() {
     const yearTo = numberValue("vehicleYearTo");
     const priceFrom = numberValue("vehiclePriceFrom");
     const priceTo = numberValue("vehiclePriceTo");
+    const currency = value("vehiclePriceCurrency") || "UAH";
     const mileageFrom = numberValue("vehicleMileageFrom");
     const mileageTo = numberValue("vehicleMileageTo");
     const engineFrom = numberValue("vehicleEngineFrom");
@@ -2225,15 +2242,24 @@ async function loadListings() {
     const body = value("vehicleBodyType");
     const fuel = value("vehicleFuel");
     const transmission = value("vehicleTransmission");
+    const status = value("vehicleSearchStatus");
+    const powerFrom = numberValue("vehiclePowerFrom");
+    const powerTo = numberValue("vehiclePowerTo");
+    const doors = value("vehicleDoors");
+    const drive = value("vehicleDrive");
+    const operationalCondition = value("vehicleOperationalCondition");
+    const color = value("vehicleColor");
+    const sellerType = value("vehicleSellerType");
     const message = document.getElementById("vehicleSearchMessage");
     if (message) { message.textContent = ""; message.classList.remove("error"); }
     const ranges = [
       [yearFrom, yearTo, "Рік «від» не може бути більшим за рік «до»."],
       [priceFrom, priceTo, "Ціна «від» не може бути більшою за ціну «до»."],
       [mileageFrom, mileageTo, "Пробіг «від» не може бути більшим за пробіг «до»."],
-      [engineFrom, engineTo, "Об’єм двигуна «від» не може бути більшим за «до»."]
+      [engineFrom, engineTo, "Об’єм двигуна «від» не може бути більшим за «до»."],
+      [powerFrom, powerTo, "Потужність «від» не може бути більшою за «до». "]
     ];
-    const numbers = [yearFrom, yearTo, priceFrom, priceTo, mileageFrom, mileageTo, engineFrom, engineTo];
+    const numbers = [yearFrom, yearTo, priceFrom, priceTo, mileageFrom, mileageTo, engineFrom, engineTo, powerFrom, powerTo];
     const invalidNumber = numbers.some(n => n !== null && (!Number.isFinite(n) || n < 0));
     const invalidRange = ranges.some(([from, to]) => from !== null && to !== null && from > to);
     if (invalidNumber || invalidRange) {
@@ -2244,11 +2270,12 @@ async function loadListings() {
       }
       return;
     }
-    vehicleClientFilters = { make, model, yearFrom, yearTo, priceFrom, priceTo, mileageFrom, mileageTo, engineFrom, engineTo, body, fuel, transmission };
+    vehicleClientFilters = { make, model, yearFrom, yearTo, priceFrom, priceTo, currency, mileageFrom, mileageTo, engineFrom, engineTo, body, fuel, transmission, status, powerFrom, powerTo, doors, drive, operationalCondition, color, sellerType };
     if (make) query = query.eq("vehicle_make_slug", make);
     if (model) query = query.eq("vehicle_model_slug", model);
     if (yearFrom !== null) query = query.gte("vehicle_year", yearFrom);
     if (yearTo !== null) query = query.lte("vehicle_year", yearTo);
+    query = query.eq("currency", currency);
     if (priceFrom !== null) query = query.gte("price", priceFrom);
     if (priceTo !== null) query = query.lte("price", priceTo);
     if (mileageFrom !== null) query = query.gte("vehicle_mileage_km", mileageFrom);
@@ -2281,7 +2308,15 @@ async function loadListings() {
         within(item.vehicle_engine_liters, f.engineFrom, f.engineTo) &&
         (!f.body || item.vehicle_body_type === f.body) &&
         (!f.fuel || item.vehicle_fuel_type === f.fuel) &&
-        (!f.transmission || item.vehicle_transmission === f.transmission)
+        (!f.transmission || item.vehicle_transmission === f.transmission) &&
+        (!f.status || item.vehicle_status === f.status) &&
+        within(item.vehicle_power_hp, f.powerFrom, f.powerTo) &&
+        (!f.doors || String(item.vehicle_doors ?? "") === f.doors) &&
+        (!f.drive || item.vehicle_drive === f.drive) &&
+        (!f.operationalCondition || item.vehicle_operational_condition === f.operationalCondition) &&
+        (!f.color || String(item.vehicle_color || "").toLowerCase() === f.color) &&
+        (!f.sellerType || item.seller_type === f.sellerType) &&
+        (String(item.currency || "UAH").toUpperCase() === f.currency)
       );
     }
     rows.sort((a, b) =>
@@ -2513,7 +2548,8 @@ document.getElementById("vehicleSearchToggleAdvanced")?.addEventListener("click"
   setVehicleSearchAdvanced(document.getElementById("vehicleSearchAdvanced")?.classList.contains("hidden"));
 });
 document.getElementById("vehicleSearchReset")?.addEventListener("click", () => {
-  ["vehicleSearchMake","vehicleSearchModel","vehicleYearFrom","vehicleYearTo","vehiclePriceFrom","vehiclePriceTo","vehicleMileageFrom","vehicleMileageTo","vehicleEngineFrom","vehicleEngineTo","vehicleBodyType","vehicleFuel","vehicleTransmission"].forEach(id => { const el=document.getElementById(id); if(el) el.value=""; });
+  ["vehicleSearchMake","vehicleSearchModel","vehicleYearFrom","vehicleYearTo","vehiclePriceFrom","vehiclePriceTo","vehicleMileageFrom","vehicleMileageTo","vehicleEngineFrom","vehicleEngineTo","vehicleBodyType","vehicleFuel","vehicleTransmission","vehicleSearchStatus","vehiclePowerFrom","vehiclePowerTo","vehicleDoors","vehicleDrive","vehicleOperationalCondition","vehicleColor","vehicleSellerType"].forEach(id => { const el=document.getElementById(id); if(el) el.value=""; });
+  const currency = document.getElementById("vehiclePriceCurrency"); if (currency) currency.value = "UAH";
   const make = document.getElementById("vehicleSearchMake");
   const model = document.getElementById("vehicleSearchModel");
   if (model) {
@@ -2675,7 +2711,9 @@ function translateVehicleSearchUI() {
     vehicleSearchMake: "Марка", vehicleSearchModel: "Модель", vehicleYearFrom: "Рік від", vehicleYearTo: "Рік до",
     vehiclePriceFrom: "Ціна від", vehiclePriceTo: "Ціна до", vehicleMileageFrom: "Пробіг від, км", vehicleMileageTo: "Пробіг до, км",
     vehicleEngineFrom: "Об’єм двигуна від, л", vehicleEngineTo: "Об’єм двигуна до, л", vehicleBodyType: "Тип кузова",
-    vehicleFuel: "Паливо", vehicleTransmission: "Коробка передач"
+    vehicleFuel: "Паливо", vehicleTransmission: "Коробка передач", vehicleSearchStatus: "Стан авто",
+    vehiclePowerFrom: "Потужність від, к. с.", vehiclePowerTo: "Потужність до, к. с.", vehicleDoors: "Кількість дверей",
+    vehicleDrive: "Привід", vehicleOperationalCondition: "Технічний стан", vehicleColor: "Колір", vehicleSellerType: "Продавець"
   };
   Object.entries(labelKeys).forEach(([id, key]) => {
     const el = document.getElementById(id);
@@ -2688,15 +2726,23 @@ function translateVehicleSearchUI() {
   const model = document.getElementById("vehicleSearchModel");
   if (make?.options[0]) make.options[0].textContent = t("Усі марки");
   if (model?.options[0]) model.options[0].textContent = t("Усі моделі");
-  const placeholderOptions = {
-    vehicleBodyType: "Будь-який",
-    vehicleFuel: "Будь-яке",
-    vehicleTransmission: "Будь-яка"
-  };
+  const placeholderOptions = { vehicleBodyType: "Будь-який", vehicleFuel: "Будь-яке", vehicleTransmission: "Будь-яка", vehicleSearchStatus: "Будь-який", vehicleDoors: "Будь-яка", vehicleDrive: "Будь-який", vehicleOperationalCondition: "Будь-який", vehicleColor: "Будь-який", vehicleSellerType: "Будь-хто" };
   Object.entries(placeholderOptions).forEach(([id, key]) => {
     const select = document.getElementById(id);
     if (select?.options[0]) select.options[0].textContent = t(key);
   });
+  menu.querySelectorAll("select option").forEach(option => {
+    if (option.value === "UAH") option.textContent = "₴ UAH";
+    else if (option.value === "USD") option.textContent = "$ USD";
+    else if (option.value && /^[0-9]+$/.test(option.value)) return;
+    else {
+      if (!option.dataset.i18nOriginal) option.dataset.i18nOriginal = option.textContent.trim();
+      const original = option.dataset.i18nOriginal;
+      if (translations[original]) option.textContent = t(original);
+    }
+  });
+  const currencyLabel = document.getElementById("vehiclePriceCurrency")?.closest("label");
+  if (currencyLabel) { const textNode = [...currencyLabel.childNodes].find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim()); if (textNode) textNode.textContent = t("Валюта") + " "; }
   const reset = document.getElementById("vehicleSearchReset");
   const apply = document.getElementById("vehicleSearchApply");
   if (reset) reset.textContent = t("Скинути");

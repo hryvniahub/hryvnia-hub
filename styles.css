@@ -1023,3 +1023,13 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 @media (max-width: 720px) {
   .search-input-row-stacked .category-select-trigger { min-height: 74px; height: 74px; }
 }
+
+
+/* Hryvnia Hub: follow-up fixes */
+@media (max-width: 720px) {
+  /* Keep a tiny visible separation between the two category-card rows. */
+  .categories-grid { row-gap: 2px; }
+}
+
+/* Remove the extra currency-ticker caption to save vertical space. */
+.ticker-note { display: none !important; }

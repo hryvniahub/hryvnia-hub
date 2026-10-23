@@ -233,8 +233,9 @@
     <h2 id="vehicleSearchTitle">Автомобілі</h2>
     <p class="vehicle-search-intro">Оберіть параметри автомобіля</p>
     <div class="vehicle-search-grid" id="vehicleSearchMain">
-      <label>Марка
-        <select id="vehicleSearchMake"><option value="">Усі марки</option></select>
+      <label class="vehicle-make-filter">Марка
+        <span class="vehicle-make-control"><select id="vehicleSearchMake" aria-describedby="vehicleMakeLoadStatus"><option value="">Усі марки</option></select><span class="vehicle-make-spinner hidden" id="vehicleMakeSpinner" aria-hidden="true"></span></span>
+        <span class="vehicle-make-load-status" id="vehicleMakeLoadStatus" role="status" aria-live="polite"></span>
       </label>
       <label>Модель
         <select id="vehicleSearchModel" disabled><option value="">Усі моделі</option></select>

@@ -111,7 +111,7 @@ button { font-family: inherit; }
    КАТЕГОРИИ (Исправлены размеры иконок)
    ============================================================ */
 .categories-section { margin-top: 0; background: linear-gradient(180deg, #f7f9f3 0%, #f2f5ed 100%); border-radius: var(--radius); padding: 2px; }
-.categories-grid { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.categories-grid { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 10px; row-gap: 0; }
 
 .category-card {
   position: relative; border: 0; border-radius: var(--radius); overflow: hidden; cursor: pointer;
@@ -340,7 +340,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
   .account-btn .account-label { display: none; }
 
   /* Категории */
-  .categories-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .categories-grid { grid-template-columns: repeat(2, 1fr); column-gap: 8px; row-gap: 0; }
   .category-card { aspect-ratio: 3 / 1; padding: 8px; }
   .category-card-label { font-size: 14px; gap: 4px; flex-direction: column; }
   .category-icon { width: 20px; height: 20px; flex: 0 0 20px; }
@@ -1014,4 +1014,12 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
   .brand { gap: 4px; padding: 2px 5px; }
   .brand .logo { width: 22px; height: 22px; flex-basis: 22px; }
   .brand .brand-text { font-size: 11px; }
+}
+
+
+/* Hryvnia Hub: compact category grid and merged category control */
+.search-input-row-stacked #searchInput { display: none; }
+.search-input-row-stacked .category-select-trigger { min-height: 74px; height: 74px; }
+@media (max-width: 720px) {
+  .search-input-row-stacked .category-select-trigger { min-height: 74px; height: 74px; }
 }

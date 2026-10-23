@@ -478,4 +478,60 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
     display: none !important;
   }
 }
+/* ============================================================
+   ФИНАЛЬНЫЙ ФИКС: УПЛОТНЕНИЕ ВЕРХНЕЙ ЧАСТИ (МОБИЛКИ И ПК)
+   ============================================================ */
 
+/* 1. Шапка: убираем лишние отступы внутри */
+.header { padding: 0; }
+.nav { padding: 4px 0; min-height: 52px; }
+
+/* 2. Категории: прижимаем к шапке */
+.categories-section { margin-top: 6px !important; }
+
+/* 3. Баннер: прижимаем к категориям и делаем чуть ниже */
+.hero { margin-top: 6px !important; }
+.main-banner { height: 95px !important; padding: 6px 16px 20px !important; }
+
+/* 4. Курс валют: прижимаем к баннеру и ужимаем на ~30% */
+.market-ticker { 
+  margin-top: 6px !important; 
+  padding: 4px 10px !important; 
+}
+.ticker-icon { width: 24px !important; height: 24px !important; font-size: 14px !important; }
+.ticker-value { font-size: 12px !important; }
+.ticker-source { display: none !important; } /* Скрываем подписи снизу, чтобы не мешали */
+.ticker-note { font-size: 10px !important; margin-top: 2px; display: block; }
+
+/* 5. Блок поиска и AI: прижимаем к курсу валют */
+.search-ai-section { margin-top: 6px !important; }
+
+/* ============================================================
+   ДОПОЛНИТЕЛЬНО ДЛЯ МОБИЛЬНЫХ (до 720px)
+   ============================================================ */
+@media (max-width: 720px) {
+  .nav { padding: 2px 0; min-height: 46px; }
+  .categories-section { margin-top: 4px !important; }
+  .hero { margin-top: 4px !important; }
+  
+  .main-banner { 
+    height: 64px !important; 
+    padding: 4px 10px 14px !important; 
+  }
+  .banner-title { font-size: 13px !important; }
+  .hero-text { font-size: 9px !important; }
+  
+  .market-ticker { 
+    margin-top: 4px !important; 
+    padding: 3px 6px !important; 
+    border-radius: 10px !important;
+  }
+  .ticker-scroll { gap: 2px !important; }
+  .ticker-item { padding: 0 2px !important; gap: 4px !important; }
+  .ticker-icon { width: 18px !important; height: 18px !important; font-size: 11px !important; }
+  .ticker-label { font-size: 8px !important; }
+  .ticker-value { font-size: 10px !important; }
+  .ticker-note { font-size: 8px !important; margin-top: 1px !important; }
+  
+  .search-ai-section { margin-top: 4px !important; }
+}

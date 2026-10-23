@@ -2751,15 +2751,37 @@ if (addForm) {
       user_id: currentUser.id
     };
     if (form.get("category") === "Автомобили") {
-      const makeSlug = form.get("vehicle_make_slug") || "";
-      const modelSlug = form.get("vehicle_model_slug") || "";
-      const makeRow = vehicleModelsCache.find(row => row.make_slug === makeSlug);
-      const modelRow = vehicleModelsCache.find(row => row.make_slug === makeSlug && row.model_slug === modelSlug);
+      const makeSlug = String(form.get("vehicle_make_slug") || "").trim();
+      const modelSlug = String(form.get("vehicle_model_slug") || "").trim();
+      if (!makeSlug || !modelSlug) {
+        if (formMessage) formMessage.textContent = "Выберите марку и модель автомобиля.";
+        (!makeSlug ? vehicleListingMake : vehicleListingModel)?.focus();
+        return;
+      }
+
+      // Ensure the catalog is loaded before resolving slugs to display names.
+      // This prevents saving a valid slug with a null make/model name when the cache is empty.
+      let catalog;
+      try {
+        catalog = await fetchAllVehicleModels();
+      } catch (error) {
+        console.error("Не удалось проверить марку и модель автомобиля", error);
+        if (formMessage) formMessage.textContent = "Не удалось проверить каталог автомобилей. Повторите попытку.";
+        return;
+      }
+      const makeRow = catalog.find(row => String(row.make_slug) === makeSlug);
+      const modelRow = catalog.find(row => String(row.make_slug) === makeSlug && String(row.model_slug) === modelSlug);
+      if (!makeRow || !modelRow) {
+        if (formMessage) formMessage.textContent = "Марка или модель не найдена в каталоге. Выберите их заново.";
+        if (!makeRow) vehicleListingMake?.focus();
+        else vehicleListingModel?.focus();
+        return;
+      }
       Object.assign(payload, {
-        vehicle_make_slug: makeSlug || null,
-        vehicle_make_name: makeRow?.make_name || null,
-        vehicle_model_slug: modelSlug || null,
-        vehicle_model_name: modelRow?.model_name || null,
+        vehicle_make_slug: makeSlug,
+        vehicle_make_name: makeRow.make_name,
+        vehicle_model_slug: modelSlug,
+        vehicle_model_name: modelRow.model_name,
         vehicle_year: form.get("vehicle_year") ? Number(form.get("vehicle_year")) : null,
         vehicle_body_type: form.get("vehicle_body_type") || null,
         vehicle_fuel_type: form.get("vehicle_fuel_type") || null,
@@ -2773,11 +2795,6 @@ if (addForm) {
         vehicle_color: form.get("vehicle_color") || null,
         seller_type: form.get("seller_type") || "private"
       });
-      if (!makeSlug || !modelSlug) {
-        if (formMessage) formMessage.textContent = "Выберите марку и модель автомобиля.";
-        vehicleListingMake?.focus();
-        return;
-      }
     }
     const selectedListingConditionIds = form.get("category") === "Автомобили" ? getSelectedConditionIds("vehicleListingConditions") : [];
     const withPhotos = selectedPhotos.length > 0;

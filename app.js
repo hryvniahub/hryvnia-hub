@@ -2758,6 +2758,8 @@ document.getElementById("addCategoryOptions")?.addEventListener("click", event =
   if (!categorySelect || ![...categorySelect.options].some(item => item.value === category)) return;
   categorySelect.value = category;
   categorySelect.dispatchEvent(new Event("change", { bubbles: true }));
+  // Re-sync visibility before showing the form, so vehicle listings start directly at car characteristics.
+  syncVehicleListingFields();
   closeAddCategoryMenu();
   addModal?.classList.remove("hidden");
 });

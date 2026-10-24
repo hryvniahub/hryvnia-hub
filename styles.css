@@ -328,6 +328,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
    МОБИЛЬНАЯ АДАПТАЦИЯ (≤ 720px)
    ============================================================ */
 @media (max-width: 720px) {
+  .vehicle-price-range { grid-template-columns: minmax(0,1fr) 88px minmax(0,1fr); gap: 7px; }
+  .vehicle-price-range label { font-size: 12px; }
   .container { width: calc(100% - 16px); } /* Уменьшили отступы по краям с 16 до 8 пикселей */
 
   /* Шапка */
@@ -350,16 +352,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
 
   .all-btn { width: 54px; height: 30px; font-size: 10px; }
 
-  /* Баннер (Высота уменьшена на 20%) */
-  .main-banner {
-    height: 60px; /* 75px (было) - 20% = 60px */
-    padding: 6px 10px 16px;
-  }
-  .banner-title { font-size: 14px; }
-  .banner-title::after { width: 25px; height: 2px; margin-top: 2px; }
-  .hero-text { font-size: 10px; }
-  .banner-icons { bottom: 3px; gap: 12px; }
-  .banner-icon { width: 14px; height: 14px; }
+  /* Мобильные настройки баннера заданы единым блоком ниже. */
 
   /* Валюты */
   .market-ticker { margin-top: 6px; padding: 6px 8px; }
@@ -947,12 +940,15 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 
 /* Адаптация восстановленных компонентов */
 @media (max-width: 720px) {
+  .vehicle-price-range { grid-template-columns: minmax(0,1fr) 88px minmax(0,1fr); gap: 7px; }
+  .vehicle-price-range label { font-size: 12px; }
   body { padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px)); }
+  /* Единые мобильные настройки баннера: без повторных переопределений */
   .main-banner { height: 56px; padding: 4px 10px 15px; }
-  .banner-content { gap: 2px; padding-bottom: 17px; }
-  .banner-title { font-size: 12.5px; line-height: 1.05; }
+  .banner-content { gap: 2px; padding-bottom: 7px; }
+  .banner-title { font-size: 18px; line-height: 1.05; }
   .banner-title::after { width: 25px; height: 2px; margin-top: 2px; }
-  .hero-text { font-size: 9.5px; line-height: 1.05; }
+  .hero-text { font-size: 12px; line-height: 1.1; }
   .banner-icons { bottom: 3px; gap: 12px; }
   .banner-icon { width: 14px; height: 14px; }
   .ticker-icon { flex-basis: 18px; width: 18px; height: 18px; font-size: 11px; }
@@ -960,6 +956,7 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
   .ticker-value { font-size: 10px; }
   .ticker-arrow { font-size: 9px; }
   .search-panel { padding: 8px 10px; gap: 6px; }
+  .search-filters-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
   .ai-panel { padding: 8px; }
   .ai-panel h3 { font-size: 14px; }
   .ai-panel .ai-features { display: none; }
@@ -1016,7 +1013,7 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
   #openAdd::before { content: "+"; font-size: 18px; line-height: 1; font-weight: 800; }
 }
 
-@media (min-width: 361px) and (max-width: 420px) {
+@media (max-width: 420px) {
   .brand { gap: 4px; padding: 2px 5px; }
   .brand .logo { width: 22px; height: 22px; flex-basis: 22px; }
   .brand .brand-text { font-size: 11px; }
@@ -1027,7 +1024,16 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 .search-input-row-stacked #searchInput { display: none; }
 .search-input-row-stacked .category-select-trigger { min-height: 74px; height: 74px; }
 @media (max-width: 720px) {
+  .vehicle-price-range { grid-template-columns: minmax(0,1fr) 88px minmax(0,1fr); gap: 7px; }
+  .vehicle-price-range label { font-size: 12px; }
   .search-input-row-stacked .category-select-trigger { min-height: 74px; height: 74px; }
+}
+
+
+/* Hryvnia Hub: follow-up fixes */
+@media (max-width: 720px) {
+  .vehicle-price-range { grid-template-columns: minmax(0,1fr) 88px minmax(0,1fr); gap: 7px; }
+  .vehicle-price-range label { font-size: 12px; }
   /* Keep a tiny visible separation between the two category-card rows. */
   .categories-grid { row-gap: 2px; }
 }

@@ -40,6 +40,13 @@ function updateClock() {
 }
 
 const translations = {
+  // Stable slug keys for vehicle select options; values saved to Supabase stay unchanged.
+  "roadworthy": { ru: "На ходу, технически исправен", uk: "На ходу, технічно справний", en: "Roadworthy, mechanically sound", pl: "Sprawny technicznie, jeżdżący" },
+  "needs_repair": { ru: "Требует ремонта", uk: "Потребує ремонту", en: "Needs repair", pl: "Wymaga naprawy" },
+  "not_running": { ru: "Не на ходу", uk: "Не на ходу", en: "Not running", pl: "Nie jeździ" },
+  "after_accident": { ru: "После ДТП", uk: "Після ДТП", en: "After an accident", pl: "Po wypadku" },
+  "new": { ru: "Новое", uk: "Нове", en: "New", pl: "Nowe" },
+  "used": { ru: "С пробегом", uk: "З пробігом", en: "Used", pl: "Używane" },
   "Категорії": { ru: "Категории", uk: "Категорії", en: "Categories", pl: "Kategorie" },
   "Автомобили": { ru: "Автомобили", uk: "Автомобілі", en: "Cars", pl: "Samochody" },
   "Недвижимость": { ru: "Недвижимость", uk: "Нерухомість", en: "Real estate", pl: "Nieruchomości" },
@@ -2052,8 +2059,16 @@ function openListing(item, galleryOnly = false) {
   document.body.style.overflow = "hidden";
 }
 
+// Single guarded entry point: edit/create flows must not render a city selector before cities arrive.
+async function ensureCitiesLoaded() {
+  if (availableCities.length) return availableCities;
+  await loadCities();
+  return availableCities;
+}
+
 // ==== РАСШИРЕННОЕ РЕДАКТИРОВАНИЕ (включая авто-поля) ====
 async function editListing(item, labels) {
+  await ensureCitiesLoaded();
   if (!db || !currentUser) { alert(labels.denied); return; }
   if (String(currentUser.id) !== String(item.user_id || "")) { alert(labels.denied); return; }
 
@@ -2066,9 +2081,15 @@ async function editListing(item, labels) {
 
   const isVehicle = item.category === "Автомобили";
 
-  const cityOptions = availableCities
-    .map(city => `<option value="${escapeHtml(String(city.id))}" ${String(city.id) === String(item.city_id || item.cities?.id || "") ? "selected" : ""}>${escapeHtml(city[`name_${lang}`] || city.name_uk || city.name_ru || city.name || "")}</option>`)
+  const selectedCityId = String(item.city_id || item.cities?.id || "");
+  let cityOptions = availableCities
+    .map(city => `<option value="${escapeHtml(String(city.id))}" ${String(city.id) === selectedCityId ? "selected" : ""}>${escapeHtml(city[`name_${lang}`] || city.name_uk || city.name_ru || city.name || "")}</option>`)
     .join("");
+  // Fallback keeps the saved city selectable if the catalog is temporarily incomplete.
+  if (selectedCityId && !availableCities.some(city => String(city.id) === selectedCityId)) {
+    const fallbackName = item.cities?.[`name_${lang}`] || item.cities?.name_uk || item.cities?.name_ru || selectedCityId;
+    cityOptions += `<option value="${escapeHtml(selectedCityId)}" selected>${escapeHtml(fallbackName)}</option>`;
+  }
   const categoryOptions = ["Автомобили","Недвижимость","Готовый бизнес","Инвестиции"]
     .map(cat => `<option value="${cat}" ${item.category === cat ? "selected" : ""}>${escapeHtml(translations[cat]?.[lang] || cat)}</option>`)
     .join("");
@@ -2088,8 +2109,8 @@ async function editListing(item, labels) {
   const colors = ["white","black","gray","silver","red","blue","green","brown","yellow","other"];
   const colorKeys = ["Білий","Чорний","Сірий","Сріблястий","Червоний","Синій","Зелений","Коричневий","Жовтий","Інший"];
   const sellerTypes = [["private","Частное лицо"],["business","Компания / бизнес"]];
-  const vehicleTypes = [["new","Новое"],["used","С пробегом"]];
-  const operational = [["roadworthy","На ходу, технически исправен"],["needs_repair","Требует ремонта"],["not_running","Не на ходу"],["after_accident","После ДТП"]];
+  const vehicleTypes = [["new","new"],["used","used"]];
+  const operational = [["roadworthy","roadworthy"],["needs_repair","needs_repair"],["not_running","not_running"],["after_accident","after_accident"]];
 
   const vehicleBlock = isVehicle ? `
     <fieldset class="vehicle-listing-fields">
@@ -2121,8 +2142,7 @@ async function editListing(item, labels) {
 
   const dialog = document.createElement("dialog");
   dialog.className = "modal-card listing-edit-dialog";
-  dialog.style.cssText = "width:min(720px,calc(100% - 24px));max-height:90dvh;overflow:auto;border:1px solid #d9e0d9;border-radius:16px;color:var(--text,#1b2b20);";
-  dialog.innerHTML = `<form class="listing-edit-form"><h2>${escapeHtml(labels.edit)}</h2>
+  dialog.innerHTML = `<form class="listing-edit-form"><header class="listing-edit-header"><p class="eyebrow">${escapeHtml(t("Редактирование объявления"))}</p><h2>${escapeHtml(labels.edit)}</h2></header>
     <label>${escapeHtml(L.category)}<select name="category" required>${categoryOptions}</select></label>
     ${isVehicle ? "" : `<label>${escapeHtml(L.title)}<input name="title" required maxlength="180" value="${escapeHtml(item.title || "")}"></label>`}
     ${vehicleBlock}
@@ -2173,9 +2193,11 @@ async function editListing(item, labels) {
     if (!Number.isFinite(price) || price < 0) { message.textContent = labels.failed; return; }
     const urls = [...new Set(form.elements.photo_urls.value.split(/\r?\n/).map(x => x.trim()).filter(x => /^https?:\/\//i.test(x)))].slice(0, 10);
 
+    const cityIdValue = String(form.elements.city_id.value || "");
+    if (!cityIdValue) { message.textContent = t("Выберите город"); return; }
     const payload = {
       category: form.elements.category.value,
-      city_id: Number(form.elements.city_id.value),
+      city_id: Number(cityIdValue),
       price,
       previous_price: Number(item.price) !== price ? Number(item.price) : (item.previous_price ?? null),
       description: form.elements.description.value.trim(),
@@ -2396,7 +2418,8 @@ async function loadListings() {
     const drive = value("vehicleDrive");
     const color = value("vehicleColor");
     const sellerType = value("vehicleSellerType");
-    const operationalCondition = value("vehicleSearchOperationalCondition");
+    const operationalConditionEl = document.getElementById("vehicleSearchOperationalCondition");
+    const operationalCondition = operationalConditionEl ? String(operationalConditionEl.value || "").trim() : "";
     const message = document.getElementById("vehicleSearchMessage");
     if (message) { message.textContent = ""; message.classList.remove("error"); }
     const ranges = [
@@ -2489,6 +2512,30 @@ const categorySubcategories = {
 const categoryMenu = document.getElementById("categoryMenu");
 const categoryMenuBackdrop = document.getElementById("categoryMenuBackdrop");
 const categoryMenuTitle = document.getElementById("categoryMenuTitle");
+function resetCatalogFilters() {
+  currentCategory = "";
+  selectedSearchCategory = "";
+  selectedCatalogCityId = "";
+  activeRegionCode = "";
+  vehicleClientFilters = null;
+  if (searchInput) searchInput.value = "";
+  if (catalogCitySearchInput) catalogCitySearchInput.value = "";
+  if (catalogRegionSelect) catalogRegionSelect.value = "";
+  const categoryLabel = document.getElementById("categorySelectLabel");
+  if (categoryLabel) categoryLabel.textContent = t("Все категории");
+  document.querySelectorAll(".category").forEach(button => button.classList.remove("active"));
+  ["vehicleSearchMake","vehicleSearchModel","vehicleYearFrom","vehicleYearTo","vehiclePriceFrom","vehiclePriceTo","vehicleMileageFrom","vehicleMileageTo","vehicleEngineFrom","vehicleEngineTo","vehicleBodyType","vehicleFuel","vehicleTransmission","vehicleSearchStatus","vehiclePowerFrom","vehiclePowerTo","vehicleDoors","vehicleDrive","vehicleColor","vehicleSellerType","vehicleSearchOperationalCondition"].forEach(id => {
+    const element = document.getElementById(id);
+    if (element) element.value = "";
+  });
+  const model = document.getElementById("vehicleSearchModel");
+  if (model) { model.innerHTML = `<option value="">${escapeHtml(t("Спочатку оберіть марку"))}</option>`; model.disabled = true; }
+  const currency = document.getElementById("vehiclePriceCurrency");
+  if (currency) currency.value = "UAH";
+  const message = document.getElementById("vehicleSearchMessage");
+  if (message) { message.textContent = ""; message.classList.remove("error"); }
+}
+
 const categoryMenuOptions = document.getElementById("categoryMenuOptions");
 const categorySelectTrigger = document.getElementById("categorySelectTrigger");
 const categorySelectLabel = document.getElementById("categorySelectLabel");
@@ -2681,6 +2728,8 @@ categoryMenuOptions?.addEventListener("click", event => {
     openCategoryMenu(category); return;
   }
   const subcategory = option.dataset.searchSubcategory;
+  // A category change starts a fresh catalog query; do not carry stale vehicle or city filters.
+  resetCatalogFilters();
   selectedSearchCategory = category; currentCategory = category;
   if (subcategory && searchInput) searchInput.value = subcategory;
   if (categorySelectLabel) categorySelectLabel.textContent = category ? t(category === "Готовый бизнес" ? "Бизнес и предпринимательство" : category) : t("Все категории");
@@ -2698,6 +2747,7 @@ document.querySelectorAll(".category").forEach(button => {
   button.addEventListener("click", () => {
     const category = button.dataset.category || "";
     if (button.classList.contains("category-card") && category) {
+      resetCatalogFilters();
       selectedSearchCategory = category; currentCategory = category;
       if (categorySelectLabel) categorySelectLabel.textContent = t(category === "Готовый бизнес" ? "Бизнес и предпринимательство" : category);
       if (category === "Автомобили") { openVehicleSearch(); return; }
@@ -2705,6 +2755,7 @@ document.querySelectorAll(".category").forEach(button => {
       return;
     }
     document.querySelectorAll(".category").forEach(b => b.classList.remove("active")); button.classList.add("active");
+    resetCatalogFilters();
     currentCategory = category; selectedSearchCategory = category;
     if (categorySelectLabel) categorySelectLabel.textContent = category ? t(category) : t("Все категории");
     loadListings();
@@ -2764,7 +2815,8 @@ function closeAddCategoryMenu() {
   addCategoryMenu?.classList.add("hidden");
   addCategoryBackdrop?.classList.add("hidden");
 }
-function openAddCategoryMenu() {
+async function openAddCategoryMenu() {
+  await ensureCitiesLoaded();
   if (!addCategoryMenu) { addModal?.classList.remove("hidden"); return; }
   closeCategoryMenu();
   closeVehicleSearch();
@@ -2955,9 +3007,10 @@ function translateVehicleSearchUI() {
   menu.querySelectorAll("select").forEach(select => {
     [...select.options].forEach((option, idx) => {
       if (idx === 0) return;
+      const valueKey = String(option.value || "").trim();
       const raw = option.dataset.i18nOriginal || option.textContent.trim();
       if (!option.dataset.i18nOriginal) option.dataset.i18nOriginal = raw;
-      const item = translations[raw];
+      const item = translations[valueKey] || translations[raw];
       if (item && item[lang]) option.textContent = item[lang];
     });
   });

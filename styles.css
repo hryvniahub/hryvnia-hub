@@ -124,13 +124,13 @@ button { font-family: inherit; }
 .category-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
 .category-card::before {
   content: ''; position: absolute; inset: 0; z-index: 1;
-  background: linear-gradient(180deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.6) 100%);
+  background: linear-gradient(180deg, rgba(0,0,0,0.14) 0%, rgba(0,0,0,0.66) 100%);
 }
 .category-card-img {
   position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;
 }
 .category-card-label {
-  position: relative; z-index: 2; font-weight: 800; font-size: clamp(16px, 1.5vw, 22px);
+  position: relative; z-index: 2; font-weight: 800; font-size: clamp(18px, 1.5vw, 24px);
   line-height: 1.1; text-shadow: 0 2px 4px rgba(0,0,0,0.8);
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   width: 100%;
@@ -176,7 +176,7 @@ button { font-family: inherit; }
 }
 .main-banner::before {
   content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  background: linear-gradient(180deg, rgba(5,12,18,0.7) 0%, rgba(5,12,18,0.5) 60%, rgba(5,12,18,0.1) 100%);
+  background: linear-gradient(180deg, rgba(5,12,18,0.74) 0%, rgba(5,12,18,0.56) 60%, rgba(5,12,18,0.16) 100%);
 }
 .banner-content {
   position: relative; z-index: 2; text-align: center; max-width: 100%; padding-bottom: 12px;
@@ -347,11 +347,11 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
   /* Категории */
   .categories-grid { grid-template-columns: repeat(2, 1fr); column-gap: 8px; row-gap: 0; }
   .category-card { aspect-ratio: 3 / 1; padding: 8px; }
-  .category-card-label { font-size: 24px; gap: 5px; flex-direction: row; align-items: center; justify-content: center; }
+  .category-card-label { font-size: 22px; gap: 5px; flex-direction: row; align-items: center; justify-content: center; }
   .category-icon { width: 24px; height: 24px; flex: 0 0 24px; }
   .category-card-label > span[data-i18n] { min-width: 0; }
   .category-card[data-category="Готовый бизнес"] .category-card-label > span[data-i18n] { text-align: center; line-height: 1.02; }
-  .category-card[data-category="Готовый бизнес"] .category-card-long-word { display: block; font-size: 1em; white-space: normal; }
+  .category-card[data-category="Готовый бизнес"] .category-card-long-word { display: block; font-size: 19px; white-space: normal; }
 
   .all-btn { width: 54px; height: 30px; font-size: 10px; }
 
@@ -948,10 +948,10 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
   body { padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px)); }
   /* Единые мобильные настройки баннера: без повторных переопределений */
   .main-banner { height: 56px; padding: 4px 10px 15px; }
-  .banner-content { gap: 2px; padding-bottom: 7px; transform: translateY(4px); }
-  .banner-title { font-size: 16px; line-height: 1.05; transform: none; }
+  .banner-content { gap: 2px; padding-bottom: 7px; }
+  .banner-title { font-size: 18px; line-height: 1.05; transform: translateY(3px); }
   .banner-title::after { width: 25px; height: 2px; margin-top: 2px; }
-  .hero-text { font-size: 14px; line-height: 1.1; }
+  .hero-text { font-size: 12px; line-height: 1.1; }
   .banner-icons { bottom: 3px; gap: 12px; }
   .banner-icon { width: 14px; height: 14px; }
   .ticker-icon { flex-basis: 18px; width: 18px; height: 18px; font-size: 11px; }

@@ -1029,6 +1029,12 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 /* Hryvnia Hub: compact category grid and merged category control */
 .search-input-row-stacked #searchInput { display: none; }
 .search-input-row-stacked .category-select-trigger { min-height: 74px; height: 74px; }
+/* General search filters are available only in All Categories mode. */
+.search-panel.category-mode .search-filters-row,
+.search-panel.category-mode #searchBtn { display: none !important; }
+.search-panel.category-mode .search-input-row { grid-template-columns: minmax(0, 1fr); }
+.search-filters-row > * { min-width: 0; }
+.search-filters-row input, .search-filters-row select { box-sizing: border-box; width: 100%; min-width: 0; }
 
 
 /* Hryvnia Hub: follow-up fixes */

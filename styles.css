@@ -1415,3 +1415,77 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 .listing-edit-form .edit-city-suggestion .city-suggestion-name { display: block; font-weight: 700; }
 .listing-edit-form .edit-city-suggestion .city-suggestion-region { display: block; margin-top: 2px; color: #617968; font-size: .82em; }
 .listing-edit-form .edit-city-suggestions .city-suggestion-empty { padding: 10px; color: #617968; }
+
+/* Final compact dark-green listing editor, aligned with the create-listing modal. */
+.listing-edit-dialog {
+  background: linear-gradient(160deg, #102b1e 0%, #173a29 100%);
+  color: #f4f8f2;
+  border: 1px solid rgba(212, 255, 0, .58);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, .48);
+}
+.listing-edit-header {
+  background: linear-gradient(110deg, #1b4933 0%, #244b30 72%, #304b20 100%);
+  border: 1px solid rgba(212, 255, 0, .25);
+  border-bottom-color: rgba(212, 255, 0, .38);
+}
+.listing-edit-header .eyebrow { color: #d4ff00; }
+.listing-edit-header h2,
+.listing-edit-form > label,
+.listing-edit-form .vehicle-listing-fields legend,
+.listing-edit-form .vehicle-listing-fields label,
+.listing-edit-form .hot-toggle { color: #f4f8f2; }
+.listing-edit-form { gap: 9px 12px; }
+.listing-edit-form > label { gap: 4px; font-size: .88rem; }
+.listing-edit-form input:not([type="checkbox"]),
+.listing-edit-form select,
+.listing-edit-form textarea {
+  padding: 9px 11px;
+  min-height: 40px;
+  border: 1px solid rgba(212, 255, 0, .55);
+  border-radius: 10px;
+  background: #f7f8f5;
+  color: #20382a;
+}
+.listing-edit-form input:focus,
+.listing-edit-form select:focus,
+.listing-edit-form textarea:focus {
+  border-color: #d4ff00;
+  box-shadow: 0 0 0 3px rgba(212, 255, 0, .2);
+}
+.listing-edit-form .vehicle-listing-fields {
+  gap: 8px 12px;
+  padding: 10px 12px 12px;
+  border: 1px solid rgba(212, 255, 0, .5);
+  border-radius: 13px;
+  background: linear-gradient(145deg, rgba(8, 27, 18, .62), rgba(27, 67, 43, .72));
+}
+.listing-edit-form .vehicle-listing-fields label { gap: 4px; font-size: .86rem; }
+.listing-edit-form .edit-actions { padding-top: 7px; border-top-color: rgba(212, 255, 0, .25); }
+.listing-edit-form .edit-actions button:not(.btn-primary) {
+  border-color: rgba(212, 255, 0, .55);
+  background: #203f2d;
+  color: #f4f8f2;
+}
+.listing-edit-form .edit-city-suggestions { border-color: #527c5c; }
+@media (max-width: 640px) {
+  .listing-edit-dialog { width: calc(100% - 14px); max-height: 94dvh; padding: 10px; border-radius: 15px; }
+  .listing-edit-header { padding: 9px 11px 10px; }
+  .listing-edit-form { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 9px; }
+  .listing-edit-form > label { font-size: .79rem; gap: 4px; }
+  .listing-edit-form input:not([type="checkbox"]),
+  .listing-edit-form select,
+  .listing-edit-form textarea { padding: 8px 9px; min-height: 38px; font-size: .88rem; }
+  .listing-edit-form .vehicle-listing-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 9px; gap: 8px; }
+  .listing-edit-form .vehicle-listing-fields label { font-size: .78rem; gap: 4px; }
+  .listing-edit-form > label:has(textarea[name="description"]),
+  .listing-edit-form > label:has(textarea[name="photo_urls"]),
+  .listing-edit-form .muted,
+  .listing-edit-form .form-message,
+  .listing-edit-form .edit-actions { grid-column: 1 / -1; }
+  .listing-edit-form .edit-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .listing-edit-form .edit-actions button { min-height: 39px; padding: 8px 10px; }
+}
+@media (max-width: 360px) {
+  .listing-edit-form { grid-template-columns: minmax(0, 1fr); }
+  .listing-edit-form .vehicle-listing-fields { grid-template-columns: minmax(0, 1fr); }
+}

@@ -147,17 +147,12 @@
 
   <div class="input-with-icon">
     <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-    <input id="catalogMinPriceInput" type="number" min="0" step="1" placeholder="Цена от" aria-label="Цена от" data-i18n-placeholder="Цена от" data-i18n-aria="Цена от">
-  </div>
-
-  <div class="input-with-icon">
-    <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-    <input id="catalogMaxPriceInput" type="number" min="0" step="1" placeholder="Цена до" aria-label="Цена до" data-i18n-placeholder="Цена до" data-i18n-aria="Цена до">
+    <input type="number" placeholder="Ціна (будь-яка)" aria-label="Цена" data-i18n-placeholder="Цена (любая)" data-i18n-aria="Цена">
   </div>
 
   <div class="select-with-icon">
     <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-    <select id="catalogRadiusSelect" aria-label="Радиус поиска" data-i18n-aria="Радиус поиска">
+    <select aria-label="Радиус поиска" data-i18n-aria="Радиус поиска">
       <option value="30" data-i18n="Радиус: 30 км">Радіус: 30 км</option>
       <option value="50" data-i18n="Радиус: 50 км">Радіус: 50 км</option>
       <option value="100" data-i18n="Радиус: 100 км">Радіус: 100 км</option>
@@ -246,8 +241,8 @@
 
   <div class="vehicle-search-backdrop hidden" id="vehicleSearchBackdrop"></div>
   <section class="vehicle-search-menu hidden" id="vehicleSearchMenu" role="dialog" aria-modal="true" aria-labelledby="vehicleSearchTitle">
-    <button class="category-menu-close" id="vehicleSearchClose" type="button" aria-label="Close">×</button>
-    <h2 id="vehicleSearchTitle">Автомобілі</h2>
+    <button class="category-menu-close" id="vehicleSearchClose" type="button" aria-label="Закрыть" data-i18n-aria="Закрыть">×</button>
+    <h2 id="vehicleSearchTitle" data-i18n="Автомобили">Автомобілі</h2>
     <p class="vehicle-search-intro">Оберіть параметри автомобіля</p>
     <div class="vehicle-search-grid" id="vehicleSearchMain">
       <label class="vehicle-make-filter">Марка
@@ -328,8 +323,7 @@
   <div class="modal hidden" id="addModal">
     <div class="modal-card">
       <button class="modal-close" id="closeAdd" type="button">×</button>
-      <p class="eyebrow">Новое объявление</p>
-      <h2>Добавить объявление</h2>
+      <h2 data-i18n="Добавить объявление">Добавить объявление</h2>
       <form id="addForm">
         <label class="listing-category-field hidden">Категория<select name="category" required><option value="Автомобили">Автомобили</option><option value="Недвижимость">Недвижимость</option><option value="Готовый бизнес">Готовый бизнес</option><option value="Инвестиции">Инвестиции</option></select></label>
         <label id="listingTitleField">Название<input name="title" required placeholder="Например: Skoda Octavia 1.6"></label>

@@ -262,6 +262,10 @@ const translations = {
   "Скинути": { ru: "Сбросить", uk: "Скинути", en: "Reset", pl: "Wyczyść" },
   "Знайти автомобілі": { ru: "Найти автомобили", uk: "Знайти автомобілі", en: "Find cars", pl: "Znajdź samochody" },
   "Оберіть параметри автомобіля": { ru:"Выберите параметры автомобиля", uk:"Оберіть параметри автомобіля", en:"Choose vehicle filters", pl:"Wybierz parametry pojazdu" },
+  "Будь-яка ціна": {ru:"Любая",uk:"Будь-яка ціна",en:"Any price",pl:"Dowolna cena"},
+  "Всі марки": {ru:"Все марки",uk:"Всі марки",en:"All makes",pl:"Wszystkie marki"},
+  "Всі моделі": {ru:"Все модели",uk:"Всі моделі",en:"All models",pl:"Wszystkie modele"},
+  "Закрити": {ru:"Закрыть",uk:"Закрити",en:"Close",pl:"Zamknij"},
   "Марка": { ru: "Марка", uk: "Марка", en: "Make", pl: "Marka" },
   "Модель": { ru: "Модель", uk: "Модель", en: "Model", pl: "Model" },
   "Рік від": { ru: "Год от", uk: "Рік від", en: "Year from", pl: "Rok od" },
@@ -294,7 +298,7 @@ const translations = {
   "Сірий": {ru:"Серый",uk:"Сірий",en:"Gray",pl:"Szary"}, "Сріблястий": {ru:"Серебристый",uk:"Сріблястий",en:"Silver",pl:"Srebrny"}, "Червоний": {ru:"Красный",uk:"Червоний",en:"Red",pl:"Czerwony"}, "Синій": {ru:"Синий",uk:"Синій",en:"Blue",pl:"Niebieski"},
   "Зелений": {ru:"Зелёный",uk:"Зелений",en:"Green",pl:"Zielony"}, "Коричневий": {ru:"Коричневый",uk:"Коричневий",en:"Brown",pl:"Brązowy"}, "Жовтий": {ru:"Жёлтый",uk:"Жовтий",en:"Yellow",pl:"Żółty"}, "Інший": {ru:"Другой",uk:"Інший",en:"Other",pl:"Inny"},
   "Будь-хто": {ru:"Любой",uk:"Будь-хто",en:"Any",pl:"Dowolny"}, "Приватна особа": {ru:"Частное лицо",uk:"Приватна особа",en:"Private seller",pl:"Osoba prywatna"}, "Компанія / автосалон": {ru:"Компания / автосалон",uk:"Компанія / автосалон",en:"Company / dealer",pl:"Firma / dealer"},
-  "Повний, що підключається": {ru:"Подключаемый полный привод",uk:"Повний, що підключається",en:"Selectable all-wheel drive",pl:"Dołączany napęd 4x4"}, "На ходу, технически исправен": {ru:"На ходу, технически исправен",uk:"На ходу, технічно справний",en:"Running, mechanically sound",pl:"Sprawny technicznie, jeździ"}, "Требует ремонта": {ru:"Требует ремонта",uk:"Потребує ремонту",en:"Needs repair",pl:"Wymaga naprawy"}, "Не на ходу": {ru:"Не на ходу",uk:"Не на ходу",en:"Not running",pl:"Niesprawny, nie jeździ"}, "Проблемы с документами": {ru:"Проблемы с документами",uk:"Проблеми з документами",en:"Document issues",pl:"Problemy z dokumentami"},
+  "Повний, що підключається": {ru:"Подключаемый полный привод",uk:"Повний, що підключається",en:"Selectable all-wheel drive",pl:"Dołączany napęd 4x4"}, "На ходу, технічно справний": {ru:"На ходу, технически исправно",uk:"На ходу, технічно справний",en:"Roadworthy and mechanically sound",pl:"Sprawny technicznie, jeżdżący"}, "Задовільний": {ru:"Удовлетворительное",uk:"Задовільний",en:"Fair",pl:"Zadowalający"}, "Потребує ремонту": {ru:"Требует ремонта",uk:"Потребує ремонту",en:"Needs repair",pl:"Wymaga naprawy"}, "Не на ходу": {ru:"Не на ходу",uk:"Не на ходу",en:"Not running",pl:"Niesprawny, nie jeździ"},
   "Потужність «від» не може бути більшою за «до». ": {ru:"Мощность «от» не может быть больше «до».",uk:"Потужність «від» не може бути більшою за «до».",en:"Power from cannot be greater than power to.",pl:"Moc od nie może być większa od mocy do."},
   "Седан": {ru:"Седан",uk:"Седан",en:"Sedan",pl:"Sedan"}, "Хетчбек": {ru:"Хэтчбек",uk:"Хетчбек",en:"Hatchback",pl:"Hatchback"}, "Універсал": {ru:"Универсал",uk:"Універсал",en:"Wagon",pl:"Kombi"}, "Позашляховик": {ru:"Внедорожник",uk:"Позашляховик",en:"SUV",pl:"SUV"}, "Купе": {ru:"Купе",uk:"Купе",en:"Coupe",pl:"Coupe"}, "Мінівен": {ru:"Минивэн",uk:"Мінівен",en:"Minivan",pl:"Minivan"}, "Пікап": {ru:"Пикап",uk:"Пікап",en:"Pickup",pl:"Pickup"},
   "Бензин": {ru:"Бензин",uk:"Бензин",en:"Petrol",pl:"Benzyna"}, "Дизель": {ru:"Дизель",uk:"Дизель",en:"Diesel",pl:"Diesel"}, "Газ/бензин": {ru:"Газ/бензин",uk:"Газ/бензин",en:"LPG/petrol",pl:"LPG/benzyna"}, "Електро": {ru:"Электро",uk:"Електро",en:"Electric",pl:"Elektryczny"}, "Гібрид": {ru:"Гибрид",uk:"Гібрид",en:"Hybrid",pl:"Hybryda"},
@@ -2957,10 +2961,25 @@ function translateVehicleSearchUI() {
   });
   const currencyLabel = document.getElementById("vehiclePriceCurrency")?.closest("label");
   if (currencyLabel) { const textNode = [...currencyLabel.childNodes].find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim()); if (textNode) textNode.textContent = t("Валюта") + " "; }
+  const placeholderKeys = {
+    vehicleYearFrom: "2010", vehicleYearTo: "2026", vehiclePriceFrom: "0",
+    vehiclePriceTo: "Будь-яка ціна", vehicleMileageFrom: "Будь-який", vehicleMileageTo: "Будь-який",
+    vehicleEngineFrom: "Будь-який", vehicleEngineTo: "Будь-який", vehiclePowerFrom: "Будь-яка", vehiclePowerTo: "Будь-яка"
+  };
+  Object.entries(placeholderKeys).forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    if (el) el.placeholder = key === "2010" || key === "2026" || key === "0" ? key : t(key);
+  });
+  const close = document.getElementById("vehicleSearchClose");
+  if (close) close.setAttribute("aria-label", t("Закрыть"));
+  const makeStatus = document.getElementById("vehicleMakeLoadStatus");
+  if (makeStatus && !makeStatus.textContent.trim()) makeStatus.textContent = "";
   const reset = document.getElementById("vehicleSearchReset");
   const apply = document.getElementById("vehicleSearchApply");
   if (reset) reset.textContent = t("Скинути");
   if (apply) apply.textContent = t("Знайти автомобілі");
+  const toggle = document.getElementById("vehicleSearchToggleAdvanced");
+  if (toggle) toggle.textContent = t(document.getElementById("vehicleSearchAdvanced")?.classList.contains("hidden") ? "Розширений пошук" : "Згорнути розширений пошук");
   setVehicleSearchAdvanced(Boolean(document.getElementById("vehicleSearchAdvanced") && !document.getElementById("vehicleSearchAdvanced").classList.contains("hidden")));
 }
 function translatePage(selectedLanguage) {

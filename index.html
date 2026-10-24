@@ -241,8 +241,8 @@
 
   <div class="vehicle-search-backdrop hidden" id="vehicleSearchBackdrop"></div>
   <section class="vehicle-search-menu hidden" id="vehicleSearchMenu" role="dialog" aria-modal="true" aria-labelledby="vehicleSearchTitle">
-    <button class="category-menu-close" id="vehicleSearchClose" type="button" aria-label="Close">×</button>
-    <h2 id="vehicleSearchTitle">Автомобілі</h2>
+    <button class="category-menu-close" id="vehicleSearchClose" type="button" aria-label="Закрыть" data-i18n-aria="Закрыть">×</button>
+    <h2 id="vehicleSearchTitle" data-i18n="Автомобили">Автомобілі</h2>
     <p class="vehicle-search-intro">Оберіть параметри автомобіля</p>
     <div class="vehicle-search-grid" id="vehicleSearchMain">
       <label class="vehicle-make-filter">Марка
@@ -323,8 +323,7 @@
   <div class="modal hidden" id="addModal">
     <div class="modal-card">
       <button class="modal-close" id="closeAdd" type="button">×</button>
-      <p class="eyebrow">Новое объявление</p>
-      <h2>Добавить объявление</h2>
+      <h2 data-i18n="Добавить объявление">Добавить объявление</h2>
       <form id="addForm">
         <label class="listing-category-field hidden">Категория<select name="category" required><option value="Автомобили">Автомобили</option><option value="Недвижимость">Недвижимость</option><option value="Готовый бизнес">Готовый бизнес</option><option value="Инвестиции">Инвестиции</option></select></label>
         <label id="listingTitleField">Название<input name="title" required placeholder="Например: Skoda Octavia 1.6"></label>

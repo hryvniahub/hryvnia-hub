@@ -2601,7 +2601,7 @@ function syncVehicleListingFields() {
   vehicleListingFields?.querySelectorAll("input,select").forEach(el => { el.disabled = !isVehicle; });
   if (listingTitleField) {
     listingTitleField.hidden = isVehicle;
-    const titleInput = listingTitleField.querySelector("input[name=\"title\"]");
+    const titleInput = listingTitleField.querySelector('input[name="title"]');
     if (titleInput) { titleInput.required = !isVehicle; titleInput.disabled = isVehicle; }
   }
   if (isVehicle) loadVehicleListingMakes();

@@ -47,7 +47,7 @@ const translations = {
   "Категорії": { ru: "Категории", uk: "Категорії", en: "Categories", pl: "Kategorie" },
   "Автомобили": { ru: "Автомобили", uk: "Автомобілі", en: "Cars", pl: "Samochody" },
   "Недвижимость": { ru: "Недвижимость", uk: "Нерухомість", en: "Real estate", pl: "Nieruchomości" },
-  "Готовый бизнес": { ru: "Готовый бизнес", uk: "Готовий бізнес", en: "Business", pl: "Gotowy biznes" },
+  "Готовый бизнес": { ru: "Готовый бизнес", uk: "Готовий бізнес", en: "Ready-made business", pl: "Gotowy biznes" },
   "Инвестиции": { ru: "Инвестиции", uk: "Інвестиції", en: "Investments", pl: "Inwestycje" },
   "Все категории": { ru: "Все категории", uk: "Усі категорії", en: "All categories", pl: "Wszystkie kategorie" },
   "Купівля автомобіля": { ru: "Покупка автомобиля", uk: "Купівля автомобіля", en: "Buy a car", pl: "Kupno samochodu" },
@@ -99,9 +99,6 @@ const translations = {
   "Найти": { ru: "Найти", uk: "Знайти", en: "Search", pl: "Szukaj" },
   "Все": { ru: "Все", uk: "Усі", en: "All", pl: "Wszystkie" },
   "Все объявления": { ru: "Все объявления", uk: "Усі оголошення", en: "All listings", pl: "Wszystkie ogłoszenia" },
-  "Автомобили": { ru: "Автомобили", uk: "Автомобілі", en: "Cars", pl: "Samochody" },
-  "Недвижимость": { ru: "Недвижимость", uk: "Нерухомість", en: "Real estate", pl: "Nieruchomości" },
-  "Готовый бизнес": { ru: "Готовый бизнес", uk: "Готовий бізнес", en: "Ready-made business", pl: "Gotowy biznes" },
   "Бизнес и предпринимательство": { ru: "Бизнес и предпринимательство", uk: "Бізнес і підприємництво", en: "Business & entrepreneurship", pl: "Biznes i przedsiębiorczość" },
   "Куплю автомобиль": { ru: "Куплю автомобиль", uk: "Куплю автомобіль", en: "Buy a car", pl: "Kupię samochód" },
   "Арендую автомобиль": { ru: "Арендую автомобиль", uk: "Орендую автомобіль", en: "Rent a car", pl: "Wynajmę samochód" },
@@ -112,15 +109,12 @@ const translations = {
   "Продам готовый бизнес": { ru: "Продам готовый бизнес", uk: "Продам готовий бізнес", en: "Sell an existing business", pl: "Sprzedam działającą firmę" },
   "Ищу бизнес-партнёра": { ru: "Ищу бизнес-партнёра", uk: "Шукаю бізнес-партнера", en: "Looking for a business partner", pl: "Szukam partnera biznesowego" },
   "Услуги": { ru: "Услуги", uk: "Послуги", en: "Services", pl: "Usługi" },
-  "Ищу бизнес-партнёра": { ru: "Ищу бизнес-партнёра", uk: "Шукаю бізнес-партнера", en: "Looking for a business partner", pl: "Szukam partnera biznesowego" },
-  "Услуги": { ru: "Услуги", uk: "Послуги", en: "Services", pl: "Usługi" },
   "Ищу инвестора": { ru: "Ищу инвестора", uk: "Шукаю інвестора", en: "Looking for an investor", pl: "Szukam inwestora" },
   "Стану инвестором": { ru: "Стану инвестором", uk: "Стану інвестором", en: "Become an investor", pl: "Zostanę inwestorem" },
   "Стартапы": { ru: "Стартапы", uk: "Стартапи", en: "Startups", pl: "Startupy" },
   "Столица Украины": { ru: "Столица Украины", uk: "Столиця України", en: "Capital of Ukraine", pl: "Stolica Ukrainy" },
   "Область / регион": { ru: "Область / регион", uk: "Область / регіон", en: "Region", pl: "Region" },
   "Закрыть": { ru: "Закрыть", uk: "Закрити", en: "Close", pl: "Zamknij" },
-  "Инвестиции": { ru: "Инвестиции", uk: "Інвестиції", en: "Investments", pl: "Inwestycje" },
   "Днепр": { ru: "Днепр", uk: "Дніпро", en: "Dnipro", pl: "Dniepr" },
   "Сумы": { ru: "Сумы", uk: "Суми", en: "Sumy", pl: "Sumy" },
   "Славянск": { ru: "Славянск", uk: "Слов'янськ", en: "Sloviansk", pl: "Słowiańsk" },
@@ -267,7 +261,7 @@ const translations = {
   "Згорнути розширений пошук": { ru: "Свернуть расширенный поиск", uk: "Згорнути розширений пошук", en: "Hide advanced search", pl: "Ukryj wyszukiwanie zaawansowane" },
   "Скинути": { ru: "Сбросить", uk: "Скинути", en: "Reset", pl: "Wyczyść" },
   "Знайти автомобілі": { ru: "Найти автомобили", uk: "Знайти автомобілі", en: "Find cars", pl: "Znajdź samochody" },
-  "Оберіть параметри автомобіля": { ru: "Выберите параметры автомобиля", uk: "Оберіть параметри автомобіля", en: "Choose car parameters", pl: "Wybierz parametry samochodu" },
+  "Оберіть параметри автомобіля": { ru:"Выберите параметры автомобиля", uk:"Оберіть параметри автомобіля", en:"Choose vehicle filters", pl:"Wybierz parametry pojazdu" },
   "Марка": { ru: "Марка", uk: "Марка", en: "Make", pl: "Marka" },
   "Модель": { ru: "Модель", uk: "Модель", en: "Model", pl: "Model" },
   "Рік від": { ru: "Год от", uk: "Рік від", en: "Year from", pl: "Rok od" },
@@ -292,7 +286,6 @@ const translations = {
   "Ціна «від» не може бути більшою за ціну «до».": { ru: "Цена «от» не может быть больше цены «до».", uk: "Ціна «від» не може бути більшою за ціну «до».", en: "Price from cannot be greater than price to.", pl: "Cena minimalna nie może być większa od maksymalnej." },
   "Пробіг «від» не може бути більшим за пробіг «до».": { ru: "Пробег «от» не может быть больше пробега «до».", uk: "Пробіг «від» не може бути більшим за пробіг «до».", en: "Mileage from cannot be greater than mileage to.", pl: "Przebieg od nie może być większy od przebiegu do." },
   "Об’єм двигуна «від» не може бути більшим за «до».": { ru: "Объём двигателя «от» не может быть больше «до».", uk: "Об’єм двигуна «від» не може бути більшим за «до».", en: "Engine size from cannot be greater than engine size to.", pl: "Pojemność silnika od nie może być większa od pojemności do." },
-  "Оберіть параметри автомобіля": { ru:"Выберите параметры автомобиля", uk:"Оберіть параметри автомобіля", en:"Choose vehicle filters", pl:"Wybierz parametry pojazdu" },
   "Валюта": {ru:"Валюта",uk:"Валюта",en:"Currency",pl:"Waluta"}, "Стан авто": {ru:"Состояние авто",uk:"Стан авто",en:"Vehicle status",pl:"Stan pojazdu"},
   "Потужність від, к. с.": {ru:"Мощность от, л. с.",uk:"Потужність від, к. с.",en:"Power from, hp",pl:"Moc od, KM"}, "Потужність до, к. с.": {ru:"Мощность до, л. с.",uk:"Потужність до, к. с.",en:"Power to, hp",pl:"Moc do, KM"},
   "Кількість дверей": {ru:"Количество дверей",uk:"Кількість дверей",en:"Number of doors",pl:"Liczba drzwi"}, "Привід": {ru:"Привод",uk:"Привід",en:"Drive type",pl:"Napęd"},
@@ -306,7 +299,6 @@ const translations = {
   "Седан": {ru:"Седан",uk:"Седан",en:"Sedan",pl:"Sedan"}, "Хетчбек": {ru:"Хэтчбек",uk:"Хетчбек",en:"Hatchback",pl:"Hatchback"}, "Універсал": {ru:"Универсал",uk:"Універсал",en:"Wagon",pl:"Kombi"}, "Позашляховик": {ru:"Внедорожник",uk:"Позашляховик",en:"SUV",pl:"SUV"}, "Купе": {ru:"Купе",uk:"Купе",en:"Coupe",pl:"Coupe"}, "Мінівен": {ru:"Минивэн",uk:"Мінівен",en:"Minivan",pl:"Minivan"}, "Пікап": {ru:"Пикап",uk:"Пікап",en:"Pickup",pl:"Pickup"},
   "Бензин": {ru:"Бензин",uk:"Бензин",en:"Petrol",pl:"Benzyna"}, "Дизель": {ru:"Дизель",uk:"Дизель",en:"Diesel",pl:"Diesel"}, "Газ/бензин": {ru:"Газ/бензин",uk:"Газ/бензин",en:"LPG/petrol",pl:"LPG/benzyna"}, "Електро": {ru:"Электро",uk:"Електро",en:"Electric",pl:"Elektryczny"}, "Гібрид": {ru:"Гибрид",uk:"Гібрид",en:"Hybrid",pl:"Hybryda"},
   "Механічна": {ru:"Механическая",uk:"Механічна",en:"Manual",pl:"Manualna"}, "Автоматична": {ru:"Автоматическая",uk:"Автоматична",en:"Automatic",pl:"Automatyczna"}, "Варіатор": {ru:"Вариатор",uk:"Варіатор",en:"CVT",pl:"CVT"}, "Робот": {ru:"Робот",uk:"Робот",en:"Automated manual",pl:"Automatyczna zautomatyzowana"},
-  "Усі марки": {ru:"Все марки",uk:"Усі марки",en:"All makes",pl:"Wszystkie marki"}, "Усі моделі": {ru:"Все модели",uk:"Усі моделі",en:"All models",pl:"Wszystkie modele"},
   "Передній": {ru:"Передний",uk:"Передній",en:"Front-wheel drive",pl:"Napęd na przednie koła"}, "Задній": {ru:"Задний",uk:"Задній",en:"Rear-wheel drive",pl:"Napęd na tylne koła"}, "Повний": {ru:"Полный",uk:"Повний",en:"All-wheel drive",pl:"Napęd na wszystkie koła"}
 };
 
@@ -2592,21 +2584,46 @@ const vehicleListingFields = document.getElementById("vehicleListingFields");
 const listingCategorySelect = addForm?.querySelector('select[name="category"]');
 const vehicleListingMake = document.getElementById("vehicleListingMake");
 const vehicleListingModel = document.getElementById("vehicleListingModel");
+const vehicleListingMakeSpinner = document.getElementById("vehicleListingMakeSpinner");
+const vehicleListingMakeStatus = document.getElementById("vehicleListingMakeStatus");
+const listingTitleField = document.getElementById("listingTitleField");
 function syncVehicleListingFields() {
-  const isVehicle = listingCategorySelect?.value === "Автомобили";
+  const category = listingCategorySelect?.value || "";
+  const isVehicle = category === "Автомобили";
+  const hidesManualTitle = isVehicle || category === "Недвижимость";
   if (vehicleListingFields) vehicleListingFields.hidden = !isVehicle;
   vehicleListingFields?.querySelectorAll("input,select").forEach(el => { el.disabled = !isVehicle; });
+  if (listingTitleField) {
+    listingTitleField.hidden = hidesManualTitle;
+    const titleInput = listingTitleField.querySelector('input[name="title"]');
+    if (titleInput) {
+      titleInput.required = !hidesManualTitle;
+      titleInput.disabled = hidesManualTitle;
+    }
+  }
   if (isVehicle) loadVehicleListingMakes();
 }
 async function loadVehicleListingMakes() {
-  if (!vehicleListingMake || !db || vehicleListingMake.dataset.loaded === "1") return;
+  if (!vehicleListingMake || !db || vehicleListingMake.dataset.loaded === "1" || vehicleListingMake.dataset.loading === "1") return;
+  vehicleListingMake.dataset.loading = "1";
+  vehicleListingMake.disabled = true;
+  vehicleListingMakeSpinner?.classList.remove("hidden");
+  if (vehicleListingMakeStatus) vehicleListingMakeStatus.textContent = "Загрузка марок автомобилей…";
   try {
     const data = await fetchAllVehicleModels();
     vehicleModelsCache = data;
     const makes = [...new Map(data.map(row => [row.make_slug,row.make_name])).entries()].sort((a,b) => a[1].localeCompare(b[1]));
     vehicleListingMake.innerHTML = '<option value="">Выберите марку</option>' + makes.map(([slug,name]) => `<option value="${escapeHtml(slug)}">${escapeHtml(name)}</option>`).join("");
     vehicleListingMake.dataset.loaded = "1";
-  } catch (error) { console.error("Не удалось загрузить каталог автомобилей", error); }
+    if (vehicleListingMakeStatus) vehicleListingMakeStatus.textContent = makes.length ? "" : "Марки автомобилей не найдены.";
+  } catch (error) {
+    console.error("Не удалось загрузить каталог автомобилей", error);
+    if (vehicleListingMakeStatus) vehicleListingMakeStatus.textContent = "Не удалось загрузить марки. Закройте и откройте форму повторно.";
+  } finally {
+    vehicleListingMake.dataset.loading = "0";
+    vehicleListingMake.disabled = false;
+    vehicleListingMakeSpinner?.classList.add("hidden");
+  }
 }
 vehicleListingMake?.addEventListener("change", () => {
   const make = vehicleListingMake.value;
@@ -2689,7 +2706,7 @@ document.getElementById("vehicleSearchReset")?.addEventListener("click", () => {
 document.getElementById("vehicleSearchApply")?.addEventListener("click", () => {
   currentCategory = "Автомобили"; closeVehicleSearch(); loadListings();
 });
-document.addEventListener("keydown", event => { if (event.key === "Escape") { closeCategoryMenu(); closeVehicleSearch(); } });
+document.addEventListener("keydown", event => { if (event.key === "Escape") { closeCategoryMenu(); closeVehicleSearch(); closeAddCategoryMenu(); } });
 if (searchBtn) searchBtn.addEventListener("click", loadListings);
 if (searchInput) searchInput.addEventListener("keydown", e => { if (e.key === "Enter") loadListings(); });
 
@@ -2710,6 +2727,37 @@ if (openAddBtn) openAddBtn.addEventListener("click", () => {
     }
     return;
   }
+  openAddCategoryMenu();
+});
+const addCategoryMenu = document.getElementById("addCategoryMenu");
+const addCategoryBackdrop = document.getElementById("addCategoryBackdrop");
+function closeAddCategoryMenu() {
+  addCategoryMenu?.classList.add("hidden");
+  addCategoryBackdrop?.classList.add("hidden");
+}
+function openAddCategoryMenu() {
+  if (!addCategoryMenu) {
+    addModal?.classList.remove("hidden");
+    return;
+  }
+  closeCategoryMenu();
+  closeVehicleSearch();
+  addCategoryMenu.classList.remove("hidden");
+  addCategoryBackdrop?.classList.remove("hidden");
+}
+document.getElementById("addCategoryClose")?.addEventListener("click", closeAddCategoryMenu);
+addCategoryBackdrop?.addEventListener("click", closeAddCategoryMenu);
+document.getElementById("addCategoryOptions")?.addEventListener("click", event => {
+  const option = event.target.closest("[data-add-category]");
+  if (!option) return;
+  const category = option.dataset.addCategory;
+  const categorySelect = addForm?.querySelector('select[name="category"]');
+  if (!categorySelect || ![...categorySelect.options].some(item => item.value === category)) return;
+  categorySelect.value = category;
+  categorySelect.dispatchEvent(new Event("change", { bubbles: true }));
+  // Re-sync visibility before showing the form, so vehicle listings start directly at car characteristics.
+  syncVehicleListingFields();
+  closeAddCategoryMenu();
   addModal?.classList.remove("hidden");
 });
 const closeAddBtn = document.getElementById("closeAdd");
@@ -2740,14 +2788,22 @@ if (addForm) {
       citySearchInput?.focus();
       return;
     }
+    const selectedCategory = String(form.get("category") || "");
+    const vehicleMakeName = vehicleListingMake?.selectedOptions?.[0]?.textContent?.trim() || "";
+    const vehicleModelName = vehicleListingModel?.selectedOptions?.[0]?.textContent?.trim() || "";
+    const description = String(form.get("description") || "").trim();
+    const generatedVehicleTitle = selectedCategory === "Автомобили" ? [vehicleMakeName, vehicleModelName].filter(Boolean).join(" ") : "";
+    const generatedRealEstateTitle = selectedCategory === "Недвижимость"
+      ? (description.split(/\r?\n/)[0].trim().slice(0, 100) || (translations["Недвижимость"]?.[lang] || "Недвижимость"))
+      : "";
     const payload = {
-      category: form.get("category"),
-      title: form.get("title"),
+      category: selectedCategory,
+      title: selectedCategory === "Автомобили" ? generatedVehicleTitle : selectedCategory === "Недвижимость" ? generatedRealEstateTitle : String(form.get("title") || "").trim(),
       city_id: Number(form.get("city_id")),
       price: Number(form.get("price")),
-      description: form.get("description") || "",
-      is_hot: Boolean(form.get("is_hot")),
-      is_urgent: Boolean(form.get("is_urgent")),
+      description,
+      is_hot: false,
+      is_urgent: false,
       user_id: currentUser.id
     };
     if (form.get("category") === "Автомобили") {
@@ -2777,6 +2833,7 @@ if (addForm) {
         else vehicleListingModel?.focus();
         return;
       }
+      payload.title = [makeRow.make_name, modelRow.model_name].filter(Boolean).join(" ");
       Object.assign(payload, {
         vehicle_make_slug: makeSlug,
         vehicle_make_name: makeRow.make_name,
@@ -2795,6 +2852,12 @@ if (addForm) {
         vehicle_color: form.get("vehicle_color") || null,
         seller_type: form.get("seller_type") || "private"
       });
+    }
+    if (!String(payload.title || "").trim()) {
+      if (formMessage) formMessage.textContent = "Выберите марку и модель автомобиля или добавьте описание объявления.";
+      if (selectedCategory === "Автомобили") vehicleListingMake?.focus();
+      else addForm?.querySelector('textarea[name="description"]')?.focus();
+      return;
     }
     const selectedListingConditionIds = form.get("category") === "Автомобили" ? getSelectedConditionIds("vehicleListingConditions") : [];
     const withPhotos = selectedPhotos.length > 0;
@@ -2921,6 +2984,7 @@ function translatePage(selectedLanguage) {
   translateVehicleSearchUI();
   if (typeof rerenderConditionsOnLangChange === "function") rerenderConditionsOnLangChange();
   translateTextElement(document.getElementById("openAdd"), "+ Добавить объявление");
+  translateTextElement(document.getElementById("addCategoryTitle"), "Выберите категорию объявления");
   const heroTitle = document.querySelector(".hero h1");
   if (heroTitle) {
     const title = translations["Найди выгодное"];
@@ -2948,7 +3012,7 @@ function translatePage(selectedLanguage) {
   if (addModal) {
     translateTextElement(addModal.querySelector(".eyebrow"), "Новое объявление");
     translateTextElement(addModal.querySelector("h2"), "Добавить объявление");
-    const labels = addModal.querySelectorAll("label");
+    const labels = [...addModal.querySelector("#addForm").children].filter(el => el.tagName === "LABEL");
     const labelKeys = ["Категория", "Название", "Город", "Область / регион", "Цена, грн", "Описание"];
     labels.forEach((label, index) => {
       const key = labelKeys[index];

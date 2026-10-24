@@ -347,8 +347,11 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
   /* Категории */
   .categories-grid { grid-template-columns: repeat(2, 1fr); column-gap: 8px; row-gap: 0; }
   .category-card { aspect-ratio: 3 / 1; padding: 8px; }
-  .category-card-label { font-size: 14px; gap: 4px; flex-direction: column; }
-  .category-icon { width: 20px; height: 20px; flex: 0 0 20px; }
+  .category-card-label { font-size: 24px; gap: 5px; flex-direction: row; align-items: center; justify-content: center; }
+  .category-icon { width: 24px; height: 24px; flex: 0 0 24px; }
+  .category-card-label > span[data-i18n] { min-width: 0; }
+  .category-card[data-category="Готовый бизнес"] .category-card-label > span[data-i18n] { text-align: center; line-height: 1.02; }
+  .category-card[data-category="Готовый бизнес"] .category-card-long-word { display: block; font-size: 1em; white-space: normal; }
 
   .all-btn { width: 54px; height: 30px; font-size: 10px; }
 
@@ -945,10 +948,10 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
   body { padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px)); }
   /* Единые мобильные настройки баннера: без повторных переопределений */
   .main-banner { height: 56px; padding: 4px 10px 15px; }
-  .banner-content { gap: 2px; padding-bottom: 7px; }
-  .banner-title { font-size: 18px; line-height: 1.05; }
+  .banner-content { gap: 2px; padding-bottom: 7px; transform: translateY(4px); }
+  .banner-title { font-size: 16px; line-height: 1.05; transform: none; }
   .banner-title::after { width: 25px; height: 2px; margin-top: 2px; }
-  .hero-text { font-size: 12px; line-height: 1.1; }
+  .hero-text { font-size: 14px; line-height: 1.1; }
   .banner-icons { bottom: 3px; gap: 12px; }
   .banner-icon { width: 14px; height: 14px; }
   .ticker-icon { flex-basis: 18px; width: 18px; height: 18px; font-size: 11px; }

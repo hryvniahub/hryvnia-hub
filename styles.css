@@ -130,15 +130,22 @@ button { font-family: inherit; }
   position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;
 }
 .category-card-label {
-  position: relative; z-index: 2; font-weight: 800; font-size: clamp(20px, 1.7vw, 24px);
+  position: relative; z-index: 2; font-weight: 800; font-size: clamp(21px, 1.7vw, 24px);
   line-height: 1.1; text-shadow: 0 2px 4px rgba(0,0,0,0.8);
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   width: 100%;
 }
 
 .category-card-long-word {
-  font-size: 0.7em;
+  font-size: 18px;
   white-space: nowrap;
+}
+
+/* Компьютерная версия: освобождаем место от центральной кнопки «Усі». */
+@media (min-width: 721px) {
+  .category-card[data-category="Недвижимость"] .category-card-label {
+    transform: translateX(-10px);
+  }
 }
 
 /* Иконки категорий (уменьшены) */

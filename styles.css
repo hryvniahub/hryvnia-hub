@@ -1108,6 +1108,9 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 .add-category-menu .category-menu-option:last-child { border-bottom: 0; }
 
 
+/* Explicitly respect hidden on form labels; the grid label rule must not override it. */
+#addModal #addForm [hidden] { display: none !important; }
+
 /* --- Обновлённая форма создания объявления: единый стиль с поиском авто --- */
 #addModal {
   z-index: 1001;
@@ -1293,5 +1296,4 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 #addModal #vehicleListingMake:disabled { opacity: .82; cursor: progress; }
 #addModal #vehicleListingMakeSpinner { border-color: rgba(32,53,43,.2); border-top-color: var(--accent, #d4ff00); border-right-color: var(--accent, #d4ff00); }
 #addModal #vehicleListingMakeStatus { color: rgba(247,249,245,.78); }
-#addModal #listingTitleField[hidden] { display: none !important; }
 

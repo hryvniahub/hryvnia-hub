@@ -335,8 +335,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
    МОБИЛЬНАЯ АДАПТАЦИЯ (≤ 720px)
    ============================================================ */
 @media (max-width: 720px) {
-  .vehicle-price-range { grid-template-columns: minmax(0,1fr) 88px minmax(0,1fr); gap: 7px; }
-  .vehicle-price-range label { font-size: 12px; }
   .container { width: calc(100% - 16px); } /* Уменьшили отступы по краям с 16 до 8 пикселей */
 
   /* Шапка */
@@ -950,8 +948,6 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 
 /* Адаптация восстановленных компонентов */
 @media (max-width: 720px) {
-  .vehicle-price-range { grid-template-columns: minmax(0,1fr) 88px minmax(0,1fr); gap: 7px; }
-  .vehicle-price-range label { font-size: 12px; }
   body { padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px)); }
   /* Единые мобильные настройки баннера: без повторных переопределений */
   .main-banner { height: 56px; padding: 4px 10px 15px; }
@@ -1033,17 +1029,10 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 /* Hryvnia Hub: compact category grid and merged category control */
 .search-input-row-stacked #searchInput { display: none; }
 .search-input-row-stacked .category-select-trigger { min-height: 74px; height: 74px; }
-@media (max-width: 720px) {
-  .vehicle-price-range { grid-template-columns: minmax(0,1fr) 88px minmax(0,1fr); gap: 7px; }
-  .vehicle-price-range label { font-size: 12px; }
-  .search-input-row-stacked .category-select-trigger { min-height: 74px; height: 74px; }
-}
 
 
 /* Hryvnia Hub: follow-up fixes */
 @media (max-width: 720px) {
-  .vehicle-price-range { grid-template-columns: minmax(0,1fr) 88px minmax(0,1fr); gap: 7px; }
-  .vehicle-price-range label { font-size: 12px; }
   /* Keep a tiny visible separation between the two category-card rows. */
   .categories-grid { row-gap: 2px; }
 }
@@ -1099,3 +1088,201 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
     order: -1;
   }
 }
+
+
+/* Компактный выбор категории перед созданием объявления */
+.add-category-menu { width: min(92vw, 390px); max-height: min(78dvh, 480px); padding: 18px; }
+.add-category-menu h2 { margin-bottom: 10px; padding-right: 20px; font-size: 20px; }
+.add-category-menu .category-menu-option { padding: 11px 6px; }
+.add-category-menu .category-menu-option:last-child { border-bottom: 0; }
+
+
+/* Explicitly respect hidden on form labels; the grid label rule must not override it. */
+#addModal #addForm [hidden] { display: none !important; }
+
+/* --- Обновлённая форма создания объявления: единый стиль с поиском авто --- */
+#addModal {
+  z-index: 1001;
+  padding: 12px;
+  background: rgba(8, 18, 13, .52);
+  -webkit-backdrop-filter: blur(8px) saturate(115%);
+  backdrop-filter: blur(8px) saturate(115%);
+}
+#addModal .modal-card {
+  width: min(92vw, 620px);
+  max-height: 88dvh;
+  overflow: auto;
+  padding: 24px;
+  border: 1px solid rgba(212,255,0,.45);
+  border-radius: 22px;
+  background: rgba(18,39,29,.98);
+  color: #f7f9f5;
+  box-shadow: 0 24px 80px rgba(0,0,0,.38);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+#addModal .modal-card .eyebrow {
+  margin: 0 42px 6px 0;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+#addModal .modal-card h2 {
+  margin: 0 40px 20px 0;
+  color: #fff;
+  font-size: clamp(22px, 4vw, 28px);
+  line-height: 1.15;
+}
+#addModal .modal-close {
+  top: 12px;
+  right: 12px;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 50%;
+  background: rgba(255,255,255,.07);
+  color: #f7f9f5;
+  font-size: 25px;
+}
+#addModal .modal-close:hover { background: rgba(212,255,0,.12); color: var(--accent); }
+#addModal #addForm {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+#addModal #addForm > label:not(.hot-toggle):not(.listing-category-field) {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  color: #f7f9f5;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.35;
+}
+#addModal #addForm > label:nth-of-type(2),
+#addModal #addForm > label:has(textarea),
+#addModal #addForm > .photo-fields,
+#addModal #addForm > button[type="submit"],
+#addModal #addForm > #formMessage {
+  grid-column: 1 / -1;
+}
+#addModal #addForm input:not([type="checkbox"]),
+#addModal #addForm select,
+#addModal #addForm textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(212,255,0,.42);
+  border-radius: 11px;
+  outline: none;
+  background: rgba(255,255,255,.97);
+  color: #20352b;
+  font: inherit;
+  font-weight: 400;
+  box-shadow: none;
+}
+#addModal #addForm textarea { min-height: 104px; resize: vertical; }
+#addModal #addForm input:focus,
+#addModal #addForm select:focus,
+#addModal #addForm textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(212,255,0,.14);
+}
+#addModal #addForm input::placeholder,
+#addModal #addForm textarea::placeholder { color: #7b827e; opacity: 1; }
+#addModal .vehicle-listing-fields,
+#addModal .photo-fields {
+  min-width: 0;
+  margin: 0;
+  padding: 14px;
+  border: 1px solid rgba(212,255,0,.58);
+  border-radius: 15px;
+  color: #f7f9f5;
+}
+#addModal .vehicle-listing-fields { grid-column: 1 / -1; gap: 12px; }
+#addModal .vehicle-listing-fields legend,
+#addModal .photo-fields legend {
+  padding: 0 7px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 750;
+}
+#addModal .vehicle-listing-fields label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  color: #f7f9f5;
+  font-size: 13px;
+  font-weight: 650;
+}
+#addModal .vehicle-listing-fields label[style*="grid-column"] { grid-column: 1 / -1; }
+#addModal .photo-fields { grid-column: 1 / -1; }
+#addModal .photo-fields .muted,
+#addModal .photo-fields .form-message { color: rgba(247,249,245,.72); }
+#addModal .hot-toggle {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 11px;
+  background: rgba(255,255,255,.045);
+  color: #f7f9f5;
+  font-size: 13px;
+}
+#addModal .hot-toggle input { width: 17px; height: 17px; accent-color: var(--accent); }
+#addModal #addForm > button[type="submit"] {
+  min-height: 48px;
+  margin-top: 2px;
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  background: var(--accent);
+  color: #1d2b21;
+  font-weight: 800;
+}
+#addModal #addForm > button[type="submit"]:hover { background: #e1ff45; }
+#addModal .form-message { color: rgba(247,249,245,.78); }
+#addModal .form-message.error { color: #ffb4a9; }
+#addModal .form-message.success { color: var(--accent); }
+#addModal .city-search { margin: 0; }
+#addModal .city-suggestions { z-index: 1100; }
+#addModal .listing-category-field { display: none !important; }
+
+@media (max-width: 520px) {
+  #addModal { place-items: center; padding: 8px; }
+  #addModal .modal-card { width: 100%; max-height: 84dvh; padding: 20px 15px; border-radius: 18px; }
+  #addModal #addForm { gap: 10px; }
+  #addModal #addForm > label:not(.hot-toggle):not(.listing-category-field) { font-size: 12px; }
+  #addModal #addForm input:not([type="checkbox"]),
+  #addModal #addForm select,
+  #addModal #addForm textarea { min-height: 42px; padding: 9px 10px; font-size: 14px; }
+  #addModal .vehicle-listing-fields { gap: 10px; padding: 12px 10px; }
+  #addModal .vehicle-listing-fields label { font-size: 12px; }
+  #addModal .vehicle-listing-fields legend,
+  #addModal .photo-fields legend { font-size: 14px; }
+}
+@media (max-width: 360px) {
+  #addModal .modal-card { padding: 18px 12px; }
+  #addModal #addForm { grid-template-columns: minmax(0, 1fr); }
+  #addModal #addForm > label,
+  #addModal #addForm > fieldset,
+  #addModal #addForm > button,
+  #addModal #addForm > p { grid-column: 1 / -1; }
+}
+
+
+/* Listing-form vehicle make loading state */
+#addModal #vehicleListingMake:disabled { opacity: .82; cursor: progress; }
+#addModal #vehicleListingMakeSpinner { border-color: rgba(32,53,43,.2); border-top-color: var(--accent, #d4ff00); border-right-color: var(--accent, #d4ff00); }
+#addModal #vehicleListingMakeStatus { color: rgba(247,249,245,.78); }
+

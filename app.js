@@ -246,6 +246,8 @@ const translations = {
   "Best offers below market price": { ru: "Лучшие предложения ниже рыночной цены", uk: "Найкращі пропозиції нижче ринкової ціни", en: "Best offers below market price", pl: "Najlepsze oferty poniżej ceny rynkowej" },
   "Urgent deals will appear here once listings are flagged as urgent in the database.": { ru: "Срочные предложения появятся здесь, когда объявления будут отмечены как срочные.", uk: "Термінові пропозиції з'являться тут, коли оголошення будуть позначені як термінові.", en: "Urgent deals will appear here once listings are flagged as urgent in the database.", pl: "Pilne okazje pojawią się tutaj, gdy ogłoszenia zostaną oznaczone jako pilne." },
   "Цена (любая)": { ru: "Цена (любая)", uk: "Ціна (будь-яка)", en: "Price (any)", pl: "Cena (dowolna)" },
+  "Цена от": { ru: "Цена от", uk: "Ціна від", en: "Price from", pl: "Cena od" },
+  "Цена до": { ru: "Цена до", uk: "Ціна до", en: "Price to", pl: "Cena do" },
   "Радиус поиска": { ru: "Радиус поиска", uk: "Радіус пошуку", en: "Search radius", pl: "Promień wyszukiwania" },
   "Радиус: 30 км": { ru: "Радиус: 30 км", uk: "Радіус: 30 км", en: "Radius: 30 km", pl: "Promień: 30 km" },
   "Радиус: 50 км": { ru: "Радиус: 50 км", uk: "Радіус: 50 км", en: "Radius: 50 km", pl: "Promień: 50 km" },
@@ -342,6 +344,9 @@ const listing = document.getElementById("listing");
 const resultCount = document.getElementById("resultCount");
 const searchInput = document.getElementById("searchInput");
 const searchBtn = document.getElementById("searchBtn");
+const catalogMinPriceInput = document.getElementById("catalogMinPriceInput");
+const catalogMaxPriceInput = document.getElementById("catalogMaxPriceInput");
+const catalogRadiusSelect = document.getElementById("catalogRadiusSelect");
 const catalogCitySearchInput = document.getElementById("catalogCitySearchInput");
 const catalogCitySuggestions = document.getElementById("catalogCitySuggestions");
 const catalogRegionSelect = document.getElementById("catalogRegionSelect");
@@ -1450,6 +1455,12 @@ async function runAiSearch() {
     if (currentCategory) query = query.eq("category", currentCategory);
     if (selectedCatalogCityId) query = query.eq("city_id", selectedCatalogCityId);
     else if (activeRegionCode) query = query.eq("cities.region_katottg_code", activeRegionCode);
+    if (!currentCategory) {
+      const minPrice = catalogMinPriceInput?.value.trim() ? Number(catalogMinPriceInput.value) : null;
+      const maxPrice = catalogMaxPriceInput?.value.trim() ? Number(catalogMaxPriceInput.value) : null;
+      if (minPrice !== null && Number.isFinite(minPrice) && minPrice >= 0) query = query.gte("price", minPrice);
+      if (maxPrice !== null && Number.isFinite(maxPrice) && maxPrice >= 0) query = query.lte("price", maxPrice);
+    }
     const { data, error } = await query;
     if (error) { alert(t("Ошибка") + ": " + error.message); return; }
     const items = data || [];
@@ -2213,8 +2224,17 @@ async function loadListings() {
   if (currentCategory) query = query.eq("category", currentCategory);
   if (selectedCatalogCityId) query = query.eq("city_id", selectedCatalogCityId);
   else if (activeRegionCode) query = query.eq("cities.region_katottg_code", activeRegionCode);
+  // Text in the legacy hidden field is retained for category subcategory keywords only.
   const term = searchInput?.value.trim();
-  if (term) query = query.or(`title.ilike.%${term}%,description.ilike.%${term}%`);
+  if (term && currentCategory) query = query.or(`title.ilike.%${term}%,description.ilike.%${term}%`);
+  const minPrice = !currentCategory && catalogMinPriceInput?.value.trim() !== "" ? Number(catalogMinPriceInput.value) : null;
+  const maxPrice = !currentCategory && catalogMaxPriceInput?.value.trim() !== "" ? Number(catalogMaxPriceInput.value) : null;
+  if (minPrice !== null && (!Number.isFinite(minPrice) || minPrice < 0) || maxPrice !== null && (!Number.isFinite(maxPrice) || maxPrice < 0) || minPrice !== null && maxPrice !== null && minPrice > maxPrice) {
+    alert(t("Перевірте числові значення фільтрів."));
+    return;
+  }
+  if (minPrice !== null) query = query.gte("price", minPrice);
+  if (maxPrice !== null) query = query.lte("price", maxPrice);
 
   vehicleClientFilters = null;
   if (currentCategory === "Автомобили") {
@@ -2425,6 +2445,16 @@ const categorySelectLabel = document.getElementById("categorySelectLabel");
 const vehicleSearchMenu = document.getElementById("vehicleSearchMenu");
 const vehicleSearchBackdrop = document.getElementById("vehicleSearchBackdrop");
 let selectedSearchCategory = "";
+function syncSearchModeUI() {
+  const panel = document.querySelector(".search-panel");
+  if (!panel) return;
+  const isAllCategories = !currentCategory;
+  panel.classList.toggle("all-category-mode", isAllCategories);
+  panel.classList.toggle("category-mode", !isAllCategories);
+  const filters = panel.querySelector(".search-filters-row");
+  if (filters) filters.setAttribute("aria-hidden", String(!isAllCategories));
+  if (searchBtn) searchBtn.setAttribute("aria-hidden", String(!isAllCategories));
+}
 let vehicleModelsCache = [];
 let vehicleModelsPromise = null;
 function closeCategoryMenu() {
@@ -2643,6 +2673,7 @@ categoryMenuOptions?.addEventListener("click", event => {
   if (option.hasAttribute("data-open-submenu")) {
     if (category === "Автомобили") {
       selectedSearchCategory = category; currentCategory = category;
+      syncSearchModeUI();
       if (categorySelectLabel) categorySelectLabel.textContent = t(category);
       document.querySelectorAll(".category").forEach(b => b.classList.toggle("active", (b.dataset.category || "") === category));
       openVehicleSearch();
@@ -2652,6 +2683,7 @@ categoryMenuOptions?.addEventListener("click", event => {
   }
   const subcategory = option.dataset.searchSubcategory;
   selectedSearchCategory = category; currentCategory = category;
+  syncSearchModeUI();
   if (subcategory && searchInput) searchInput.value = subcategory;
   if (categorySelectLabel) categorySelectLabel.textContent = category ? t(category === "Готовый бизнес" ? "Бизнес и предпринимательство" : category) : t("Все категории");
   document.querySelectorAll(".category").forEach(b => b.classList.toggle("active", (b.dataset.category || "") === category));
@@ -2669,6 +2701,7 @@ document.querySelectorAll(".category").forEach(button => {
     const category = button.dataset.category || "";
     if (button.classList.contains("category-card") && category) {
       selectedSearchCategory = category; currentCategory = category;
+      syncSearchModeUI();
       if (categorySelectLabel) categorySelectLabel.textContent = t(category === "Готовый бизнес" ? "Бизнес и предпринимательство" : category);
       if (category === "Автомобили") { openVehicleSearch(); return; }
       openCategoryMenu(category);
@@ -2676,6 +2709,7 @@ document.querySelectorAll(".category").forEach(button => {
     }
     document.querySelectorAll(".category").forEach(b => b.classList.remove("active")); button.classList.add("active");
     currentCategory = category; selectedSearchCategory = category;
+    syncSearchModeUI();
     if (categorySelectLabel) categorySelectLabel.textContent = category ? t(category) : t("Все категории");
     loadListings();
   });
@@ -2707,6 +2741,7 @@ document.getElementById("vehicleSearchApply")?.addEventListener("click", () => {
   currentCategory = "Автомобили"; closeVehicleSearch(); loadListings();
 });
 document.addEventListener("keydown", event => { if (event.key === "Escape") { closeCategoryMenu(); closeVehicleSearch(); closeAddCategoryMenu(); } });
+syncSearchModeUI();
 if (searchBtn) searchBtn.addEventListener("click", loadListings);
 if (searchInput) searchInput.addEventListener("keydown", e => { if (e.key === "Enter") loadListings(); });
 

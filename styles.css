@@ -328,8 +328,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
    МОБИЛЬНАЯ АДАПТАЦИЯ (≤ 720px)
    ============================================================ */
 @media (max-width: 720px) {
-  .vehicle-price-range { grid-template-columns: minmax(0,1fr) 88px minmax(0,1fr); gap: 7px; }
-  .vehicle-price-range label { font-size: 12px; }
   .container { width: calc(100% - 16px); } /* Уменьшили отступы по краям с 16 до 8 пикселей */
 
   /* Шапка */
@@ -949,8 +947,6 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 
 /* Адаптация восстановленных компонентов */
 @media (max-width: 720px) {
-  .vehicle-price-range { grid-template-columns: minmax(0,1fr) 88px minmax(0,1fr); gap: 7px; }
-  .vehicle-price-range label { font-size: 12px; }
   body { padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px)); }
   .main-banner { height: 56px; padding: 4px 10px 15px; }
   .banner-content { gap: 2px; padding-bottom: 17px; }
@@ -964,7 +960,6 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
   .ticker-value { font-size: 10px; }
   .ticker-arrow { font-size: 9px; }
   .search-panel { padding: 8px 10px; gap: 6px; }
-  .search-filters-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
   .ai-panel { padding: 8px; }
   .ai-panel h3 { font-size: 14px; }
   .ai-panel .ai-features { display: none; }
@@ -1021,7 +1016,7 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
   #openAdd::before { content: "+"; font-size: 18px; line-height: 1; font-weight: 800; }
 }
 
-@media (max-width: 420px) {
+@media (min-width: 361px) and (max-width: 420px) {
   .brand { gap: 4px; padding: 2px 5px; }
   .brand .logo { width: 22px; height: 22px; flex-basis: 22px; }
   .brand .brand-text { font-size: 11px; }
@@ -1032,16 +1027,7 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 .search-input-row-stacked #searchInput { display: none; }
 .search-input-row-stacked .category-select-trigger { min-height: 74px; height: 74px; }
 @media (max-width: 720px) {
-  .vehicle-price-range { grid-template-columns: minmax(0,1fr) 88px minmax(0,1fr); gap: 7px; }
-  .vehicle-price-range label { font-size: 12px; }
   .search-input-row-stacked .category-select-trigger { min-height: 74px; height: 74px; }
-}
-
-
-/* Hryvnia Hub: follow-up fixes */
-@media (max-width: 720px) {
-  .vehicle-price-range { grid-template-columns: minmax(0,1fr) 88px minmax(0,1fr); gap: 7px; }
-  .vehicle-price-range label { font-size: 12px; }
   /* Keep a tiny visible separation between the two category-card rows. */
   .categories-grid { row-gap: 2px; }
 }
@@ -1095,86 +1081,5 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
   .vehicle-search-actions .vehicle-search-toggle {
     flex: 1 1 100%;
     order: -1;
-  }
-}
-
-/* ============================================================
-   Hryvnia Hub — точечная настройка баннера и карточек категорий
-   Размеры баннера и карточек не меняются.
-   ============================================================ */
-.main-banner {
-  justify-content: center;
-}
-.banner-content {
-  width: 100%;
-  max-width: 100%;
-  padding-bottom: 10px;
-  gap: 4px;
-  text-align: center;
-  align-items: center;
-  transform: translateY(-2px);
-}
-.banner-title {
-  font-size: clamp(20px, 2.35vw, 29px);
-  line-height: 1.08;
-  max-width: 100%;
-  text-wrap: balance;
-}
-.hero-text {
-  font-size: clamp(12px, 1.35vw, 16px);
-  line-height: 1.15;
-  max-width: 100%;
-  text-wrap: balance;
-}
-.category-card-label {
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  white-space: nowrap;
-  font-size: clamp(15px, 1.75vw, 24px);
-  line-height: 1.05;
-  text-align: center;
-  transform: translateY(1px);
-}
-.category-icon {
-  flex: 0 0 28px;
-  width: 28px;
-  height: 28px;
-}
-.category-card-long-word {
-  font-size: .78em;
-  white-space: nowrap;
-}
-
-@media (max-width: 720px) {
-  .banner-content {
-    padding-bottom: 15px;
-    gap: 2px;
-    transform: translateY(-1px);
-  }
-  .banner-title {
-    font-size: clamp(13.5px, 3.8vw, 17px);
-    line-height: 1.05;
-  }
-  .hero-text {
-    font-size: clamp(10px, 2.8vw, 12px);
-    line-height: 1.05;
-  }
-  .category-card-label {
-    flex-direction: row;
-    gap: 3px;
-    font-size: clamp(9px, 2.55vw, 12px);
-    line-height: 1.05;
-    white-space: nowrap;
-    transform: translateY(1px);
-  }
-  .category-icon {
-    flex: 0 0 18px;
-    width: 18px;
-    height: 18px;
-  }
-  .category-card-long-word {
-    font-size: .72em;
   }
 }

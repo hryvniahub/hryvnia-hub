@@ -2596,13 +2596,18 @@ const vehicleListingMakeSpinner = document.getElementById("vehicleListingMakeSpi
 const vehicleListingMakeStatus = document.getElementById("vehicleListingMakeStatus");
 const listingTitleField = document.getElementById("listingTitleField");
 function syncVehicleListingFields() {
-  const isVehicle = listingCategorySelect?.value === "Автомобили";
+  const category = listingCategorySelect?.value || "";
+  const isVehicle = category === "Автомобили";
+  const hidesManualTitle = isVehicle || category === "Недвижимость";
   if (vehicleListingFields) vehicleListingFields.hidden = !isVehicle;
   vehicleListingFields?.querySelectorAll("input,select").forEach(el => { el.disabled = !isVehicle; });
   if (listingTitleField) {
-    listingTitleField.hidden = isVehicle;
+    listingTitleField.hidden = hidesManualTitle;
     const titleInput = listingTitleField.querySelector('input[name="title"]');
-    if (titleInput) { titleInput.required = !isVehicle; titleInput.disabled = isVehicle; }
+    if (titleInput) {
+      titleInput.required = !hidesManualTitle;
+      titleInput.disabled = hidesManualTitle;
+    }
   }
   if (isVehicle) loadVehicleListingMakes();
 }
@@ -2791,16 +2796,20 @@ if (addForm) {
       citySearchInput?.focus();
       return;
     }
-    const selectedCategory = form.get("category");
+    const selectedCategory = String(form.get("category") || "");
     const vehicleMakeName = vehicleListingMake?.selectedOptions?.[0]?.textContent?.trim() || "";
     const vehicleModelName = vehicleListingModel?.selectedOptions?.[0]?.textContent?.trim() || "";
+    const description = String(form.get("description") || "").trim();
     const generatedVehicleTitle = selectedCategory === "Автомобили" ? [vehicleMakeName, vehicleModelName].filter(Boolean).join(" ") : "";
+    const generatedRealEstateTitle = selectedCategory === "Недвижимость"
+      ? (description.split(/\r?\n/)[0].trim().slice(0, 100) || (translations["Недвижимость"]?.[lang] || "Недвижимость"))
+      : "";
     const payload = {
       category: selectedCategory,
-      title: selectedCategory === "Автомобили" ? generatedVehicleTitle : String(form.get("title") || "").trim(),
+      title: selectedCategory === "Автомобили" ? generatedVehicleTitle : selectedCategory === "Недвижимость" ? generatedRealEstateTitle : String(form.get("title") || "").trim(),
       city_id: Number(form.get("city_id")),
       price: Number(form.get("price")),
-      description: form.get("description") || "",
+      description,
       is_hot: false,
       is_urgent: false,
       user_id: currentUser.id
@@ -2832,6 +2841,7 @@ if (addForm) {
         else vehicleListingModel?.focus();
         return;
       }
+      payload.title = [makeRow.make_name, modelRow.model_name].filter(Boolean).join(" ");
       Object.assign(payload, {
         vehicle_make_slug: makeSlug,
         vehicle_make_name: makeRow.make_name,
@@ -2850,6 +2860,12 @@ if (addForm) {
         vehicle_color: form.get("vehicle_color") || null,
         seller_type: form.get("seller_type") || "private"
       });
+    }
+    if (!String(payload.title || "").trim()) {
+      if (formMessage) formMessage.textContent = "Выберите марку и модель автомобиля или добавьте описание объявления.";
+      if (selectedCategory === "Автомобили") vehicleListingMake?.focus();
+      else addForm?.querySelector('textarea[name="description"]')?.focus();
+      return;
     }
     const selectedListingConditionIds = form.get("category") === "Автомобили" ? getSelectedConditionIds("vehicleListingConditions") : [];
     const withPhotos = selectedPhotos.length > 0;

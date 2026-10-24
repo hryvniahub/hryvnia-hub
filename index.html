@@ -227,6 +227,18 @@
     <div id="categoryMenuOptions" class="category-menu-options"></div>
   </section>
 
+  <div class="category-menu-backdrop hidden" id="addCategoryBackdrop"></div>
+  <section class="category-menu add-category-menu hidden" id="addCategoryMenu" role="dialog" aria-modal="true" aria-labelledby="addCategoryTitle">
+    <button class="category-menu-close" id="addCategoryClose" type="button" aria-label="Close">×</button>
+    <h2 id="addCategoryTitle" data-i18n="Выберите категорию объявления">Выберите категорию объявления</h2>
+    <div class="category-menu-options" id="addCategoryOptions">
+      <button type="button" class="category-menu-option" data-add-category="Автомобили"><span class="category-menu-icon" aria-hidden="true">🚗</span><span class="category-menu-option-label" data-i18n="Автомобили">Автомобілі</span><span aria-hidden="true">›</span></button>
+      <button type="button" class="category-menu-option" data-add-category="Недвижимость"><span class="category-menu-icon" aria-hidden="true">⌂</span><span class="category-menu-option-label" data-i18n="Недвижимость">Нерухомість</span><span aria-hidden="true">›</span></button>
+      <button type="button" class="category-menu-option" data-add-category="Готовый бизнес"><span class="category-menu-icon" aria-hidden="true">▣</span><span class="category-menu-option-label" data-i18n="Бизнес и предпринимательство">Бізнес і підприємництво</span><span aria-hidden="true">›</span></button>
+      <button type="button" class="category-menu-option" data-add-category="Инвестиции"><span class="category-menu-icon" aria-hidden="true">▥</span><span class="category-menu-option-label" data-i18n="Инвестиции">Інвестиції</span><span aria-hidden="true">›</span></button>
+    </div>
+  </section>
+
   <div class="vehicle-search-backdrop hidden" id="vehicleSearchBackdrop"></div>
   <section class="vehicle-search-menu hidden" id="vehicleSearchMenu" role="dialog" aria-modal="true" aria-labelledby="vehicleSearchTitle">
     <button class="category-menu-close" id="vehicleSearchClose" type="button" aria-label="Close">×</button>
@@ -314,7 +326,7 @@
       <p class="eyebrow">Новое объявление</p>
       <h2>Добавить объявление</h2>
       <form id="addForm">
-        <label>Категория<select name="category" required><option value="Автомобили">Автомобили</option><option value="Недвижимость">Недвижимость</option><option value="Готовый бизнес">Готовый бизнес</option><option value="Инвестиции">Инвестиции</option></select></label>
+        <label class="listing-category-field hidden">Категория<select name="category" required><option value="Автомобили">Автомобили</option><option value="Недвижимость">Недвижимость</option><option value="Готовый бизнес">Готовый бизнес</option><option value="Инвестиции">Инвестиции</option></select></label>
         <label>Название<input name="title" required placeholder="Например: Skoda Octavia 1.6"></label>
         <fieldset id="vehicleListingFields" class="vehicle-listing-fields" hidden>
           <legend>Характеристики автомобиля</legend>

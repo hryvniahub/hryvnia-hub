@@ -951,7 +951,7 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
   .banner-content { gap: 2px; padding-bottom: 0; }
   .banner-title { font-size: 16px; line-height: 1.05; transform: none; }
   .banner-title::after { width: 25px; height: 2px; margin-top: 2px; }
-  .hero-text { font-size: 13px; line-height: 1.1; }
+  .hero-text { font-size: 12px; line-height: 1.1; }
   .banner-icons { bottom: 3px; gap: 12px; }
   .banner-icon { width: 14px; height: 14px; }
   .ticker-icon { flex-basis: 18px; width: 18px; height: 18px; font-size: 11px; }

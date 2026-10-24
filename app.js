@@ -2689,7 +2689,7 @@ document.getElementById("vehicleSearchReset")?.addEventListener("click", () => {
 document.getElementById("vehicleSearchApply")?.addEventListener("click", () => {
   currentCategory = "Автомобили"; closeVehicleSearch(); loadListings();
 });
-document.addEventListener("keydown", event => { if (event.key === "Escape") { closeCategoryMenu(); closeVehicleSearch(); } });
+document.addEventListener("keydown", event => { if (event.key === "Escape") { closeCategoryMenu(); closeVehicleSearch(); closeAddCategoryMenu(); } });
 if (searchBtn) searchBtn.addEventListener("click", loadListings);
 if (searchInput) searchInput.addEventListener("keydown", e => { if (e.key === "Enter") loadListings(); });
 
@@ -2710,6 +2710,35 @@ if (openAddBtn) openAddBtn.addEventListener("click", () => {
     }
     return;
   }
+  openAddCategoryMenu();
+});
+const addCategoryMenu = document.getElementById("addCategoryMenu");
+const addCategoryBackdrop = document.getElementById("addCategoryBackdrop");
+function closeAddCategoryMenu() {
+  addCategoryMenu?.classList.add("hidden");
+  addCategoryBackdrop?.classList.add("hidden");
+}
+function openAddCategoryMenu() {
+  if (!addCategoryMenu) {
+    addModal?.classList.remove("hidden");
+    return;
+  }
+  closeCategoryMenu();
+  closeVehicleSearch();
+  addCategoryMenu.classList.remove("hidden");
+  addCategoryBackdrop?.classList.remove("hidden");
+}
+document.getElementById("addCategoryClose")?.addEventListener("click", closeAddCategoryMenu);
+addCategoryBackdrop?.addEventListener("click", closeAddCategoryMenu);
+document.getElementById("addCategoryOptions")?.addEventListener("click", event => {
+  const option = event.target.closest("[data-add-category]");
+  if (!option) return;
+  const category = option.dataset.addCategory;
+  const categorySelect = addForm?.querySelector('select[name="category"]');
+  if (!categorySelect || ![...categorySelect.options].some(item => item.value === category)) return;
+  categorySelect.value = category;
+  categorySelect.dispatchEvent(new Event("change", { bubbles: true }));
+  closeAddCategoryMenu();
   addModal?.classList.remove("hidden");
 });
 const closeAddBtn = document.getElementById("closeAdd");
@@ -2921,6 +2950,7 @@ function translatePage(selectedLanguage) {
   translateVehicleSearchUI();
   if (typeof rerenderConditionsOnLangChange === "function") rerenderConditionsOnLangChange();
   translateTextElement(document.getElementById("openAdd"), "+ Добавить объявление");
+  translateTextElement(document.getElementById("addCategoryTitle"), "Выберите категорию объявления");
   const heroTitle = document.querySelector(".hero h1");
   if (heroTitle) {
     const title = translations["Найди выгодное"];

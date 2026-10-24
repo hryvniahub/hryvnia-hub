@@ -2592,21 +2592,41 @@ const vehicleListingFields = document.getElementById("vehicleListingFields");
 const listingCategorySelect = addForm?.querySelector('select[name="category"]');
 const vehicleListingMake = document.getElementById("vehicleListingMake");
 const vehicleListingModel = document.getElementById("vehicleListingModel");
+const vehicleListingMakeSpinner = document.getElementById("vehicleListingMakeSpinner");
+const vehicleListingMakeStatus = document.getElementById("vehicleListingMakeStatus");
+const listingTitleField = document.getElementById("listingTitleField");
 function syncVehicleListingFields() {
   const isVehicle = listingCategorySelect?.value === "Автомобили";
   if (vehicleListingFields) vehicleListingFields.hidden = !isVehicle;
   vehicleListingFields?.querySelectorAll("input,select").forEach(el => { el.disabled = !isVehicle; });
+  if (listingTitleField) {
+    listingTitleField.hidden = isVehicle;
+    const titleInput = listingTitleField.querySelector("input[name=\"title\"]");
+    if (titleInput) { titleInput.required = !isVehicle; titleInput.disabled = isVehicle; }
+  }
   if (isVehicle) loadVehicleListingMakes();
 }
 async function loadVehicleListingMakes() {
-  if (!vehicleListingMake || !db || vehicleListingMake.dataset.loaded === "1") return;
+  if (!vehicleListingMake || !db || vehicleListingMake.dataset.loaded === "1" || vehicleListingMake.dataset.loading === "1") return;
+  vehicleListingMake.dataset.loading = "1";
+  vehicleListingMake.disabled = true;
+  vehicleListingMakeSpinner?.classList.remove("hidden");
+  if (vehicleListingMakeStatus) vehicleListingMakeStatus.textContent = "Загрузка марок автомобилей…";
   try {
     const data = await fetchAllVehicleModels();
     vehicleModelsCache = data;
     const makes = [...new Map(data.map(row => [row.make_slug,row.make_name])).entries()].sort((a,b) => a[1].localeCompare(b[1]));
     vehicleListingMake.innerHTML = '<option value="">Выберите марку</option>' + makes.map(([slug,name]) => `<option value="${escapeHtml(slug)}">${escapeHtml(name)}</option>`).join("");
     vehicleListingMake.dataset.loaded = "1";
-  } catch (error) { console.error("Не удалось загрузить каталог автомобилей", error); }
+    if (vehicleListingMakeStatus) vehicleListingMakeStatus.textContent = makes.length ? "" : "Марки автомобилей не найдены.";
+  } catch (error) {
+    console.error("Не удалось загрузить каталог автомобилей", error);
+    if (vehicleListingMakeStatus) vehicleListingMakeStatus.textContent = "Не удалось загрузить марки. Закройте и откройте форму повторно.";
+  } finally {
+    vehicleListingMake.dataset.loading = "0";
+    vehicleListingMake.disabled = false;
+    vehicleListingMakeSpinner?.classList.add("hidden");
+  }
 }
 vehicleListingMake?.addEventListener("change", () => {
   const make = vehicleListingMake.value;
@@ -2769,14 +2789,18 @@ if (addForm) {
       citySearchInput?.focus();
       return;
     }
+    const selectedCategory = form.get("category");
+    const vehicleMakeName = vehicleListingMake?.selectedOptions?.[0]?.textContent?.trim() || "";
+    const vehicleModelName = vehicleListingModel?.selectedOptions?.[0]?.textContent?.trim() || "";
+    const generatedVehicleTitle = selectedCategory === "Автомобили" ? [vehicleMakeName, vehicleModelName].filter(Boolean).join(" ") : "";
     const payload = {
-      category: form.get("category"),
-      title: form.get("title"),
+      category: selectedCategory,
+      title: selectedCategory === "Автомобили" ? generatedVehicleTitle : String(form.get("title") || "").trim(),
       city_id: Number(form.get("city_id")),
       price: Number(form.get("price")),
       description: form.get("description") || "",
-      is_hot: Boolean(form.get("is_hot")),
-      is_urgent: Boolean(form.get("is_urgent")),
+      is_hot: false,
+      is_urgent: false,
       user_id: currentUser.id
     };
     if (form.get("category") === "Автомобили") {
@@ -2978,7 +3002,7 @@ function translatePage(selectedLanguage) {
   if (addModal) {
     translateTextElement(addModal.querySelector(".eyebrow"), "Новое объявление");
     translateTextElement(addModal.querySelector("h2"), "Добавить объявление");
-    const labels = addModal.querySelectorAll("label");
+    const labels = [...addModal.querySelector("#addForm").children].filter(el => el.tagName === "LABEL");
     const labelKeys = ["Категория", "Название", "Город", "Область / регион", "Цена, грн", "Описание"];
     labels.forEach((label, index) => {
       const key = labelKeys[index];

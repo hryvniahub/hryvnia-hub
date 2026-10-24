@@ -43,7 +43,6 @@
     </div>
   </header>
 
-  <!-- Скрытые элементы мобильного меню (добавлен класс hidden) -->
   <label for="menuToggle" class="mobile-menu-overlay hidden" aria-hidden="true"></label>
   <nav class="mobile-menu hidden" aria-label="Mobile menu">
     <div class="mobile-menu-header">
@@ -139,7 +138,7 @@
     </div>
     <div id="catalogCitySuggestions" class="catalog-city-suggestions" role="listbox" hidden></div>
   </div>
-  
+
   <div class="select-with-icon">
     <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
     <select id="catalogRegionSelect" aria-label="Область" data-i18n-aria="Область"><option value="">Всі області</option></select>
@@ -197,7 +196,6 @@
 
   <footer class="footer"><div class="container">© 2026 Hryvnia Hub · MVP</div></footer>
 
-  <!-- Нижняя навигация с нормальными SVG иконками -->
   <nav class="bottom-nav" aria-label="Bottom navigation">
     <button class="bottom-nav-btn active" data-nav="home" type="button" aria-label="Главная">
       <span class="bottom-nav-icon" aria-hidden="true">
@@ -249,74 +247,45 @@
         <span class="vehicle-make-control"><select id="vehicleSearchMake" aria-describedby="vehicleMakeLoadStatus"><option value="">Усі марки</option></select><span class="vehicle-make-spinner hidden" id="vehicleMakeSpinner" aria-hidden="true"></span></span>
         <span class="vehicle-make-load-status" id="vehicleMakeLoadStatus" role="status" aria-live="polite"></span>
       </label>
-      <label>Модель
-        <select id="vehicleSearchModel" disabled><option value="">Усі моделі</option></select>
-      </label>
-      <label>Рік від
-        <input id="vehicleYearFrom" type="number" min="1900" max="2100" placeholder="2010">
-      </label>
-      <label>Рік до
-        <input id="vehicleYearTo" type="number" min="1900" max="2100" placeholder="2026">
-      </label>
+      <label>Модель<select id="vehicleSearchModel" disabled><option value="">Спочатку оберіть марку</option></select></label>
+      <label>Рік від<input id="vehicleYearFrom" type="number" min="1900" max="2100" inputmode="numeric" placeholder="2010"></label>
+      <label>Рік до<input id="vehicleYearTo" type="number" min="1900" max="2100" inputmode="numeric" placeholder="2024"></label>
       <div class="vehicle-price-range">
-        <label>Ціна від<input id="vehiclePriceFrom" type="number" min="0" placeholder="0"></label>
-        <label class="vehicle-currency-label">Валюта<select id="vehiclePriceCurrency" aria-label="Валюта ціни"><option value="UAH">₴ UAH</option><option value="USD">$ USD</option></select></label>
-        <label>Ціна до<input id="vehiclePriceTo" type="number" min="0" placeholder="Будь-яка"></label>
+        <label>Ціна від<input id="vehiclePriceFrom" type="number" min="0" inputmode="numeric" placeholder="0"></label>
+        <label>Валюта<select id="vehiclePriceCurrency"><option value="UAH">₴ UAH</option><option value="USD">$ USD</option><option value="EUR">€ EUR</option></select></label>
+        <label>Ціна до<input id="vehiclePriceTo" type="number" min="0" inputmode="numeric" placeholder="1000000"></label>
       </div>
     </div>
     <div class="vehicle-search-grid hidden" id="vehicleSearchAdvanced">
-      <label>Пробіг від, км
-        <input id="vehicleMileageFrom" type="number" min="0" placeholder="Будь-який">
-      </label>
-      <label>Пробіг до, км
-        <input id="vehicleMileageTo" type="number" min="0" placeholder="Будь-який">
-      </label>
-      <label>Об’єм двигуна від, л
-        <input id="vehicleEngineFrom" type="number" min="0" max="20" step="0.1" placeholder="Будь-який">
-      </label>
-      <label>Об’єм двигуна до, л
-        <input id="vehicleEngineTo" type="number" min="0" max="20" step="0.1" placeholder="Будь-який">
-      </label>
-      <label>Тип кузова
-        <select id="vehicleBodyType">
-          <option value="">Будь-який</option>
-          <option>Седан</option>
-          <option>Хетчбек</option>
-          <option>Універсал</option>
-          <option>Позашляховик</option>
-          <option>Купе</option>
-          <option>Мінівен</option>
-          <option>Пікап</option>
-          <option>Інший</option>
-        </select>
-      </label>
-      <label>Паливо
-        <select id="vehicleFuel">
-          <option value="">Будь-яке</option>
-          <option value="Бензин">Бензин</option>
-          <option value="Дизель">Дизель</option>
-          <option value="Газ/бензин">Газ/бензин</option>
-          <option value="Електро">Электро</option>
-          <option value="Гибрид">Гибрид</option>
-        </select>
-      </label>
-      <label>Коробка передач
-        <select id="vehicleTransmission"><option value="">Будь-яка</option><option value="Механічна">Механічна</option><option value="Автоматична">Автоматична</option><option value="Варіатор">Варіатор</option><option value="Робот">Робот</option></select>
-      </label>
-      <label>Стан авто<select id="vehicleSearchStatus"><option value="">Будь-який</option><option value="new">Нове</option><option value="used">Вживане</option></select></label>
-      <label>Потужність від, к. с.<input id="vehiclePowerFrom" type="number" min="1" max="3000" placeholder="Будь-яка"></label>
-      <label>Потужність до, к. с.<input id="vehiclePowerTo" type="number" min="1" max="3000" placeholder="Будь-яка"></label>
+      <label>Тип кузова<select id="vehicleBodyType"><option value="">Будь-який</option><option value="Седан">Седан</option><option value="Хетчбек">Хетчбек</option><option value="Универсал">Универсал</option><option value="Позашляховик">Позашляховик / SUV</option><option value="Купе">Купе</option><option value="Мінівен">Мінівен</option><option value="Пікап">Пікап</option><option value="Інший">Інший</option></select></label>
+      <label>Паливо<select id="vehicleFuel"><option value="">Будь-яке</option><option value="Бензин">Бензин</option><option value="Дизель">Дизель</option><option value="Газ/бензин">Газ/бензин</option><option value="Електро">Електро</option><option value="Гібрид">Гібрид</option></select></label>
+      <label>Пробіг від, км<input id="vehicleMileageFrom" type="number" min="0" inputmode="numeric"></label>
+      <label>Пробіг до, км<input id="vehicleMileageTo" type="number" min="0" inputmode="numeric"></label>
+      <label>Об’єм двигуна від, л<input id="vehicleEngineFrom" type="number" min="0" max="20" step="0.1" inputmode="decimal"></label>
+      <label>Об’єм двигуна до, л<input id="vehicleEngineTo" type="number" min="0" max="20" step="0.1" inputmode="decimal"></label>
+      <label>Коробка передач<select id="vehicleTransmission"><option value="">Будь-яка</option><option value="Механічна">Механічна</option><option value="Автоматична">Автоматична</option><option value="Варіатор">Варіатор</option><option value="Робот">Робот</option></select></label>
+      <label>Тип авто<select id="vehicleSearchStatus"><option value="">Будь-який</option><option value="new">Новий</option><option value="used">З пробігом</option></select></label>
+      <label>Потужність от, к. с.<input id="vehiclePowerFrom" type="number" min="0" inputmode="numeric"></label>
+      <label>Потужність до, к. с.<input id="vehiclePowerTo" type="number" min="0" inputmode="numeric"></label>
       <label>Кількість дверей<select id="vehicleDoors"><option value="">Будь-яка</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></label>
-      <label>Привід<select id="vehicleDrive"><option value="">Будь-який</option><option value="Передній">Передній</option><option value="Задній">Задній</option><option value="Повний">Повний</option><option value="Повний підключаємий">Повний, що підключається</option></select></label>
-      <label style="grid-column:1 / -1;">Технічний стан<div id="vehicleSearchConditions" role="group" aria-label="Технічний стан"></div></label>
+      <label>Привід<select id="vehicleDrive"><option value="">Будь-який</option><option value="Передній">Передній</option><option value="Задній">Задній</option><option value="Повний">Повний</option><option value="Повний підключаємий">Повний підключаємий</option></select></label>
       <label>Колір<select id="vehicleColor"><option value="">Будь-який</option><option value="white">Білий</option><option value="black">Чорний</option><option value="gray">Сірий</option><option value="silver">Сріблястий</option><option value="red">Червоний</option><option value="blue">Синій</option><option value="green">Зелений</option><option value="brown">Коричневий</option><option value="yellow">Жовтий</option><option value="other">Інший</option></select></label>
-      <label>Продавець<select id="vehicleSellerType"><option value="">Будь-хто</option><option value="private">Приватна особа</option><option value="business">Компанія / автосалон</option></select></label>
+      <label>Продавець<select id="vehicleSellerType"><option value="">Будь-хто</option><option value="private">Приватна особа</option><option value="business">Компанія / бізнес</option></select></label>
+      <label>Технічний стан
+        <select id="vehicleSearchOperationalCondition">
+          <option value="">Будь-який</option>
+          <option value="roadworthy" data-i18n-key="roadworthy">На ходу, технічно справний</option>
+          <option value="needs_repair" data-i18n-key="needs_repair">Потребує ремонту</option>
+          <option value="not_running" data-i18n-key="not_running">Не на ходу</option>
+          <option value="after_accident" data-i18n-key="after_accident">Після ДТП</option>
+        </select>
+      </label>
     </div>
     <p id="vehicleSearchMessage" class="form-message" role="status" aria-live="polite"></p>
     <div class="vehicle-search-actions">
-      <button type="button" class="vehicle-reset-btn" id="vehicleSearchReset">Скинути</button>
-      <button type="button" class="btn vehicle-search-toggle" id="vehicleSearchToggleAdvanced" aria-expanded="false" aria-controls="vehicleSearchAdvanced" data-i18n="Розширений пошук">Розширений пошук</button>
-      <button type="button" class="btn btn-primary" id="vehicleSearchApply">Знайти автомобілі</button>
+      <button class="btn" id="vehicleSearchReset" type="button">Скинути</button>
+      <button class="btn" id="vehicleSearchToggleAdvanced" type="button" aria-expanded="false" aria-controls="vehicleSearchAdvanced">Розширений пошук</button>
+      <button class="btn btn-primary" id="vehicleSearchApply" type="button">Застосувати</button>
     </div>
   </section>
 
@@ -340,7 +309,7 @@
           <label>Привод<select name="vehicle_drive"><option value="">Выберите привод</option><option value="Передній">Передний</option><option value="Задній">Задний</option><option value="Повний">Полный</option><option value="Повний підключаємий">Полный подключаемый</option></select></label>
           <label>Пробег, км<input name="vehicle_mileage_km" type="number" min="0" placeholder="125000"></label>
           <label>Тип авто<select name="vehicle_condition"><option value="">Выберите тип</option><option value="new">Новое</option><option value="used">С пробегом</option></select></label>
-          <label style="grid-column:1 / -1;">Техническое состояние<div id="vehicleListingConditions" role="group" aria-label="Техническое состояние"></div></label>
+          <label>Техническое состояние<select name="vehicle_operational_condition"><option value="">Выберите состояние</option><option value="roadworthy">На ходу, технически исправен</option><option value="needs_repair">Требует ремонта</option><option value="not_running" data-i18n-key="not_running">Не на ходу</option><option value="after_accident">После ДТП</option></select></label>
           <label>Количество дверей<select name="vehicle_doors"><option value="">Выберите количество</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></label>
           <label>Цвет<select name="vehicle_color"><option value="">Выберите цвет</option><option value="white">Белый</option><option value="black">Чёрный</option><option value="gray">Серый</option><option value="silver">Серебристый</option><option value="red">Красный</option><option value="blue">Синий</option><option value="green">Зелёный</option><option value="brown">Коричневый</option><option value="yellow">Жёлтый</option><option value="other">Другой</option></select></label>
           <label>Тип продавца<select name="seller_type"><option value="private">Частное лицо</option><option value="business">Компания / бизнес</option></select></label>
@@ -386,7 +355,6 @@
   <div class="modal hidden" id="messagesModal" role="dialog" aria-modal="true" aria-labelledby="messagesTitle"><div class="modal-card messages-card"><button class="modal-close" id="closeMessages" type="button" aria-label="Закрыть">×</button><h2 id="messagesTitle" data-i18n="Сообщения">Сообщения</h2><div id="messagesContent"><p class="muted" id="messagesGuestHint">Войдите, чтобы видеть сообщения.</p><div id="conversationsList" class="conversations-list hidden"></div><div id="messagesThread" class="messages-thread hidden"><button class="link-btn" id="backToConvs" type="button">← К списку</button><div id="threadMessages" class="thread-messages"></div><form id="sendMessageForm" class="send-message-form"><input type="text" name="body" placeholder="Ваше сообщение..." required maxlength="2000" autocomplete="off"><button class="btn btn-primary" type="submit">Отправить</button></form></div></div></div></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="app.js"></script>
   <script>
-    // Keep only the final word of the business-category label smaller in every language.
     (() => {
       const selector = '.category-card[data-category="Готовый бизнес"] .category-card-label > span[data-i18n]';
       const fitFinalWord = (target) => {
@@ -411,3 +379,4 @@
   </script>
 </body>
 </html>
+<!-- КОНЕЦ ФАЙЛА -->

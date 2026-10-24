@@ -1286,3 +1286,206 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 #addModal #vehicleListingMakeSpinner { border-color: rgba(32,53,43,.2); border-top-color: var(--accent, #d4ff00); border-right-color: var(--accent, #d4ff00); }
 #addModal #vehicleListingMakeStatus { color: rgba(247,249,245,.78); }
 
+
+
+/* Unified listing editor — visually aligned with the Hryvnia Hub search/create UI. */
+.listing-edit-dialog {
+  width: min(900px, calc(100% - 24px));
+  max-width: 900px;
+  max-height: min(92dvh, 980px);
+  overflow: auto;
+  padding: clamp(16px, 3vw, 28px);
+  border: 1px solid var(--accent-border, rgba(212,255,0,.35));
+  border-radius: 20px;
+  background: var(--card, #fff);
+  color: var(--text, #1b2b20);
+  box-shadow: 0 24px 80px rgba(0,0,0,.28);
+}
+.listing-edit-dialog::backdrop { background: rgba(10,14,10,.68); backdrop-filter: blur(3px); }
+.listing-edit-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 18px; }
+.listing-edit-header { grid-column: 1 / -1; padding-bottom: 8px; border-bottom: 1px solid var(--line, #e3e8df); }
+.listing-edit-header .eyebrow { margin: 0 0 5px; color: var(--muted, #667064); font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; }
+.listing-edit-header h2 { margin: 0; font-size: clamp(1.25rem, 3vw, 1.7rem); line-height: 1.25; }
+.listing-edit-form > label { min-width: 0; align-content: start; display: grid; gap: 7px; font-weight: 600; font-size: .92rem; }
+.listing-edit-form input:not([type="checkbox"]), .listing-edit-form select, .listing-edit-form textarea {
+  min-width: 0; width: 100%; box-sizing: border-box; padding: 11px 12px;
+  border: 1px solid var(--line, #d8dfd3); border-radius: 10px;
+  background: var(--input-bg, var(--card, #fff)); color: inherit; font: inherit; font-weight: 400;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.listing-edit-form input:focus, .listing-edit-form select:focus, .listing-edit-form textarea:focus { outline: none; border-color: var(--accent, #d4ff00); box-shadow: 0 0 0 3px rgba(212,255,0,.18); }
+.listing-edit-form textarea { resize: vertical; }
+.listing-edit-form .vehicle-listing-fields { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px 16px; margin: 0; padding: 16px; border: 1px solid var(--line, #d8dfd3); border-radius: 14px; }
+.listing-edit-form .vehicle-listing-fields legend { padding: 0 8px; font-size: 1rem; font-weight: 800; }
+.listing-edit-form .vehicle-listing-fields label { display: grid; gap: 6px; min-width: 0; font-size: .9rem; font-weight: 600; }
+.listing-edit-form > label:has(textarea[name="description"]), .listing-edit-form > label:has(textarea[name="photo_urls"]) { grid-column: 1 / -1; }
+.listing-edit-form .hot-toggle { display: flex; align-items: center; gap: 9px; font-weight: 600; }
+.listing-edit-form .hot-toggle input { width: 18px; height: 18px; accent-color: var(--accent, #d4ff00); }
+.listing-edit-form .muted, .listing-edit-form .form-message { grid-column: 1 / -1; margin: 0; overflow-wrap: anywhere; }
+.listing-edit-form .edit-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; padding-top: 8px; border-top: 1px solid var(--line, #e3e8df); }
+.listing-edit-form .edit-actions button { min-height: 42px; padding: 10px 18px; border-radius: 10px; }
+@media (max-width: 640px) {
+  .listing-edit-dialog { width: calc(100% - 14px); max-height: 94dvh; padding: 14px; border-radius: 16px; }
+  .listing-edit-form { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .listing-edit-form .vehicle-listing-fields { grid-template-columns: minmax(0, 1fr); padding: 12px; gap: 11px; }
+  .listing-edit-form > label:has(textarea[name="description"]), .listing-edit-form > label:has(textarea[name="photo_urls"]) { grid-column: auto; }
+  .listing-edit-form .edit-actions { display: grid; grid-template-columns: 1fr 1fr; }
+  .listing-edit-form .edit-actions button { width: 100%; }
+}
+
+/* Hryvnia Hub listing editor: deep-green visual system + searchable city field */
+.listing-edit-dialog {
+  border: 1px solid rgba(31, 91, 58, .42);
+  background: linear-gradient(180deg, #fbfdf9 0%, #f2f8f1 100%);
+  color: #183b29;
+  box-shadow: 0 24px 80px rgba(5, 35, 19, .38);
+}
+.listing-edit-header {
+  border-bottom: 1px solid #c6dcca;
+  background: linear-gradient(100deg, rgba(17, 82, 49, .09), rgba(212, 255, 0, .12));
+  border-radius: 12px;
+  padding: 12px 14px 14px;
+}
+.listing-edit-header .eyebrow { color: #286543; font-weight: 800; }
+.listing-edit-header h2 { color: #123e27; }
+.listing-edit-form > label { color: #234a32; }
+.listing-edit-form input:not([type="checkbox"]),
+.listing-edit-form select,
+.listing-edit-form textarea {
+  border: 1px solid #b8cfbd;
+  border-radius: 11px;
+  background: #fff;
+  color: #1d3024;
+}
+.listing-edit-form input:focus,
+.listing-edit-form select:focus,
+.listing-edit-form textarea:focus {
+  border-color: #287348;
+  box-shadow: 0 0 0 3px rgba(40, 115, 72, .16);
+}
+.listing-edit-form .vehicle-listing-fields {
+  border: 1px solid #8db69a;
+  background: linear-gradient(145deg, rgba(20, 87, 51, .055), rgba(212, 255, 0, .055));
+  border-radius: 15px;
+}
+.listing-edit-form .vehicle-listing-fields legend { color: #185333; }
+.listing-edit-form .hot-toggle { color: #234a32; }
+.listing-edit-form .edit-actions { border-top-color: #c6dcca; }
+.listing-edit-form .edit-actions .btn-primary {
+  border-color: #164f32;
+  background: #164f32;
+  color: #fff;
+}
+.listing-edit-form .edit-actions .btn-primary:hover { background: #216b43; }
+.listing-edit-form .edit-actions button:not(.btn-primary) {
+  border: 1px solid #9cbea5;
+  background: #edf5ee;
+  color: #19452d;
+}
+.listing-edit-form .edit-city-field { position: relative; }
+.listing-edit-form .edit-city-suggestions {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 5px;
+  border: 1px solid #8db69a;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 12px 28px rgba(10, 52, 29, .18);
+}
+.listing-edit-form .edit-city-suggestions[hidden] { display: none; }
+.listing-edit-form .edit-city-suggestion {
+  display: block;
+  width: 100%;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #183b29;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+.listing-edit-form .edit-city-suggestion:hover,
+.listing-edit-form .edit-city-suggestion:focus { outline: none; background: #eaf4e9; }
+.listing-edit-form .edit-city-suggestion .city-suggestion-name { display: block; font-weight: 700; }
+.listing-edit-form .edit-city-suggestion .city-suggestion-region { display: block; margin-top: 2px; color: #617968; font-size: .82em; }
+.listing-edit-form .edit-city-suggestions .city-suggestion-empty { padding: 10px; color: #617968; }
+
+/* Final compact dark-green listing editor, aligned with the create-listing modal. */
+.listing-edit-dialog {
+  background: linear-gradient(160deg, #102b1e 0%, #173a29 100%);
+  color: #f4f8f2;
+  border: 1px solid rgba(212, 255, 0, .58);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, .48);
+}
+.listing-edit-header {
+  background: linear-gradient(110deg, #1b4933 0%, #244b30 72%, #304b20 100%);
+  border: 1px solid rgba(212, 255, 0, .25);
+  border-bottom-color: rgba(212, 255, 0, .38);
+}
+.listing-edit-header .eyebrow { color: #d4ff00; }
+.listing-edit-header h2,
+.listing-edit-form > label,
+.listing-edit-form .vehicle-listing-fields legend,
+.listing-edit-form .vehicle-listing-fields label,
+.listing-edit-form .hot-toggle { color: #f4f8f2; }
+.listing-edit-form { gap: 9px 12px; }
+.listing-edit-form > label { gap: 4px; font-size: .88rem; }
+.listing-edit-form input:not([type="checkbox"]),
+.listing-edit-form select,
+.listing-edit-form textarea {
+  padding: 9px 11px;
+  min-height: 40px;
+  border: 1px solid rgba(212, 255, 0, .55);
+  border-radius: 10px;
+  background: #f7f8f5;
+  color: #20382a;
+}
+.listing-edit-form input:focus,
+.listing-edit-form select:focus,
+.listing-edit-form textarea:focus {
+  border-color: #d4ff00;
+  box-shadow: 0 0 0 3px rgba(212, 255, 0, .2);
+}
+.listing-edit-form .vehicle-listing-fields {
+  gap: 8px 12px;
+  padding: 10px 12px 12px;
+  border: 1px solid rgba(212, 255, 0, .5);
+  border-radius: 13px;
+  background: linear-gradient(145deg, rgba(8, 27, 18, .62), rgba(27, 67, 43, .72));
+}
+.listing-edit-form .vehicle-listing-fields label { gap: 4px; font-size: .86rem; }
+.listing-edit-form .edit-actions { padding-top: 7px; border-top-color: rgba(212, 255, 0, .25); }
+.listing-edit-form .edit-actions button:not(.btn-primary) {
+  border-color: rgba(212, 255, 0, .55);
+  background: #203f2d;
+  color: #f4f8f2;
+}
+.listing-edit-form .edit-city-suggestions { border-color: #527c5c; }
+@media (max-width: 640px) {
+  .listing-edit-dialog { width: calc(100% - 14px); max-height: 94dvh; padding: 10px; border-radius: 15px; }
+  .listing-edit-header { padding: 9px 11px 10px; }
+  .listing-edit-form { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 9px; }
+  .listing-edit-form > label { font-size: .79rem; gap: 4px; }
+  .listing-edit-form input:not([type="checkbox"]),
+  .listing-edit-form select,
+  .listing-edit-form textarea { padding: 8px 9px; min-height: 38px; font-size: .88rem; }
+  .listing-edit-form .vehicle-listing-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 9px; gap: 8px; }
+  .listing-edit-form .vehicle-listing-fields label { font-size: .78rem; gap: 4px; }
+  .listing-edit-form > label:has(textarea[name="description"]),
+  .listing-edit-form > label:has(textarea[name="photo_urls"]),
+  .listing-edit-form .muted,
+  .listing-edit-form .form-message,
+  .listing-edit-form .edit-actions { grid-column: 1 / -1; }
+  .listing-edit-form .edit-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .listing-edit-form .edit-actions button { min-height: 39px; padding: 8px 10px; }
+}
+@media (max-width: 360px) {
+  .listing-edit-form { grid-template-columns: minmax(0, 1fr); }
+  .listing-edit-form .vehicle-listing-fields { grid-template-columns: minmax(0, 1fr); }
+}

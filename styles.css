@@ -347,7 +347,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
   /* Категории */
   .categories-grid { grid-template-columns: repeat(2, 1fr); column-gap: 8px; row-gap: 0; }
   .category-card { aspect-ratio: 3 / 1; padding: 8px; }
-  .category-card-label { font-size: 20px; gap: 5px; flex-direction: row; align-items: center; justify-content: center; }
+  .category-card-label { font-size: 19px; gap: 5px; flex-direction: row; align-items: center; justify-content: center; }
   .category-icon { width: 24px; height: 24px; flex: 0 0 24px; }
   .category-card-label > span[data-i18n] { min-width: 0; }
   .category-card[data-category="Готовый бизнес"] .category-card-label > span[data-i18n] { text-align: center; line-height: 1.02; }

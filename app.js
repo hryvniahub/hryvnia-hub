@@ -2082,14 +2082,8 @@ async function editListing(item, labels) {
   const isVehicle = item.category === "Автомобили";
 
   const selectedCityId = String(item.city_id || item.cities?.id || "");
-  let cityOptions = availableCities
-    .map(city => `<option value="${escapeHtml(String(city.id))}" ${String(city.id) === selectedCityId ? "selected" : ""}>${escapeHtml(city[`name_${lang}`] || city.name_uk || city.name_ru || city.name || "")}</option>`)
-    .join("");
-  // Fallback keeps the saved city selectable if the catalog is temporarily incomplete.
-  if (selectedCityId && !availableCities.some(city => String(city.id) === selectedCityId)) {
-    const fallbackName = item.cities?.[`name_${lang}`] || item.cities?.name_uk || item.cities?.name_ru || selectedCityId;
-    cityOptions += `<option value="${escapeHtml(selectedCityId)}" selected>${escapeHtml(fallbackName)}</option>`;
-  }
+  const selectedCity = availableCities.find(city => String(city.id) === selectedCityId);
+  const initialCityName = selectedCity ? cityName(selectedCity) : String(item.cities?.[`name_${lang}`] || item.cities?.name_uk || item.cities?.name_ru || "");
   const categoryOptions = ["Автомобили","Недвижимость","Готовый бизнес","Инвестиции"]
     .map(cat => `<option value="${cat}" ${item.category === cat ? "selected" : ""}>${escapeHtml(translations[cat]?.[lang] || cat)}</option>`)
     .join("");
@@ -2146,7 +2140,11 @@ async function editListing(item, labels) {
     <label>${escapeHtml(L.category)}<select name="category" required>${categoryOptions}</select></label>
     ${isVehicle ? "" : `<label>${escapeHtml(L.title)}<input name="title" required maxlength="180" value="${escapeHtml(item.title || "")}"></label>`}
     ${vehicleBlock}
-    <label>${escapeHtml(L.city)}<select name="city_id" required>${cityOptions}</select></label>
+    <label class="edit-city-field">${escapeHtml(L.city)}
+      <input name="city_search" type="text" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="editCitySuggestions" placeholder="${escapeHtml(cityTranslation("Введите название города"))}" value="${escapeHtml(initialCityName)}" required>
+      <input name="city_id" type="hidden" value="${escapeHtml(selectedCityId)}">
+      <div class="edit-city-suggestions" id="editCitySuggestions" role="listbox" hidden></div>
+    </label>
     <label>${escapeHtml(L.price)}<input name="price" type="number" min="0" step="0.01" required value="${escapeHtml(String(item.price ?? ""))}"></label>
     <label>${escapeHtml(L.description)}<textarea name="description" rows="5" maxlength="10000">${escapeHtml(item.description || "")}</textarea></label>
     <label>${escapeHtml(L.photos)}<textarea name="photo_urls" rows="3">${escapeHtml(photos.join("\n"))}</textarea></label>
@@ -2157,6 +2155,64 @@ async function editListing(item, labels) {
 
   document.body.append(dialog);
   dialog.showModal();
+
+  // Reuse the same city index/ranking as the create-listing form, but keep the editor self-contained.
+  const editCityInput = dialog.querySelector('input[name="city_search"]');
+  const editCityId = dialog.querySelector('input[name="city_id"]');
+  const editCitySuggestions = dialog.querySelector("#editCitySuggestions");
+  const closeEditCitySuggestions = () => {
+    editCitySuggestions.hidden = true;
+    editCityInput.setAttribute("aria-expanded", "false");
+  };
+  const renderEditCitySuggestions = () => {
+    const variants = getQueryVariants(editCityInput.value);
+    const ranked = citySearchIndex.map(entry => ({ entry, rank: rankCityEntry(entry, variants) }))
+      .filter(row => row.rank >= 0)
+      .sort((a, b) => a.rank - b.rank || cityName(a.entry.city).localeCompare(cityName(b.entry.city)))
+      .slice(0, 12).map(row => row.entry);
+    editCitySuggestions.innerHTML = ranked.length
+      ? ranked.map(entry => renderCitySuggestionButton(entry, "edit-city-suggestion")).join("")
+      : `<div class="city-suggestion-empty" role="status">${escapeHtml(cityTranslation("Город не найден"))}</div>`;
+    editCitySuggestions.hidden = false;
+    editCityInput.setAttribute("aria-expanded", "true");
+  };
+  const chooseEditCity = city => {
+    editCityId.value = String(city.id);
+    editCityInput.value = cityName(city);
+    closeEditCitySuggestions();
+  };
+  editCityInput.addEventListener("input", () => {
+    editCityId.value = ""; // Never silently save the previous city after the user edits the text.
+    renderEditCitySuggestions();
+  });
+  editCityInput.addEventListener("focus", renderEditCitySuggestions);
+  editCityInput.addEventListener("keydown", event => {
+    if (event.key === "Escape") closeEditCitySuggestions();
+    if (event.key === "ArrowDown" && !editCitySuggestions.hidden) {
+      const first = editCitySuggestions.querySelector("[data-city-id]");
+      if (first) { event.preventDefault(); first.focus(); }
+    }
+    if (event.key === "Enter" && !editCitySuggestions.hidden) {
+      const first = editCitySuggestions.querySelector("[data-city-id]");
+      const city = availableCities.find(row => String(row.id) === first?.dataset.cityId);
+      if (city) { event.preventDefault(); chooseEditCity(city); }
+    }
+  });
+  editCitySuggestions.addEventListener("mousedown", event => {
+    if (event.target.closest("[data-city-id]")) event.preventDefault();
+  });
+  editCitySuggestions.addEventListener("click", event => {
+    const option = event.target.closest("[data-city-id]");
+    if (!option) return;
+    const city = availableCities.find(row => String(row.id) === option.dataset.cityId);
+    if (city) chooseEditCity(city);
+  });
+  editCitySuggestions.addEventListener("keydown", event => {
+    if (event.key === "Escape") { closeEditCitySuggestions(); editCityInput.focus(); }
+  });
+  dialog.addEventListener("click", event => {
+    if (!event.target.closest(".edit-city-field")) closeEditCitySuggestions();
+  });
 
   if (isVehicle) {
     const makeSelect = dialog.querySelector("#editVehicleMake");
@@ -2194,7 +2250,11 @@ async function editListing(item, labels) {
     const urls = [...new Set(form.elements.photo_urls.value.split(/\r?\n/).map(x => x.trim()).filter(x => /^https?:\/\//i.test(x)))].slice(0, 10);
 
     const cityIdValue = String(form.elements.city_id.value || "");
-    if (!cityIdValue) { message.textContent = t("Выберите город"); return; }
+    if (!cityIdValue || !availableCities.some(city => String(city.id) === cityIdValue)) {
+      message.textContent = t("Выберите город из предложенных вариантов");
+      form.elements.city_search.focus();
+      return;
+    }
     const payload = {
       category: form.elements.category.value,
       city_id: Number(cityIdValue),

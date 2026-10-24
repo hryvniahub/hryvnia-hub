@@ -335,8 +335,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
    МОБИЛЬНАЯ АДАПТАЦИЯ (≤ 720px)
    ============================================================ */
 @media (max-width: 720px) {
-  .vehicle-price-range { grid-template-columns: minmax(0,1fr) 88px minmax(0,1fr); gap: 7px; }
-  .vehicle-price-range label { font-size: 12px; }
   .container { width: calc(100% - 16px); } /* Уменьшили отступы по краям с 16 до 8 пикселей */
 
   /* Шапка */
@@ -950,8 +948,6 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 
 /* Адаптация восстановленных компонентов */
 @media (max-width: 720px) {
-  .vehicle-price-range { grid-template-columns: minmax(0,1fr) 88px minmax(0,1fr); gap: 7px; }
-  .vehicle-price-range label { font-size: 12px; }
   body { padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px)); }
   /* Единые мобильные настройки баннера: без повторных переопределений */
   .main-banner { height: 56px; padding: 4px 10px 15px; }
@@ -1033,17 +1029,10 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 /* Hryvnia Hub: compact category grid and merged category control */
 .search-input-row-stacked #searchInput { display: none; }
 .search-input-row-stacked .category-select-trigger { min-height: 74px; height: 74px; }
-@media (max-width: 720px) {
-  .vehicle-price-range { grid-template-columns: minmax(0,1fr) 88px minmax(0,1fr); gap: 7px; }
-  .vehicle-price-range label { font-size: 12px; }
-  .search-input-row-stacked .category-select-trigger { min-height: 74px; height: 74px; }
-}
 
 
 /* Hryvnia Hub: follow-up fixes */
 @media (max-width: 720px) {
-  .vehicle-price-range { grid-template-columns: minmax(0,1fr) 88px minmax(0,1fr); gap: 7px; }
-  .vehicle-price-range label { font-size: 12px; }
   /* Keep a tiny visible separation between the two category-card rows. */
   .categories-grid { row-gap: 2px; }
 }

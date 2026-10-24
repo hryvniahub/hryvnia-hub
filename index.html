@@ -274,10 +274,10 @@
       <label>Технічний стан
         <select id="vehicleSearchOperationalCondition">
           <option value="">Будь-який</option>
-          <option value="roadworthy">На ходу, технічно справний</option>
-          <option value="needs_repair">Потребує ремонту</option>
-          <option value="not_running">Не на ходу</option>
-          <option value="after_accident">Після ДТП</option>
+          <option value="roadworthy" data-i18n-key="roadworthy">На ходу, технічно справний</option>
+          <option value="needs_repair" data-i18n-key="needs_repair">Потребує ремонту</option>
+          <option value="not_running" data-i18n-key="not_running">Не на ходу</option>
+          <option value="after_accident" data-i18n-key="after_accident">Після ДТП</option>
         </select>
       </label>
     </div>
@@ -309,7 +309,7 @@
           <label>Привод<select name="vehicle_drive"><option value="">Выберите привод</option><option value="Передній">Передний</option><option value="Задній">Задний</option><option value="Повний">Полный</option><option value="Повний підключаємий">Полный подключаемый</option></select></label>
           <label>Пробег, км<input name="vehicle_mileage_km" type="number" min="0" placeholder="125000"></label>
           <label>Тип авто<select name="vehicle_condition"><option value="">Выберите тип</option><option value="new">Новое</option><option value="used">С пробегом</option></select></label>
-          <label>Техническое состояние<select name="vehicle_operational_condition"><option value="">Выберите состояние</option><option value="roadworthy">На ходу, технически исправен</option><option value="needs_repair">Требует ремонта</option><option value="not_running">Не на ходу</option><option value="after_accident">После ДТП</option></select></label>
+          <label>Техническое состояние<select name="vehicle_operational_condition"><option value="">Выберите состояние</option><option value="roadworthy">На ходу, технически исправен</option><option value="needs_repair">Требует ремонта</option><option value="not_running" data-i18n-key="not_running">Не на ходу</option><option value="after_accident">После ДТП</option></select></label>
           <label>Количество дверей<select name="vehicle_doors"><option value="">Выберите количество</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></label>
           <label>Цвет<select name="vehicle_color"><option value="">Выберите цвет</option><option value="white">Белый</option><option value="black">Чёрный</option><option value="gray">Серый</option><option value="silver">Серебристый</option><option value="red">Красный</option><option value="blue">Синий</option><option value="green">Зелёный</option><option value="brown">Коричневый</option><option value="yellow">Жёлтый</option><option value="other">Другой</option></select></label>
           <label>Тип продавца<select name="seller_type"><option value="private">Частное лицо</option><option value="business">Компания / бизнес</option></select></label>

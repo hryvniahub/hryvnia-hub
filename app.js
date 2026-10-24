@@ -246,8 +246,6 @@ const translations = {
   "Best offers below market price": { ru: "Лучшие предложения ниже рыночной цены", uk: "Найкращі пропозиції нижче ринкової ціни", en: "Best offers below market price", pl: "Najlepsze oferty poniżej ceny rynkowej" },
   "Urgent deals will appear here once listings are flagged as urgent in the database.": { ru: "Срочные предложения появятся здесь, когда объявления будут отмечены как срочные.", uk: "Термінові пропозиції з'являться тут, коли оголошення будуть позначені як термінові.", en: "Urgent deals will appear here once listings are flagged as urgent in the database.", pl: "Pilne okazje pojawią się tutaj, gdy ogłoszenia zostaną oznaczone jako pilne." },
   "Цена (любая)": { ru: "Цена (любая)", uk: "Ціна (будь-яка)", en: "Price (any)", pl: "Cena (dowolna)" },
-  "Цена от": { ru: "Цена от", uk: "Ціна від", en: "Price from", pl: "Cena od" },
-  "Цена до": { ru: "Цена до", uk: "Ціна до", en: "Price to", pl: "Cena do" },
   "Радиус поиска": { ru: "Радиус поиска", uk: "Радіус пошуку", en: "Search radius", pl: "Promień wyszukiwania" },
   "Радиус: 30 км": { ru: "Радиус: 30 км", uk: "Радіус: 30 км", en: "Radius: 30 km", pl: "Promień: 30 km" },
   "Радиус: 50 км": { ru: "Радиус: 50 км", uk: "Радіус: 50 км", en: "Radius: 50 km", pl: "Promień: 50 km" },
@@ -264,6 +262,10 @@ const translations = {
   "Скинути": { ru: "Сбросить", uk: "Скинути", en: "Reset", pl: "Wyczyść" },
   "Знайти автомобілі": { ru: "Найти автомобили", uk: "Знайти автомобілі", en: "Find cars", pl: "Znajdź samochody" },
   "Оберіть параметри автомобіля": { ru:"Выберите параметры автомобиля", uk:"Оберіть параметри автомобіля", en:"Choose vehicle filters", pl:"Wybierz parametry pojazdu" },
+  "Будь-яка ціна": {ru:"Любая",uk:"Будь-яка ціна",en:"Any price",pl:"Dowolna cena"},
+  "Всі марки": {ru:"Все марки",uk:"Всі марки",en:"All makes",pl:"Wszystkie marki"},
+  "Всі моделі": {ru:"Все модели",uk:"Всі моделі",en:"All models",pl:"Wszystkie modele"},
+  "Закрити": {ru:"Закрыть",uk:"Закрити",en:"Close",pl:"Zamknij"},
   "Марка": { ru: "Марка", uk: "Марка", en: "Make", pl: "Marka" },
   "Модель": { ru: "Модель", uk: "Модель", en: "Model", pl: "Model" },
   "Рік від": { ru: "Год от", uk: "Рік від", en: "Year from", pl: "Rok od" },
@@ -296,7 +298,7 @@ const translations = {
   "Сірий": {ru:"Серый",uk:"Сірий",en:"Gray",pl:"Szary"}, "Сріблястий": {ru:"Серебристый",uk:"Сріблястий",en:"Silver",pl:"Srebrny"}, "Червоний": {ru:"Красный",uk:"Червоний",en:"Red",pl:"Czerwony"}, "Синій": {ru:"Синий",uk:"Синій",en:"Blue",pl:"Niebieski"},
   "Зелений": {ru:"Зелёный",uk:"Зелений",en:"Green",pl:"Zielony"}, "Коричневий": {ru:"Коричневый",uk:"Коричневий",en:"Brown",pl:"Brązowy"}, "Жовтий": {ru:"Жёлтый",uk:"Жовтий",en:"Yellow",pl:"Żółty"}, "Інший": {ru:"Другой",uk:"Інший",en:"Other",pl:"Inny"},
   "Будь-хто": {ru:"Любой",uk:"Будь-хто",en:"Any",pl:"Dowolny"}, "Приватна особа": {ru:"Частное лицо",uk:"Приватна особа",en:"Private seller",pl:"Osoba prywatna"}, "Компанія / автосалон": {ru:"Компания / автосалон",uk:"Компанія / автосалон",en:"Company / dealer",pl:"Firma / dealer"},
-  "Повний, що підключається": {ru:"Подключаемый полный привод",uk:"Повний, що підключається",en:"Selectable all-wheel drive",pl:"Dołączany napęd 4x4"}, "На ходу, технически исправен": {ru:"На ходу, технически исправен",uk:"На ходу, технічно справний",en:"Running, mechanically sound",pl:"Sprawny technicznie, jeździ"}, "Требует ремонта": {ru:"Требует ремонта",uk:"Потребує ремонту",en:"Needs repair",pl:"Wymaga naprawy"}, "Не на ходу": {ru:"Не на ходу",uk:"Не на ходу",en:"Not running",pl:"Niesprawny, nie jeździ"}, "Проблемы с документами": {ru:"Проблемы с документами",uk:"Проблеми з документами",en:"Document issues",pl:"Problemy z dokumentami"},
+  "Повний, що підключається": {ru:"Подключаемый полный привод",uk:"Повний, що підключається",en:"Selectable all-wheel drive",pl:"Dołączany napęd 4x4"}, "На ходу, технічно справний": {ru:"На ходу, технически исправно",uk:"На ходу, технічно справний",en:"Roadworthy and mechanically sound",pl:"Sprawny technicznie, jeżdżący"}, "Задовільний": {ru:"Удовлетворительное",uk:"Задовільний",en:"Fair",pl:"Zadowalający"}, "Потребує ремонту": {ru:"Требует ремонта",uk:"Потребує ремонту",en:"Needs repair",pl:"Wymaga naprawy"}, "Не на ходу": {ru:"Не на ходу",uk:"Не на ходу",en:"Not running",pl:"Niesprawny, nie jeździ"},
   "Потужність «від» не може бути більшою за «до». ": {ru:"Мощность «от» не может быть больше «до».",uk:"Потужність «від» не може бути більшою за «до».",en:"Power from cannot be greater than power to.",pl:"Moc od nie może być większa od mocy do."},
   "Седан": {ru:"Седан",uk:"Седан",en:"Sedan",pl:"Sedan"}, "Хетчбек": {ru:"Хэтчбек",uk:"Хетчбек",en:"Hatchback",pl:"Hatchback"}, "Універсал": {ru:"Универсал",uk:"Універсал",en:"Wagon",pl:"Kombi"}, "Позашляховик": {ru:"Внедорожник",uk:"Позашляховик",en:"SUV",pl:"SUV"}, "Купе": {ru:"Купе",uk:"Купе",en:"Coupe",pl:"Coupe"}, "Мінівен": {ru:"Минивэн",uk:"Мінівен",en:"Minivan",pl:"Minivan"}, "Пікап": {ru:"Пикап",uk:"Пікап",en:"Pickup",pl:"Pickup"},
   "Бензин": {ru:"Бензин",uk:"Бензин",en:"Petrol",pl:"Benzyna"}, "Дизель": {ru:"Дизель",uk:"Дизель",en:"Diesel",pl:"Diesel"}, "Газ/бензин": {ru:"Газ/бензин",uk:"Газ/бензин",en:"LPG/petrol",pl:"LPG/benzyna"}, "Електро": {ru:"Электро",uk:"Електро",en:"Electric",pl:"Elektryczny"}, "Гібрид": {ru:"Гибрид",uk:"Гібрид",en:"Hybrid",pl:"Hybryda"},
@@ -344,9 +346,6 @@ const listing = document.getElementById("listing");
 const resultCount = document.getElementById("resultCount");
 const searchInput = document.getElementById("searchInput");
 const searchBtn = document.getElementById("searchBtn");
-const catalogMinPriceInput = document.getElementById("catalogMinPriceInput");
-const catalogMaxPriceInput = document.getElementById("catalogMaxPriceInput");
-const catalogRadiusSelect = document.getElementById("catalogRadiusSelect");
 const catalogCitySearchInput = document.getElementById("catalogCitySearchInput");
 const catalogCitySuggestions = document.getElementById("catalogCitySuggestions");
 const catalogRegionSelect = document.getElementById("catalogRegionSelect");
@@ -1455,12 +1454,6 @@ async function runAiSearch() {
     if (currentCategory) query = query.eq("category", currentCategory);
     if (selectedCatalogCityId) query = query.eq("city_id", selectedCatalogCityId);
     else if (activeRegionCode) query = query.eq("cities.region_katottg_code", activeRegionCode);
-    if (!currentCategory) {
-      const minPrice = catalogMinPriceInput?.value.trim() ? Number(catalogMinPriceInput.value) : null;
-      const maxPrice = catalogMaxPriceInput?.value.trim() ? Number(catalogMaxPriceInput.value) : null;
-      if (minPrice !== null && Number.isFinite(minPrice) && minPrice >= 0) query = query.gte("price", minPrice);
-      if (maxPrice !== null && Number.isFinite(maxPrice) && maxPrice >= 0) query = query.lte("price", maxPrice);
-    }
     const { data, error } = await query;
     if (error) { alert(t("Ошибка") + ": " + error.message); return; }
     const items = data || [];
@@ -2224,17 +2217,8 @@ async function loadListings() {
   if (currentCategory) query = query.eq("category", currentCategory);
   if (selectedCatalogCityId) query = query.eq("city_id", selectedCatalogCityId);
   else if (activeRegionCode) query = query.eq("cities.region_katottg_code", activeRegionCode);
-  // Text in the legacy hidden field is retained for category subcategory keywords only.
   const term = searchInput?.value.trim();
-  if (term && currentCategory) query = query.or(`title.ilike.%${term}%,description.ilike.%${term}%`);
-  const minPrice = !currentCategory && catalogMinPriceInput?.value.trim() !== "" ? Number(catalogMinPriceInput.value) : null;
-  const maxPrice = !currentCategory && catalogMaxPriceInput?.value.trim() !== "" ? Number(catalogMaxPriceInput.value) : null;
-  if (minPrice !== null && (!Number.isFinite(minPrice) || minPrice < 0) || maxPrice !== null && (!Number.isFinite(maxPrice) || maxPrice < 0) || minPrice !== null && maxPrice !== null && minPrice > maxPrice) {
-    alert(t("Перевірте числові значення фільтрів."));
-    return;
-  }
-  if (minPrice !== null) query = query.gte("price", minPrice);
-  if (maxPrice !== null) query = query.lte("price", maxPrice);
+  if (term) query = query.or(`title.ilike.%${term}%,description.ilike.%${term}%`);
 
   vehicleClientFilters = null;
   if (currentCategory === "Автомобили") {
@@ -2445,16 +2429,6 @@ const categorySelectLabel = document.getElementById("categorySelectLabel");
 const vehicleSearchMenu = document.getElementById("vehicleSearchMenu");
 const vehicleSearchBackdrop = document.getElementById("vehicleSearchBackdrop");
 let selectedSearchCategory = "";
-function syncSearchModeUI() {
-  const panel = document.querySelector(".search-panel");
-  if (!panel) return;
-  const isAllCategories = !currentCategory;
-  panel.classList.toggle("all-category-mode", isAllCategories);
-  panel.classList.toggle("category-mode", !isAllCategories);
-  const filters = panel.querySelector(".search-filters-row");
-  if (filters) filters.setAttribute("aria-hidden", String(!isAllCategories));
-  if (searchBtn) searchBtn.setAttribute("aria-hidden", String(!isAllCategories));
-}
 let vehicleModelsCache = [];
 let vehicleModelsPromise = null;
 function closeCategoryMenu() {
@@ -2673,7 +2647,6 @@ categoryMenuOptions?.addEventListener("click", event => {
   if (option.hasAttribute("data-open-submenu")) {
     if (category === "Автомобили") {
       selectedSearchCategory = category; currentCategory = category;
-      syncSearchModeUI();
       if (categorySelectLabel) categorySelectLabel.textContent = t(category);
       document.querySelectorAll(".category").forEach(b => b.classList.toggle("active", (b.dataset.category || "") === category));
       openVehicleSearch();
@@ -2683,7 +2656,6 @@ categoryMenuOptions?.addEventListener("click", event => {
   }
   const subcategory = option.dataset.searchSubcategory;
   selectedSearchCategory = category; currentCategory = category;
-  syncSearchModeUI();
   if (subcategory && searchInput) searchInput.value = subcategory;
   if (categorySelectLabel) categorySelectLabel.textContent = category ? t(category === "Готовый бизнес" ? "Бизнес и предпринимательство" : category) : t("Все категории");
   document.querySelectorAll(".category").forEach(b => b.classList.toggle("active", (b.dataset.category || "") === category));
@@ -2701,7 +2673,6 @@ document.querySelectorAll(".category").forEach(button => {
     const category = button.dataset.category || "";
     if (button.classList.contains("category-card") && category) {
       selectedSearchCategory = category; currentCategory = category;
-      syncSearchModeUI();
       if (categorySelectLabel) categorySelectLabel.textContent = t(category === "Готовый бизнес" ? "Бизнес и предпринимательство" : category);
       if (category === "Автомобили") { openVehicleSearch(); return; }
       openCategoryMenu(category);
@@ -2709,7 +2680,6 @@ document.querySelectorAll(".category").forEach(button => {
     }
     document.querySelectorAll(".category").forEach(b => b.classList.remove("active")); button.classList.add("active");
     currentCategory = category; selectedSearchCategory = category;
-    syncSearchModeUI();
     if (categorySelectLabel) categorySelectLabel.textContent = category ? t(category) : t("Все категории");
     loadListings();
   });
@@ -2741,7 +2711,6 @@ document.getElementById("vehicleSearchApply")?.addEventListener("click", () => {
   currentCategory = "Автомобили"; closeVehicleSearch(); loadListings();
 });
 document.addEventListener("keydown", event => { if (event.key === "Escape") { closeCategoryMenu(); closeVehicleSearch(); closeAddCategoryMenu(); } });
-syncSearchModeUI();
 if (searchBtn) searchBtn.addEventListener("click", loadListings);
 if (searchInput) searchInput.addEventListener("keydown", e => { if (e.key === "Enter") loadListings(); });
 
@@ -2992,10 +2961,25 @@ function translateVehicleSearchUI() {
   });
   const currencyLabel = document.getElementById("vehiclePriceCurrency")?.closest("label");
   if (currencyLabel) { const textNode = [...currencyLabel.childNodes].find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim()); if (textNode) textNode.textContent = t("Валюта") + " "; }
+  const placeholderKeys = {
+    vehicleYearFrom: "2010", vehicleYearTo: "2026", vehiclePriceFrom: "0",
+    vehiclePriceTo: "Будь-яка ціна", vehicleMileageFrom: "Будь-який", vehicleMileageTo: "Будь-який",
+    vehicleEngineFrom: "Будь-який", vehicleEngineTo: "Будь-який", vehiclePowerFrom: "Будь-яка", vehiclePowerTo: "Будь-яка"
+  };
+  Object.entries(placeholderKeys).forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    if (el) el.placeholder = key === "2010" || key === "2026" || key === "0" ? key : t(key);
+  });
+  const close = document.getElementById("vehicleSearchClose");
+  if (close) close.setAttribute("aria-label", t("Закрыть"));
+  const makeStatus = document.getElementById("vehicleMakeLoadStatus");
+  if (makeStatus && !makeStatus.textContent.trim()) makeStatus.textContent = "";
   const reset = document.getElementById("vehicleSearchReset");
   const apply = document.getElementById("vehicleSearchApply");
   if (reset) reset.textContent = t("Скинути");
   if (apply) apply.textContent = t("Знайти автомобілі");
+  const toggle = document.getElementById("vehicleSearchToggleAdvanced");
+  if (toggle) toggle.textContent = t(document.getElementById("vehicleSearchAdvanced")?.classList.contains("hidden") ? "Розширений пошук" : "Згорнути розширений пошук");
   setVehicleSearchAdvanced(Boolean(document.getElementById("vehicleSearchAdvanced") && !document.getElementById("vehicleSearchAdvanced").classList.contains("hidden")));
 }
 function translatePage(selectedLanguage) {

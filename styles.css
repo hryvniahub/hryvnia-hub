@@ -1097,3 +1097,84 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
     order: -1;
   }
 }
+
+/* ============================================================
+   Hryvnia Hub — точечная настройка баннера и карточек категорий
+   Размеры баннера и карточек не меняются.
+   ============================================================ */
+.main-banner {
+  justify-content: center;
+}
+.banner-content {
+  width: 100%;
+  max-width: 100%;
+  padding-bottom: 10px;
+  gap: 4px;
+  text-align: center;
+  align-items: center;
+  transform: translateY(-2px);
+}
+.banner-title {
+  font-size: clamp(20px, 2.35vw, 29px);
+  line-height: 1.08;
+  max-width: 100%;
+  text-wrap: balance;
+}
+.hero-text {
+  font-size: clamp(12px, 1.35vw, 16px);
+  line-height: 1.15;
+  max-width: 100%;
+  text-wrap: balance;
+}
+.category-card-label {
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  white-space: nowrap;
+  font-size: clamp(15px, 1.75vw, 24px);
+  line-height: 1.05;
+  text-align: center;
+  transform: translateY(1px);
+}
+.category-icon {
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+}
+.category-card-long-word {
+  font-size: .78em;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .banner-content {
+    padding-bottom: 15px;
+    gap: 2px;
+    transform: translateY(-1px);
+  }
+  .banner-title {
+    font-size: clamp(13.5px, 3.8vw, 17px);
+    line-height: 1.05;
+  }
+  .hero-text {
+    font-size: clamp(10px, 2.8vw, 12px);
+    line-height: 1.05;
+  }
+  .category-card-label {
+    flex-direction: row;
+    gap: 3px;
+    font-size: clamp(9px, 2.55vw, 12px);
+    line-height: 1.05;
+    white-space: nowrap;
+    transform: translateY(1px);
+  }
+  .category-icon {
+    flex: 0 0 18px;
+    width: 18px;
+    height: 18px;
+  }
+  .category-card-long-word {
+    font-size: .72em;
+  }
+}

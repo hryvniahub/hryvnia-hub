@@ -2500,61 +2500,6 @@ function vehicleCardSpecs(item) {
   return specs;
 }
 
-function vehicleMarketComparison(item, items) {
-  if (String(item.category || "") !== "Автомобили" || !(Number(item.price) > 0)) return null;
-  const make = item.vehicle_make_slug || item.vehicle_make_name;
-  const model = item.vehicle_model_slug || item.vehicle_model_name;
-  if (!make || !model) return null;
-  const currency = item.currency || "UAH";
-  const year = Number(item.vehicle_year) || 0;
-  const comparable = items.filter(row => {
-    if (String(row.category || "") !== "Автомобили" || String(row.id) === String(item.id)) return false;
-    if ((row.currency || "UAH") !== currency || !(Number(row.price) > 0)) return false;
-    const rowMake = row.vehicle_make_slug || row.vehicle_make_name;
-    const rowModel = row.vehicle_model_slug || row.vehicle_model_name;
-    if (!rowMake || !rowModel || String(rowMake) !== String(make) || String(rowModel) !== String(model)) return false;
-    const rowYear = Number(row.vehicle_year) || 0;
-    return !year || !rowYear || Math.abs(year - rowYear) <= 3;
-  }).map(row => Number(row.price)).sort((a, b) => a - b);
-  // Confidence is based on the number of comparable listings: 1–2 approximate, 3–4 preliminary, 5+ full.
-  // With zero comparable listings there is no evidence for a market-price indicator.
-  if (comparable.length === 0) return null;
-  const middle = Math.floor(comparable.length / 2);
-  const median = comparable.length % 2 ? comparable[middle] : (comparable[middle - 1] + comparable[middle]) / 2;
-  if (!(median > 0)) return null;
-  const difference = Math.round(((Number(item.price) - median) / median) * 100);
-  const position = Math.max(0, Math.min(100, ((Number(item.price) / median - 0.7) / 0.6) * 100));
-  const labels = {
-    ru: { below: "Ниже рынка", average: "Средняя цена", above: "Выше рынка", belowText: "дешевле", aboveText: "дороже" },
-    uk: { below: "Нижче ринку", average: "Середня ціна", above: "Вище ринку", belowText: "дешевше", aboveText: "дорожче" },
-    en: { below: "Below market", average: "Average price", above: "Above market", belowText: "below market", aboveText: "above market" },
-    pl: { below: "Poniżej rynku", average: "Średnia cena", above: "Powyżej rynku", belowText: "taniej", aboveText: "drożej" }
-  }[lang] || { below: "Below market", average: "Average price", above: "Above market", belowText: "below market", aboveText: "above market" };
-  let message = labels.average;
-  let tone = "average";
-  if (difference <= -3) {
-    message = lang === "ru" ? `На ${Math.abs(difference)}% дешевле рынка`
-      : lang === "uk" ? `На ${Math.abs(difference)}% дешевше ринку`
-      : lang === "pl" ? `${Math.abs(difference)}% poniżej rynku`
-      : `${Math.abs(difference)}% below market`;
-    tone = "below";
-  } else if (difference >= 3) {
-    message = lang === "ru" ? `На ${difference}% дороже рынка`
-      : lang === "uk" ? `На ${difference}% дорожче ринку`
-      : lang === "pl" ? `${difference}% powyżej rynku`
-      : `${difference}% above market`;
-    tone = "above";
-  }
-  const confidence = comparable.length < 3 ? "approximate" : comparable.length < 5 ? "preliminary" : "full";
-  const confidenceLabels = {
-    ru: { approximate: "Приблизительный ориентир", preliminary: "Предварительная оценка", full: "Полноценная оценка", samples: n => `По ${n} похожим объявлениям`, low: "Мало данных — ориентир неточный" },
-    uk: { approximate: "Приблизний орієнтир", preliminary: "Попередня оцінка", full: "Повноцінна оцінка", samples: n => `За ${n} схожими оголошеннями`, low: "Мало даних — орієнтир неточний" },
-    en: { approximate: "Approximate guide", preliminary: "Preliminary estimate", full: "Full estimate", samples: n => `Based on ${n} similar listings`, low: "Limited data — this guide is less reliable" },
-    pl: { approximate: "Orientacyjna wskazówka", preliminary: "Wstępna wycena", full: "Pełna wycena", samples: n => `Na podstawie ${n} podobnych ogłoszeń`, low: "Mało danych — orientacyjna cena jest mniej wiarygodna" }
-  }[lang] || { approximate: "Approximate guide", preliminary: "Preliminary estimate", full: "Full estimate", samples: n => `Based on ${n} similar listings`, low: "Limited data — this guide is less reliable" };
-  return { position, message, tone, labels, median, difference, count: comparable.length, confidence, confidenceLabel: confidenceLabels[confidence], confidenceNote: comparable.length < 3 ? confidenceLabels.low : confidenceLabels.samples(comparable.length) };
-}
-
 function renderListings(items) {
   visibleListings = items;
   renderHotListings(items.filter(item => item.is_hot));
@@ -2581,17 +2526,10 @@ function renderListings(items) {
     const isOwner = Boolean(currentUser?.id && item.user_id && String(currentUser.id) === String(item.user_id));
     const myListingLabel = ({ uk: "Моє оголошення", ru: "Моё объявление", en: "My listing", pl: "Moje ogłoszenie" })[lang] || "My listing";
     const specs = vehicleCardSpecs(item);
-    const market = vehicleMarketComparison(item, items);
     const city = item.cities?.[`name_${lang}`] || item.cities?.name_ru || item.city || "";
-    const marketScale = market ? `<div class="listing-market ${market.tone}" aria-label="${escapeHtml(market.message)}">
-      <div class="listing-market-message">${escapeHtml(market.message)}</div>
-      <div class="listing-market-confidence">${escapeHtml(market.confidenceLabel)} · ${escapeHtml(market.confidenceNote)}</div>
-      <div class="listing-market-bar" role="img" aria-label="${escapeHtml(market.labels.below)} — ${escapeHtml(market.labels.average)} — ${escapeHtml(market.labels.above)}">
-        <span class="listing-market-marker" style="left:${market.position.toFixed(1)}%"></span>
-      </div>
-      <div class="listing-market-labels"><span>${escapeHtml(market.labels.below)}</span><span>${escapeHtml(market.labels.average)}</span><span>${escapeHtml(market.labels.above)}</span></div>
-      <small>${escapeHtml(({ru:"Сравнение с похожими объявлениями Hryvnia Hub",uk:"Порівняння зі схожими оголошеннями Hryvnia Hub",en:"Compared with similar Hryvnia Hub listings",pl:"Porównanie z podobnymi ogłoszeniami Hryvnia Hub"})[lang] || "Compared with similar Hryvnia Hub listings")}</small>
-    </div>` : "";
+    const marketScale = String(item.category || "") === "Автомобили" && Number(item.price) > 0
+      ? `<div class="listing-market" aria-label="${escapeHtml(({ru:"Декоративный индикатор цены",uk:"Декоративний індикатор ціни",en:"Decorative price indicator",pl:"Dekoracyjny wskaźnik ceny"})[lang] || "Decorative price indicator")}"><span class="listing-market-bar" aria-hidden="true"></span></div>`
+      : "";
     return `
     <article class="card listing-card-horizontal${hasCover ? " has-cover" : " no-cover"}" data-listing-index="${index}" tabindex="0" role="button" aria-label="${escapeHtml(item.title)}" style="cursor:pointer">
       <div class="listing-card-media">

@@ -247,8 +247,8 @@ const translations = {
   "В избранное": { ru: "В избранное", uk: "В обране", en: "Add to favorites", pl: "Dodaj do ulubionych" },
   "Убрать из избранного": { ru: "Убрать из избранного", uk: "Прибрати з обраного", en: "Remove from favorites", pl: "Usuń z ulubionych" },
   "Объявление": { ru: "Объявление", uk: "Оголошення", en: "Listing", pl: "Ogłoszenie" },
-  "Розширений пошук": { ru: "Расширенный поиск", uk: "Розширений пошук", en: "Advanced search", pl: "Wyszukiwanie zaawansowane" },
-  "Згорнути розширений пошук": { ru: "Свернуть расширенный поиск", uk: "Згорнути розширений пошук", en: "Hide advanced search", pl: "Ukryj wyszukiwanie zaawansowane" },
+  "Розширений пошук": { ru: "Больше", uk: "Більше", en: "More", pl: "Więcej" },
+  "Згорнути розширений пошук": { ru: "Меньше", uk: "Менше", en: "Less", pl: "Mniej" },
   "Скинути": { ru: "Сбросить", uk: "Скинути", en: "Reset", pl: "Wyczyść" },
   "Знайти автомобілі": { ru: "Найти автомобили", uk: "Знайти автомобілі", en: "Find cars", pl: "Znajdź samochody" },
   "Застосувати": { ru: "Применить", uk: "Застосувати", en: "Apply", pl: "Zastosuj" },
@@ -269,6 +269,10 @@ const translations = {
   "Об’єм двигуна до, л": { ru: "Объём двигателя до, л", uk: "Об’єм двигуна до, л", en: "Engine size to, L", pl: "Pojemność silnika do, l" },
   "Тип кузова": { ru: "Тип кузова", uk: "Тип кузова", en: "Body type", pl: "Typ nadwozia" },
   "Паливо": { ru: "Топливо", uk: "Паливо", en: "Fuel", pl: "Paliwo" },
+  "Топливо": { ru: "Топливо", uk: "Паливо", en: "Fuel", pl: "Paliwo" },
+  "Привод": { ru: "Привод", uk: "Привід", en: "Drive type", pl: "Napęd" },
+  "Количество дверей": { ru: "Количество дверей", uk: "Кількість дверей", en: "Number of doors", pl: "Liczba drzwi" },
+  "Цвет": { ru: "Цвет", uk: "Колір", en: "Color", pl: "Kolor" },
   "Коробка передач": { ru: "Коробка передач", uk: "Коробка передач", en: "Transmission", pl: "Skrzynia biegów" },
   "Будь-який": { ru: "Любой", uk: "Будь-який", en: "Any", pl: "Dowolny" },
   "Будь-яка": { ru: "Любая", uk: "Будь-яка", en: "Any", pl: "Dowolna" },
@@ -1091,12 +1095,12 @@ async function compressPhoto(file) {
   return { blob, mime, width, height, compressed: true, undecodable: false };
 }
 
-async function uploadListingPhotos() {
+async function uploadListingPhotos(photosToUpload = selectedPhotos) {
   const { error: schemaError } = await db.from("listings").select("image_urls").limit(0);
   if (schemaError) throw new Error(photoText("setup"));
   const bucket = db.storage.from(PHOTO_BUCKET);
   const urls = [];
-  for (const photo of selectedPhotos) {
+  for (const photo of photosToUpload) {
     if (photo.uploadedUrl) { urls.push(photo.uploadedUrl); continue; }
 
     const result = await compressPhoto(photo.file);
@@ -2073,10 +2077,10 @@ async function editListing(item, labels) {
   if (String(currentUser.id) !== String(item.user_id || "")) { alert(labels.denied); return; }
 
   const L = {
-    ru: { title:"Название", category:"Категория", city:"Город", price:"Цена (грн)", description:"Описание", photos:"Фотографии (URL через новую строку)", hot:"Горячее объявление", urgent:"Срочная продажа", save:"Сохранить изменения", cancel:"Отмена", published:"Опубликовано" },
-    uk: { title:"Назва", category:"Категорія", city:"Місто", price:"Ціна (грн)", description:"Опис", photos:"Фотографії (URL з нового рядка)", hot:"Гаряче оголошення", urgent:"Терміновий продаж", save:"Зберегти зміни", cancel:"Скасувати", published:"Опубліковано" },
-    en: { title:"Title", category:"Category", city:"City", price:"Price (UAH)", description:"Description", photos:"Photos (one URL per line)", hot:"Hot listing", urgent:"Urgent sale", save:"Save changes", cancel:"Cancel", published:"Published" },
-    pl: { title:"Tytuł", category:"Kategoria", city:"Miasto", price:"Cena (UAH)", description:"Opis", photos:"Zdjęcia (jeden URL w wierszu)", hot:"Gorące ogłoszenie", urgent:"Pilna sprzedaż", save:"Zapisz zmiany", cancel:"Anuluj", published:"Opublikowano" }
+    ru: { title:"Название", category:"Категория", city:"Город", price:"Цена (грн)", description:"Описание", photos:"Фотографии", hot:"Горячее объявление", urgent:"Срочная продажа", save:"Сохранить изменения", cancel:"Отмена", published:"Опубликовано" },
+    uk: { title:"Назва", category:"Категорія", city:"Місто", price:"Ціна (грн)", description:"Опис", photos:"Фотографії", hot:"Гаряче оголошення", urgent:"Терміновий продаж", save:"Зберегти зміни", cancel:"Скасувати", published:"Опубліковано" },
+    en: { title:"Title", category:"Category", city:"City", price:"Price (UAH)", description:"Description", photos:"Photos", hot:"Hot listing", urgent:"Urgent sale", save:"Save changes", cancel:"Cancel", published:"Published" },
+    pl: { title:"Tytuł", category:"Kategoria", city:"Miasto", price:"Cena (UAH)", description:"Opis", photos:"Zdjęcia", hot:"Gorące ogłoszenie", urgent:"Pilna sprzedaż", save:"Zapisz zmiany", cancel:"Anuluj", published:"Opublikowano" }
   }[lang] || { title:"Title", category:"Category", city:"City", price:"Price", description:"Description", photos:"Photos", hot:"Hot", urgent:"Urgent", save:"Save", cancel:"Cancel", published:"Published" };
 
   const isVehicle = item.category === "Автомобили";
@@ -2147,7 +2151,14 @@ async function editListing(item, labels) {
     </label>
     <label>${escapeHtml(L.price)}<input name="price" type="number" min="0" step="0.01" required value="${escapeHtml(String(item.price ?? ""))}"></label>
     <label>${escapeHtml(L.description)}<textarea name="description" rows="5" maxlength="10000">${escapeHtml(item.description || "")}</textarea></label>
-    <label>${escapeHtml(L.photos)}<textarea name="photo_urls" rows="3">${escapeHtml(photos.join("\n"))}</textarea></label>
+    <fieldset class="edit-photo-fields">
+      <legend>${escapeHtml(L.photos)}</legend>
+      <p class="edit-photo-hint">${escapeHtml(photoText("hint"))}</p>
+      <input name="edit_photo_input" type="file" accept="image/jpeg,image/png,image/webp" multiple hidden>
+      <button class="btn edit-photo-pick" type="button" data-edit-photo-pick>${escapeHtml(photoText("add"))}</button>
+      <div class="edit-photo-preview" data-edit-photo-preview></div>
+      <p class="form-message" data-edit-photo-message role="status"></p>
+    </fieldset>
     <label class="hot-toggle"><input type="checkbox" name="is_hot" ${item.is_hot ? "checked" : ""}> ${escapeHtml(L.hot)}</label>
     <label class="hot-toggle"><input type="checkbox" name="is_urgent" ${item.is_urgent ? "checked" : ""}> ${escapeHtml(L.urgent)}</label>
     <p class="muted">${escapeHtml(L.published)}: ${item.created_at ? escapeHtml(new Date(item.created_at).toLocaleDateString()) : "—"}</p>
@@ -2155,6 +2166,71 @@ async function editListing(item, labels) {
 
   document.body.append(dialog);
   dialog.showModal();
+
+  // Photo manager for editing: keep existing URLs, allow new local files, reorder cover, and remove photos.
+  const editPhotoInput = dialog.querySelector('input[name="edit_photo_input"]');
+  const editPhotoPreview = dialog.querySelector("[data-edit-photo-preview]");
+  const editPhotoMessage = dialog.querySelector("[data-edit-photo-message]");
+  const editPhotoPick = dialog.querySelector("[data-edit-photo-pick]");
+  let editPhotos = photos.map(url => ({ file: null, previewUrl: url, uploadedUrl: url, existing: true }));
+  let editPhotosBusy = false;
+  const renderEditPhotos = () => {
+    editPhotoPreview.innerHTML = editPhotos.map((photo, index) => `
+      <div class="photo-item edit-photo-item">
+        <img src="${escapeHtml(photo.previewUrl)}" alt="${escapeHtml(photo.file?.name || `Photo ${index + 1}`)}">
+        <span>${index === 0 ? escapeHtml(photoText("main")) : index + 1}</span>
+        <div class="photo-actions">
+          ${index > 0 ? `<button type="button" class="btn" data-edit-photo-main="${index}">${escapeHtml(photoText("makeMain"))}</button>` : ""}
+          <button type="button" class="btn" data-edit-photo-remove="${index}">${escapeHtml(photoText("remove"))}</button>
+        </div>
+      </div>`).join("");
+  };
+  editPhotoPick.addEventListener("click", () => { if (!editPhotosBusy) editPhotoInput.click(); });
+  editPhotoInput.addEventListener("change", async () => {
+    if (editPhotosBusy) return;
+    const files = [...editPhotoInput.files];
+    editPhotoInput.value = "";
+    editPhotoMessage.textContent = "";
+    if (files.length + editPhotos.length > MAX_PHOTOS) { editPhotoMessage.textContent = photoText("limit"); return; }
+    if (files.some(file => !PHOTO_TYPES[file.type] || !file.size || file.size > MAX_PHOTO_BYTES)) { editPhotoMessage.textContent = photoText("invalid"); return; }
+    editPhotosBusy = true;
+    editPhotoPick.disabled = true;
+    const additions = [];
+    try {
+      for (const file of files) {
+        const previewUrl = URL.createObjectURL(file);
+        additions.push({ file, previewUrl, uploadedUrl: "", existing: false });
+        await new Promise((resolve, reject) => {
+          const img = new Image(); img.onload = resolve; img.onerror = reject; img.src = previewUrl;
+        });
+      }
+      editPhotos.push(...additions);
+      renderEditPhotos();
+    } catch {
+      additions.forEach(photo => URL.revokeObjectURL(photo.previewUrl));
+      editPhotoMessage.textContent = photoText("unreadable");
+    } finally {
+      editPhotosBusy = false;
+      editPhotoPick.disabled = false;
+    }
+  });
+  editPhotoPreview.addEventListener("click", event => {
+    if (editPhotosBusy) return;
+    const button = event.target.closest("button");
+    if (!button) return;
+    if (button.dataset.editPhotoRemove !== undefined) {
+      const [removed] = editPhotos.splice(Number(button.dataset.editPhotoRemove), 1);
+      if (removed && !removed.existing && removed.previewUrl) URL.revokeObjectURL(removed.previewUrl);
+    } else if (button.dataset.editPhotoMain !== undefined) {
+      editPhotos.unshift(...editPhotos.splice(Number(button.dataset.editPhotoMain), 1));
+    }
+    editPhotoMessage.textContent = "";
+    renderEditPhotos();
+  });
+  dialog.addEventListener("close", () => editPhotos.forEach(photo => {
+    if (!photo.existing && photo.previewUrl) URL.revokeObjectURL(photo.previewUrl);
+  }), { once: true });
+  renderEditPhotos();
 
   // Reuse the same city index/ranking as the create-listing form, but keep the editor self-contained.
   const editCityInput = dialog.querySelector('input[name="city_search"]');
@@ -2247,7 +2323,8 @@ async function editListing(item, labels) {
     const message = form.querySelector(".form-message");
     const price = Number(form.elements.price.value);
     if (!Number.isFinite(price) || price < 0) { message.textContent = labels.failed; return; }
-    const urls = [...new Set(form.elements.photo_urls.value.split(/\r?\n/).map(x => x.trim()).filter(x => /^https?:\/\//i.test(x)))].slice(0, 10);
+    if (editPhotosBusy) return;
+    let urls = editPhotos.map(photo => photo.uploadedUrl).filter(Boolean).slice(0, MAX_PHOTOS);
 
     const cityIdValue = String(form.elements.city_id.value || "");
     if (!cityIdValue || !availableCities.some(city => String(city.id) === cityIdValue)) {
@@ -2301,8 +2378,13 @@ async function editListing(item, labels) {
       payload.title = title;
     }
 
-    button.disabled = true; message.textContent = "…";
+    button.disabled = true;
+    editPhotoPick.disabled = true;
+    message.textContent = photoText("saving");
     try {
+      urls = await uploadListingPhotos(editPhotos);
+      payload.image_urls = urls;
+      payload.image_url = urls[0] || null;
       const { data, error } = await db.from("listings")
         .update(payload).eq("id", item.id).eq("user_id", currentUser.id)
         .select("id").maybeSingle();
@@ -2321,6 +2403,7 @@ async function editListing(item, labels) {
     } catch (error) {
       message.textContent = error?.message || labels.failed;
       button.disabled = false;
+      editPhotoPick.disabled = false;
     }
   });
 }
@@ -3163,6 +3246,26 @@ function translatePage(selectedLanguage) {
       const textNode = [...label.childNodes].find(n => n.nodeType === Node.TEXT_NODE && n.textContent.trim());
       if (textNode) textNode.textContent = t(key) + " ";
     });
+    // Keep the shared fields of the add-listing form in the same translation flow.
+    const sharedFieldLabels = [
+      ["#citySearchInput", "Город"],
+      ["#cityRegionSelect", "Область / регион"],
+      ['input[name="price"]', "Цена, грн"],
+      ['textarea[name="description"]', "Описание"]
+    ];
+    sharedFieldLabels.forEach(([selector, key]) => {
+      const field = addModal.querySelector(selector);
+      const label = field?.closest("label");
+      if (!label) return;
+      const textNode = [...label.childNodes].find(n => n.nodeType === Node.TEXT_NODE && n.textContent.trim());
+      if (textNode) textNode.textContent = t(key) + " ";
+    });
+    const cityInput = addModal.querySelector("#citySearchInput");
+    if (cityInput) cityInput.placeholder = cityTranslation("Введите название города");
+    const addDescriptionField = addModal.querySelector('textarea[name="description"]');
+    if (addDescriptionField) addDescriptionField.placeholder = t("Коротко опишите предложение");
+    const regionSelect = addModal.querySelector("#cityRegionSelect");
+    if (regionSelect?.options[0]) regionSelect.options[0].textContent = cityTranslation("Все области");
     const categorySelect = addModal.querySelector('select[name="category"]');
     if (categorySelect) {
       const categoryKeys = ["Автомобили", "Недвижимость", "Бизнес и предпринимательство", "Инвестиции"];

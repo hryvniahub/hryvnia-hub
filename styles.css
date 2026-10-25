@@ -1519,3 +1519,7 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
   #addModal .listing-progress-step { min-width: 43px; }
   #addModal .listing-progress-step small { font-size: 9px; }
 }
+
+
+/* Keep authentication dialog above the listing form that launched it. */
+#authModal { z-index: 2000 !important; position: fixed; }

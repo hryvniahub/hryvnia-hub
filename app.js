@@ -231,9 +231,7 @@ const translations = {
     en: "AI picks: below the category average",
     pl: "Wybór AI: poniżej średniej kategorii"
   },
-  "HOT OFFERS": { ru: "ГОРЯЧИЕ ПРЕДЛОЖЕНИЯ", uk: "ГАРЯЧІ ПРОПОЗИЦІЇ", en: "HOT OFFERS", pl: "GORĄCE OFERTY" },
-  "Urgent deals": { ru: "Срочные предложения", uk: "Термінові пропозиції", en: "Urgent deals", pl: "Pilne okazje" },
-  "Best offers below market price": { ru: "Лучшие предложения ниже рыночной цены", uk: "Найкращі пропозиції нижче ринкової ціни", en: "Best offers below market price", pl: "Najlepsze oferty poniżej ceny rynkowej" },
+  "Hot": { ru: "Горячее", uk: "Гаряче", en: "Hot", pl: "Gorące" },
   "Urgent deals will appear here once listings are flagged as urgent in the database.": { ru: "Срочные предложения появятся здесь, когда объявления будут отмечены как срочные.", uk: "Термінові пропозиції з'являться тут, коли оголошення будуть позначені як термінові.", en: "Urgent deals will appear here once listings are flagged as urgent in the database.", pl: "Pilne okazje pojawią się tutaj, gdy ogłoszenia zostaną oznaczone jako pilne." },
   "Цена (любая)": { ru: "Цена (любая)", uk: "Ціна (будь-яка)", en: "Price (any)", pl: "Cena (dowolna)" },
   "Радиус поиска": { ru: "Радиус поиска", uk: "Радіус пошуку", en: "Search radius", pl: "Promień wyszukiwania" },
@@ -2464,10 +2462,10 @@ async function renderHotListings(items) {
   }
   items = (items || []).filter(item => item.is_hot || item.is_urgent);
   const langPack = {
-    ru: { hot:"⚡ Горячее", urgent:"⏱ Срочно", empty:"Горячих и срочных объявлений пока нет." },
-    uk: { hot:"⚡ Гаряче", urgent:"⏱ Терміново", empty:"Гарячих і термінових оголошень поки немає." },
-    en: { hot:"⚡ Hot", urgent:"⏱ Urgent", empty:"No hot or urgent listings yet." },
-    pl: { hot:"⚡ Gorące", urgent:"⏱ Pilne", empty:"Brak gorących i pilnych ogłoszeń." }
+    ru: { hot:"Горячее", urgent:"Срочно", empty:"Горячих и срочных объявлений пока нет." },
+    uk: { hot:"Гаряче", urgent:"Терміново", empty:"Гарячих і термінових оголошень поки немає." },
+    en: { hot:"Hot", urgent:"Urgent", empty:"No hot or urgent listings yet." },
+    pl: { hot:"Gorące", urgent:"Pilne", empty:"Brak gorących i pilnych ogłoszeń." }
   };
   const L = langPack[lang] || langPack.ru;
   if (!items.length) { host.innerHTML = `<div class="empty">${escapeHtml(L.empty)}</div>`; return; }
@@ -2542,7 +2540,8 @@ function renderListings(items) {
           <button class="fav-btn ${fav ? "active" : ""}" data-fav-id="${escapeHtml(String(item.id))}" type="button" aria-pressed="${fav ? "true" : "false"}" aria-label="${fav ? "Убрать из избранного" : "В избранное"}"><span aria-hidden="true">${fav ? "♥" : "♡"}</span></button>
         </div>
         ${specs.length ? `<p class="listing-card-specs">${specs.map(escapeHtml).join(" <span aria-hidden=\"true\">·</span> ")}</p>` : ""}
-        <p class="price">${item.previous_price != null && Number(item.previous_price) !== Number(item.price) ? `<span class="old-price">${money(item.previous_price, item.currency || "UAH")}</span> ` : ""}${money(item.price, item.currency || "UAH")}</p>
+        <p class="price"><span class="current-price">${money(item.price, item.currency || "UAH")}</span>${item.previous_price != null && Number(item.previous_price) !== Number(item.price) ? `<span class="old-price">${money(item.previous_price, item.currency || "UAH")}</span>` : ""}</p>
+        ${String(item.category || "") === "Автомобили" && item.vehicle_operational_condition ? `<p class="listing-card-condition">${escapeHtml(t(item.vehicle_operational_condition))}</p>` : ""}
         ${marketScale}
         <div class="listing-card-meta">
           ${city ? `<span class="city">⌖ ${escapeHtml(city)}</span>` : ""}

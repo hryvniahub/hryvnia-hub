@@ -1719,3 +1719,66 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
   .listing-card-condition { font-size: 12px; }
   .listing-card-horizontal .city { font-size: 13px; }
 }
+
+
+/* Hryvnia Hub — final requested card refinements (2026-10-25) */
+/* Keep the favorite button white, with a clear brand-green heart outline. */
+.listing-card-horizontal .listing-card-heading .fav-btn {
+  color: #16833b;
+  border: 1px solid rgba(22, 131, 59, .18);
+}
+.listing-card-horizontal .listing-card-heading .fav-btn.active {
+  color: #16833b;
+  background: #f0f8f1;
+}
+/* Softer orange hot badge instead of vivid red. */
+.hot-card-media > .hot-listing-badge,
+.listing-card-media > .hot-listing-badge {
+  background: #ff8a24;
+  color: #fff;
+}
+/* Make the former price easier to read without competing with the current price. */
+.listing-card-horizontal .old-price {
+  color: #7b8580;
+  opacity: .9;
+  font-size: .52em;
+  font-weight: 600;
+  text-decoration-thickness: 1px;
+}
+@media (max-width: 720px) {
+  .listing-card-horizontal .old-price { font-size: 10px; }
+}
+@media (max-width: 390px) {
+  .listing-card-horizontal .old-price { font-size: 9.5px; }
+}
+
+
+/* Hryvnia Hub — final visual alignment with bottom navigation (2026-10-25) */
+/* Favorite heart uses the same lime accent as the home, favorites and messages icons. */
+.listing-card-horizontal .listing-card-heading .fav-btn,
+.listing-card-horizontal .listing-card-heading .fav-btn.active {
+  color: #d4ff00;
+  background: #fff;
+  border: 1px solid rgba(212, 255, 0, .45);
+}
+/* Keep the agreed softer orange badge. */
+.hot-card-media > .hot-listing-badge,
+.listing-card-media > .hot-listing-badge {
+  background: #ff8a24;
+  color: #fff;
+}
+/* Slightly clearer former price, without changing the current price. */
+.listing-card-horizontal .old-price {
+  color: #6f7973;
+  opacity: 1;
+  font-size: .54em;
+  font-weight: 600;
+  text-decoration-thickness: 1px;
+  text-decoration-color: #6f7973;
+}
+@media (max-width: 720px) {
+  .listing-card-horizontal .old-price { font-size: 11px; }
+}
+@media (max-width: 390px) {
+  .listing-card-horizontal .old-price { font-size: 10px; }
+}

@@ -296,7 +296,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
    ============================================================ */
 .urgent-deals { padding-top: 20px; }
 .urgent-deals-heading { display: flex; align-items: center; margin: 0 0 12px; }
-.hot-section-badge { display: inline-flex; align-items: center; justify-content: center; padding: 7px 13px; border-radius: 6px; background: #f04432; color: #fff; font-size: 14px; line-height: 1.15; font-weight: 800; }
+.hot-section-badge { display: inline-flex; align-items: center; justify-content: center; padding: 5px 9px; border: 0; border-radius: 6px; background: #f04432; color: #fff; font-size: 12px; line-height: 1.15; font-weight: 800; white-space: nowrap; box-shadow: 0 1px 4px rgba(0,0,0,.18); }
 .urgent-deals-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 .listing-section { padding: 20px 0 40px; }
 .listing { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
@@ -1546,9 +1546,9 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 .listing-card-horizontal .fav-btn { position: static; flex: 0 0 40px; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 50%; background: #f3f6f2; color: #17241c; font-size: 25px; line-height: 1; }
 .listing-card-horizontal .listing-card-specs { margin: 0 0 12px; color: #3f4642; font-size: clamp(14px, 1.4vw, 19px); line-height: 1.35; overflow-wrap: anywhere; }
 .listing-card-horizontal .listing-card-specs span { color: #89928b; padding: 0 3px; }
-.listing-card-horizontal .price { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; margin: 0 0 5px; color: #080b09; font-size: clamp(25px, 2.7vw, 38px); line-height: 1.1; font-weight: 850; }
-.listing-card-horizontal .current-price { white-space: nowrap; }
-.listing-card-horizontal .old-price { margin: 0; color: #929a94; font-size: .48em; line-height: 1.2; font-weight: 550; white-space: nowrap; }
+.listing-card-horizontal .price { display: flex; flex-wrap: nowrap; align-items: baseline; justify-content: flex-start; gap: 4px 8px; min-width: 0; margin: 0 0 5px; color: #080b09; font-size: clamp(25px, 2.7vw, 38px); line-height: 1.1; font-weight: 850; }
+.listing-card-horizontal .current-price { flex: 0 1 auto; min-width: 0; white-space: nowrap; }
+.listing-card-horizontal .old-price { flex: 0 0 auto; margin: 0; color: #929a94; font-size: .48em; line-height: 1.2; font-weight: 550; white-space: nowrap; }
 .listing-card-condition { margin: 0 0 5px; color: #59635c; font-size: clamp(11px, 1.15vw, 14px); line-height: 1.25; overflow-wrap: anywhere; }
 .listing-card-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: auto; padding-top: 12px; }
 .listing-card-horizontal .city { color: #59635c; font-size: 15px; }
@@ -1565,7 +1565,7 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
   .listing-card-horizontal h3 { margin-bottom: 6px; font-size: clamp(14px, 3.8vw, 19px); }
   .listing-card-horizontal .fav-btn { flex-basis: 30px; width: 30px; height: 30px; font-size: 20px; }
   .listing-card-horizontal .listing-card-specs { margin-bottom: 8px; font-size: clamp(11px, 2.8vw, 14px); line-height: 1.3; }
-  .listing-card-horizontal .price { gap: 3px 6px; margin-bottom: 4px; font-size: clamp(19px, 5vw, 27px); }
+  .listing-card-horizontal .price { gap: 3px 6px; margin-bottom: 4px; font-size: clamp(17px, 4.6vw, 24px); }
   .listing-card-horizontal .old-price { font-size: .46em; }
   .listing-card-condition { margin-bottom: 4px; font-size: 10px; }
   .listing-market-bar { height: 7px; }
@@ -1578,7 +1578,7 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
   .listing-card-content { padding: 10px 8px; }
   .listing-card-horizontal h3 { font-size: 13px; }
   .listing-card-horizontal .listing-card-specs { font-size: 10px; }
-  .listing-card-horizontal .price { font-size: 18px; }
+  .listing-card-horizontal .price { font-size: 16px; gap: 3px; }
   .listing-card-horizontal .old-price { font-size: 9px; }
 }
 

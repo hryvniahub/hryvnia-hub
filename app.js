@@ -2490,12 +2490,13 @@ async function renderHotListings(items) {
 
 function vehicleCardSpecs(item) {
   if (String(item.category || "") !== "Автомобили") return [];
-  const specs = [];
-  if (item.vehicle_year) specs.push(String(item.vehicle_year));
-  if (item.vehicle_engine_liters != null && item.vehicle_engine_liters !== "") specs.push(`${String(item.vehicle_engine_liters).replace(/\.0$/, "")} л`);
-  if (item.vehicle_fuel_type) specs.push(String(item.vehicle_fuel_type));
-  if (item.vehicle_transmission) specs.push(String(item.vehicle_transmission));
-  return specs;
+  const engineAndFuel = [];
+  const transmissionAndYear = [];
+  if (item.vehicle_engine_liters != null && item.vehicle_engine_liters !== "") engineAndFuel.push(`${String(item.vehicle_engine_liters).replace(/\.0$/, "")} л`);
+  if (item.vehicle_fuel_type) engineAndFuel.push(String(item.vehicle_fuel_type));
+  if (item.vehicle_transmission) transmissionAndYear.push(String(item.vehicle_transmission));
+  if (item.vehicle_year) transmissionAndYear.push(String(item.vehicle_year));
+  return [engineAndFuel, transmissionAndYear].filter(row => row.length);
 }
 
 function renderListings(items) {
@@ -2539,9 +2540,9 @@ function renderListings(items) {
           <h3>${escapeHtml(item.title || "")}</h3>
           <button class="fav-btn ${fav ? "active" : ""}" data-fav-id="${escapeHtml(String(item.id))}" type="button" aria-pressed="${fav ? "true" : "false"}" aria-label="${fav ? "Убрать из избранного" : "В избранное"}"><span aria-hidden="true">${fav ? "♥" : "♡"}</span></button>
         </div>
-        ${specs.length ? `<p class="listing-card-specs">${specs.map(escapeHtml).join(" <span aria-hidden=\"true\">·</span> ")}</p>` : ""}
-        <p class="price"><span class="current-price">${money(item.price, item.currency || "UAH")}</span>${item.previous_price != null && Number(item.previous_price) !== Number(item.price) ? `<span class="old-price">${money(item.previous_price, item.currency || "UAH")}</span>` : ""}</p>
+        ${specs.map(row => `<p class="listing-card-specs">${row.map(escapeHtml).join(" <span aria-hidden=\"true\">·</span> ")}</p>`).join("")}
         ${String(item.category || "") === "Автомобили" && item.vehicle_operational_condition ? `<p class="listing-card-condition">${escapeHtml(t(item.vehicle_operational_condition))}</p>` : ""}
+        <p class="price"><span class="current-price">${money(item.price, item.currency || "UAH")}</span>${item.previous_price != null && Number(item.previous_price) !== Number(item.price) ? `<span class="old-price">${money(item.previous_price, item.currency || "UAH")}</span>` : ""}</p>
         ${marketScale}
         <div class="listing-card-meta">
           ${city ? `<span class="city">⌖ ${escapeHtml(city)}</span>` : ""}

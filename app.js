@@ -1112,13 +1112,8 @@ async function compressPhoto(file) {
   if (!ctx) return { blob: file, mime: file.type, width, height, compressed: false, undecodable: false };
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, width, height);
-  ctx.filter = "brightness(1.05) contrast(1.06) saturate(1.04)";
+  // Preserve the original colors; optimize size without artificial brightness or saturation changes.
   ctx.drawImage(img, 0, 0, width, height);
-  ctx.filter = "none";
-
-  if (ratio === 1 && file.size <= 350 * 1024) {
-    return { blob: file, mime: file.type, width, height, compressed: false, undecodable: false };
-  }
 
   let blob = await canvasToBlob(canvas, COMPRESS_MIME, COMPRESS_QUALITY);
   let mime = COMPRESS_MIME;
@@ -1127,6 +1122,10 @@ async function compressPhoto(file) {
     mime = "image/jpeg";
   }
   if (!blob) return { blob: file, mime: file.type, width, height, compressed: false, undecodable: false };
+  // If no resizing was needed and WebP is not smaller, keep the original instead of making it heavier.
+  if (ratio === 1 && blob.size >= file.size) {
+    return { blob: file, mime: file.type, width, height, compressed: false, undecodable: false };
+  }
   return { blob, mime, width, height, compressed: true, undecodable: false };
 }
 
@@ -2491,6 +2490,63 @@ async function renderHotListings(items) {
   }));
 }
 
+function vehicleCardSpecs(item) {
+  if (String(item.category || "") !== "Автомобили") return [];
+  const specs = [];
+  if (item.vehicle_year) specs.push(String(item.vehicle_year));
+  if (item.vehicle_engine_liters != null && item.vehicle_engine_liters !== "") specs.push(`${String(item.vehicle_engine_liters).replace(/\.0$/, "")} л`);
+  if (item.vehicle_fuel_type) specs.push(String(item.vehicle_fuel_type));
+  if (item.vehicle_transmission) specs.push(String(item.vehicle_transmission));
+  return specs;
+}
+
+function vehicleMarketComparison(item, items) {
+  if (String(item.category || "") !== "Автомобили" || !(Number(item.price) > 0)) return null;
+  const make = item.vehicle_make_slug || item.vehicle_make_name;
+  const model = item.vehicle_model_slug || item.vehicle_model_name;
+  if (!make || !model) return null;
+  const currency = item.currency || "UAH";
+  const year = Number(item.vehicle_year) || 0;
+  const comparable = items.filter(row => {
+    if (String(row.category || "") !== "Автомобили" || String(row.id) === String(item.id)) return false;
+    if ((row.currency || "UAH") !== currency || !(Number(row.price) > 0)) return false;
+    const rowMake = row.vehicle_make_slug || row.vehicle_make_name;
+    const rowModel = row.vehicle_model_slug || row.vehicle_model_name;
+    if (!rowMake || !rowModel || String(rowMake) !== String(make) || String(rowModel) !== String(model)) return false;
+    const rowYear = Number(row.vehicle_year) || 0;
+    return !year || !rowYear || Math.abs(year - rowYear) <= 3;
+  }).map(row => Number(row.price)).sort((a, b) => a - b);
+  // Never show a market-price claim unless there are enough comparable listings.
+  if (comparable.length < 3) return null;
+  const middle = Math.floor(comparable.length / 2);
+  const median = comparable.length % 2 ? comparable[middle] : (comparable[middle - 1] + comparable[middle]) / 2;
+  if (!(median > 0)) return null;
+  const difference = Math.round(((Number(item.price) - median) / median) * 100);
+  const position = Math.max(0, Math.min(100, ((Number(item.price) / median - 0.7) / 0.6) * 100));
+  const labels = {
+    ru: { below: "Ниже рынка", average: "Средняя цена", above: "Выше рынка", belowText: "дешевле", aboveText: "дороже" },
+    uk: { below: "Нижче ринку", average: "Середня ціна", above: "Вище ринку", belowText: "дешевше", aboveText: "дорожче" },
+    en: { below: "Below market", average: "Average price", above: "Above market", belowText: "below market", aboveText: "above market" },
+    pl: { below: "Poniżej rynku", average: "Średnia cena", above: "Powyżej rynku", belowText: "taniej", aboveText: "drożej" }
+  }[lang] || { below: "Below market", average: "Average price", above: "Above market", belowText: "below market", aboveText: "above market" };
+  let message = labels.average;
+  let tone = "average";
+  if (difference <= -3) {
+    message = lang === "ru" ? `На ${Math.abs(difference)}% дешевле рынка`
+      : lang === "uk" ? `На ${Math.abs(difference)}% дешевше ринку`
+      : lang === "pl" ? `${Math.abs(difference)}% poniżej rynku`
+      : `${Math.abs(difference)}% below market`;
+    tone = "below";
+  } else if (difference >= 3) {
+    message = lang === "ru" ? `На ${difference}% дороже рынка`
+      : lang === "uk" ? `На ${difference}% дорожче ринку`
+      : lang === "pl" ? `${difference}% powyżej rynku`
+      : `${difference}% above market`;
+    tone = "above";
+  }
+  return { position, message, tone, labels, median, difference, count: comparable.length };
+}
+
 function renderListings(items) {
   visibleListings = items;
   renderHotListings(items.filter(item => item.is_hot));
@@ -2516,26 +2572,38 @@ function renderListings(items) {
     const hasCover = cover !== "";
     const isOwner = Boolean(currentUser?.id && item.user_id && String(currentUser.id) === String(item.user_id));
     const myListingLabel = ({ uk: "Моє оголошення", ru: "Моё объявление", en: "My listing", pl: "Moje ogłoszenie" })[lang] || "My listing";
-    return `
-    <article class="card${hasCover ? " has-cover" : " no-cover"}" data-listing-index="${index}" tabindex="0" role="button" aria-label="${escapeHtml(item.title)}" style="cursor:pointer">
-      <button class="fav-btn ${fav ? "active" : ""}" data-fav-id="${escapeHtml(String(item.id))}" type="button" aria-pressed="${fav ? "true" : "false"}" aria-label="${fav ? "Убрать из избранного" : "В избранное"}">
-        <span aria-hidden="true">${fav ? "♥" : "♡"}</span>
-      </button>
-      ${cover}
-      <div class="card-top">
-        <span class="badge">${categoryLabel(item)}</span>
-        ${item.is_hot ? `<span class="hot-listing-badge">⚡ ${escapeHtml(({ru:"Горячее",uk:"Гаряче",en:"Hot",pl:"Gorące"})[lang] || "Hot")}</span>` : ""}
-        ${item.is_urgent ? `<span class="urgent-listing-badge">⏱ ${escapeHtml(({ru:"Срочно",uk:"Терміново",en:"Urgent",pl:"Pilne"})[lang] || "Urgent")}</span>` : ""}
-        ${isOwner ? `<span class="owner-listing-badge">✓ ${escapeHtml(myListingLabel)}</span>` : ""}
-        <span class="city">${escapeHtml(item.cities?.[`name_${lang}`] || item.cities?.name_ru || "")}</span>
+    const specs = vehicleCardSpecs(item);
+    const market = vehicleMarketComparison(item, items);
+    const city = item.cities?.[`name_${lang}`] || item.cities?.name_ru || item.city || "";
+    const marketScale = market ? `<div class="listing-market ${market.tone}" aria-label="${escapeHtml(market.message)}">
+      <div class="listing-market-message">${escapeHtml(market.message)}</div>
+      <div class="listing-market-bar" role="img" aria-label="${escapeHtml(market.labels.below)} — ${escapeHtml(market.labels.average)} — ${escapeHtml(market.labels.above)}">
+        <span class="listing-market-marker" style="left:${market.position.toFixed(1)}%"></span>
       </div>
-      <h3>${escapeHtml(item.title)}</h3>
-      <p class="price">${item.previous_price != null && Number(item.previous_price) !== Number(item.price) ? `<span class="old-price">${money(item.previous_price, item.currency || "UAH")}</span> ` : ""}${money(item.price, item.currency || "UAH")}</p>
-      <p class="desc">${escapeHtml(item.description || "Описание не указано.")}</p>
+      <div class="listing-market-labels"><span>${escapeHtml(market.labels.below)}</span><span>${escapeHtml(market.labels.average)}</span><span>${escapeHtml(market.labels.above)}</span></div>
+      <small>${escapeHtml(({ru:"Сравнение с похожими объявлениями Hryvnia Hub",uk:"Порівняння зі схожими оголошеннями Hryvnia Hub",en:"Compared with similar Hryvnia Hub listings",pl:"Porównanie z podobnymi ogłoszeniami Hryvnia Hub"})[lang] || "Compared with similar Hryvnia Hub listings")}</small>
+    </div>` : "";
+    return `
+    <article class="card listing-card-horizontal${hasCover ? " has-cover" : " no-cover"}" data-listing-index="${index}" tabindex="0" role="button" aria-label="${escapeHtml(item.title)}" style="cursor:pointer">
+      <div class="listing-card-media">${cover}</div>
+      <div class="listing-card-content">
+        <div class="listing-card-heading">
+          <h3>${escapeHtml(item.title || "")}</h3>
+          <button class="fav-btn ${fav ? "active" : ""}" data-fav-id="${escapeHtml(String(item.id))}" type="button" aria-pressed="${fav ? "true" : "false"}" aria-label="${fav ? "Убрать из избранного" : "В избранное"}"><span aria-hidden="true">${fav ? "♥" : "♡"}</span></button>
+        </div>
+        ${specs.length ? `<p class="listing-card-specs">${specs.map(escapeHtml).join(" <span aria-hidden=\"true\">·</span> ")}</p>` : ""}
+        <p class="price">${item.previous_price != null && Number(item.previous_price) !== Number(item.price) ? `<span class="old-price">${money(item.previous_price, item.currency || "UAH")}</span> ` : ""}${money(item.price, item.currency || "UAH")}</p>
+        ${marketScale}
+        <div class="listing-card-meta">
+          ${city ? `<span class="city">⌖ ${escapeHtml(city)}</span>` : ""}
+          ${item.is_hot ? `<span class="hot-listing-badge">⚡ ${escapeHtml(({ru:"Горячее",uk:"Гаряче",en:"Hot",pl:"Gorące"})[lang] || "Hot")}</span>` : ""}
+          ${item.is_urgent ? `<span class="urgent-listing-badge">⏱ ${escapeHtml(({ru:"Срочно",uk:"Терміново",en:"Urgent",pl:"Pilne"})[lang] || "Urgent")}</span>` : ""}
+          ${isOwner ? `<span class="owner-listing-badge">✓ ${escapeHtml(myListingLabel)}</span>` : ""}
+        </div>
+      </div>
     </article>`;
   }).join("");
 }
-
 if (listing) {
   listing.addEventListener("click", event => {
     const favBtn = event.target.closest(".fav-btn");

@@ -1523,3 +1523,55 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 
 /* Keep authentication dialog above the listing form that launched it. */
 #authModal { z-index: 2000 !important; position: fixed; }
+
+
+/* Hryvnia Hub — universal horizontal listing cards */
+.listing { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+.listing-card-horizontal { display: grid; grid-template-columns: minmax(260px, 44%) minmax(0, 1fr); gap: 0; padding: 0; overflow: hidden; text-align: left; background: #fff; border: 1px solid #e5e9e4; border-radius: 18px; }
+.listing-card-media { position: relative; min-width: 0; min-height: 220px; background: #f0f3ef; }
+.listing-card-horizontal .listing-photo, .listing-card-horizontal .listing-placeholder { display: block; width: 100%; height: 100%; min-height: 220px; max-height: 310px; object-fit: cover; border-radius: 0; margin: 0; }
+.listing-card-content { display: flex; flex-direction: column; justify-content: center; min-width: 0; padding: 20px 24px; color: #111; }
+.listing-card-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; min-width: 0; }
+.listing-card-horizontal h3 { margin: 0 0 8px; color: #111; font-size: clamp(19px, 2vw, 28px); line-height: 1.18; letter-spacing: -.02em; }
+.listing-card-horizontal .fav-btn { position: static; flex: 0 0 40px; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 50%; background: #f3f6f2; color: #17241c; font-size: 25px; line-height: 1; }
+.listing-card-horizontal .listing-card-specs { margin: 0 0 12px; color: #3f4642; font-size: clamp(14px, 1.4vw, 19px); line-height: 1.35; overflow-wrap: anywhere; }
+.listing-card-horizontal .listing-card-specs span { color: #89928b; padding: 0 3px; }
+.listing-card-horizontal .price { margin: 0 0 10px; color: #080b09; font-size: clamp(25px, 2.7vw, 38px); line-height: 1.1; font-weight: 850; }
+.listing-card-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: auto; padding-top: 12px; }
+.listing-card-horizontal .city { color: #59635c; font-size: 15px; }
+.listing-card-horizontal .hot-listing-badge, .listing-card-horizontal .urgent-listing-badge, .listing-card-horizontal .owner-listing-badge { font-size: 11px; }
+.listing-market { margin: 0 0 4px; min-width: 0; }
+.listing-market-message { display: inline-flex; max-width: 100%; margin-bottom: 8px; padding: 7px 11px; border-radius: 10px; background: #edf8ed; color: #21823c; font-size: clamp(13px, 1.3vw, 18px); font-weight: 750; overflow-wrap: anywhere; }
+.listing-market.above .listing-market-message { background: #fff0eb; color: #c33b2c; }
+.listing-market.average .listing-market-message { background: #fff8d9; color: #856900; }
+.listing-market-bar { position: relative; height: 10px; margin: 2px 2px 0; border-radius: 999px; background: linear-gradient(90deg,#20b76b 0%,#9ee51d 28%,#f2df19 50%,#ff9c1a 72%,#f04432 100%); }
+.listing-market-marker { position: absolute; top: -4px; width: 5px; height: 18px; transform: translateX(-50%); border: 1px solid #fff; border-radius: 4px; background: #17231c; box-shadow: 0 0 0 1px rgba(0,0,0,.2); }
+.listing-market-labels { display: flex; justify-content: space-between; gap: 6px; margin-top: 5px; color: #5e6861; font-size: 10px; }
+.listing-market small { display: block; margin-top: 4px; color: #778078; font-size: 10px; }
+@media (max-width: 720px) {
+  .listing { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .listing-card-horizontal { grid-template-columns: minmax(0, 44%) minmax(0, 1fr); border-radius: 14px; }
+  .listing-card-media { min-height: 155px; }
+  .listing-card-horizontal .listing-photo, .listing-card-horizontal .listing-placeholder { min-height: 155px; max-height: 240px; }
+  .listing-card-content { padding: 12px 11px; }
+  .listing-card-heading { gap: 5px; }
+  .listing-card-horizontal h3 { margin-bottom: 6px; font-size: clamp(14px, 3.8vw, 19px); }
+  .listing-card-horizontal .fav-btn { flex-basis: 30px; width: 30px; height: 30px; font-size: 20px; }
+  .listing-card-horizontal .listing-card-specs { margin-bottom: 8px; font-size: clamp(11px, 2.8vw, 14px); line-height: 1.3; }
+  .listing-card-horizontal .price { margin-bottom: 7px; font-size: clamp(19px, 5vw, 27px); }
+  .listing-market-message { padding: 5px 7px; margin-bottom: 6px; font-size: clamp(10px, 2.8vw, 13px); }
+  .listing-market-bar { height: 7px; }
+  .listing-market-marker { top: -3px; height: 13px; width: 4px; }
+  .listing-market-labels { font-size: 8px; gap: 3px; }
+  .listing-market small { font-size: 8px; line-height: 1.2; }
+  .listing-card-meta { gap: 5px; padding-top: 7px; }
+  .listing-card-horizontal .city { font-size: 11px; }
+}
+@media (max-width: 390px) {
+  .listing-card-horizontal { grid-template-columns: minmax(0, 40%) minmax(0, 1fr); }
+  .listing-card-media, .listing-card-horizontal .listing-photo, .listing-card-horizontal .listing-placeholder { min-height: 145px; }
+  .listing-card-content { padding: 10px 8px; }
+  .listing-card-horizontal h3 { font-size: 13px; }
+  .listing-card-horizontal .listing-card-specs { font-size: 10px; }
+  .listing-card-horizontal .price { font-size: 18px; }
+}

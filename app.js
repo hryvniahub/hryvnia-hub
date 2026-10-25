@@ -269,6 +269,10 @@ const translations = {
   "Об’єм двигуна до, л": { ru: "Объём двигателя до, л", uk: "Об’єм двигуна до, л", en: "Engine size to, L", pl: "Pojemność silnika do, l" },
   "Тип кузова": { ru: "Тип кузова", uk: "Тип кузова", en: "Body type", pl: "Typ nadwozia" },
   "Паливо": { ru: "Топливо", uk: "Паливо", en: "Fuel", pl: "Paliwo" },
+  "Топливо": { ru: "Топливо", uk: "Паливо", en: "Fuel", pl: "Paliwo" },
+  "Привод": { ru: "Привод", uk: "Привід", en: "Drive type", pl: "Napęd" },
+  "Количество дверей": { ru: "Количество дверей", uk: "Кількість дверей", en: "Number of doors", pl: "Liczba drzwi" },
+  "Цвет": { ru: "Цвет", uk: "Колір", en: "Color", pl: "Kolor" },
   "Коробка передач": { ru: "Коробка передач", uk: "Коробка передач", en: "Transmission", pl: "Skrzynia biegów" },
   "Будь-який": { ru: "Любой", uk: "Будь-який", en: "Any", pl: "Dowolny" },
   "Будь-яка": { ru: "Любая", uk: "Будь-яка", en: "Any", pl: "Dowolna" },
@@ -3242,6 +3246,26 @@ function translatePage(selectedLanguage) {
       const textNode = [...label.childNodes].find(n => n.nodeType === Node.TEXT_NODE && n.textContent.trim());
       if (textNode) textNode.textContent = t(key) + " ";
     });
+    // Keep the shared fields of the add-listing form in the same translation flow.
+    const sharedFieldLabels = [
+      ["#citySearchInput", "Город"],
+      ["#cityRegionSelect", "Область / регион"],
+      ['input[name="price"]', "Цена, грн"],
+      ['textarea[name="description"]', "Описание"]
+    ];
+    sharedFieldLabels.forEach(([selector, key]) => {
+      const field = addModal.querySelector(selector);
+      const label = field?.closest("label");
+      if (!label) return;
+      const textNode = [...label.childNodes].find(n => n.nodeType === Node.TEXT_NODE && n.textContent.trim());
+      if (textNode) textNode.textContent = t(key) + " ";
+    });
+    const cityInput = addModal.querySelector("#citySearchInput");
+    if (cityInput) cityInput.placeholder = cityTranslation("Введите название города");
+    const addDescriptionField = addModal.querySelector('textarea[name="description"]');
+    if (addDescriptionField) addDescriptionField.placeholder = t("Коротко опишите предложение");
+    const regionSelect = addModal.querySelector("#cityRegionSelect");
+    if (regionSelect?.options[0]) regionSelect.options[0].textContent = cityTranslation("Все области");
     const categorySelect = addModal.querySelector('select[name="category"]');
     if (categorySelect) {
       const categoryKeys = ["Автомобили", "Недвижимость", "Бизнес и предпринимательство", "Инвестиции"];

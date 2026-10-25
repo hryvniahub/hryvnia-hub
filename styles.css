@@ -1621,3 +1621,75 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 .hot-card-media { position: relative; display: block; width: 100%; min-width: 0; overflow: hidden; }
 .hot-card-media > .listing-photo, .hot-card-media > .listing-placeholder { display: block; width: 100%; height: 120px; object-fit: cover; margin: 0; border-radius: 8px; }
 .hot-card-media > .hot-listing-badge, .listing-card-media > .hot-listing-badge { position: absolute; top: 8px; left: 8px; z-index: 2; display: inline-flex; align-items: center; padding: 5px 9px; border: 0; border-radius: 6px; background: #f04432; color: #fff; font-size: 12px; line-height: 1.15; font-weight: 800; white-space: nowrap; box-shadow: 0 1px 4px rgba(0,0,0,.18); }
+
+
+/* Hryvnia Hub — agreed listing-card refinements (2026-10-25) */
+/* 1) Brand rail occupies the existing favorite-control edge, not the photo column. */
+.listing-card-horizontal {
+  position: relative;
+  background: linear-gradient(to right, #fff calc(100% - 28px), var(--dark) calc(100% - 28px));
+}
+.listing-card-horizontal .listing-card-content {
+  padding-right: 34px; /* reserve the slim brand rail and keep text clear of it */
+}
+.listing-card-horizontal .listing-card-heading {
+  position: relative;
+  padding-right: 0;
+}
+.listing-card-horizontal .listing-card-heading .fav-btn {
+  position: absolute;
+  top: 0;
+  right: -34px;
+  z-index: 3;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--dark);
+  box-shadow: 0 0 0 1px rgba(255,255,255,.25);
+}
+.listing-card-horizontal .listing-card-heading .fav-btn.active {
+  color: #d4381e;
+  background: #fff0ed;
+}
+
+/* 2) Slightly improve text readability without enlarging the price or photos. */
+.listing-card-horizontal h3 { font-size: clamp(15px, 3.9vw, 20px); }
+.listing-card-horizontal .listing-card-specs { font-size: clamp(11px, 2.9vw, 15px); }
+.listing-card-condition { font-size: clamp(11px, 1.2vw, 14px); }
+.listing-card-horizontal .city { font-size: 12px; }
+
+/* 3) The standalone hot heading was removed from index.html; keep its section compact. */
+.urgent-deals { padding-top: 8px; }
+.urgent-deals-heading { display: none; margin: 0; }
+
+@media (min-width: 721px) {
+  .listing-card-horizontal .listing-card-content { padding-right: 40px; }
+  .listing-card-horizontal .listing-card-heading .fav-btn {
+    right: -40px; width: 32px; height: 32px;
+  }
+  .listing-card-horizontal { background: linear-gradient(to right, #fff calc(100% - 32px), var(--dark) calc(100% - 32px)); }
+  .listing-card-horizontal h3 { font-size: clamp(20px, 2.1vw, 29px); }
+  .listing-card-horizontal .listing-card-specs { font-size: clamp(15px, 1.45vw, 20px); }
+  .listing-card-horizontal .city { font-size: 16px; }
+}
+
+@media (max-width: 720px) {
+  .listing-card-horizontal { background: linear-gradient(to right, #fff calc(100% - 24px), var(--dark) calc(100% - 24px)); }
+  .listing-card-horizontal .listing-card-content { padding-right: 30px; }
+  .listing-card-horizontal .listing-card-heading .fav-btn {
+    right: -30px; width: 24px; height: 24px; font-size: 18px;
+  }
+  .listing-card-horizontal h3 { font-size: clamp(14px, 3.9vw, 17px); }
+  .listing-card-horizontal .listing-card-specs { font-size: clamp(11px, 2.95vw, 12px); }
+  .listing-card-condition { font-size: 11px; }
+  .listing-card-horizontal .city { font-size: 12px; }
+}
+
+@media (max-width: 380px) {
+  .listing-card-horizontal .listing-card-content { padding-right: 28px; }
+  .listing-card-horizontal { background: linear-gradient(to right, #fff calc(100% - 22px), var(--dark) calc(100% - 22px)); }
+  .listing-card-horizontal .listing-card-heading .fav-btn { right: -28px; width: 22px; height: 22px; font-size: 17px; }
+}

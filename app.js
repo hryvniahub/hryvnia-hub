@@ -2502,12 +2502,20 @@ function vehicleCardSpecs(item) {
 
 function vehicleMarketComparison(item, items) {
   if (String(item.category || "") !== "Автомобили" || !(Number(item.price) > 0)) return null;
+
+  const labels = {
+    ru: { below: "Ниже рынка", average: "Средняя цена", above: "Выше рынка", belowText: "дешевле", aboveText: "дороже" },
+    uk: { below: "Нижче ринку", average: "Середня ціна", above: "Вище ринку", belowText: "дешевше", aboveText: "дорожче" },
+    en: { below: "Below market", average: "Average price", above: "Above market", belowText: "below market", aboveText: "above market" },
+    pl: { below: "Poniżej rynku", average: "Średnia cena", above: "Powyżej rynku", belowText: "taniej", aboveText: "drożej" }
+  }[lang] || { below: "Below market", average: "Average price", above: "Above market", belowText: "below market", aboveText: "above market" };
+
+  const noDataMessage = t("Пока недостаточно данных для оценки");
   const make = item.vehicle_make_slug || item.vehicle_make_name;
   const model = item.vehicle_model_slug || item.vehicle_model_name;
-  if (!make || !model) return null;
   const currency = item.currency || "UAH";
   const year = Number(item.vehicle_year) || 0;
-  const comparable = items.filter(row => {
+  const comparable = make && model ? items.filter(row => {
     if (String(row.category || "") !== "Автомобили" || String(row.id) === String(item.id)) return false;
     if ((row.currency || "UAH") !== currency || !(Number(row.price) > 0)) return false;
     const rowMake = row.vehicle_make_slug || row.vehicle_make_name;
@@ -2515,20 +2523,21 @@ function vehicleMarketComparison(item, items) {
     if (!rowMake || !rowModel || String(rowMake) !== String(make) || String(rowModel) !== String(model)) return false;
     const rowYear = Number(row.vehicle_year) || 0;
     return !year || !rowYear || Math.abs(year - rowYear) <= 3;
-  }).map(row => Number(row.price)).sort((a, b) => a - b);
-  // Never show a market-price claim unless there are enough comparable listings.
-  if (comparable.length < 3) return null;
+  }).map(row => Number(row.price)).sort((a, b) => a - b) : [];
+
+  // Keep the scale visible for priced car listings, but never invent a marker or estimate without comparable data.
+  if (!comparable.length) {
+    return { position: null, message: noDataMessage, tone: "no-data", labels, median: null, difference: null, count: 0, level: "none" };
+  }
+
   const middle = Math.floor(comparable.length / 2);
   const median = comparable.length % 2 ? comparable[middle] : (comparable[middle - 1] + comparable[middle]) / 2;
-  if (!(median > 0)) return null;
+  if (!(median > 0)) {
+    return { position: null, message: noDataMessage, tone: "no-data", labels, median: null, difference: null, count: 0, level: "none" };
+  }
+
   const difference = Math.round(((Number(item.price) - median) / median) * 100);
   const position = Math.max(0, Math.min(100, ((Number(item.price) / median - 0.7) / 0.6) * 100));
-  const labels = {
-    ru: { below: "Ниже рынка", average: "Средняя цена", above: "Выше рынка", belowText: "дешевле", aboveText: "дороже" },
-    uk: { below: "Нижче ринку", average: "Середня ціна", above: "Вище ринку", belowText: "дешевше", aboveText: "дорожче" },
-    en: { below: "Below market", average: "Average price", above: "Above market", belowText: "below market", aboveText: "above market" },
-    pl: { below: "Poniżej rynku", average: "Średnia cena", above: "Powyżej rynku", belowText: "taniej", aboveText: "drożej" }
-  }[lang] || { below: "Below market", average: "Average price", above: "Above market", belowText: "below market", aboveText: "above market" };
   let message = labels.average;
   let tone = "average";
   if (difference <= -3) {
@@ -2544,7 +2553,13 @@ function vehicleMarketComparison(item, items) {
       : `${difference}% above market`;
     tone = "above";
   }
-  return { position, message, tone, labels, median, difference, count: comparable.length };
+  const level = comparable.length < 3 ? "approximate" : comparable.length < 5 ? "preliminary" : "full";
+  const levelText = {
+    approximate: { ru: "Приблизительный ориентир", uk: "Приблизний орієнтир", en: "Approximate guide", pl: "Orientacyjny punkt odniesienia" },
+    preliminary: { ru: "Предварительная оценка", uk: "Попередня оцінка", en: "Preliminary estimate", pl: "Wstępna wycena" },
+    full: { ru: "Полноценная оценка", uk: "Повноцінна оцінка", en: "Full estimate", pl: "Pełna wycena" }
+  }[level][lang] || "Market estimate";
+  return { position, message, tone, labels, median, difference, count: comparable.length, level, levelText };
 }
 
 function renderListings(items) {
@@ -2578,10 +2593,10 @@ function renderListings(items) {
     const marketScale = market ? `<div class="listing-market ${market.tone}" aria-label="${escapeHtml(market.message)}">
       <div class="listing-market-message">${escapeHtml(market.message)}</div>
       <div class="listing-market-bar" role="img" aria-label="${escapeHtml(market.labels.below)} — ${escapeHtml(market.labels.average)} — ${escapeHtml(market.labels.above)}">
-        <span class="listing-market-marker" style="left:${market.position.toFixed(1)}%"></span>
+        ${Number.isFinite(market.position) ? `<span class="listing-market-marker" style="left:${market.position.toFixed(1)}%"></span>` : ""}
       </div>
       <div class="listing-market-labels"><span>${escapeHtml(market.labels.below)}</span><span>${escapeHtml(market.labels.average)}</span><span>${escapeHtml(market.labels.above)}</span></div>
-      <small>${escapeHtml(({ru:"Сравнение с похожими объявлениями Hryvnia Hub",uk:"Порівняння зі схожими оголошеннями Hryvnia Hub",en:"Compared with similar Hryvnia Hub listings",pl:"Porównanie z podobnymi ogłoszeniami Hryvnia Hub"})[lang] || "Compared with similar Hryvnia Hub listings")}</small>
+      ${market.levelText ? `<small>${escapeHtml(market.levelText)} · ${market.count} ${escapeHtml(({ru:"похожих объявлений",uk:"схожих оголошень",en:"similar listings",pl:"podobnych ogłoszeń"})[lang] || "similar listings")}</small>` : `<small>${escapeHtml(({ru:"Недостаточно данных для оценки",uk:"Недостатньо даних для оцінки",en:"Not enough data to estimate",pl:"Za mało danych do wyceny"})[lang] || "Not enough data to estimate")}</small>`}
     </div>` : "";
     return `
     <article class="card listing-card-horizontal${hasCover ? " has-cover" : " no-cover"}" data-listing-index="${index}" tabindex="0" role="button" aria-label="${escapeHtml(item.title)}" style="cursor:pointer">

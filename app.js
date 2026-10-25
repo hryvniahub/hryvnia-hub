@@ -2585,7 +2585,10 @@ function renderListings(items) {
     </div>` : "";
     return `
     <article class="card listing-card-horizontal${hasCover ? " has-cover" : " no-cover"}" data-listing-index="${index}" tabindex="0" role="button" aria-label="${escapeHtml(item.title)}" style="cursor:pointer">
-      <div class="listing-card-media">${cover}</div>
+      <div class="listing-card-media">
+        ${cover}
+        ${item.is_hot ? `<span class="hot-listing-badge" aria-label="${escapeHtml(({ru:"Горячее",uk:"Гаряче",en:"Hot",pl:"Gorące"})[lang] || "Hot")}">${escapeHtml(({ru:"Горячее",uk:"Гаряче",en:"Hot",pl:"Gorące"})[lang] || "Hot")}</span>` : ""}
+      </div>
       <div class="listing-card-content">
         <div class="listing-card-heading">
           <h3>${escapeHtml(item.title || "")}</h3>
@@ -2596,7 +2599,6 @@ function renderListings(items) {
         ${marketScale}
         <div class="listing-card-meta">
           ${city ? `<span class="city">⌖ ${escapeHtml(city)}</span>` : ""}
-          ${item.is_hot ? `<span class="hot-listing-badge">⚡ ${escapeHtml(({ru:"Горячее",uk:"Гаряче",en:"Hot",pl:"Gorące"})[lang] || "Hot")}</span>` : ""}
           ${item.is_urgent ? `<span class="urgent-listing-badge">⏱ ${escapeHtml(({ru:"Срочно",uk:"Терміново",en:"Urgent",pl:"Pilne"})[lang] || "Urgent")}</span>` : ""}
           ${isOwner ? `<span class="owner-listing-badge">✓ ${escapeHtml(myListingLabel)}</span>` : ""}
         </div>

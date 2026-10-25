@@ -885,7 +885,11 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 .hot-listing-card strong { font-size: 15px; }
 .hot-listing-card small { color: var(--muted); font-size: 12px; }
 .hot-listing-card .old-price { font-size: inherit; }
-.hot-listing-card .hot-listing-badge { display: inline-flex; padding: 4px 7px; border-radius: 6px; background: rgba(212,255,0,.25); font-size: 11px; font-weight: 700; }
+.hot-card-media { position: relative; display: block; width: 100%; min-width: 0; }
+.hot-card-media > .listing-photo, .hot-card-media > .listing-placeholder { display: block; width: 100%; height: 120px; min-height: 120px; object-fit: cover; margin: 0; border-radius: 8px; }
+.hot-card-media > .hot-listing-badge { white-space: nowrap; }
+.hot-card-badges { min-height: 0; }
+.hot-card-badges:empty { display: none; }
 .listing-edit-dialog::backdrop { background: rgba(0,0,0,.55); }
 .listing-edit-form { display: grid; gap: 12px; }
 .listing-edit-form label { display: grid; gap: 5px; }
@@ -1529,8 +1533,8 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 .listing { grid-template-columns: minmax(0, 1fr); gap: 14px; }
 .listing-card-horizontal { display: grid; grid-template-columns: minmax(260px, 44%) minmax(0, 1fr); gap: 0; padding: 0; overflow: hidden; text-align: left; background: #fff; border: 1px solid #e5e9e4; border-radius: 18px; }
 .listing-card-media { position: relative; min-width: 0; min-height: 220px; background: #f0f3ef; }
-.listing-card-media > .hot-listing-badge { position: absolute; top: 10px; left: 10px; z-index: 2; display: inline-flex; align-items: center; padding: 6px 10px; border-radius: 5px; background: #f04432; color: #fff; font-size: 12px; line-height: 1.1; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
-.listing-card-horizontal .listing-photo, .listing-card-horizontal .listing-placeholder { display: block; width: 100%; height: 100%; min-height: 220px; max-height: 310px; object-fit: cover; border-radius: 0; margin: 0; }
+.listing-card-media > .hot-listing-badge, .hot-card-media > .hot-listing-badge { position: absolute; top: 8px; left: 8px; z-index: 2; display: inline-flex; align-items: center; padding: 4px 7px; border-radius: 4px; background: #f04432; color: #fff; font-size: 11px; line-height: 1.15; font-weight: 800; box-shadow: 0 1px 4px rgba(0,0,0,.18); }
+.listing-card-horizontal .listing-photo, .listing-card-horizontal .listing-placeholder { display: block; width: 100%; height: 100%; min-height: 220px; max-height: 310px; object-fit: contain; background: #eef1ed; border-radius: 0; margin: 0; }
 .listing-card-content { display: flex; flex-direction: column; justify-content: center; min-width: 0; padding: 20px 24px; color: #111; }
 .listing-card-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; min-width: 0; }
 .listing-card-horizontal h3 { margin: 0 0 8px; color: #111; font-size: clamp(19px, 2vw, 28px); line-height: 1.18; letter-spacing: -.02em; }
@@ -1551,7 +1555,7 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 .listing-market small { display: block; margin-top: 4px; color: #778078; font-size: 10px; }
 @media (max-width: 720px) {
   .listing { grid-template-columns: minmax(0, 1fr); gap: 10px; }
-  .listing-card-horizontal { grid-template-columns: minmax(0, 44%) minmax(0, 1fr); border-radius: 14px; }
+  .listing-card-horizontal { grid-template-columns: minmax(0, 50%) minmax(0, 50%); border-radius: 14px; }
   .listing-card-media { min-height: 155px; }
   .listing-card-horizontal .listing-photo, .listing-card-horizontal .listing-placeholder { min-height: 155px; max-height: 240px; }
   .listing-card-content { padding: 12px 11px; }
@@ -1569,7 +1573,7 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
   .listing-card-horizontal .city { font-size: 11px; }
 }
 @media (max-width: 390px) {
-  .listing-card-horizontal { grid-template-columns: minmax(0, 40%) minmax(0, 1fr); }
+  .listing-card-horizontal { grid-template-columns: minmax(0, 50%) minmax(0, 50%); }
   .listing-card-media, .listing-card-horizontal .listing-photo, .listing-card-horizontal .listing-placeholder { min-height: 145px; }
   .listing-card-content { padding: 10px 8px; }
   .listing-card-horizontal h3 { font-size: 13px; }
@@ -1586,6 +1590,7 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 .edit-photo-item .photo-actions { display: flex; flex-wrap: wrap; gap: 5px; }
 .edit-photo-item .photo-actions .btn { min-width: 0; padding: 6px 8px; font-size: 12px; }
 @media (min-width: 700px) { .edit-photo-preview { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1000px) { .edit-photo-preview { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 @media (max-width: 360px) { .edit-photo-preview { gap: 6px; } .edit-photo-item { padding: 5px; } .edit-photo-item img { height: 85px; } .edit-photo-item .photo-actions .btn { font-size: 11px; padding: 5px 6px; } }
 
 /* Scoped fix 3b: keep add-listing photo manager full-width and tiled. */
@@ -1594,3 +1599,27 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 #addModal #photoPreview .photo-item { min-width: 0; overflow: hidden; }
 #addModal #photoPreview .photo-item img { display: block; width: 100%; height: 105px; object-fit: cover; }
 @media (min-width: 700px) { #addModal #photoPreview { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1000px) { #addModal #photoPreview { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+
+/* Hryvnia Hub mobile refinements: balanced listing columns, compact market scale, two-row photo rail, unified hot badge. */
+@media (max-width: 720px) {
+  .listing-card-horizontal { grid-template-columns: minmax(0, 50%) minmax(0, 50%); }
+  .listing-card-media { display: flex; align-items: center; overflow: hidden; }
+  .listing-card-horizontal .listing-photo, .listing-card-horizontal .listing-placeholder { width: 100%; height: auto; min-height: 0; max-height: none; max-width: 100%; object-fit: contain; }
+  .listing-card-content { padding: 10px 8px; }
+  .listing-market { width: 90%; max-width: 90%; margin-right: auto; }
+  .listing-market-confidence, .listing-market > small { display: none; }
+  .listing-market-message { display: block; width: 100%; box-sizing: border-box; padding: 5px 6px; font-size: clamp(9px, 2.5vw, 12px); line-height: 1.2; }
+  .listing-market-labels { gap: 2px; font-size: clamp(7px, 1.9vw, 9px); }
+  .edit-photo-preview { display: grid; grid-auto-flow: column; grid-template-rows: repeat(2, minmax(0, auto)); grid-auto-columns: minmax(100px, 34%); grid-template-columns: none; gap: 8px; width: 100%; overflow-x: auto; overscroll-behavior-x: contain; padding-bottom: 6px; }
+  .edit-photo-item img { height: 82px; object-fit: contain; background: rgba(255,255,255,.08); }
+  .edit-photo-item .photo-actions { display: grid; grid-template-columns: 1fr; }
+  .edit-photo-item .photo-actions .btn { white-space: normal; line-height: 1.15; overflow-wrap: anywhere; }
+  #addModal #photoPreview { display: grid; grid-auto-flow: column; grid-template-rows: repeat(2, minmax(0, auto)); grid-auto-columns: minmax(100px, 34%); grid-template-columns: none; gap: 8px; width: 100%; overflow-x: auto; overscroll-behavior-x: contain; padding-bottom: 6px; }
+  #addModal #photoPreview .photo-item img { height: 82px; object-fit: contain; background: rgba(255,255,255,.08); }
+}
+/* The same red hot badge is positioned over the photo in both card layouts. */
+.hot-card-media { position: relative; display: block; width: 100%; min-width: 0; overflow: hidden; }
+.hot-card-media > .listing-photo, .hot-card-media > .listing-placeholder { display: block; width: 100%; height: 120px; object-fit: cover; margin: 0; border-radius: 8px; }
+.hot-card-media > .hot-listing-badge, .listing-card-media > .hot-listing-badge { position: absolute; top: 8px; left: 8px; z-index: 2; display: inline-flex; align-items: center; padding: 5px 9px; border: 0; border-radius: 6px; background: #f04432; color: #fff; font-size: 12px; line-height: 1.15; font-weight: 800; white-space: nowrap; box-shadow: 0 1px 4px rgba(0,0,0,.18); }

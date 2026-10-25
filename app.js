@@ -373,7 +373,25 @@ const translations = {
   "Новое": {ru:"Новое",uk:"Нове",en:"New",pl:"Nowy"},
   "С пробегом": {ru:"С пробегом",uk:"З пробігом",en:"Used",pl:"Używany"},
   "Частное лицо": {ru:"Частное лицо",uk:"Приватна особа",en:"Private seller",pl:"Osoba prywatna"},
-  "Компания / бизнес": {ru:"Компания / бизнес",uk:"Компанія / бізнес",en:"Company / business",pl:"Firma / biznes"}
+  "Компания / бизнес": {ru:"Компания / бизнес",uk:"Компанія / бізнес",en:"Company / business",pl:"Firma / biznes"},
+  "Основное": {ru:"Основное",uk:"Основне",en:"Basics",pl:"Podstawowe"},
+  "Детали": {ru:"Детали",uk:"Деталі",en:"Details",pl:"Szczegóły"},
+  "Фото": {ru:"Фото",uk:"Фото",en:"Photos",pl:"Zdjęcia"},
+  "Публикация": {ru:"Публикация",uk:"Публікація",en:"Publish",pl:"Publikacja"},
+  "Ориентировочная рыночная цена": {ru:"Ориентировочная рыночная цена",uk:"Орієнтовна ринкова ціна",en:"Estimated market price",pl:"Szacunkowa cena rynkowa"},
+  "Ниже рынка": {ru:"Ниже рынка",uk:"Нижче ринку",en:"Below market",pl:"Poniżej rynku"},
+  "Рыночная цена": {ru:"Рыночная цена",uk:"Ринкова ціна",en:"Market price",pl:"Cena rynkowa"},
+  "Выше рынка": {ru:"Выше рынка",uk:"Вище ринку",en:"Above market",pl:"Powyżej rynku"},
+  "Рассчитываем ориентировочную цену…": {ru:"Рассчитываем ориентировочную цену…",uk:"Розраховуємо орієнтовну ціну…",en:"Estimating market price…",pl:"Szacujemy cenę rynkową…"},
+  "Ищем похожие объявления в базе Hryvnia Hub.": {ru:"Ищем похожие объявления в базе Hryvnia Hub.",uk:"Шукаємо схожі оголошення в базі Hryvnia Hub.",en:"Searching similar listings in the Hryvnia Hub database.",pl:"Szukamy podobnych ogłoszeń w bazie Hryvnia Hub."},
+  "Выберите марку, модель и год выпуска": {ru:"Выберите марку, модель и год выпуска",uk:"Оберіть марку, модель і рік випуску",en:"Select make, model and year",pl:"Wybierz markę, model i rok"},
+  "Для предварительной оценки нужны все три параметра.": {ru:"Для предварительной оценки нужны все три параметра.",uk:"Для попередньої оцінки потрібні всі три параметри.",en:"All three details are needed for an estimate.",pl:"Do wstępnej wyceny potrzebne są wszystkie trzy dane."},
+  "Оценка пока недоступна": {ru:"Оценка пока недоступна",uk:"Оцінка наразі недоступна",en:"Estimate unavailable",pl:"Wycena jest niedostępna"},
+  "Не удалось подключиться к базе объявлений.": {ru:"Не удалось подключиться к базе объявлений.",uk:"Не вдалося підключитися до бази оголошень.",en:"Could not connect to the listings database.",pl:"Nie udało się połączyć z bazą ogłoszeń."},
+  "Пока недостаточно данных для оценки": {ru:"Пока недостаточно данных для оценки",uk:"Поки недостатньо даних для оцінки",en:"Not enough data to estimate yet",pl:"Na razie za mało danych do wyceny"},
+  "В базе пока нет достаточно похожих объявлений. Не будем придумывать цену.": {ru:"В базе пока нет достаточно похожих объявлений. Не будем придумывать цену.",uk:"У базі поки недостатньо схожих оголошень. Не будемо вигадувати ціну.",en:"There are not enough similar listings in the database. We won't invent a price.",pl:"W bazie jest za mało podobnych ogłoszeń. Nie będziemy wymyślać ceny."},
+  "Войдите или зарегистрируйтесь, чтобы получить более точную рыночную оценку и продолжить заполнение объявления.": {ru:"Войдите или зарегистрируйтесь, чтобы получить более точную рыночную оценку и продолжить заполнение объявления.",uk:"Увійдіть або зареєструйтеся, щоб отримати точнішу ринкову оцінку та продовжити заповнення оголошення.",en:"Sign in or register to get a more accurate market estimate and continue creating your listing.",pl:"Zaloguj się lub zarejestruj, aby uzyskać dokładniejszą wycenę rynkową i kontynuować tworzenie ogłoszenia."},
+  "Не удалось получить сопоставимые объявления.": {ru:"Не удалось получить сопоставимые объявления.",uk:"Не вдалося отримати порівнювані оголошення.",en:"Could not retrieve comparable listings.",pl:"Nie udało się pobrać porównywalnych ogłoszeń."}
 };
 const authMessages = {
   ru: { close:"Закрыть", account:"Аккаунт", settings:"Настройки аккаунта", menu:"Меню / Настройки", login:"Вход", register:"Регистрация", email:"Электронная почта", password:"Пароль", confirm:"Подтвердите пароль", forgot:"Забыли пароль?", reset:"Восстановление пароля", resetLink:"Отправить ссылку для сброса", newPassword:"Новый пароль", savePassword:"Сохранить пароль", back:"Назад", signOut:"Выход", signedIn:"Вход выполнен.", signedOut:"Вы вышли из аккаунта.", signingIn:"Вход…", signingUp:"Регистрация…", sending:"Отправка…", saving:"Сохранение…", signingOut:"Выход…", emailRequired:"Введите email", invalidEmail:"Введите корректный email", shortPassword:"Пароль слишком короткий (минимум 6 символов)", mismatch:"Пароли не совпадают", noSupabase:"Supabase не подключён", badLogin:"Неверный email или пароль", confirmEmail:"Подтвердите email", exists:"Пользователь с таким email уже существует", registered:"Регистрация успешна. Проверьте почту для подтверждения.", resetSent:"Ссылка для сброса отправлена. Проверьте почту.", passwordUpdated:"Пароль обновлён.", signOutError:"Не удалось выйти. Попробуйте ещё раз.", signedAs:"Вы вошли как:" },
@@ -599,7 +617,13 @@ function renderAuthModal() {
 }
 
 function openAuthModal() { renderAuthModal(); authModal?.classList.remove("hidden"); authClose?.focus(); }
-function closeAuthModal() { authModal?.classList.add("hidden"); }
+function closeAuthModal() {
+  authModal?.classList.add("hidden");
+  // If the visitor closes auth without signing in, keep the form but cancel auto-publish.
+  if (typeof pendingListingPublish !== "undefined" && pendingListingPublish && !currentUser) {
+    pendingListingPublish = false;
+  }
+}
 
 const PASSWORD_TOGGLE_LABELS = {
   ru: { show: "Показать пароль", hide: "Скрыть пароль" },
@@ -915,6 +939,16 @@ async function initAuth() {
     }
     if (event === "SIGNED_IN") {
       if (authModal && !authModal.classList.contains("hidden")) renderAuthModal();
+      if (vehicleMarketPanel && !vehicleMarketPanel.hidden && listingCategorySelect?.value === "Автомобили") {
+        if (vehicleMarketAuthPrompt) vehicleMarketAuthPrompt.hidden = true;
+        closeAuthModal();
+        setVehicleAdvancedFields(true);
+      }
+      if (pendingListingPublish && addForm) {
+        pendingListingPublish = false;
+        closeAuthModal();
+        setTimeout(() => addForm.requestSubmit(), 0);
+      }
       await syncFavoritesOnLogin();
       subscribeToGlobalMessages();
       await updateUnreadMessageIndicators();
@@ -940,6 +974,7 @@ const photoMessage = document.getElementById("photoMessage");
 const addForm = document.getElementById("addForm");
 let selectedPhotos = [];
 let publishing = false;
+let pendingListingPublish = false;
 let validatingPhotos = false;
 
 const photoTranslations = {
@@ -2807,11 +2842,34 @@ const vehicleListingModel = document.getElementById("vehicleListingModel");
 const vehicleListingMakeSpinner = document.getElementById("vehicleListingMakeSpinner");
 const vehicleListingMakeStatus = document.getElementById("vehicleListingMakeStatus");
 const listingTitleField = document.getElementById("listingTitleField");
+const vehicleListingMore = document.getElementById("vehicleListingMore");
+const vehicleMarketPanel = document.getElementById("vehicleMarketPanel");
+const vehicleMarketPrice = document.getElementById("vehicleMarketPrice");
+const vehicleMarketNote = document.getElementById("vehicleMarketNote");
+const vehicleMarketAuthPrompt = document.getElementById("vehicleMarketAuthPrompt");
+const vehicleAdvancedFields = document.getElementById("vehicleAdvancedFields");
+const listingAdvancedCommonFields = document.getElementById("listingAdvancedCommonFields");
+let vehicleMarketRequestId = 0;
+function setVehicleAdvancedFields(expanded) {
+  if (vehicleAdvancedFields) vehicleAdvancedFields.hidden = !expanded;
+  if (listingAdvancedCommonFields) listingAdvancedCommonFields.hidden = !expanded && listingCategorySelect?.value === "Автомобили";
+  const steps = vehicleListingFields?.querySelectorAll(".listing-progress-step") || [];
+  steps.forEach((step, index) => {
+    step.classList.toggle("is-active", expanded ? index === 1 : index === 0);
+    step.classList.toggle("is-complete", expanded && index === 0);
+  });
+  const lines = vehicleListingFields?.querySelectorAll(".listing-progress > i") || [];
+  lines.forEach((line, index) => line.classList.toggle("is-complete", expanded && index === 0));
+}
 function syncVehicleListingFields() {
   const category = listingCategorySelect?.value || "";
   const isVehicle = category === "Автомобили";
   const hidesManualTitle = isVehicle || category === "Недвижимость";
   if (vehicleListingFields) vehicleListingFields.hidden = !isVehicle;
+  if (vehicleListingMore) vehicleListingMore.hidden = !isVehicle;
+  if (vehicleMarketPanel) vehicleMarketPanel.hidden = true;
+  if (vehicleAdvancedFields) vehicleAdvancedFields.hidden = true;
+  if (listingAdvancedCommonFields) listingAdvancedCommonFields.hidden = isVehicle;
   vehicleListingFields?.querySelectorAll("input,select").forEach(el => { el.disabled = !isVehicle; });
   if (listingTitleField) {
     listingTitleField.hidden = hidesManualTitle;
@@ -2855,6 +2913,73 @@ vehicleListingMake?.addEventListener("change", () => {
 });
 listingCategorySelect?.addEventListener("change", syncVehicleListingFields);
 syncVehicleListingFields();
+
+async function estimateVehicleMarketPrice() {
+  const requestId = ++vehicleMarketRequestId;
+  if (!vehicleMarketPanel || !vehicleMarketPrice || !vehicleMarketNote) return;
+  vehicleMarketPanel.hidden = false;
+  vehicleMarketPrice.textContent = t("Рассчитываем ориентировочную цену…");
+  vehicleMarketNote.textContent = t("Ищем похожие объявления в базе Hryvnia Hub.");
+  const make = vehicleListingMake?.value;
+  const model = vehicleListingModel?.value;
+  const year = Number(addForm?.elements.namedItem("vehicle_year")?.value || 0);
+  if (!make || !model || !year) {
+    vehicleMarketPrice.textContent = t("Выберите марку, модель и год выпуска");
+    vehicleMarketNote.textContent = t("Для предварительной оценки нужны все три параметра.");
+    return;
+  }
+  if (!db) {
+    vehicleMarketPrice.textContent = t("Оценка пока недоступна");
+    vehicleMarketNote.textContent = t("Не удалось подключиться к базе объявлений.");
+    return;
+  }
+  try {
+    const { data, error } = await db.from("listings")
+      .select("price, vehicle_year")
+      .eq("category", "Автомобили")
+      .eq("vehicle_make_slug", make)
+      .eq("vehicle_model_slug", model)
+      .not("price", "is", null)
+      .limit(100);
+    if (error) throw error;
+    if (requestId !== vehicleMarketRequestId) return;
+    const comparable = (data || []).filter(row => Number(row.price) > 0 && (!Number(row.vehicle_year) || Math.abs(Number(row.vehicle_year) - year) <= 3))
+      .map(row => Number(row.price)).sort((a, b) => a - b);
+    if (!comparable.length) {
+      vehicleMarketPrice.textContent = t("Пока недостаточно данных для оценки");
+      vehicleMarketNote.textContent = t("В базе пока нет достаточно похожих объявлений. Не будем придумывать цену.");
+      return;
+    }
+    const percentile = (p) => comparable[Math.min(comparable.length - 1, Math.floor((comparable.length - 1) * p))];
+    const low = Math.round(percentile(0.25));
+    const high = Math.round(percentile(0.75));
+    const format = value => new Intl.NumberFormat(lang === "uk" ? "uk-UA" : lang === "pl" ? "pl-PL" : lang === "en" ? "en-GB" : "ru-RU", { maximumFractionDigits: 0 }).format(value);
+    vehicleMarketPrice.textContent = `${format(low)} – ${format(high)} грн`;
+    vehicleMarketNote.textContent = `Предварительная оценка по ${comparable.length} похожим объявлениям Hryvnia Hub; это не вся рыночная выборка Украины.`;
+  } catch (error) {
+    console.error("Не удалось рассчитать предварительную цену автомобиля", error);
+    if (requestId !== vehicleMarketRequestId) return;
+    vehicleMarketPrice.textContent = "Оценка временно недоступна";
+    vehicleMarketNote.textContent = t("Не удалось получить сопоставимые объявления.");
+  }
+}
+vehicleListingMore?.addEventListener("click", async () => {
+  await estimateVehicleMarketPrice();
+  if (currentUser) {
+    if (vehicleMarketAuthPrompt) vehicleMarketAuthPrompt.hidden = true;
+    setVehicleAdvancedFields(true);
+  } else {
+    if (vehicleMarketAuthPrompt) vehicleMarketAuthPrompt.hidden = false;
+  }
+});
+document.getElementById("vehicleMarketLogin")?.addEventListener("click", () => {
+  openAuthModal();
+  document.querySelector('[data-auth-tab="login"]')?.click();
+});
+document.getElementById("vehicleMarketRegister")?.addEventListener("click", () => {
+  openAuthModal();
+  document.querySelector('[data-auth-tab="register"]')?.click();
+});
 
 categorySelectTrigger?.addEventListener("click", () => openCategoryMenu());
 categoryMenuOptions?.addEventListener("click", event => {
@@ -2933,33 +3058,16 @@ document.addEventListener("keydown", event => { if (event.key === "Escape") { cl
 if (searchBtn) searchBtn.addEventListener("click", loadListings);
 if (searchInput) searchInput.addEventListener("keydown", e => { if (e.key === "Enter") loadListings(); });
 
-// ==== Запрет создания объявления без авторизации ====
+// ==== Создание объявления: категория открывается без авторизации и ожидания загрузки городов ====
 const openAddBtn = document.getElementById("openAdd");
-if (openAddBtn) openAddBtn.addEventListener("click", () => {
-  if (!currentUser) {
-    openAuthModal();
-    const hint = document.createElement("p");
-    hint.className = "form-message stage-a-hint";
-    hint.setAttribute("role", "status");
-    hint.textContent = t("Войдите, чтобы добавить объявление");
-    const guest = document.getElementById("authGuest");
-    if (guest) {
-      guest.querySelectorAll(".stage-a-hint").forEach(n => n.remove());
-      guest.prepend(hint);
-      setTimeout(() => hint.remove(), 6000);
-    }
-    return;
-  }
-  openAddCategoryMenu();
-});
+if (openAddBtn) openAddBtn.addEventListener("click", () => openAddCategoryMenu());
 const addCategoryMenu = document.getElementById("addCategoryMenu");
 const addCategoryBackdrop = document.getElementById("addCategoryBackdrop");
 function closeAddCategoryMenu() {
   addCategoryMenu?.classList.add("hidden");
   addCategoryBackdrop?.classList.add("hidden");
 }
-async function openAddCategoryMenu() {
-  await ensureCitiesLoaded();
+function openAddCategoryMenu() {
   if (!addCategoryMenu) { addModal?.classList.remove("hidden"); return; }
   closeCategoryMenu();
   closeVehicleSearch();
@@ -2987,16 +3095,6 @@ if (addModal) addModal.addEventListener("click", e => { if (e.target === addModa
 if (addForm) {
   addForm.addEventListener("submit", async e => {
     e.preventDefault();
-    if (!currentUser) {
-      if (formMessage) {
-        formMessage.textContent = t("Войдите, чтобы добавить объявление");
-        formMessage.classList.remove("success");
-        formMessage.classList.add("error");
-      }
-      addModal?.classList.add("hidden");
-      openAuthModal();
-      return;
-    }
     if (publishing || validatingPhotos) return;
     if (formMessage) formMessage.textContent = "";
     if (!db) { if (formMessage) formMessage.textContent = "Сначала подключим Supabase — сейчас работает демо-режим."; return; }
@@ -3020,7 +3118,7 @@ if (addForm) {
       description,
       is_hot: false,
       is_urgent: false,
-      user_id: currentUser.id
+      user_id: currentUser?.id || null
     };
     if (selectedCategory === "Автомобили") {
       const makeSlug = String(form.get("vehicle_make_slug") || "").trim();
@@ -3071,11 +3169,26 @@ if (addForm) {
       else addForm?.querySelector('textarea[name="description"]')?.focus();
       return;
     }
+    // Validate the listing before asking the visitor to sign in.
+    if (!currentUser) {
+      pendingListingPublish = true;
+      if (formMessage) {
+        formMessage.textContent = t("Войдите, чтобы сохранить и опубликовать объявление");
+        formMessage.classList.remove("success", "error");
+      }
+      // Keep the form and selected File objects in memory while auth is open.
+      openAuthModal();
+      return;
+    }
+    payload.user_id = currentUser.id;
     const withPhotos = selectedPhotos.length > 0;
     publishing = true;
     const controls = [...addForm.elements].map(control => [control, control.disabled]);
-    controls.forEach(([control]) => { control.disabled = true; });
-    if (withPhotos && formMessage) formMessage.textContent = photoText("saving");
+    const publishButton = addForm.querySelector('button[type="submit"]');
+    const publishLabel = t("Сохранение и публикация…");
+    controls.forEach(([control]) => { if (control !== publishButton) control.disabled = true; });
+    setButtonLoading(publishButton, true, publishLabel);
+    if (formMessage) formMessage.textContent = withPhotos ? photoText("saving") : publishLabel;
     try {
       if (withPhotos) {
         payload.image_urls = await uploadListingPhotos();
@@ -3103,7 +3216,10 @@ if (addForm) {
       }
     } finally {
       publishing = false;
-      controls.forEach(([control, disabled]) => { control.disabled = disabled; });
+      setButtonLoading(publishButton, false);
+      controls.forEach(([control, disabled]) => {
+        if (control !== publishButton) control.disabled = disabled;
+      });
       updatePhotoFields();
     }
   });
@@ -3218,6 +3334,18 @@ function translatePage(selectedLanguage) {
   const latestListingsTitleEl = document.getElementById("latestListingsTitle");
   if (latestListingsTitleEl) { const item = translations["Последние объявления"]; if (item && item[lang]) latestListingsTitleEl.textContent = item[lang]; }
   if (addModal) {
+    ["Основное", "Детали", "Фото", "Публикация"].forEach((key, index) => {
+      const el = addModal.querySelectorAll(".listing-progress-step small")[index];
+      if (el) el.textContent = t(key);
+    });
+    translateTextElement(addModal.querySelector("#vehicleMarketPanel h3"), "Ориентировочная рыночная цена");
+    translateTextElement(addModal.querySelector("#vehicleMarketAuthPrompt > p"), "Войдите или зарегистрируйтесь, чтобы получить более точную рыночную оценку и продолжить заполнение объявления.");
+    translateTextElement(addModal.querySelector("#vehicleMarketLogin"), "Вход");
+    translateTextElement(addModal.querySelector("#vehicleMarketRegister"), "Регистрация");
+    ["Ниже рынка", "Рыночная цена", "Выше рынка"].forEach((key, index) => {
+      const el = addModal.querySelectorAll(".market-price-scale-labels span")[index];
+      if (el) el.textContent = t(key);
+    });
     translateTextElement(addModal.querySelector(".eyebrow"), "Новое объявление");
     translateTextElement(addModal.querySelector("h2"), "Добавить объявление");
     const vehicleLegend = addModal.querySelector("#vehicleListingFields legend");

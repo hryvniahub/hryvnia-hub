@@ -1490,21 +1490,36 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
   .listing-edit-form .vehicle-listing-fields { grid-template-columns: minmax(0, 1fr); }
 }
 
-
-/* Photo upload controls in the listing edit dialog; mirrors create-listing photos. */
-.listing-edit-form .edit-photo-fields {
-  grid-column: 1 / -1; min-width: 0; margin: 0; padding: 10px 12px 12px;
-  border: 1px solid rgba(212,255,0,.5); border-radius: 13px;
-  background: linear-gradient(145deg, rgba(8,27,18,.62), rgba(27,67,43,.72));
+/* Hryvnia Hub listing flow: compact basic form, inline estimate and auth prompt. */
+#addModal #addForm [hidden] { display: none !important; }
+#addModal .listing-progress { grid-column: 1 / -1; display: flex; align-items: flex-start; gap: 7px; margin: 0 0 8px; }
+#addModal .listing-progress-step { display: grid; justify-items: center; gap: 5px; min-width: 48px; color: rgba(247,249,245,.62); }
+#addModal .listing-progress-step span { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.12); font-weight: 800; }
+#addModal .listing-progress-step small { font-size: 10px; white-space: nowrap; }
+#addModal .listing-progress-step.is-active { color: #f7f9f5; }
+#addModal .listing-progress-step.is-active span { color: #14271c; background: var(--accent, #d4ff00); border-color: var(--accent, #d4ff00); }
+#addModal .listing-progress-step.is-complete span { color: #14271c; background: #78d98b; }
+#addModal .listing-progress > i { height: 2px; flex: 1; margin-top: 13px; background: rgba(255,255,255,.15); }
+#addModal .listing-progress > i.is-complete { background: #78d98b; }
+#addModal #vehicleListingMore { grid-column: 1 / -1; margin: 4px 0 8px; }
+#addModal .vehicle-market-panel { grid-column: 1 / -1; padding: 15px; border: 1px solid rgba(212,255,0,.28); border-radius: 16px; background: rgba(5,24,17,.62); }
+#addModal .vehicle-market-panel h3 { margin: 0 0 7px; font-size: 14px; color: rgba(247,249,245,.82); }
+#addModal .vehicle-market-price { margin: 0 0 10px; font-size: clamp(20px, 4vw, 27px); font-weight: 850; color: #fff; }
+#addModal .market-price-scale { position: relative; height: 13px; border-radius: 999px; background: linear-gradient(90deg,#20b76b 0%,#9ee51d 28%,#f2df19 50%,#ff9c1a 72%,#f04432 100%); }
+#addModal .market-price-scale i { position: absolute; top: -3px; left: 50%; width: 5px; height: 19px; border: 2px solid #f7f9f5; border-radius: 4px; background: #10271c; box-shadow: 0 0 0 2px rgba(0,0,0,.18); }
+#addModal .market-price-scale-labels { display: flex; justify-content: space-between; gap: 8px; margin-top: 5px; color: rgba(247,249,245,.7); font-size: 10px; }
+#addModal .vehicle-market-panel .muted { margin: 9px 0 0; font-size: 12px; }
+#addModal .vehicle-market-auth { margin-top: 13px; padding-top: 13px; border-top: 1px solid rgba(255,255,255,.12); }
+#addModal .vehicle-market-auth p { margin: 0 0 12px; font-size: 13px; line-height: 1.45; }
+#addModal .vehicle-market-auth-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+#addModal .vehicle-advanced-fields, #addModal .listing-advanced-common { display: contents; }
+@media (max-width: 480px) {
+  #addModal .vehicle-market-panel { padding: 12px; }
+  #addModal .listing-progress { gap: 4px; }
+  #addModal .listing-progress-step { min-width: 43px; }
+  #addModal .listing-progress-step small { font-size: 9px; }
 }
-.listing-edit-form .edit-photo-fields legend { padding: 0 6px; color: #f4f8f2; font-weight: 750; }
-.listing-edit-form .edit-photo-hint { margin: 2px 0 9px; color: rgba(244,248,242,.76); font-size: 12px; line-height: 1.4; }
-.listing-edit-form .edit-photo-pick { min-height: 38px; margin-bottom: 10px; border: 1px solid var(--accent); background: var(--accent); color: #1d2b21; }
-.listing-edit-form .edit-photo-preview { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; }
-.listing-edit-form .edit-photo-item { min-width: 0; padding: 6px; border-color: rgba(212,255,0,.28); background: rgba(255,255,255,.045); color: #f4f8f2; font-size: 12px; }
-.listing-edit-form .edit-photo-item img { width: 100%; height: 88px; object-fit: cover; border-radius: 7px; }
-.listing-edit-form .edit-photo-item > span { display: block; margin: 5px 0; overflow-wrap: anywhere; }
-.listing-edit-form .edit-photo-item .photo-actions { gap: 4px; }
-.listing-edit-form .edit-photo-item .photo-actions .btn { padding: 5px 6px; white-space: normal; font-size: 11px; }
-.listing-edit-form .edit-photo-fields .form-message { margin-top: 6px; color: #ffb4a9; }
-@media (max-width: 520px) { .listing-edit-form .edit-photo-preview { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+
+
+/* Keep authentication dialog above the listing form that launched it. */
+#authModal { z-index: 2000 !important; position: fixed; }

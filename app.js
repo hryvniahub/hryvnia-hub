@@ -1428,10 +1428,47 @@ function appendMessageBubble(m) {
   renderedMessageIds.add(m.id);
   const placeholder = threadMessages.querySelector(".muted");
   if (placeholder) placeholder.remove();
-  const mine = m.sender_id === currentUser?.id;
+
+  const mine = String(m.sender_id || "") === String(currentUser?.id || "");
   const el = document.createElement("div");
   el.className = `bubble ${mine ? "bubble-mine" : "bubble-theirs"}`;
-  el.textContent = m.body;
+  el.dataset.senderType = mine ? "mine" : "theirs";
+
+  // Apply the bubble layout inline as a fallback if the deployed CSS is stale
+  // or does not include the message-bubble rules.
+  Object.assign(el.style, {
+    display: "block",
+    boxSizing: "border-box",
+    width: "fit-content",
+    maxWidth: "82%",
+    padding: "8px 12px",
+    borderRadius: "14px",
+    fontSize: "14px",
+    lineHeight: "1.4",
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    alignSelf: mine ? "flex-end" : "flex-start",
+    marginLeft: mine ? "auto" : "0",
+    marginRight: mine ? "0" : "auto",
+    background: mine ? "var(--accent, #d4ff00)" : "#ffffff",
+    color: mine ? "#17210a" : "var(--text, #26332b)",
+    border: mine ? "1px solid transparent" : "1px solid #cbd7c9",
+    borderBottomRightRadius: mine ? "4px" : "14px",
+    borderBottomLeftRadius: mine ? "14px" : "4px",
+    boxShadow: "0 1px 2px rgba(0,0,0,.06)"
+  });
+
+  const senderLabel = document.createElement("div");
+  senderLabel.textContent = mine ? t("Вы") : t("Собеседник");
+  Object.assign(senderLabel.style, {
+    fontSize: "10px",
+    fontWeight: "700",
+    opacity: ".72",
+    marginBottom: "3px"
+  });
+  const messageText = document.createElement("div");
+  messageText.textContent = String(m.body ?? "");
+  el.append(senderLabel, messageText);
   threadMessages.appendChild(el);
 }
 function subscribeToThread(id) {

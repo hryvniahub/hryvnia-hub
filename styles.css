@@ -1721,3 +1721,79 @@ main {
     font-size: 17px;
   }
 }
+
+
+/* ============================================================
+   HRYVNIA HUB — ТОЧЕЧНАЯ ДОРАБОТКА ЛОГОТИПА И КАТЕГОРИЙ
+   Финальные переопределения: радиусы, размер текста и позиционирование.
+   ============================================================ */
+
+/* Более прямые углы: четыре карточки категорий и главный баннер. */
+.category-card { border-radius: 8px; }
+.main-banner { border-radius: 8px; }
+
+/* Увеличиваем текстовый логотип, сохраняя его компактность. */
+.brand {
+  padding: 7px 13px;
+  min-height: 42px;
+  font-size: 21px;
+}
+.brand .brand-name,
+.brand .brand-hub {
+  font-size: inherit;
+  line-height: 1.1;
+}
+
+/* Подписи категорий — в левом нижнем углу; размер на десктопе тоже 17 px. */
+.category-card-label {
+  left: 12px;
+  bottom: 9px;
+  width: auto;
+  max-width: calc(100% - 24px);
+  justify-content: flex-start;
+  text-align: left;
+  font-size: 17px;
+}
+.category-card-long-word { font-size: 15px; }
+
+@media (max-width: 720px) {
+  .brand {
+    min-height: 40px;
+    padding: 5px 8px;
+    gap: 4px;
+    font-size: 15px;
+  }
+
+  .category-card { border-radius: 8px; }
+  .category-card-label {
+    left: 8px;
+    bottom: 7px;
+    max-width: calc(100% - 16px);
+    font-size: 17px;
+    gap: 5px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .category-card[data-category="Готовый бизнес"] .category-card-label > span[data-i18n] {
+    text-align: left;
+    line-height: 1.02;
+  }
+  .category-card[data-category="Готовый бизнес"] .category-card-long-word {
+    display: block;
+    font-size: 15px;
+    white-space: normal;
+  }
+
+  /* Сдвигаем подпись недвижимости немного ниже, чтобы уменьшить конфликт
+     с центральной кнопкой «Усі» на стыке карточек. */
+  .category-card[data-category="Недвижимость"] .category-card-label {
+    bottom: 3px;
+  }
+}
+
+@media (max-width: 380px) {
+  .brand { font-size: 13px; padding: 4px 6px; }
+}

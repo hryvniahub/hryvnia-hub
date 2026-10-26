@@ -672,7 +672,6 @@ function updateAuthTranslations() {
   setText("#authNewPasswordForm label:nth-of-type(2) span", "confirm");
   setText("#authLoggedIn .muted", "signedAs");
   setText("#authSignOut", "signOut");
-  setText("#authOpenMenu", "menu");
   [["#authLoginForm button[type='submit']", "login"], ["#authRegisterForm button[type='submit']", "register"], ["#authResetForm button[type='submit']", "resetLink"], ["#authNewPasswordForm button[type='submit']", "savePassword"]].forEach(([s, k]) => setText(s, k));
   if (authClose) authClose.setAttribute("aria-label", authText("close"));
   updateAccountButton();
@@ -706,9 +705,6 @@ function accountMenuText(key) { return (ACCOUNT_MENU_TEXT[lang] || ACCOUNT_MENU_
 let accountMenuRoot = null;
 function ensureAccountMenuUI() {
   if (!authLoggedIn || accountMenuRoot) return;
-  const oldMenuButton = document.getElementById("authOpenMenu");
-  if (oldMenuButton) oldMenuButton.classList.add("hidden");
-
   accountMenuRoot = document.createElement("div");
   accountMenuRoot.id = "accountMenuRoot";
   accountMenuRoot.innerHTML = `
@@ -828,12 +824,6 @@ async function handleAccountMenuClick(event) {
     });
   }
 }
-
-document.getElementById("authOpenMenu")?.addEventListener("click", () => {
-  closeAuthModal();
-  const menuToggle = document.getElementById("menuToggle");
-  if (menuToggle) menuToggle.checked = true;
-});
 
 async function handleAuthSubmit(form, kind) {
   if (!form || form.dataset.submitting === "1") return;

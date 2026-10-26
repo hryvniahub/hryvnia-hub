@@ -332,11 +332,11 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
   /* Категории */
   .categories-grid { grid-template-columns: repeat(2, 1fr); column-gap: 8px;  }
   .category-card { aspect-ratio: 3 / 1; padding: 8px; }
-  .category-card-label { left: 8px; bottom: 7px; font-size: 19px; gap: 5px; flex-direction: row; align-items: center; justify-content: flex-start; max-width: calc(100% - 16px); text-align: left; }
+  .category-card-label { left: 8px; bottom: 7px; font-size: 18px; gap: 5px; flex-direction: row; align-items: center; justify-content: flex-start; max-width: calc(100% - 16px); text-align: left; }
   .category-icon { width: 24px; height: 24px; flex: 0 0 24px; }
   .category-card-label > span[data-i18n] { min-width: 0; }
   .category-card[data-category="Готовый бизнес"] .category-card-label > span[data-i18n] { text-align: left; line-height: 1.02; }
-  .category-card[data-category="Готовый бизнес"] .category-card-long-word { display: block; font-size: 16px; white-space: normal; }
+  .category-card[data-category="Готовый бизнес"] .category-card-long-word { display: block; font-size: 15px; white-space: normal; }
 
 
   /* Валюты */
@@ -1750,7 +1750,7 @@ main {
     left: 8px;
     bottom: 7px;
     max-width: calc(100% - 16px);
-    font-size: 17px;
+    font-size: 18px;
     gap: 5px;
     flex-direction: row;
     align-items: center;
@@ -1859,7 +1859,7 @@ main {
 
 @media (max-width: 720px) {
   .header .nav { gap: 6px; min-height: 54px; }
-  .header .brand { min-height: 40px; padding: 3px 7px; font-size: 17px; gap: 2px; }
+  .header .brand { min-height: 40px; padding: 3px 7px; font-size: 17px; gap: 2px; border-radius: 10px; }
   .header .header-actions { gap: 5px; }
   .header .lang-btn { flex: 1 1 0; min-width: 0; height: 40px; }
   .header .lang-trigger { padding: 0 7px; gap: 5px; font-size: 12px; }
@@ -1872,7 +1872,7 @@ main {
 }
 @media (max-width: 380px) {
   .header .nav { gap: 4px; }
-  .header .brand { padding-inline: 5px; font-size: 14px; }
+  .header .brand { padding-inline: 5px; font-size: 14px; border-radius: 10px; }
   .header .header-actions { gap: 4px; }
   .header .lang-trigger { padding-inline: 5px; gap: 4px; }
   .header .lang-clock { padding-left: 4px; font-size: 10px; }
@@ -1904,7 +1904,7 @@ main {
 
   .header-actions .lang-trigger {
     display: grid;
-    grid-template-columns: 18px minmax(0, 1fr) 34px;
+    grid-template-columns: 18px minmax(0, 1fr) 38px;
     align-items: center;
     justify-content: initial;
     gap: 5px;
@@ -1925,16 +1925,21 @@ main {
 
   .header-actions .lang-city {
     min-width: 0;
-    overflow: visible;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
     white-space: nowrap;
     font-size: 11px;
     line-height: 1;
   }
 
   .header-actions .lang-clock {
-    width: 34px;
-    min-width: 34px;
-    text-align: right;
+    width: 38px;
+    min-width: 38px;
+    text-align: center;
+    margin-left: 0;
+    padding-left: 0;
+    border-left: 0;
     white-space: nowrap;
     font-size: 10px;
     font-variant-numeric: tabular-nums;
@@ -1956,7 +1961,8 @@ main {
     bottom: 5px;
     color: #c7e86b;
     font-size: 25px;
-    font-weight: 700;
+    font-weight: 900;
+    -webkit-text-stroke: 0.7px currentColor;
     line-height: 1;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
     pointer-events: none;

@@ -1722,3 +1722,53 @@ main {
     font-size: 17px;
   }
 }
+
+/* ============================================================
+   HRYVNIA HUB — ТОЧЕЧНАЯ ДОРАБОТКА МОБИЛЬНОГО ЛОГОТИПА И УГЛОВ
+   Только размер текстового логотипа и радиусы карточек/баннера.
+   ============================================================ */
+
+/* Чуть более крупный текстовый логотип, без изменения цветов и шапки в целом. */
+.brand {
+  padding: 5px 9px;
+}
+.brand .brand-text {
+  font-size: 17px;
+  transform: none;
+}
+
+/* Более прямые углы у четырёх карточек категорий и главного баннера. */
+.category-card {
+  border-radius: 8px;
+}
+.main-banner {
+  border-radius: 8px;
+}
+
+@media (max-width: 720px) {
+  .brand {
+    padding: 4px 7px;
+  }
+  .brand .brand-text {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 420px) {
+  .brand {
+    padding: 4px 6px;
+  }
+  .brand .brand-text {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  .brand {
+    padding: 3px 4px;
+  }
+  .brand .brand-text {
+    font-size: 10px;
+  }
+}
+

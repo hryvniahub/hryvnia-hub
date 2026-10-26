@@ -1244,49 +1244,35 @@ let currentConversation = null;
 let messagesChannel = null;
 const renderedMessageIds = new Set();
 
+let unreadIndicatorRequest = null;
 async function updateUnreadMessageIndicators() {
-  const navButtons = [...document.querySelectorAll('[data-nav="messages"]')];
-  const badge = document.getElementById("messagesBadge");
-  const account = document.getElementById("accountBtn");
-  const clearAll = () => {
+  if (!db || !currentUser) {
+    const badge = document.getElementById("messagesBadge");
     if (badge) { badge.hidden = true; badge.textContent = ""; }
-    navButtons.forEach(button => button.querySelector(".unread-count")?.remove());
-    account?.querySelector(".unread-count")?.remove();
-  };
-  if (!db || !currentUser) { clearAll(); return; }
-  try {
-    const { data: reads, error: readError } = await db.from("conversation_reads")
-      .select("conversation_id,last_read_at").eq("user_id", currentUser.id);
-    if (readError) throw readError;
-    const readMap = new Map((reads || []).map(r => [String(r.conversation_id), r.last_read_at]));
-    const { data: convs, error: convError } = await db.from("conversations")
-      .select("id").or(`buyer_id.eq.${currentUser.id},seller_id.eq.${currentUser.id}`);
-    if (convError) throw convError;
-    const counts = await Promise.all((convs || []).map(async conv => {
-      let q = db.from("messages").select("id", { count: "exact", head: true })
-        .eq("conversation_id", conv.id).neq("sender_id", currentUser.id);
-      const lastRead = readMap.get(String(conv.id));
-      if (lastRead) q = q.gt("created_at", lastRead);
-      const result = await q;
-      if (result.error) throw result.error;
-      return result.count || 0;
-    }));
-    const unread = counts.reduce((sum, count) => sum + count, 0);
-    const display = unread > 99 ? "99+" : String(unread);
-    if (unread > 0 && badge) {
-      badge.textContent = display;
-      badge.hidden = false;
-      badge.setAttribute("aria-label", `${unread} unread messages`);
-    } else if (badge) {
-      badge.hidden = true;
-      badge.textContent = "";
-    }
-    navButtons.forEach(button => button.querySelector(".unread-count")?.remove());
-    account?.querySelector(".unread-count")?.remove();
-  } catch (error) {
-    console.warn("Unread message indicator requires conversation_reads migration:", error.message);
-    clearAll();
+    return;
   }
+  if (unreadIndicatorRequest) return unreadIndicatorRequest;
+
+  unreadIndicatorRequest = (async () => {
+    const badge = document.getElementById("messagesBadge");
+    try {
+      // One database call replaces the previous per-conversation count queries.
+      const { data, error } = await db.rpc("get_unread_messages_count");
+      if (error) throw error;
+      const unread = Math.max(0, Number(data) || 0);
+      if (!badge) return;
+      badge.textContent = unread > 99 ? "99+" : String(unread);
+      badge.hidden = unread === 0;
+      if (unread > 0) badge.setAttribute("aria-label", `${unread} unread messages`);
+      else badge.removeAttribute("aria-label");
+    } catch (error) {
+      // Preserve the last known badge instead of hiding it because of a transient request failure.
+      console.warn("Could not refresh unread message indicator:", error.message);
+    }
+  })();
+
+  try { await unreadIndicatorRequest; }
+  finally { unreadIndicatorRequest = null; }
 }
 
 function openMessagesModal() {
@@ -1332,7 +1318,13 @@ function showNewMessageToast() {
   clearTimeout(showNewMessageToast.timer);
   showNewMessageToast.timer = setTimeout(() => toast.classList.remove("visible"), 7000);
 }
-setInterval(() => { if (currentUser && db) updateUnreadMessageIndicators(); }, 20000);
+// Realtime handles normal updates; this visible-tab poll is a fallback only.
+setInterval(() => {
+  if (currentUser && db && !document.hidden) updateUnreadMessageIndicators();
+}, 60000);
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden && currentUser && db) updateUnreadMessageIndicators();
+});
 async function renderMessagesModal() {
   if (!db) {
     if (messagesGuestHint) { messagesGuestHint.textContent = t("Supabase не подключён."); messagesGuestHint.classList.remove("hidden"); }
@@ -1355,40 +1347,41 @@ async function renderMessagesModal() {
 async function loadConversations() {
   if (!db || !currentUser || !conversationsList) return;
   conversationsList.innerHTML = `<p class="muted">${escapeHtml(t("Загрузка…"))}</p>`;
-  const { data, error } = await db.from("conversations")
-    .select("id, listing_id, buyer_id, seller_id, updated_at, listings(title)")
-    .or(`buyer_id.eq.${currentUser.id},seller_id.eq.${currentUser.id}`)
-    .order("updated_at", { ascending: false });
-  if (error) { conversationsList.innerHTML = `<p class="muted">${escapeHtml(t("Ошибка") + ": " + error.message)}</p>`; return; }
-  if (!data || !data.length) {
+  const { data, error } = await db.rpc("get_conversation_summaries");
+  if (error) {
+    conversationsList.innerHTML = `<p class="muted">${escapeHtml(t("Ошибка") + ": " + error.message)}</p>`;
+    return;
+  }
+  if (!data?.length) {
     conversationsList.innerHTML = `<div class="messages-empty"><span class="messages-empty-icon" aria-hidden="true">✉</span><p class="muted">${escapeHtml(t("Сообщений пока нет."))}</p></div>`;
     return;
   }
-  const reads = await db.from("conversation_reads").select("conversation_id,last_read_at").eq("user_id", currentUser.id);
-  const readMap = new Map((reads.data || []).map(r => [String(r.conversation_id), r.last_read_at]));
+
   const locale = ({ ru:"ru-RU", uk:"uk-UA", en:"en-GB", pl:"pl-PL" })[lang] || "uk-UA";
-  const cards = await Promise.all(data.map(async c => {
-    const last = await db.from("messages").select("body, created_at, sender_id")
-      .eq("conversation_id", c.id).order("created_at", { ascending: false }).limit(1).maybeSingle();
-    const lastMessage = last.data || null;
-    const lastRead = readMap.get(String(c.id));
-    let unreadQ = db.from("messages").select("id", { count: "exact", head: true })
-      .eq("conversation_id", c.id).neq("sender_id", currentUser.id);
-    if (lastRead) unreadQ = unreadQ.gt("created_at", lastRead);
-    const unreadRes = await unreadQ;
-    const unreadCount = unreadRes.count || 0;
-    const when = lastMessage?.created_at || c.updated_at;
+  const cards = data.map(c => {
+    const when = c.last_message_at || c.updated_at;
     let timeLabel = "";
     if (when) {
       const d = new Date(when);
       if (!Number.isNaN(d.getTime())) {
         const sameDay = d.toDateString() === new Date().toDateString();
-        try { timeLabel = sameDay ? d.toLocaleTimeString(locale, { hour:"2-digit", minute:"2-digit" }) : d.toLocaleDateString(locale, { day:"2-digit", month:"2-digit" }); }
-        catch { timeLabel = ""; }
+        try {
+          timeLabel = sameDay
+            ? d.toLocaleTimeString(locale, { hour:"2-digit", minute:"2-digit" })
+            : d.toLocaleDateString(locale, { day:"2-digit", month:"2-digit" });
+        } catch { timeLabel = ""; }
       }
     }
-    return { id:c.id, title:c.listings?.title || t("Объявление"), preview:lastMessage?.body || "", timeLabel, unreadCount };
-  }));
+    const unreadCount = Math.max(0, Number(c.unread_count) || 0);
+    return {
+      id: c.conversation_id,
+      title: c.title || t("Объявление"),
+      preview: c.preview || "",
+      timeLabel,
+      unreadCount,
+    };
+  });
+
   conversationsList.innerHTML = cards.map(c => `
     <button type="button" class="conversation-card ${c.unreadCount > 0 ? "is-unread" : ""}" data-conv-id="${escapeHtml(String(c.id))}" aria-label="${escapeHtml(c.title)}">
       <span class="conv-icon" aria-hidden="true">✉</span>
@@ -1457,12 +1450,30 @@ sendMessageForm?.addEventListener("submit", async (e) => {
   if (!body) return;
   const btn = sendMessageForm.querySelector("button[type='submit']");
   setButtonLoading(btn, true);
-  const { error } = await db.from("messages").insert({ conversation_id: currentConversation, sender_id: currentUser.id, body });
-  setButtonLoading(btn, false);
-  if (error) { console.warn("send message:", error.message); return; }
-  sendMessageForm.reset();
-  await db.from("conversations").update({ updated_at: new Date().toISOString() }).eq("id", currentConversation);
-  await updateUnreadMessageIndicators();
+  const conversationId = currentConversation;
+  try {
+    const { data: insertedMessage, error } = await db.from("messages")
+      .insert({ conversation_id: conversationId, sender_id: currentUser.id, body })
+      .select("id")
+      .single();
+    if (error) throw error;
+    sendMessageForm.reset();
+    const { error: conversationError } = await db.from("conversations")
+      .update({ updated_at: new Date().toISOString() })
+      .eq("id", conversationId);
+    if (conversationError) console.warn("Could not update conversation timestamp:", conversationError.message);
+    // The server validates the participants and enforces the 12-hour email cooldown.
+    void db.functions.invoke("notify-new-message", {
+      body: { conversation_id: conversationId, message_id: insertedMessage.id }
+    }).then(({ error: notificationError }) => {
+      if (notificationError) console.warn("Email notification was not sent:", notificationError.message);
+    }).catch(error => console.warn("Email notification was not sent:", error.message));
+    await updateUnreadMessageIndicators();
+  } catch (error) {
+    console.warn("send message:", error.message);
+  } finally {
+    setButtonLoading(btn, false);
+  }
 });
 backToConvs?.addEventListener("click", () => {
   currentConversation = null;
@@ -2438,18 +2449,11 @@ async function deleteListing(item, labels) {
   await loadListings();
 }
 
-async function renderHotListings(items) {
+function renderHotListings(items) {
   const host = document.querySelector(".urgent-deals-grid");
   if (!host) return;
-  if (db) {
-    const { data, error } = await db.from("listings")
-      .select("*, cities!inner(name_ru, name_uk, name_en, name_pl, region_katottg_code)")
-      .or("is_hot.eq.true,is_urgent.eq.true")
-      .order("created_at", { ascending: false })
-      .limit(20);
-    if (!error) items = data || [];
-    else console.warn("Hot listings query failed:", error.message);
-  }
+  // Use the same already-filtered listings as the main catalog.
+  // Do not issue a second unfiltered Supabase query here.
   items = (items || []).filter(item => item.is_hot || item.is_urgent);
   const langPack = {
     ru: { hot:"Горячее", urgent:"Срочно", empty:"Горячих и срочных объявлений пока нет." },
@@ -2491,7 +2495,7 @@ function vehicleCardSpecs(item) {
 
 function renderListings(items) {
   visibleListings = items;
-  renderHotListings(items.filter(item => item.is_hot));
+  renderHotListings(items.filter(item => item.is_hot || item.is_urgent));
   if (resultCount) {
     const wordMap = { uk: ["оголошення", "оголошень", "оголошення"], ru: ["объявление", "объявлений", "объявления"], en: ["listing", "listings", "listings"], pl: ["ogłoszenie", "ogłoszeń", "ogłoszenia"] };
     const [one, many, few] = wordMap[lang] || wordMap.ru;

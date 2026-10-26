@@ -63,16 +63,16 @@ button { font-family: inherit; }
 .brand {
   display: inline-flex; align-items: center; gap: 8px;
   text-decoration: none; 
-  font-weight: 800; font-size: 17px; letter-spacing: -0.01em;
+  font-weight: 800; font-size: 19px; letter-spacing: -0.01em;
   border: 2px solid var(--accent); border-radius: 12px;
-  padding: 4px 10px 4px 6px; 
+  padding: 6px 12px; 
   position: relative; flex: 0 0 auto;
 }
 .brand .logo {
   width: 32px; height: 32px; border-radius: 8px;
   object-fit: contain; background: var(--accent); padding: 2px;
 }
-.brand .brand-text { transform: scale(1.05, 1.25); transform-origin: left center; white-space: nowrap; }
+.brand .brand-text { transform: scale(1.05, 1.25); transform-origin: left center; white-space: nowrap; line-height: 1.1; }
 
 /* Кнопки шапки */
 .header-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-wrap: nowrap; }
@@ -129,10 +129,11 @@ button { font-family: inherit; }
   position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;
 }
 .category-card-label {
-  position: relative; z-index: 2; font-weight: 800; font-size: clamp(21px, 1.7vw, 24px);
+  position: absolute; z-index: 2; left: 12px; bottom: 10px;
+  font-weight: 800; font-size: clamp(21px, 1.7vw, 24px);
   line-height: 1.1; text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  width: 100%;
+  display: inline-flex; align-items: center; justify-content: flex-start; gap: 6px;
+  width: auto; max-width: calc(100% - 24px); text-align: left;
 }
 
 .category-card-long-word {
@@ -336,9 +337,9 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
 
   /* Шапка */
   .nav { gap: 6px; }
-  .brand { padding: 2px 6px; gap: 4px; }
+  .brand { padding: 4px 8px; gap: 4px; }
   .brand .logo { width: 24px; height: 24px; }
-  .brand .brand-text { transform: scale(1, 1.15); font-size: 13px; }
+  .brand .brand-text { transform: scale(1, 1.15); font-size: 14px; }
 
   .header-action, .lang-btn { height: 36px; padding: 0 8px; font-size: 11px; border-width: 2px; }
   .lang-trigger { padding: 0 6px; font-size: 11px; }
@@ -349,10 +350,10 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
   /* Категории */
   .categories-grid { grid-template-columns: repeat(2, 1fr); column-gap: 8px;  }
   .category-card { aspect-ratio: 3 / 1; padding: 8px; }
-  .category-card-label { font-size: 19px; gap: 5px; flex-direction: row; align-items: center; justify-content: center; }
+  .category-card-label { left: 8px; bottom: 7px; font-size: 19px; gap: 5px; flex-direction: row; align-items: center; justify-content: flex-start; max-width: calc(100% - 16px); text-align: left; }
   .category-icon { width: 24px; height: 24px; flex: 0 0 24px; }
   .category-card-label > span[data-i18n] { min-width: 0; }
-  .category-card[data-category="Готовый бизнес"] .category-card-label > span[data-i18n] { text-align: center; line-height: 1.02; }
+  .category-card[data-category="Готовый бизнес"] .category-card-label > span[data-i18n] { text-align: left; line-height: 1.02; }
   .category-card[data-category="Готовый бизнес"] .category-card-long-word { display: block; font-size: 16px; white-space: normal; }
 
   .all-btn { width: 54px; height: 30px; font-size: 10px; }
@@ -926,9 +927,8 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
 
 /* Узкие телефоны: шапка не должна выходить за экран */
 @media (max-width: 360px) {
-  .brand { gap: 3px; padding: 2px 4px; }
-  .brand .logo { width: 20px; height: 20px; flex-basis: 20px; }
-  .brand .brand-text { font-size: 8px; transform: none; }
+  .brand { gap: 3px; padding: 3px 5px; font-size: 12px; }
+  .brand .brand-text { font-size: 12px; transform: none; }
   .header-actions { gap: 3px; }
   .header-action, .lang-btn { padding-inline: 3px; }
   #openAdd { width: 32px; min-width: 32px; padding: 0; font-size: 0; }
@@ -936,9 +936,8 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
 }
 
 @media (max-width: 420px) {
-  .brand { gap: 4px; padding: 2px 5px; }
-  .brand .logo { width: 22px; height: 22px; flex-basis: 22px; }
-  .brand .brand-text { font-size: 11px; }
+  .brand { gap: 4px; padding: 4px 6px; font-size: 12px; }
+  .brand .brand-text { font-size: 12px; }
 }
 
 /* Search row: keep the general text search visible and category control compact. */
@@ -1722,53 +1721,3 @@ main {
     font-size: 17px;
   }
 }
-
-/* ============================================================
-   HRYVNIA HUB — ТОЧЕЧНАЯ ДОРАБОТКА МОБИЛЬНОГО ЛОГОТИПА И УГЛОВ
-   Только размер текстового логотипа и радиусы карточек/баннера.
-   ============================================================ */
-
-/* Чуть более крупный текстовый логотип, без изменения цветов и шапки в целом. */
-.brand {
-  padding: 5px 9px;
-}
-.brand .brand-text {
-  font-size: 17px;
-  transform: none;
-}
-
-/* Более прямые углы у четырёх карточек категорий и главного баннера. */
-.category-card {
-  border-radius: 8px;
-}
-.main-banner {
-  border-radius: 8px;
-}
-
-@media (max-width: 720px) {
-  .brand {
-    padding: 4px 7px;
-  }
-  .brand .brand-text {
-    font-size: 13px;
-  }
-}
-
-@media (max-width: 420px) {
-  .brand {
-    padding: 4px 6px;
-  }
-  .brand .brand-text {
-    font-size: 12px;
-  }
-}
-
-@media (max-width: 360px) {
-  .brand {
-    padding: 3px 4px;
-  }
-  .brand .brand-text {
-    font-size: 10px;
-  }
-}
-

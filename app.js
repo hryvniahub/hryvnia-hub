@@ -403,21 +403,39 @@ function t(key) { return translations[key]?.[lang] || translations[key]?.ru || k
 
 function setButtonLoading(button, loading, loadingText = "") {
   if (!button) return;
+  const count = Math.max(0, Number(button.dataset.loadingCount) || 0);
+
   if (loading) {
-    if (button.dataset.originalHtml === undefined) button.dataset.originalHtml = button.innerHTML;
-    button.disabled = true;
-    button.setAttribute("aria-busy", "true");
-    button.classList.add("is-loading");
-    button.innerHTML = `<span class="spinner" aria-hidden="true"></span>${loadingText ? `<span>${escapeHtml(loadingText)}</span>` : ""}`;
-  } else {
-    button.disabled = false;
-    button.removeAttribute("aria-busy");
-    button.classList.remove("is-loading");
-    if (button.dataset.originalHtml !== undefined) {
-      button.innerHTML = button.dataset.originalHtml;
-      delete button.dataset.originalHtml;
+    // Preserve the original state once; nested callers must not overwrite it.
+    if (count === 0) {
+      button.dataset.originalHtml = button.innerHTML;
+      button.dataset.originalDisabled = String(button.disabled);
+      button.dataset.loadingCount = "1";
+      button.disabled = true;
+      button.setAttribute("aria-busy", "true");
+      button.classList.add("is-loading");
+      button.innerHTML = `<span class="spinner" aria-hidden="true"></span>${loadingText ? `<span>${escapeHtml(loadingText)}</span>` : ""}`;
+    } else {
+      button.dataset.loadingCount = String(count + 1);
     }
+    return;
   }
+
+  if (count > 1) {
+    button.dataset.loadingCount = String(count - 1);
+    return;
+  }
+  if (count === 0 && button.dataset.originalHtml === undefined) return;
+
+  button.removeAttribute("aria-busy");
+  button.classList.remove("is-loading");
+  if (button.dataset.originalHtml !== undefined) {
+    button.innerHTML = button.dataset.originalHtml;
+    delete button.dataset.originalHtml;
+  }
+  button.disabled = button.dataset.originalDisabled === "true";
+  delete button.dataset.originalDisabled;
+  delete button.dataset.loadingCount;
 }
 
 const listing = document.getElementById("listing");
@@ -1161,36 +1179,77 @@ function toggleFavorite(id) {
   const key = String(id);
   const list = getLocalFavorites();
   const wasFav = list.includes(key);
-  const next = wasFav ? list.filter(x => x !== key) : [...list, key];
+  const next = wasFav ? list.filter(value => value !== key) : [...list, key];
+
   saveLocalFavorites(next);
+  updateFavoriteButtons(key, !wasFav);
+
   if (db && currentUser) {
-    if (wasFav) db.from("favorites").delete().eq("user_id", currentUser.id).eq("listing_id", key).then(() => {});
-    else db.from("favorites").insert({ user_id: currentUser.id, listing_id: key })
-      .then(({ error }) => { if (error) console.warn("fav insert:", error.message); });
+    const userId = currentUser.id;
+    const request = wasFav
+      ? db.from("favorites").delete().eq("user_id", userId).eq("listing_id", key)
+      : db.from("favorites").upsert(
+          { user_id: userId, listing_id: key },
+          { onConflict: "user_id,listing_id", ignoreDuplicates: true }
+        );
+
+    request.then(({ error }) => {
+      if (error) {
+        console.warn("favorite update:", error.message);
+        // Restore the local state and button appearance if the database operation failed.
+        const current = getLocalFavorites();
+        const restored = wasFav
+          ? [...new Set([...current, key])]
+          : current.filter(value => value !== key);
+        saveLocalFavorites(restored);
+        updateFavoriteButtons(key, wasFav);
+      }
+    }).catch(error => {
+      console.warn("favorite update:", error?.message || error);
+    });
   }
+}
+
+function updateFavoriteButtons(key, active) {
   document.querySelectorAll(`.fav-btn[data-fav-id="${CSS.escape(key)}"]`).forEach(btn => {
-    btn.classList.toggle("active", !wasFav);
-    btn.setAttribute("aria-pressed", String(!wasFav));
-    btn.setAttribute("aria-label", !wasFav ? t("Убрать из избранного") : t("В избранное"));
+    btn.classList.toggle("active", active);
+    btn.setAttribute("aria-pressed", String(active));
+    btn.setAttribute("aria-label", active ? t("Убрать из избранного") : t("В избранное"));
     const span = btn.querySelector("span");
-    if (span) span.textContent = !wasFav ? "♥" : "♡";
+    if (span) span.textContent = active ? "♥" : "♡";
   });
 }
 
 async function syncFavoritesOnLogin() {
   if (!db || !currentUser) return;
+
+  const userId = currentUser.id;
   const local = getLocalFavorites();
+
   try {
-    const { data, error } = await db.from("favorites").select("listing_id").eq("user_id", currentUser.id);
-    if (error) { console.warn("favorites fetch error:", error.message); return; }
-    const remote = (data || []).map(r => String(r.listing_id));
+    const { data, error } = await db.from("favorites")
+      .select("listing_id")
+      .eq("user_id", userId);
+
+    if (error) throw error;
+
+    const remote = (data || []).map(row => String(row.listing_id));
     const merged = [...new Set([...local, ...remote])];
     saveLocalFavorites(merged);
-    const toUpload = merged.filter(id => !remote.includes(id));
+
+    const remoteSet = new Set(remote);
+    const toUpload = merged
+      .filter(id => !remoteSet.has(String(id)))
+      .map(listing_id => ({ user_id: userId, listing_id }));
+
     if (toUpload.length) {
-      await db.from("favorites").insert(toUpload.map(listing_id => ({ user_id: currentUser.id, listing_id })));
+      const { error: upsertError } = await db.from("favorites")
+        .upsert(toUpload, { onConflict: "user_id,listing_id", ignoreDuplicates: true });
+      if (upsertError) throw upsertError;
     }
-  } catch (err) { console.warn("syncFavorites:", err); }
+  } catch (error) {
+    console.warn("syncFavorites:", error?.message || error);
+  }
 }
 
 function openFavoritesModal() { favoritesModal?.classList.remove("hidden"); renderFavoritesList(); }
@@ -1395,33 +1454,52 @@ conversationsList?.addEventListener("click", (e) => {
   if (!btn) return;
   openConversation(btn.dataset.convId);
 });
+async function markConversationRead(id) {
+  if (!db || !currentUser || !id || currentConversation !== id || messagesModal?.classList.contains("hidden")) return false;
+  const { error } = await db.from("conversation_reads").upsert(
+    { user_id:currentUser.id, conversation_id:id, last_read_at:new Date().toISOString() },
+    { onConflict:"user_id,conversation_id" }
+  );
+  if (error) {
+    console.warn("Could not mark conversation read:", error.message);
+    return false;
+  }
+  await updateUnreadMessageIndicators();
+  return true;
+}
 async function openConversation(id) {
   if (!db || !currentUser) return;
   currentConversation = id;
   renderedMessageIds.clear();
   conversationsList?.classList.add("hidden");
   messagesThread?.classList.remove("hidden");
-  await loadThread(id);
-  if (db && currentUser) {
-    const { error } = await db.from("conversation_reads").upsert({ user_id:currentUser.id, conversation_id:id, last_read_at:new Date().toISOString() }, { onConflict:"user_id,conversation_id" });
-    if (error) console.warn("Could not mark conversation read:",error.message);
-    await updateUnreadMessageIndicators();
-  }
+  const loaded = await loadThread(id);
+  // Do not mark messages as read unless the thread was loaded successfully.
+  if (loaded && currentConversation === id) await markConversationRead(id);
   subscribeToThread(id);
 }
 async function loadThread(id) {
-  if (!threadMessages) return;
+  if (!threadMessages || !db) return false;
   threadMessages.innerHTML = `<p class="muted">${escapeHtml(t("Загрузка…"))}</p>`;
   const { data, error } = await db.from("messages")
     .select("id, sender_id, body, created_at")
     .eq("conversation_id", id)
     .order("created_at", { ascending: true });
-  if (error) { threadMessages.innerHTML = `<p class="muted">${escapeHtml(t("Ошибка") + ": " + error.message)}</p>`; return; }
+  if (error) {
+    threadMessages.innerHTML = `<p class="muted">${escapeHtml(t("Ошибка") + ": " + error.message)}</p>`;
+    return false;
+  }
+  // Ignore stale results if the user switched to another conversation while loading.
+  if (currentConversation !== id) return false;
   threadMessages.innerHTML = "";
   renderedMessageIds.clear();
-  if (!data || !data.length) { threadMessages.innerHTML = `<p class="muted">${escapeHtml(t("Сообщений пока нет."))}</p>`; return; }
+  if (!data || !data.length) {
+    threadMessages.innerHTML = `<p class="muted">${escapeHtml(t("Сообщений пока нет."))}</p>`;
+    return true;
+  }
   data.forEach(m => appendMessageBubble(m));
   threadMessages.scrollTop = threadMessages.scrollHeight;
+  return true;
 }
 function appendMessageBubble(m) {
   if (!threadMessages || renderedMessageIds.has(m.id)) return;
@@ -1475,16 +1553,57 @@ function subscribeToThread(id) {
   if (!db) return;
   if (messagesChannel) { try { db.removeChannel(messagesChannel); } catch {} }
   messagesChannel = db.channel(`messages:${id}`)
-    .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages", filter: `conversation_id=eq.${id}` }, (payload) => {
-      if (payload.new) { appendMessageBubble(payload.new); if (threadMessages) threadMessages.scrollTop = threadMessages.scrollHeight; }
+    .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages", filter: `conversation_id=eq.${id}` }, async (payload) => {
+      // A delayed realtime event from an old thread must not affect the current thread.
+      if (!payload.new || currentConversation !== id || messagesModal?.classList.contains("hidden")) return;
+      appendMessageBubble(payload.new);
+      if (threadMessages) threadMessages.scrollTop = threadMessages.scrollHeight;
+      // The user is actively viewing this conversation, so mark the incoming message read.
+      if (String(payload.new.sender_id || "") !== String(currentUser?.id || "")) {
+        await markConversationRead(id);
+      }
     })
     .subscribe();
 }
+function getSendMessageStatusElement() {
+  if (!sendMessageForm) return null;
+  let status = sendMessageForm.querySelector("[data-send-message-status]");
+  if (!status) {
+    status = document.createElement("p");
+    status.className = "form-message";
+    status.dataset.sendMessageStatus = "true";
+    status.setAttribute("role", "status");
+    status.setAttribute("aria-live", "polite");
+    sendMessageForm.appendChild(status);
+  }
+  return status;
+}
+function showSendMessageStatus(kind, message = "") {
+  const status = getSendMessageStatusElement();
+  if (!status) return;
+  status.textContent = message;
+  status.classList.toggle("error", kind === "error");
+  status.classList.toggle("success", kind === "success");
+  status.hidden = !message;
+}
+function sendMessageErrorText() {
+  return ({
+    ru: "Не удалось отправить сообщение. Проверьте соединение и попробуйте ещё раз.",
+    uk: "Не вдалося надіслати повідомлення. Перевірте з’єднання та спробуйте ще раз.",
+    en: "Could not send the message. Check your connection and try again.",
+    pl: "Nie udało się wysłać wiadomości. Sprawdź połączenie i spróbuj ponownie."
+  })[lang] || "Не удалось отправить сообщение. Проверьте соединение и попробуйте ещё раз.";
+}
+
 sendMessageForm?.addEventListener("submit", async (e) => {
   e.preventDefault();
-  if (!db || !currentUser || !currentConversation) return;
+  if (!db || !currentUser || !currentConversation) {
+    showSendMessageStatus("error", sendMessageErrorText());
+    return;
+  }
   const body = String(sendMessageForm.elements.body.value || "").trim();
   if (!body) return;
+  showSendMessageStatus("");
   const btn = sendMessageForm.querySelector("button[type='submit']");
   setButtonLoading(btn, true);
   const conversationId = currentConversation;
@@ -1495,6 +1614,7 @@ sendMessageForm?.addEventListener("submit", async (e) => {
       .single();
     if (error) throw error;
     sendMessageForm.reset();
+    showSendMessageStatus("");
     const { error: conversationError } = await db.from("conversations")
       .update({ updated_at: new Date().toISOString() })
       .eq("id", conversationId);
@@ -1507,7 +1627,9 @@ sendMessageForm?.addEventListener("submit", async (e) => {
     }).catch(error => console.warn("Email notification was not sent:", error.message));
     await updateUnreadMessageIndicators();
   } catch (error) {
-    console.warn("send message:", error.message);
+    console.warn("send message:", error?.message || error);
+    const detail = String(error?.message || "").trim();
+    showSendMessageStatus("error", detail ? `${sendMessageErrorText()} (${detail})` : sendMessageErrorText());
   } finally {
     setButtonLoading(btn, false);
   }
@@ -1525,19 +1647,54 @@ messagesModal?.addEventListener("click", (e) => { if (e.target === messagesModal
 
 async function startConversation(item) {
   if (!currentUser) { alert(t("Войдите, чтобы написать продавцу.")); return; }
-  if (!item.user_id) { alert(t("У объявления нет автора.")); return; }
-  if (item.user_id === currentUser.id) { alert(t("Это ваше объявление.")); return; }
+  if (!item?.user_id) { alert(t("У объявления нет автора.")); return; }
+  if (String(item.user_id) === String(currentUser.id)) { alert(t("Это ваше объявление.")); return; }
   if (!db) { alert(t("Supabase не подключён.")); return; }
-  const existing = await db.from("conversations").select("id").eq("listing_id", item.id).eq("buyer_id", currentUser.id).maybeSingle();
-  let convId = existing.data?.id;
-  if (!convId) {
-    const ins = await db.from("conversations").insert({ listing_id: item.id, buyer_id: currentUser.id, seller_id: item.user_id }).select("id").single();
-    if (ins.error) { alert(ins.error.message); return; }
-    convId = ins.data.id;
+
+  try {
+    // First try to reuse the existing conversation.
+    const existing = await db.from("conversations")
+      .select("id")
+      .eq("listing_id", item.id)
+      .eq("buyer_id", currentUser.id)
+      .maybeSingle();
+
+    if (existing.error) throw existing.error;
+    let convId = existing.data?.id;
+
+    if (!convId) {
+      // The unique constraint on (listing_id, buyer_id) protects against races.
+      const ins = await db.from("conversations")
+        .insert({
+          listing_id: item.id,
+          buyer_id: currentUser.id,
+          seller_id: item.user_id
+        })
+        .select("id")
+        .single();
+
+      if (ins.error) {
+        // If another request created the conversation first, fetch and reuse it.
+        const retry = await db.from("conversations")
+          .select("id")
+          .eq("listing_id", item.id)
+          .eq("buyer_id", currentUser.id)
+          .maybeSingle();
+
+        if (retry.error || !retry.data?.id) throw ins.error;
+        convId = retry.data.id;
+      } else {
+        convId = ins.data.id;
+      }
+    }
+
+    openMessagesModal();
+    await new Promise(resolve => setTimeout(resolve, 60));
+    await openConversation(convId);
+  } catch (error) {
+    console.error("startConversation:", error);
+    alert(t("Ошибка") + ": " + (error?.message || t("Не удалось открыть переписку.")));
   }
-  openMessagesModal();
-  await new Promise(r => setTimeout(r, 60));
-  await openConversation(convId);
 }
 
 document.querySelectorAll("[data-nav]").forEach(btn => {
@@ -1561,6 +1718,16 @@ const aiSearchBtn = document.getElementById("aiSearchBtn");
 async function runAiSearch() {
   if (!db) { alert(t("Supabase не подключён.")); return; }
   if (!aiSearchBtn) return;
+  if (!currentCategory) {
+    const categoryPrompt = ({
+      ru: "Сначала выберите категорию: автомобили, недвижимость, готовый бизнес или инвестиции.",
+      uk: "Спочатку виберіть категорію: автомобілі, нерухомість, готовий бізнес або інвестиції.",
+      en: "Please select a category first: automobiles, real estate, ready businesses, or investments.",
+      pl: "Najpierw wybierz kategorię: samochody, nieruchomości, gotowe firmy lub inwestycje."
+    })[lang] || "Сначала выберите категорию.";
+    alert(categoryPrompt);
+    return;
+  }
   setButtonLoading(aiSearchBtn, true, t("Поиск лучших предложений…"));
   try {
     let query = db.from("listings").select("*, cities!inner(name_ru, name_uk, name_en, name_pl, region_katottg_code)");

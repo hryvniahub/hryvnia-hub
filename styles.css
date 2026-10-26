@@ -73,7 +73,6 @@ button { font-family: inherit; }
   object-fit: contain; background: var(--accent); padding: 2px;
 }
 .brand .brand-text { transform: scale(1.05, 1.25); transform-origin: left center; white-space: nowrap; }
-.brand .brand-hub {  }
 
 /* Кнопки шапки */
 .header-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-wrap: nowrap; }
@@ -294,14 +293,10 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
 /* ============================================================
    СПИСКИ ОБЪЯВЛЕНИЙ
    ============================================================ */
-.urgent-deals {  }
-.urgent-deals-heading {  align-items: center;  }
-.hot-section-badge { display: inline-flex; align-items: center; justify-content: center; padding: 5px 9px; border: 0; border-radius: 6px; background: #f04432; color: #fff; font-size: 12px; line-height: 1.15; font-weight: 800; white-space: nowrap; box-shadow: 0 1px 4px rgba(0,0,0,.18); }
 .urgent-deals-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 .listing-section { padding: 20px 0 40px; }
 .listing { display: grid;   }
 .empty { grid-column: 1 / -1; padding: 30px; text-align: center; color: var(--muted); background: #fff; border: 1px dashed var(--line); border-radius: var(--radius); }
-
 
 /* ============================================================
    МОДАЛЬНЫЕ ОКНА, ФОРМЫ И КОМПОНЕНТЫ
@@ -362,22 +357,17 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
 
   .all-btn { width: 54px; height: 30px; font-size: 10px; }
 
-  /* Мобильные настройки баннера заданы единым блоком ниже. */
-
   /* Валюты */
   .market-ticker { margin-top: 6px; padding: 6px 8px; }
   .ticker-scroll { gap: 4px; }
   .ticker-item { padding: 0 4px; gap: 4px; }
-  .ticker-icon {     }
   
   
   .ticker-source { display: none; font-size: 7px; }
 
   /* Поиск и AI */
   .search-ai-section { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 8px; }
-  .search-panel {   }
   
-  .ai-panel {  }
   
    /* Скрываем лишний текст для компактности */
   .btn-ai { font-size: 11px; padding: 6px; }
@@ -385,7 +375,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
   /* Списки */
   .urgent-deals { padding-top: 14px; }
   .urgent-deals-grid { grid-template-columns: 1fr; gap: 10px; }
-  .listing {  }
 }
 /* ============================================================
    HRYVNIA HUB — ВОССТАНОВЛЕНИЕ ДИЗАЙНА МОДАЛОК И ФОРМ
@@ -470,8 +459,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
 .flag-ru { display: inline-block; width: 18px; height: 12px; border-radius: 2px; background: linear-gradient(to bottom, #f7f7f7 0 33.33%, #a7a7a7 33.33% 66.66%, #222 66.66% 100%); box-shadow: 0 0 0 1px rgba(0,0,0,.12); vertical-align: middle; }
 .lang-city { font-size: 11px; }
 .lang-clock { font-size: 10px; font-variant-numeric: tabular-nums; }
-.icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; padding: 0; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--text); font: inherit; font-size: 16px; cursor: pointer; }
-.icon-btn:hover { background: var(--accent-soft); }
 .search-input-row-stacked { grid-template-columns: minmax(0, 1fr); }
 .search-input-row-stacked > input, .search-input-row-stacked > button { width: 100%; min-width: 0; }
 .ticker-main { display: flex; align-items: center; gap: 4px; min-width: 0; }
@@ -484,17 +471,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
 #listingDialog .btn-contact { margin-top: 12px; }
 
 /* Заголовки секций и общие текстовые элементы */
-.badge-soft {
-  display: inline-flex;
-  align-items: center;
-  max-width: 100%;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: var(--accent-light);
-  color: #43551b;
-  font-size: 12px;
-  font-weight: 700;
-}
 .section-head {
   display: flex;
   align-items: flex-end;
@@ -526,7 +502,6 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
   transition: transform .15s ease, box-shadow .15s ease;
 }
 .card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
-.card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; }
 .badge {
   display: inline-block;
   max-width: 100%;
@@ -543,13 +518,7 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
 .desc { margin: 0; color: #4f555d; font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
 .listing-photo { width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; }
 .old-price { margin-right: 4px; color: var(--muted); text-decoration: line-through; opacity: .6; font-size: .82em; font-weight: 500; }
-.price-change-note { margin: -8px 0 8px; color: var(--muted); font-size: 12px; line-height: 1.35; opacity: .8; }
 .listing-published-date { margin: 6px 0 10px; color: var(--muted); font-size: 12px; }
-.card .card-top .city { min-width: 0; text-align: right; overflow-wrap: anywhere; }
-.card .card-top .badge,
-.card .card-top .hot-listing-badge,
-.card .card-top .urgent-listing-badge,
-.card .card-top .owner-listing-badge { flex: 0 0 auto; }
 .card.no-cover .listing-photo { display: none; }
 
 /* Бейджи горячих, срочных и частных объявлений */
@@ -593,15 +562,15 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
   gap: 6px;
   min-height: 38px;
   padding: 8px 12px;
-  border: 1px solid var(--accent-border);
+  padding-inline: 4px;
+  border: 1px solid transparent;
   border-radius: 10px;
-  
-  
+  background: transparent;
+  color: #426b16;
   font: inherit;
   font-weight: 700;
   cursor: pointer;
 }
-.link-btn { border-color: transparent; background: transparent; color: #426b16; padding-inline: 4px; }
 .link-btn:hover { background: var(--accent-soft); }
 .account-icon { display: inline-flex; align-items: center; justify-content: center; line-height: 1; }
 .hot-toggle { display: flex; align-items: center; gap: 8px; min-width: 0; margin: 8px 0; }
@@ -805,7 +774,6 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
 .vehicle-search-actions button { flex: 1 1 0; min-width: 0; min-height: 44px; border-radius: 12px; font: inherit; font-weight: 700; cursor: pointer; }
 .vehicle-reset-btn { border: 1px solid rgba(255,255,255,.3); background: transparent; color: #f7f9f5; }
 
-
 /* ============================================================
    КОМПОНЕНТЫ, РАНЬШЕ СТИЛИЗОВАВШИЕСЯ ИЗ app.js
    ============================================================ */
@@ -849,27 +817,9 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
 .hot-listing-card strong { font-size: 15px; }
 .hot-listing-card small { color: var(--muted); font-size: 12px; }
 .hot-listing-card .old-price { font-size: inherit; }
-.hot-card-media {     }
-.hot-card-media > .listing-photo, .hot-card-media > .listing-placeholder {    min-height: 120px;    }
-.hot-card-media > .hot-listing-badge { white-space: nowrap; }
 .hot-card-badges { min-height: 0; }
 .hot-card-badges:empty { display: none; }
-.listing-edit-dialog::backdrop {  }
-.listing-edit-form {   }
 .listing-edit-form label { display: grid; gap: 5px; }
-.listing-edit-form input:not([type="checkbox"]),
-.listing-edit-form select,
-.listing-edit-form textarea {
-  width: 100%;
-  box-sizing: border-box;
-  
-  
-  
-  
-  
-  font: inherit;
-}
-.listing-edit-form .hot-toggle {    }
 .edit-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 .listing-edit-form .form-message { overflow-wrap: anywhere; }
 
@@ -939,7 +889,6 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
   .bottom-nav.keyboard-open { transform: translateY(120%); }
   .nav-badge { top: 0; right: calc(50% - 22px); min-width: 16px; height: 16px; padding: 0 4px; font-size: 9.5px; line-height: 16px; border-radius: 8px; }
   .section-head { align-items: flex-start; }
-  .badge-soft { font-size: 10px; padding: 5px 7px; }
   .lang-city { font-size: 9px; }
   .lang-clock { font-size: 8.5px; }
   .lang-trigger { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: 1fr 1fr; align-items: center; column-gap: 4px; padding-inline: 5px; }
@@ -975,7 +924,6 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
   .search-filters-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-
 /* Узкие телефоны: шапка не должна выходить за экран */
 @media (max-width: 360px) {
   .brand { gap: 3px; padding: 2px 4px; }
@@ -993,18 +941,15 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
   .brand .brand-text { font-size: 11px; }
 }
 
-
 /* Search row: keep the general text search visible and category control compact. */
 .search-input-row-stacked #searchInput { display: block; }
 .search-input-row-stacked .category-select-trigger { min-height: 42px; height: 42px; }
-
 
 /* Hryvnia Hub: follow-up fixes */
 @media (max-width: 720px) {
   /* Keep a tiny visible separation between the two category-card rows. */
   .categories-grid { row-gap: 2px; }
 }
-
 
 /* Валюта в поиске автомобилей — отдельный фирменный акцент. */
 .vehicle-price-range .vehicle-currency-label select {
@@ -1057,16 +1002,13 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
   }
 }
 
-
 /* Компактный выбор категории перед созданием объявления */
 .add-category-menu { width: min(92vw, 390px); max-height: min(78dvh, 480px); padding: 18px; }
 .add-category-menu h2 { margin-bottom: 10px; padding-right: 20px; font-size: 20px; }
 .add-category-menu .category-menu-option { padding: 11px 6px; }
 .add-category-menu .category-menu-option:last-child { border-bottom: 0; }
 
-
 /* Explicitly respect hidden on form labels; the grid label rule must not override it. */
-
 
 /* --- Обновлённая форма создания объявления: единый стиль с поиском авто --- */
 #addModal {
@@ -1248,13 +1190,10 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
   #addModal #addForm > p { grid-column: 1 / -1; }
 }
 
-
 /* Listing-form vehicle make loading state */
 #addModal #vehicleListingMake:disabled { opacity: .82; cursor: progress; }
 #addModal #vehicleListingMakeSpinner { border-color: rgba(32,53,43,.2); border-top-color: var(--accent, #A8C928); border-right-color: var(--accent, #A8C928); }
 #addModal #vehicleListingMakeStatus { color: rgba(247,249,245,.78); }
-
-
 
 /* Unified listing editor — visually aligned with the Hryvnia Hub search/create UI. */
 .listing-edit-dialog {
@@ -1296,21 +1235,11 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
 .listing-edit-form .edit-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap;  border-top: 1px solid var(--line, #e3e8df); }
 .listing-edit-form .edit-actions button { min-height: 42px; padding: 10px 18px; border-radius: 10px; }
 @media (max-width: 640px) {
-  .listing-edit-dialog {     }
-  .listing-edit-form {   }
-  .listing-edit-form .vehicle-listing-fields {    }
   .listing-edit-form > label:has(textarea[name="description"]), .listing-edit-form > label:has(textarea[name="photo_urls"]) { grid-column: auto; }
-  .listing-edit-form .edit-actions {   }
   .listing-edit-form .edit-actions button { width: 100%; }
 }
 
 /* Hryvnia Hub listing editor: deep-green visual system + searchable city field */
-.listing-edit-dialog {
-  
-  
-  
-  
-}
 .listing-edit-header {
   border-bottom: 1px solid #c6dcca;
   
@@ -1320,28 +1249,8 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
 .listing-edit-header .eyebrow {  font-weight: 800; }
 .listing-edit-header h2 { color: #123e27; }
 .listing-edit-form > label { color: #234a32; }
-.listing-edit-form input:not([type="checkbox"]),
-.listing-edit-form select,
-.listing-edit-form textarea {
-  
-  
-  
-  
-}
-.listing-edit-form input:focus,
-.listing-edit-form select:focus,
-.listing-edit-form textarea:focus {
-  
-  
-}
-.listing-edit-form .vehicle-listing-fields {
-  
-  
-  
-}
 .listing-edit-form .vehicle-listing-fields legend { color: #185333; }
 .listing-edit-form .hot-toggle { color: #234a32; }
-.listing-edit-form .edit-actions {  }
 .listing-edit-form .edit-actions .btn-primary {
   border-color: #164f32;
   background: #164f32;
@@ -1491,16 +1400,13 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
   #addModal .listing-progress-step small { font-size: 9px; }
 }
 
-
 /* Keep authentication dialog above the listing form that launched it. */
 #authModal { z-index: 2000 !important; position: fixed; }
-
 
 /* Hryvnia Hub — universal horizontal listing cards */
 .listing { grid-template-columns: minmax(0, 1fr); gap: 14px; }
 .listing-card-horizontal { display: grid; grid-template-columns: minmax(260px, 44%) minmax(0, 1fr); gap: 0; padding: 0; overflow: hidden; text-align: left;  border: 1px solid #e5e9e4; border-radius: 18px; }
 .listing-card-media { position: relative; min-width: 0; min-height: 220px; background: #f0f3ef; }
-.listing-card-media > .hot-listing-badge, .hot-card-media > .hot-listing-badge { position: absolute; top: 8px; left: 8px; z-index: 2; display: inline-flex; align-items: center; padding: 4px 7px; border-radius: 4px; background: #f04432; color: #fff; font-size: 11px; line-height: 1.15; font-weight: 800; box-shadow: 0 1px 4px rgba(0,0,0,.18); }
 .listing-card-horizontal .listing-photo, .listing-card-horizontal .listing-placeholder { display: block; width: 100%; height: 100%; min-height: 220px; max-height: 310px; object-fit: contain; background: #eef1ed; border-radius: 0; margin: 0; }
 .listing-card-content { display: flex; flex-direction: column; justify-content: center; min-width: 0; padding: 20px 24px; color: #111; }
 .listing-card-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; min-width: 0; }
@@ -1521,18 +1427,14 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
   .listing { grid-template-columns: minmax(0, 1fr); gap: 10px; }
   .listing-card-horizontal {  border-radius: 14px; }
   .listing-card-media { min-height: 155px; }
-  .listing-card-horizontal .listing-photo, .listing-card-horizontal .listing-placeholder {   }
-  .listing-card-content {  }
   .listing-card-heading { gap: 5px; }
   .listing-card-horizontal h3 { margin-bottom: 6px;  }
   .listing-card-horizontal .fav-btn { flex-basis: 30px; width: 30px; height: 30px; font-size: 20px; }
   .listing-card-horizontal .listing-card-specs { margin-bottom: 2px;   }
   .listing-card-horizontal .price { gap: 3px 6px; margin-bottom: 4px; font-size: clamp(17px, 4.6vw, 24px); }
-  .listing-card-horizontal .old-price {  }
   .listing-card-condition { margin-bottom: 4px;  }
   .listing-market-bar { height: 7px; }
   .listing-card-meta { gap: 5px; padding-top: 7px; }
-  .listing-card-horizontal .city {  }
 }
 @media (max-width: 390px) {
   .listing-card-horizontal { grid-template-columns: minmax(0, 50%) minmax(0, 50%); }
@@ -1541,9 +1443,7 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
   .listing-card-horizontal h3 { font-size: 13px; }
   .listing-card-horizontal .listing-card-specs { font-size: 10px; }
   .listing-card-horizontal .price { font-size: 16px; gap: 3px; }
-  .listing-card-horizontal .old-price {  }
 }
-
 
 /* Scoped fix 3: compact photo grid only inside listing edit dialog. */
 .edit-photo-fields { min-width: 0; width: 100%; box-sizing: border-box; }
@@ -1564,7 +1464,6 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
 @media (min-width: 700px) { #addModal #photoPreview { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (min-width: 1000px) { #addModal #photoPreview { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 
-
 /* Hryvnia Hub mobile refinements: balanced listing columns, compact market scale, two-row photo rail, unified hot badge. */
 @media (max-width: 720px) {
   .listing-card-horizontal { grid-template-columns: minmax(0, 50%) minmax(0, 50%); }
@@ -1584,18 +1483,10 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
 .hot-card-media > .listing-photo, .hot-card-media > .listing-placeholder { display: block; width: 100%; height: 120px; object-fit: cover; margin: 0; border-radius: 8px; }
 .hot-card-media > .hot-listing-badge, .listing-card-media > .hot-listing-badge { position: absolute; top: 8px; left: 8px; z-index: 2; display: inline-flex; align-items: center; padding: 5px 9px; border: 0; border-radius: 6px; background: #f04432; color: #fff; font-size: 12px; line-height: 1.15; font-weight: 800; white-space: nowrap; box-shadow: 0 1px 4px rgba(0,0,0,.18); }
 
-
 /* Hryvnia Hub — agreed listing-card refinements (2026-10-25) */
 /* 1) Brand rail occupies the existing favorite-control edge, not the photo column. */
 .listing-card-horizontal {
   position: relative;
-  
-}
-.listing-card-horizontal .listing-card-content {
-   /* reserve the slim brand rail and keep text clear of it */
-}
-.listing-card-horizontal .listing-card-heading {
-  
   
 }
 .listing-card-horizontal .listing-card-heading .fav-btn {
@@ -1612,10 +1503,6 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
   
   
 }
-.listing-card-horizontal .listing-card-heading .fav-btn.active {
-  
-  
-}
 
 /* 2) Slightly improve text readability without enlarging the price or photos. */
 .listing-card-horizontal h3 { font-size: clamp(15px, 3.9vw, 20px); }
@@ -1625,10 +1512,7 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
 
 /* 3) The standalone hot heading was removed from index.html; keep its section compact. */
 .urgent-deals { padding-top: 8px; }
-.urgent-deals-heading { display: none; margin: 0; }
-
 @media (min-width: 721px) {
-  .listing-card-horizontal .listing-card-content {  }
   .listing-card-horizontal .listing-card-heading .fav-btn {
     right: -40px;  
   }
@@ -1640,18 +1524,13 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
 
 @media (max-width: 720px) {
   .listing-card-horizontal { background: linear-gradient(to right, #fff calc(100% - 24px), var(--dark) calc(100% - 24px)); }
-  .listing-card-horizontal .listing-card-content {  }
   .listing-card-horizontal .listing-card-heading .fav-btn {
     right: -30px;   
   }
   .listing-card-horizontal h3 { font-size: clamp(14px, 3.9vw, 17px); }
-  .listing-card-horizontal .listing-card-specs {  }
-  .listing-card-condition {  }
-  .listing-card-horizontal .city {  }
 }
 
 @media (max-width: 380px) {
-  .listing-card-horizontal .listing-card-content {  }
   .listing-card-horizontal { background: linear-gradient(to right, #fff calc(100% - 22px), var(--dark) calc(100% - 22px)); }
   .listing-card-horizontal .listing-card-heading .fav-btn { right: -28px;    }
 }
@@ -1682,13 +1561,8 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
   .listing-card-horizontal .city { font-size: 13px; }
 }
 
-
 /* Hryvnia Hub — final requested card refinements (2026-10-25) */
 /* Keep the favorite button white, with a clear brand-green heart outline. */
-.listing-card-horizontal .listing-card-heading .fav-btn {
-  
-  
-}
 .listing-card-horizontal .listing-card-heading .fav-btn.active {
   color: #16833b;
   background: #f0f8f1;
@@ -1696,19 +1570,6 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
 /* Softer orange hot badge instead of vivid red. */
 
 /* Make the former price easier to read without competing with the current price. */
-.listing-card-horizontal .old-price {
-  
-  
-  
-  
-  
-}
-@media (max-width: 720px) {
-  .listing-card-horizontal .old-price {  }
-}
-@media (max-width: 390px) {
-  .listing-card-horizontal .old-price {  }
-}
 
 
 /* Hryvnia Hub — final visual alignment with bottom navigation (2026-10-25) */
@@ -1740,7 +1601,6 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
 @media (max-width: 390px) {
   .listing-card-horizontal .old-price { font-size: 10px; }
 }
-
 
 /* ============================================================
    HRYVNIA HUB — фирменный тёмно-зелёный фон (черновик 2026-10-26)

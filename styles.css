@@ -293,7 +293,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
 /* ============================================================
    СПИСКИ ОБЪЯВЛЕНИЙ
    ============================================================ */
-.hot-section-badge { display: inline-flex; align-items: center; justify-content: center; padding: 5px 9px; border: 0; border-radius: 6px; background: #f04432; color: #fff; font-size: 12px; line-height: 1.15; font-weight: 800; white-space: nowrap; box-shadow: 0 1px 4px rgba(0,0,0,.18); }
 .urgent-deals-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 .listing-section { padding: 20px 0 40px; }
 .listing { display: grid;   }
@@ -460,8 +459,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
 .flag-ru { display: inline-block; width: 18px; height: 12px; border-radius: 2px; background: linear-gradient(to bottom, #f7f7f7 0 33.33%, #a7a7a7 33.33% 66.66%, #222 66.66% 100%); box-shadow: 0 0 0 1px rgba(0,0,0,.12); vertical-align: middle; }
 .lang-city { font-size: 11px; }
 .lang-clock { font-size: 10px; font-variant-numeric: tabular-nums; }
-.icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; padding: 0; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--text); font: inherit; font-size: 16px; cursor: pointer; }
-.icon-btn:hover { background: var(--accent-soft); }
 .search-input-row-stacked { grid-template-columns: minmax(0, 1fr); }
 .search-input-row-stacked > input, .search-input-row-stacked > button { width: 100%; min-width: 0; }
 .ticker-main { display: flex; align-items: center; gap: 4px; min-width: 0; }
@@ -474,17 +471,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
 #listingDialog .btn-contact { margin-top: 12px; }
 
 /* Заголовки секций и общие текстовые элементы */
-.badge-soft {
-  display: inline-flex;
-  align-items: center;
-  max-width: 100%;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: var(--accent-light);
-  color: #43551b;
-  font-size: 12px;
-  font-weight: 700;
-}
 .section-head {
   display: flex;
   align-items: flex-end;
@@ -516,7 +502,6 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
   transition: transform .15s ease, box-shadow .15s ease;
 }
 .card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
-.card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; }
 .badge {
   display: inline-block;
   max-width: 100%;
@@ -533,13 +518,7 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
 .desc { margin: 0; color: #4f555d; font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
 .listing-photo { width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; }
 .old-price { margin-right: 4px; color: var(--muted); text-decoration: line-through; opacity: .6; font-size: .82em; font-weight: 500; }
-.price-change-note { margin: -8px 0 8px; color: var(--muted); font-size: 12px; line-height: 1.35; opacity: .8; }
 .listing-published-date { margin: 6px 0 10px; color: var(--muted); font-size: 12px; }
-.card .card-top .city { min-width: 0; text-align: right; overflow-wrap: anywhere; }
-.card .card-top .badge,
-.card .card-top .hot-listing-badge,
-.card .card-top .urgent-listing-badge,
-.card .card-top .owner-listing-badge { flex: 0 0 auto; }
 .card.no-cover .listing-photo { display: none; }
 
 /* Бейджи горячих, срочных и частных объявлений */
@@ -910,7 +889,6 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
   .bottom-nav.keyboard-open { transform: translateY(120%); }
   .nav-badge { top: 0; right: calc(50% - 22px); min-width: 16px; height: 16px; padding: 0 4px; font-size: 9.5px; line-height: 16px; border-radius: 8px; }
   .section-head { align-items: flex-start; }
-  .badge-soft { font-size: 10px; padding: 5px 7px; }
   .lang-city { font-size: 9px; }
   .lang-clock { font-size: 8.5px; }
   .lang-trigger { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: 1fr 1fr; align-items: center; column-gap: 4px; padding-inline: 5px; }
@@ -1534,8 +1512,6 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
 
 /* 3) The standalone hot heading was removed from index.html; keep its section compact. */
 .urgent-deals { padding-top: 8px; }
-.urgent-deals-heading { display: none; margin: 0; }
-
 @media (min-width: 721px) {
   .listing-card-horizontal .listing-card-heading .fav-btn {
     right: -40px;  

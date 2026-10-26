@@ -9,12 +9,12 @@
   --muted: #707a75;
   --line: #dce3df;
   --accent: #A8C928;
-  --accent-hover: #c3ed00;
+  
   --accent-soft: #f0f6d9;
   --accent-light: #e8f3c8;
   --accent-border: #7fa800;
   --accent-input: #c4d7a0;
-  --dark: #174C3A;
+  
   --radius: 14px;
   --radius-lg: 20px;
   --radius-btn: 12px;
@@ -62,10 +62,10 @@ button { font-family: inherit; }
 /* Логотип */
 .brand {
   display: inline-flex; align-items: center; gap: 8px;
-  text-decoration: none; color: #111111;
+  text-decoration: none; 
   font-weight: 800; font-size: 17px; letter-spacing: -0.01em;
   border: 2px solid var(--accent); border-radius: 12px;
-  padding: 4px 10px 4px 6px; background: #ffffff;
+  padding: 4px 10px 4px 6px; 
   position: relative; flex: 0 0 auto;
 }
 .brand .logo {
@@ -73,7 +73,7 @@ button { font-family: inherit; }
   object-fit: contain; background: var(--accent); padding: 2px;
 }
 .brand .brand-text { transform: scale(1.05, 1.25); transform-origin: left center; white-space: nowrap; }
-.brand .brand-hub { color: #426b16; }
+.brand .brand-hub {  }
 
 /* Кнопки шапки */
 .header-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-wrap: nowrap; }
@@ -111,7 +111,7 @@ button { font-family: inherit; }
 /* ============================================================
    КАТЕГОРИИ (Исправлены размеры иконок)
    ============================================================ */
-.categories-section { margin-top: 0; background: linear-gradient(180deg, #f7f9f3 0%, #f2f5ed 100%); border-radius: var(--radius); padding: 2px; }
+.categories-section { margin-top: 0;  border-radius: var(--radius); padding: 2px; }
 .categories-grid { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 10px; row-gap: 0; }
 
 .category-card {
@@ -212,7 +212,7 @@ button { font-family: inherit; }
    ============================================================ */
 .market-ticker {
   margin-top: 6px; padding: 6px 8px;
-  background: rgba(255,255,255,.97); border: 1px solid #174C3A;
+   border: 1px solid #174C3A;
   border-radius: 10px; box-shadow: var(--shadow-sm);
 }
 .ticker-scroll { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
@@ -235,7 +235,7 @@ button { font-family: inherit; }
   font-size: 8px;
   line-height: 1.2;
 }
-.ticker-note { display: block; margin-top: 2px; color: var(--muted); font-size: 10px; }
+.ticker-note {  margin-top: 2px; color: var(--muted); font-size: 10px; }
 
 /* ============================================================
    ПОИСК И AI
@@ -294,12 +294,12 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
 /* ============================================================
    СПИСКИ ОБЪЯВЛЕНИЙ
    ============================================================ */
-.urgent-deals { padding-top: 20px; }
-.urgent-deals-heading { display: flex; align-items: center; margin: 0 0 12px; }
+.urgent-deals {  }
+.urgent-deals-heading {  align-items: center;  }
 .hot-section-badge { display: inline-flex; align-items: center; justify-content: center; padding: 5px 9px; border: 0; border-radius: 6px; background: #f04432; color: #fff; font-size: 12px; line-height: 1.15; font-weight: 800; white-space: nowrap; box-shadow: 0 1px 4px rgba(0,0,0,.18); }
 .urgent-deals-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 .listing-section { padding: 20px 0 40px; }
-.listing { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.listing { display: grid;   }
 .empty { grid-column: 1 / -1; padding: 30px; text-align: center; color: var(--muted); background: #fff; border: 1px dashed var(--line); border-radius: var(--radius); }
 
 
@@ -352,7 +352,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
   .account-btn .account-label { display: none; }
 
   /* Категории */
-  .categories-grid { grid-template-columns: repeat(2, 1fr); column-gap: 8px; row-gap: 0; }
+  .categories-grid { grid-template-columns: repeat(2, 1fr); column-gap: 8px;  }
   .category-card { aspect-ratio: 3 / 1; padding: 8px; }
   .category-card-label { font-size: 19px; gap: 5px; flex-direction: row; align-items: center; justify-content: center; }
   .category-icon { width: 24px; height: 24px; flex: 0 0 24px; }
@@ -368,24 +368,24 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
   .market-ticker { margin-top: 6px; padding: 6px 8px; }
   .ticker-scroll { gap: 4px; }
   .ticker-item { padding: 0 4px; gap: 4px; }
-  .ticker-icon { flex-basis: 20px; width: 20px; height: 20px; font-size: 12px; }
-  .ticker-label { font-size: 8px; }
-  .ticker-value { font-size: 10px; }
+  .ticker-icon {     }
+  
+  
   .ticker-source { display: none; font-size: 7px; }
 
   /* Поиск и AI */
   .search-ai-section { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 8px; }
-  .search-panel { padding: 10px; gap: 6px; }
-  .search-filters-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
-  .ai-panel { padding: 10px; }
-  .ai-panel h3 { font-size: 14px; }
-  .ai-panel .ai-features { display: none; } /* Скрываем лишний текст для компактности */
+  .search-panel {   }
+  
+  .ai-panel {  }
+  
+   /* Скрываем лишний текст для компактности */
   .btn-ai { font-size: 11px; padding: 6px; }
 
   /* Списки */
   .urgent-deals { padding-top: 14px; }
   .urgent-deals-grid { grid-template-columns: 1fr; gap: 10px; }
-  .listing { grid-template-columns: 1fr; }
+  .listing {  }
 }
 /* ============================================================
    HRYVNIA HUB — ВОССТАНОВЛЕНИЕ ДИЗАЙНА МОДАЛОК И ФОРМ
@@ -595,8 +595,8 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
   padding: 8px 12px;
   border: 1px solid var(--accent-border);
   border-radius: 10px;
-  background: #fff;
-  color: var(--dark);
+  
+  
   font: inherit;
   font-weight: 700;
   cursor: pointer;
@@ -849,27 +849,27 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
 .hot-listing-card strong { font-size: 15px; }
 .hot-listing-card small { color: var(--muted); font-size: 12px; }
 .hot-listing-card .old-price { font-size: inherit; }
-.hot-card-media { position: relative; display: block; width: 100%; min-width: 0; }
-.hot-card-media > .listing-photo, .hot-card-media > .listing-placeholder { display: block; width: 100%; height: 120px; min-height: 120px; object-fit: cover; margin: 0; border-radius: 8px; }
+.hot-card-media {     }
+.hot-card-media > .listing-photo, .hot-card-media > .listing-placeholder {    min-height: 120px;    }
 .hot-card-media > .hot-listing-badge { white-space: nowrap; }
 .hot-card-badges { min-height: 0; }
 .hot-card-badges:empty { display: none; }
-.listing-edit-dialog::backdrop { background: rgba(0,0,0,.55); }
-.listing-edit-form { display: grid; gap: 12px; }
+.listing-edit-dialog::backdrop {  }
+.listing-edit-form {   }
 .listing-edit-form label { display: grid; gap: 5px; }
 .listing-edit-form input:not([type="checkbox"]),
 .listing-edit-form select,
 .listing-edit-form textarea {
   width: 100%;
   box-sizing: border-box;
-  padding: 10px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--card);
-  color: inherit;
+  
+  
+  
+  
+  
   font: inherit;
 }
-.listing-edit-form .hot-toggle { display: flex; align-items: center; gap: 8px; }
+.listing-edit-form .hot-toggle {    }
 .edit-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 .listing-edit-form .form-message { overflow-wrap: anywhere; }
 
@@ -1066,7 +1066,7 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
 
 
 /* Explicitly respect hidden on form labels; the grid label rule must not override it. */
-#addModal #addForm [hidden] { display: none !important; }
+
 
 /* --- Обновлённая форма создания объявления: единый стиль с поиском авто --- */
 #addModal {
@@ -1263,18 +1263,18 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
   max-height: min(92dvh, 980px);
   overflow: auto;
   padding: clamp(16px, 3vw, 28px);
-  border: 1px solid var(--accent-border, rgba(168, 201, 40,.35));
+  
   border-radius: 20px;
-  background: var(--card, #fff);
-  color: var(--text, #1b2b20);
-  box-shadow: 0 24px 80px rgba(0,0,0,.28);
+  
+  
+  
 }
 .listing-edit-dialog::backdrop { background: rgba(10,14,10,.68); backdrop-filter: blur(3px); }
-.listing-edit-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 18px; }
-.listing-edit-header { grid-column: 1 / -1; padding-bottom: 8px; border-bottom: 1px solid var(--line, #e3e8df); }
-.listing-edit-header .eyebrow { margin: 0 0 5px; color: var(--muted, #667064); font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; }
+.listing-edit-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));  }
+.listing-edit-header { grid-column: 1 / -1; padding-bottom: 8px;  }
+.listing-edit-header .eyebrow { margin: 0 0 5px;  font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; }
 .listing-edit-header h2 { margin: 0; font-size: clamp(1.25rem, 3vw, 1.7rem); line-height: 1.25; }
-.listing-edit-form > label { min-width: 0; align-content: start; display: grid; gap: 7px; font-weight: 600; font-size: .92rem; }
+.listing-edit-form > label { min-width: 0; align-content: start; display: grid;  font-weight: 600;  }
 .listing-edit-form input:not([type="checkbox"]), .listing-edit-form select, .listing-edit-form textarea {
   min-width: 0; width: 100%; box-sizing: border-box; padding: 11px 12px;
   border: 1px solid var(--line, #d8dfd3); border-radius: 10px;
@@ -1283,9 +1283,9 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
 }
 .listing-edit-form input:focus, .listing-edit-form select:focus, .listing-edit-form textarea:focus { outline: none; border-color: var(--accent, #A8C928); box-shadow: 0 0 0 3px rgba(168, 201, 40,.18); }
 .listing-edit-form textarea { resize: vertical; }
-.listing-edit-form .vehicle-listing-fields { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px 16px; margin: 0; padding: 16px; border: 1px solid var(--line, #d8dfd3); border-radius: 14px; }
+.listing-edit-form .vehicle-listing-fields { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));  margin: 0;    }
 .listing-edit-form .vehicle-listing-fields legend { padding: 0 8px; font-size: 1rem; font-weight: 800; }
-.listing-edit-form .vehicle-listing-fields label { display: grid; gap: 6px; min-width: 0; font-size: .9rem; font-weight: 600; }
+.listing-edit-form .vehicle-listing-fields label { display: grid;  min-width: 0;  font-weight: 600; }
 .listing-edit-form > label:has(textarea[name="description"]), .listing-edit-form > label:has(textarea[name="photo_urls"]) { grid-column: 1 / -1; }
 .listing-edit-form .edit-photo-fields { grid-column: 1 / -1; min-width: 0; width: 100%; box-sizing: border-box; }
 .listing-edit-form > .hot-toggle { grid-column: 1 / -1; }
@@ -1293,55 +1293,55 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
 .listing-edit-form .hot-toggle input { width: 18px; height: 18px; accent-color: var(--accent, #A8C928); }
 .listing-edit-form > .hot-toggle { justify-self: start; margin: 0; }
 .listing-edit-form .muted, .listing-edit-form .form-message { grid-column: 1 / -1; margin: 0; overflow-wrap: anywhere; }
-.listing-edit-form .edit-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; padding-top: 8px; border-top: 1px solid var(--line, #e3e8df); }
+.listing-edit-form .edit-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap;  border-top: 1px solid var(--line, #e3e8df); }
 .listing-edit-form .edit-actions button { min-height: 42px; padding: 10px 18px; border-radius: 10px; }
 @media (max-width: 640px) {
-  .listing-edit-dialog { width: calc(100% - 14px); max-height: 94dvh; padding: 14px; border-radius: 16px; }
-  .listing-edit-form { grid-template-columns: minmax(0, 1fr); gap: 12px; }
-  .listing-edit-form .vehicle-listing-fields { grid-template-columns: minmax(0, 1fr); padding: 12px; gap: 11px; }
+  .listing-edit-dialog {     }
+  .listing-edit-form {   }
+  .listing-edit-form .vehicle-listing-fields {    }
   .listing-edit-form > label:has(textarea[name="description"]), .listing-edit-form > label:has(textarea[name="photo_urls"]) { grid-column: auto; }
-  .listing-edit-form .edit-actions { display: grid; grid-template-columns: 1fr 1fr; }
+  .listing-edit-form .edit-actions {   }
   .listing-edit-form .edit-actions button { width: 100%; }
 }
 
 /* Hryvnia Hub listing editor: deep-green visual system + searchable city field */
 .listing-edit-dialog {
-  border: 1px solid rgba(31, 91, 58, .42);
-  background: linear-gradient(180deg, #fbfdf9 0%, #f2f8f1 100%);
-  color: #183b29;
-  box-shadow: 0 24px 80px rgba(5, 35, 19, .38);
+  
+  
+  
+  
 }
 .listing-edit-header {
   border-bottom: 1px solid #c6dcca;
-  background: linear-gradient(100deg, rgba(17, 82, 49, .09), rgba(168,  201,  40, .12));
+  
   border-radius: 12px;
   padding: 12px 14px 14px;
 }
-.listing-edit-header .eyebrow { color: #286543; font-weight: 800; }
+.listing-edit-header .eyebrow {  font-weight: 800; }
 .listing-edit-header h2 { color: #123e27; }
 .listing-edit-form > label { color: #234a32; }
 .listing-edit-form input:not([type="checkbox"]),
 .listing-edit-form select,
 .listing-edit-form textarea {
-  border: 1px solid #b8cfbd;
-  border-radius: 11px;
-  background: #fff;
-  color: #1d3024;
+  
+  
+  
+  
 }
 .listing-edit-form input:focus,
 .listing-edit-form select:focus,
 .listing-edit-form textarea:focus {
-  border-color: #287348;
-  box-shadow: 0 0 0 3px rgba(40, 115, 72, .16);
+  
+  
 }
 .listing-edit-form .vehicle-listing-fields {
-  border: 1px solid #8db69a;
-  background: linear-gradient(145deg, rgba(20, 87, 51, .055), rgba(168,  201,  40, .055));
-  border-radius: 15px;
+  
+  
+  
 }
 .listing-edit-form .vehicle-listing-fields legend { color: #185333; }
 .listing-edit-form .hot-toggle { color: #234a32; }
-.listing-edit-form .edit-actions { border-top-color: #c6dcca; }
+.listing-edit-form .edit-actions {  }
 .listing-edit-form .edit-actions .btn-primary {
   border-color: #164f32;
   background: #164f32;
@@ -1350,8 +1350,8 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
 .listing-edit-form .edit-actions .btn-primary:hover { background: #216b43; }
 .listing-edit-form .edit-actions button:not(.btn-primary) {
   border: 1px solid #9cbea5;
-  background: #edf5ee;
-  color: #19452d;
+  
+  
 }
 .listing-edit-form .edit-city-field { position: relative; }
 .listing-edit-form .edit-city-suggestions {
@@ -1498,41 +1498,41 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
 
 /* Hryvnia Hub — universal horizontal listing cards */
 .listing { grid-template-columns: minmax(0, 1fr); gap: 14px; }
-.listing-card-horizontal { display: grid; grid-template-columns: minmax(260px, 44%) minmax(0, 1fr); gap: 0; padding: 0; overflow: hidden; text-align: left; background: #fff; border: 1px solid #e5e9e4; border-radius: 18px; }
+.listing-card-horizontal { display: grid; grid-template-columns: minmax(260px, 44%) minmax(0, 1fr); gap: 0; padding: 0; overflow: hidden; text-align: left;  border: 1px solid #e5e9e4; border-radius: 18px; }
 .listing-card-media { position: relative; min-width: 0; min-height: 220px; background: #f0f3ef; }
 .listing-card-media > .hot-listing-badge, .hot-card-media > .hot-listing-badge { position: absolute; top: 8px; left: 8px; z-index: 2; display: inline-flex; align-items: center; padding: 4px 7px; border-radius: 4px; background: #f04432; color: #fff; font-size: 11px; line-height: 1.15; font-weight: 800; box-shadow: 0 1px 4px rgba(0,0,0,.18); }
 .listing-card-horizontal .listing-photo, .listing-card-horizontal .listing-placeholder { display: block; width: 100%; height: 100%; min-height: 220px; max-height: 310px; object-fit: contain; background: #eef1ed; border-radius: 0; margin: 0; }
 .listing-card-content { display: flex; flex-direction: column; justify-content: center; min-width: 0; padding: 20px 24px; color: #111; }
 .listing-card-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; min-width: 0; }
-.listing-card-horizontal h3 { margin: 0 0 8px; color: #111; font-size: clamp(19px, 2vw, 28px); line-height: 1.18; letter-spacing: -.02em; }
+.listing-card-horizontal h3 { margin: 0 0 8px; color: #111;  line-height: 1.18; letter-spacing: -.02em; }
 .listing-card-horizontal .fav-btn { position: static; flex: 0 0 40px; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 50%; background: #f3f6f2; color: #17241c; font-size: 25px; line-height: 1; }
-.listing-card-horizontal .listing-card-specs { margin: 0 0 2px; color: #3f4642; font-size: clamp(14px, 1.4vw, 19px); line-height: 1.35; overflow-wrap: anywhere; }
+.listing-card-horizontal .listing-card-specs { margin: 0 0 2px; color: #3f4642;  line-height: 1.35; overflow-wrap: anywhere; }
 .listing-card-horizontal .listing-card-specs span { color: #89928b; padding: 0 3px; }
 .listing-card-horizontal .price { display: flex; flex-wrap: nowrap; align-items: baseline; justify-content: flex-start; gap: 4px 8px; min-width: 0; margin: 0 0 5px; color: #080b09; font-size: clamp(25px, 2.7vw, 38px); line-height: 1.1; font-weight: 850; }
 .listing-card-horizontal .current-price { flex: 0 1 auto; min-width: 0; white-space: nowrap; }
-.listing-card-horizontal .old-price { flex: 0 0 auto; margin: 0; color: #929a94; font-size: .48em; line-height: 1.2; font-weight: 550; white-space: nowrap; }
-.listing-card-condition { margin: 5px 0 5px; color: #59635c; font-size: clamp(11px, 1.15vw, 14px); line-height: 1.25; overflow-wrap: anywhere; }
+.listing-card-horizontal .old-price { flex: 0 0 auto; margin: 0;   line-height: 1.2;  white-space: nowrap; }
+.listing-card-condition { margin: 5px 0 5px; color: #59635c;  line-height: 1.25; overflow-wrap: anywhere; }
 .listing-card-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: auto; padding-top: 12px; }
-.listing-card-horizontal .city { color: #59635c; font-size: 15px; }
+.listing-card-horizontal .city { color: #59635c;  }
 .listing-card-horizontal .hot-listing-badge, .listing-card-horizontal .urgent-listing-badge, .listing-card-horizontal .owner-listing-badge { font-size: 11px; }
 .listing-market { display: block; width: 100%; min-width: 0; margin: 0 0 8px; }
 .listing-market-bar { display: block; width: 100%; height: 8px; border-radius: 999px; background: linear-gradient(90deg, #20b76b 0%, #9ee51d 28%, #f2df19 50%, #ff9c1a 72%, #f04432 100%); box-shadow: inset 0 0 0 1px rgba(20, 45, 28, .08); }
 @media (max-width: 720px) {
   .listing { grid-template-columns: minmax(0, 1fr); gap: 10px; }
-  .listing-card-horizontal { grid-template-columns: minmax(0, 50%) minmax(0, 50%); border-radius: 14px; }
+  .listing-card-horizontal {  border-radius: 14px; }
   .listing-card-media { min-height: 155px; }
-  .listing-card-horizontal .listing-photo, .listing-card-horizontal .listing-placeholder { min-height: 155px; max-height: 240px; }
-  .listing-card-content { padding: 12px 11px; }
+  .listing-card-horizontal .listing-photo, .listing-card-horizontal .listing-placeholder {   }
+  .listing-card-content {  }
   .listing-card-heading { gap: 5px; }
-  .listing-card-horizontal h3 { margin-bottom: 6px; font-size: clamp(14px, 3.8vw, 19px); }
+  .listing-card-horizontal h3 { margin-bottom: 6px;  }
   .listing-card-horizontal .fav-btn { flex-basis: 30px; width: 30px; height: 30px; font-size: 20px; }
-  .listing-card-horizontal .listing-card-specs { margin-bottom: 2px; font-size: clamp(11px, 2.8vw, 14px); line-height: 1.3; }
+  .listing-card-horizontal .listing-card-specs { margin-bottom: 2px;   }
   .listing-card-horizontal .price { gap: 3px 6px; margin-bottom: 4px; font-size: clamp(17px, 4.6vw, 24px); }
-  .listing-card-horizontal .old-price { font-size: .46em; }
-  .listing-card-condition { margin-bottom: 4px; font-size: 10px; }
+  .listing-card-horizontal .old-price {  }
+  .listing-card-condition { margin-bottom: 4px;  }
   .listing-market-bar { height: 7px; }
   .listing-card-meta { gap: 5px; padding-top: 7px; }
-  .listing-card-horizontal .city { font-size: 11px; }
+  .listing-card-horizontal .city {  }
 }
 @media (max-width: 390px) {
   .listing-card-horizontal { grid-template-columns: minmax(0, 50%) minmax(0, 50%); }
@@ -1541,7 +1541,7 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
   .listing-card-horizontal h3 { font-size: 13px; }
   .listing-card-horizontal .listing-card-specs { font-size: 10px; }
   .listing-card-horizontal .price { font-size: 16px; gap: 3px; }
-  .listing-card-horizontal .old-price { font-size: 9px; }
+  .listing-card-horizontal .old-price {  }
 }
 
 
@@ -1589,32 +1589,32 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
 /* 1) Brand rail occupies the existing favorite-control edge, not the photo column. */
 .listing-card-horizontal {
   position: relative;
-  background: linear-gradient(to right, #fff calc(100% - 28px), var(--dark) calc(100% - 28px));
+  
 }
 .listing-card-horizontal .listing-card-content {
-  padding-right: 34px; /* reserve the slim brand rail and keep text clear of it */
+   /* reserve the slim brand rail and keep text clear of it */
 }
 .listing-card-horizontal .listing-card-heading {
-  position: relative;
-  padding-right: 0;
+  
+  
 }
 .listing-card-horizontal .listing-card-heading .fav-btn {
-  position: absolute;
+  
   top: 0;
   right: -34px;
   z-index: 3;
-  flex: 0 0 28px;
-  width: 28px;
-  height: 28px;
-  border: 0;
+  
+  
+  
+  
   border-radius: 50%;
-  background: #fff;
-  color: var(--dark);
-  box-shadow: 0 0 0 1px rgba(255,255,255,.25);
+  
+  
+  
 }
 .listing-card-horizontal .listing-card-heading .fav-btn.active {
-  color: #d4381e;
-  background: #fff0ed;
+  
+  
 }
 
 /* 2) Slightly improve text readability without enlarging the price or photos. */
@@ -1628,9 +1628,9 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
 .urgent-deals-heading { display: none; margin: 0; }
 
 @media (min-width: 721px) {
-  .listing-card-horizontal .listing-card-content { padding-right: 40px; }
+  .listing-card-horizontal .listing-card-content {  }
   .listing-card-horizontal .listing-card-heading .fav-btn {
-    right: -40px; width: 32px; height: 32px;
+    right: -40px;  
   }
   .listing-card-horizontal { background: linear-gradient(to right, #fff calc(100% - 32px), var(--dark) calc(100% - 32px)); }
   .listing-card-horizontal h3 { font-size: clamp(20px, 2.1vw, 29px); }
@@ -1640,20 +1640,20 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
 
 @media (max-width: 720px) {
   .listing-card-horizontal { background: linear-gradient(to right, #fff calc(100% - 24px), var(--dark) calc(100% - 24px)); }
-  .listing-card-horizontal .listing-card-content { padding-right: 30px; }
+  .listing-card-horizontal .listing-card-content {  }
   .listing-card-horizontal .listing-card-heading .fav-btn {
-    right: -30px; width: 24px; height: 24px; font-size: 18px;
+    right: -30px;   
   }
   .listing-card-horizontal h3 { font-size: clamp(14px, 3.9vw, 17px); }
-  .listing-card-horizontal .listing-card-specs { font-size: clamp(11px, 2.95vw, 12px); }
-  .listing-card-condition { font-size: 11px; }
-  .listing-card-horizontal .city { font-size: 12px; }
+  .listing-card-horizontal .listing-card-specs {  }
+  .listing-card-condition {  }
+  .listing-card-horizontal .city {  }
 }
 
 @media (max-width: 380px) {
-  .listing-card-horizontal .listing-card-content { padding-right: 28px; }
+  .listing-card-horizontal .listing-card-content {  }
   .listing-card-horizontal { background: linear-gradient(to right, #fff calc(100% - 22px), var(--dark) calc(100% - 22px)); }
-  .listing-card-horizontal .listing-card-heading .fav-btn { right: -28px; width: 22px; height: 22px; font-size: 17px; }
+  .listing-card-horizontal .listing-card-heading .fav-btn { right: -28px;    }
 }
 
 /* 4) Fine-tune mobile listing typography: slightly larger specs, condition and city. */
@@ -1686,32 +1686,28 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
 /* Hryvnia Hub — final requested card refinements (2026-10-25) */
 /* Keep the favorite button white, with a clear brand-green heart outline. */
 .listing-card-horizontal .listing-card-heading .fav-btn {
-  color: #16833b;
-  border: 1px solid rgba(22, 131, 59, .18);
+  
+  
 }
 .listing-card-horizontal .listing-card-heading .fav-btn.active {
   color: #16833b;
   background: #f0f8f1;
 }
 /* Softer orange hot badge instead of vivid red. */
-.hot-card-media > .hot-listing-badge,
-.listing-card-media > .hot-listing-badge {
-  background: #ff8a24;
-  color: #fff;
-}
+
 /* Make the former price easier to read without competing with the current price. */
 .listing-card-horizontal .old-price {
-  color: #7b8580;
-  opacity: .9;
-  font-size: .52em;
-  font-weight: 600;
-  text-decoration-thickness: 1px;
+  
+  
+  
+  
+  
 }
 @media (max-width: 720px) {
-  .listing-card-horizontal .old-price { font-size: 10px; }
+  .listing-card-horizontal .old-price {  }
 }
 @media (max-width: 390px) {
-  .listing-card-horizontal .old-price { font-size: 9.5px; }
+  .listing-card-horizontal .old-price {  }
 }
 
 

@@ -64,8 +64,8 @@ button { font-family: inherit; }
   display: inline-flex; align-items: center; gap: 8px;
   text-decoration: none; 
   font-weight: 800; font-size: 19px; letter-spacing: -0.01em;
-  border: 2px solid var(--accent); border-radius: 12px;
-  padding: 6px 12px; 
+  border: 2px solid var(--accent); border-radius: 6px;
+  padding: 7px 15px; 
   position: relative; flex: 0 0 auto;
 }
 .brand .logo {
@@ -141,28 +141,10 @@ button { font-family: inherit; }
   white-space: nowrap;
 }
 
-/* Компьютерная версия: освобождаем место от центральной кнопки «Усі». */
-@media (min-width: 721px) {
-  .category-card[data-category="Недвижимость"] .category-card-label {
-    transform: translateX(-10px);
-  }
-}
-
 /* Иконки категорий (уменьшены) */
 .category-icon {
   flex: 0 0 24px; width: 24px; height: 24px;
   filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
-}
-
-/* Кнопка "Усі" по центру */
-.categories-section .categories-grid { position: relative; }
-.all-btn {
-  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-  width: 64px; height: 36px; border-radius: 10px;
-  background: var(--accent); border: 3px solid #426B16; color: #17210a;
-  font-weight: 800; font-size: 11px; z-index: 5;
-  display: inline-flex; align-items: center; justify-content: center;
-  cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
 /* ============================================================
@@ -356,7 +338,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
   .category-card[data-category="Готовый бизнес"] .category-card-label > span[data-i18n] { text-align: left; line-height: 1.02; }
   .category-card[data-category="Готовый бизнес"] .category-card-long-word { display: block; font-size: 16px; white-space: normal; }
 
-  .all-btn { width: 54px; height: 30px; font-size: 10px; }
 
   /* Валюты */
   .market-ticker { margin-top: 6px; padding: 6px 8px; }
@@ -1736,7 +1717,7 @@ main {
 .brand {
   padding: 7px 13px;
   min-height: 42px;
-  font-size: 21px;
+  font-size: 22px;
 }
 .brand .brand-name,
 .brand .brand-hub {
@@ -1759,8 +1740,8 @@ main {
 @media (max-width: 720px) {
   .brand {
     min-height: 40px;
-    padding: 5px 8px;
-    gap: 4px;
+    padding: 5px 10px;
+    gap: 5px;
     font-size: 15px;
   }
 
@@ -1787,11 +1768,6 @@ main {
     white-space: normal;
   }
 
-  /* Сдвигаем подпись недвижимости немного ниже, чтобы уменьшить конфликт
-     с центральной кнопкой «Усі» на стыке карточек. */
-  .category-card[data-category="Недвижимость"] .category-card-label {
-    bottom: 3px;
-  }
 }
 
 @media (max-width: 380px) {

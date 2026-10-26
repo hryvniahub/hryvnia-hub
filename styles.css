@@ -1879,3 +1879,79 @@ main {
   .header .header-action.account-btn { width: 34px; min-width: 34px; height: 38px; }
   .header #openAdd { padding-inline: 5px; font-size: 10px; }
 }
+
+
+/* ============================================================
+   МОБИЛЬНЫЕ ТОЧЕЧНЫЕ ПРАВКИ: логотип, переключатель, стрелки
+   Только мобильная версия; desktop не затрагивается.
+   ============================================================ */
+@media (max-width: 720px) {
+  /* Увеличиваем высоту букв без изменения ширины текста в потоке
+     и без изменения размеров белого блока логотипа. */
+  .brand .brand-text {
+    transform: scale(1, 1.25);
+    transform-origin: left center;
+  }
+
+  /* Одинаковая ширина переключателя для всех языков.
+     Отдельные колонки фиксируют место флага, города и часов. */
+  .header-actions .lang-btn {
+    flex: 0 0 126px;
+    width: 126px;
+    min-width: 126px;
+    padding: 0;
+  }
+
+  .header-actions .lang-trigger {
+    display: grid;
+    grid-template-columns: 18px minmax(0, 1fr) 34px;
+    align-items: center;
+    justify-content: initial;
+    gap: 5px;
+    width: 100%;
+    min-width: 0;
+    padding: 0 6px;
+  }
+
+  .header-actions .lang-flag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    min-width: 18px;
+    font-size: 12px;
+    line-height: 1;
+  }
+
+  .header-actions .lang-city {
+    min-width: 0;
+    overflow: visible;
+    white-space: nowrap;
+    font-size: 11px;
+    line-height: 1;
+  }
+
+  .header-actions .lang-clock {
+    width: 34px;
+    min-width: 34px;
+    text-align: right;
+    white-space: nowrap;
+    font-size: 10px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Неброская лаймовая стрелка в правом нижнем углу карточек. */
+  .category-card::after {
+    content: "›";
+    position: absolute;
+    z-index: 2;
+    right: 10px;
+    bottom: 5px;
+    color: #c7e86b;
+    font-size: 25px;
+    font-weight: 700;
+    line-height: 1;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+    pointer-events: none;
+  }
+}

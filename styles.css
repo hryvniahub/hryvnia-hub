@@ -1940,6 +1940,13 @@ main {
     font-variant-numeric: tabular-nums;
   }
 
+  /* Убираем стрелку у переключателя языка только на мобильных.
+     Иначе псевдоэлемент попадает на новую строку CSS Grid. */
+  .header .lang-trigger::after {
+    content: none;
+    display: none;
+  }
+
   /* Неброская лаймовая стрелка в правом нижнем углу карточек. */
   .category-card::after {
     content: "›";

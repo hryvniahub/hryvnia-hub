@@ -2187,15 +2187,6 @@ document.addEventListener("click", event => {
   if (catalogCitySearchInput && !catalogCitySearchInput.parentElement.contains(event.target)) closeCatalogCitySuggestions();
 });
 
-// === СПРАВОЧНИК ТЕХНИЧЕСКИХ СОСТОЯНИЙ АВТО (устарел) ===
-// Чекбоксы `vehicle_operational_conditions` заменены одиночным полем
-// vehicle_operational_condition. Заглушки оставлены, чтобы не ломать
-// существующие вызовы в loadListings()/translatePage()/сабмите формы.
-function getSelectedConditionIds() { return []; }
-function clearConditionsCheckboxes() {}
-function renderConditionsCheckboxes() {}
-function renderAllConditionGroups() {}
-async function rerenderConditionsOnLangChange() {}
 let currentCategory = "";
 let visibleListings = [];
 let isSearching = false;

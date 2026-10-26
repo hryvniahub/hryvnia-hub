@@ -1782,3 +1782,125 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 @media (max-width: 390px) {
   .listing-card-horizontal .old-price { font-size: 10px; }
 }
+
+
+/* ============================================================
+   HRYVNIA HUB — фирменный тёмно-зелёный фон (черновик 2026-10-26)
+   Только оформление: размеры блоков и логика приложения не меняются.
+   ============================================================ */
+:root {
+  --dark: #174C3A;
+  --accent-hover: #B5D63A;
+}
+
+/* Основной фон страницы и свободные промежутки между секциями. */
+html,
+body {
+  background-color: #174C3A;
+}
+
+main {
+  background-color: #174C3A;
+}
+
+.categories-section {
+  background: transparent;
+}
+
+/* Тикер валют остаётся светлым, как в согласованном макете. */
+.market-ticker {
+  background: #ffffff;
+}
+
+/* Логотип: только текст HRYVNIA HUB, без старой иконки H. */
+.brand .logo {
+  display: none;
+}
+
+.brand {
+  color: #174C3A;
+  background: #ffffff;
+}
+
+.brand .brand-name {
+  color: #174C3A;
+}
+
+.brand .brand-hub {
+  color: #A8C928;
+}
+
+/* Фон между объявлениями становится фирменным зелёным.
+   Белая поверхность каждой карточки сохраняется; правая цветная полоса убирается. */
+.listing-card-horizontal {
+  background: #ffffff;
+}
+
+/* Сердечко остаётся рабочим и находится внутри белой карточки,
+   а не в отдельной зелёной полосе. */
+.listing-card-horizontal .listing-card-content {
+  padding-right: 24px;
+}
+
+.listing-card-horizontal .listing-card-heading {
+  position: static;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  padding-right: 0;
+}
+
+.listing-card-horizontal .listing-card-heading .fav-btn {
+  position: static;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  color: #A8C928;
+  background: #ffffff;
+  border: 1px solid rgba(168, 201, 40, .45);
+  box-shadow: none;
+}
+
+@media (min-width: 721px) {
+  .listing-card-horizontal .listing-card-content {
+    padding-right: 24px;
+  }
+
+  .listing-card-horizontal .listing-card-heading .fav-btn {
+    flex-basis: 32px;
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@media (max-width: 720px) {
+  .listing-card-horizontal .listing-card-content {
+    padding-right: 11px;
+  }
+
+  .listing-card-horizontal .listing-card-heading {
+    gap: 5px;
+  }
+
+  .listing-card-horizontal .listing-card-heading .fav-btn {
+    flex-basis: 24px;
+    width: 24px;
+    height: 24px;
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 380px) {
+  .listing-card-horizontal .listing-card-content {
+    padding-right: 8px;
+  }
+
+  .listing-card-horizontal .listing-card-heading .fav-btn {
+    flex-basis: 22px;
+    width: 22px;
+    height: 22px;
+    font-size: 17px;
+  }
+}

@@ -14,7 +14,6 @@
   <header class="header">
     <div class="container nav">
       <a class="brand" href="#">
-        <img class="logo" src="hryvnia-hub-logo.png" alt="Hryvnia Hub">
         <span class="brand-text"><span class="brand-name">HRYVNIA</span> <span class="brand-hub">HUB</span></span>
       </a>
       <div class="header-actions">
@@ -176,18 +175,19 @@
       </aside>
     </section>
 
-    <section class="urgent-deals container" aria-label="Гарячі пропозиції">
+    <section class="urgent-deals container" aria-label="Urgent deals">
+      <div class="section-head">
+        <div><p class="eyebrow">⚡ <span data-i18n="HOT OFFERS">HOT OFFERS</span></p><h2 data-i18n="Urgent deals">Urgent deals</h2></div>
+        <span class="badge-soft" data-i18n="Best offers below market price">Best offers below market price</span>
+      </div>
       <div class="urgent-deals-grid">
         <div class="empty" data-i18n="Urgent deals will appear here once listings are flagged as urgent in the database.">Urgent deals will appear here once listings are flagged as urgent in the database.</div>
       </div>
     </section>
 
     <section class="listing-section container">
-      <div class="section-head">
-        <div><p id="listingLabel" class="eyebrow">Листинг</p><h2 id="latestListingsTitle">Последние объявления</h2></div>
-        <span id="resultCount" class="muted"></span>
-      </div>
-      <div id="listing" class="listing"><div class="empty">Загрузка объявлений…</div></div>
+          <span id="resultCount" class="muted"></span>
+          <div id="listing" class="listing"><div class="empty">Загрузка объявлений…</div></div>
     </section>
   </main>
 
@@ -223,95 +223,31 @@
     <div id="categoryMenuOptions" class="category-menu-options"></div>
   </section>
 
-  <div class="category-menu-backdrop hidden" id="addCategoryBackdrop"></div>
-  <section class="category-menu add-category-menu hidden" id="addCategoryMenu" role="dialog" aria-modal="true" aria-labelledby="addCategoryTitle">
-    <button class="category-menu-close" id="addCategoryClose" type="button" aria-label="Close">×</button>
-    <h2 id="addCategoryTitle" data-i18n="Выберите категорию объявления">Выберите категорию объявления</h2>
-    <div class="category-menu-options" id="addCategoryOptions">
-      <button type="button" class="category-menu-option" data-add-category="Автомобили"><span class="category-menu-icon" aria-hidden="true">🚗</span><span class="category-menu-option-label" data-i18n="Автомобили">Автомобілі</span><span aria-hidden="true">›</span></button>
-      <button type="button" class="category-menu-option" data-add-category="Недвижимость"><span class="category-menu-icon" aria-hidden="true">⌂</span><span class="category-menu-option-label" data-i18n="Недвижимость">Нерухомість</span><span aria-hidden="true">›</span></button>
-      <button type="button" class="category-menu-option" data-add-category="Готовый бизнес"><span class="category-menu-icon" aria-hidden="true">▣</span><span class="category-menu-option-label" data-i18n="Бизнес и предпринимательство">Бізнес і підприємництво</span><span aria-hidden="true">›</span></button>
-      <button type="button" class="category-menu-option" data-add-category="Инвестиции"><span class="category-menu-icon" aria-hidden="true">▥</span><span class="category-menu-option-label" data-i18n="Инвестиции">Інвестиції</span><span aria-hidden="true">›</span></button>
-    </div>
-  </section>
-
   <div class="vehicle-search-backdrop hidden" id="vehicleSearchBackdrop"></div>
   <section class="vehicle-search-menu hidden" id="vehicleSearchMenu" role="dialog" aria-modal="true" aria-labelledby="vehicleSearchTitle">
     <button class="category-menu-close" id="vehicleSearchClose" type="button" aria-label="Close">×</button>
     <h2 id="vehicleSearchTitle">Автомобілі</h2>
     <p class="vehicle-search-intro">Оберіть параметри автомобіля</p>
-    <div class="vehicle-search-grid" id="vehicleSearchMain">
-      <label class="vehicle-make-filter">Марка
-        <span class="vehicle-make-control"><select id="vehicleSearchMake" aria-describedby="vehicleMakeLoadStatus"><option value="">Усі марки</option></select><span class="vehicle-make-spinner hidden" id="vehicleMakeSpinner" aria-hidden="true"></span></span>
-        <span class="vehicle-make-load-status" id="vehicleMakeLoadStatus" role="status" aria-live="polite"></span>
-      </label>
-      <label>Модель
-        <select id="vehicleSearchModel" disabled><option value="">Усі моделі</option></select>
-      </label>
-      <label>Рік від
-        <input id="vehicleYearFrom" type="number" min="1900" max="2100" placeholder="2010">
-      </label>
-      <label>Рік до
-        <input id="vehicleYearTo" type="number" min="1900" max="2100" placeholder="2026">
-      </label>
-      <div class="vehicle-price-range">
-        <label>Ціна від<input id="vehiclePriceFrom" type="number" min="0" placeholder="0"></label>
-        <label class="vehicle-currency-label">Валюта<select id="vehiclePriceCurrency" aria-label="Валюта ціни"><option value="UAH">₴ UAH</option><option value="USD">$ USD</option></select></label>
-        <label>Ціна до<input id="vehiclePriceTo" type="number" min="0" placeholder="Будь-яка"></label>
-      </div>
-    </div>
-    <div class="vehicle-search-grid hidden" id="vehicleSearchAdvanced">
-      <label>Пробіг від, км
-        <input id="vehicleMileageFrom" type="number" min="0" placeholder="Будь-який">
-      </label>
-      <label>Пробіг до, км
-        <input id="vehicleMileageTo" type="number" min="0" placeholder="Будь-який">
-      </label>
-      <label>Об’єм двигуна від, л
-        <input id="vehicleEngineFrom" type="number" min="0" max="20" step="0.1" placeholder="Будь-який">
-      </label>
-      <label>Об’єм двигуна до, л
-        <input id="vehicleEngineTo" type="number" min="0" max="20" step="0.1" placeholder="Будь-який">
-      </label>
-      <label>Тип кузова
-        <select id="vehicleBodyType">
-          <option value="">Будь-який</option>
-          <option>Седан</option>
-          <option>Хетчбек</option>
-          <option>Універсал</option>
-          <option>Позашляховик</option>
-          <option>Купе</option>
-          <option>Мінівен</option>
-          <option>Пікап</option>
-          <option>Інший</option>
-        </select>
-      </label>
-      <label>Паливо
-        <select id="vehicleFuel">
-          <option value="">Будь-яке</option>
-          <option value="Бензин">Бензин</option>
-          <option value="Дизель">Дизель</option>
-          <option value="Газ/бензин">Газ/бензин</option>
-          <option value="Електро">Электро</option>
-          <option value="Гибрид">Гибрид</option>
-        </select>
-      </label>
-      <label>Коробка передач
-        <select id="vehicleTransmission"><option value="">Будь-яка</option><option value="Механічна">Механічна</option><option value="Автоматична">Автоматична</option><option value="Варіатор">Варіатор</option><option value="Робот">Робот</option></select>
-      </label>
-      <label>Стан авто<select id="vehicleSearchStatus"><option value="">Будь-який</option><option value="new">Нове</option><option value="used">Вживане</option></select></label>
-      <label>Потужність від, к. с.<input id="vehiclePowerFrom" type="number" min="1" max="3000" placeholder="Будь-яка"></label>
-      <label>Потужність до, к. с.<input id="vehiclePowerTo" type="number" min="1" max="3000" placeholder="Будь-яка"></label>
-      <label>Кількість дверей<select id="vehicleDoors"><option value="">Будь-яка</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></label>
-      <label>Привід<select id="vehicleDrive"><option value="">Будь-який</option><option value="Передній">Передній</option><option value="Задній">Задній</option><option value="Повний">Повний</option><option value="Повний підключаємий">Повний, що підключається</option></select></label>
-      <label style="grid-column:1 / -1;">Технічний стан<div id="vehicleSearchConditions" role="group" aria-label="Технічний стан"></div></label>
-      <label>Колір<select id="vehicleColor"><option value="">Будь-який</option><option value="white">Білий</option><option value="black">Чорний</option><option value="gray">Сірий</option><option value="silver">Сріблястий</option><option value="red">Червоний</option><option value="blue">Синій</option><option value="green">Зелений</option><option value="brown">Коричневий</option><option value="yellow">Жовтий</option><option value="other">Інший</option></select></label>
-      <label>Продавець<select id="vehicleSellerType"><option value="">Будь-хто</option><option value="private">Приватна особа</option><option value="business">Компанія / автосалон</option></select></label>
+    <div class="vehicle-search-grid">
+      <label>Марка<select id="vehicleSearchMake"><option value="">Усі марки</option></select></label>
+      <label>Модель<select id="vehicleSearchModel" disabled><option value="">Усі моделі</option></select></label>
+      <label>Рік від<input id="vehicleYearFrom" type="number" min="1900" max="2100" placeholder="2010"></label>
+      <label>Рік до<input id="vehicleYearTo" type="number" min="1900" max="2100" placeholder="2026"></label>
+      <label>Ціна від<input id="vehiclePriceFrom" type="number" min="0" placeholder="0"></label>
+      <label>Ціна до<input id="vehiclePriceTo" type="number" min="0" placeholder="Будь-яка"></label>
+      <label>Пробіг від, км<input id="vehicleMileageFrom" type="number" min="0" placeholder="Будь-який"></label>
+      <label>Пробіг до, км<input id="vehicleMileageTo" type="number" min="0" placeholder="Будь-який"></label>
+      <label>Об’єм двигуна від, л<input id="vehicleEngineFrom" type="number" min="0" max="20" step="0.1" placeholder="Будь-який"></label>
+      <label>Об’єм двигуна до, л<input id="vehicleEngineTo" type="number" min="0" max="20" step="0.1" placeholder="Будь-який"></label>
+      <label>Тип кузова<select id="vehicleBodyType"><option value="">Будь-який</option><option>Седан</option><option>Хетчбек</option><option>Універсал</option><option>Позашляховик</option><option>Купе</option><option>Мінівен</option><option>Пікап</option><option>Інший</option></select></label>
+      <label>Паливо<select id="vehicleFuel"><option value="">Будь-яке</option><option value="Бензин">Бензин</option><option value="Дизель">Дизель</option><option value="Газ/бензин">Газ/бензин</option><option value="Електро">Электро</option><option value="Гибрид">Гибрид</option></select></label>
+      <label>Коробка передач<select id="vehicleTransmission"><option value="">Будь-яка</option><option value="Механічна">Механічна</option><option value="Автоматична">Автоматична</option><option value="Варіатор">Варіатор</option><option value="Робот">Робот</option></select></label>
+      <label class="hot-toggle"><input id="vehicleOnlyUrgent" type="checkbox"> Лише термінові</label>
+      <label class="hot-toggle"><input id="vehicleOnlyHot" type="checkbox"> Лише гарячі</label>
     </div>
     <p id="vehicleSearchMessage" class="form-message" role="status" aria-live="polite"></p>
     <div class="vehicle-search-actions">
       <button type="button" class="vehicle-reset-btn" id="vehicleSearchReset">Скинути</button>
-      <button type="button" class="btn vehicle-search-toggle" id="vehicleSearchToggleAdvanced" aria-expanded="false" aria-controls="vehicleSearchAdvanced" data-i18n="Розширений пошук">Розширений пошук</button>
       <button type="button" class="btn btn-primary" id="vehicleSearchApply">Знайти автомобілі</button>
     </div>
   </section>
@@ -322,51 +258,30 @@
       <p class="eyebrow">Новое объявление</p>
       <h2>Добавить объявление</h2>
       <form id="addForm">
-        <label class="listing-category-field hidden">Категория<select name="category" required><option value="Автомобили">Автомобили</option><option value="Недвижимость">Недвижимость</option><option value="Готовый бизнес">Готовый бизнес</option><option value="Инвестиции">Инвестиции</option></select></label>
-        <label id="listingTitleField">Название<input name="title" required placeholder="Например: Skoda Octavia 1.6"></label>
+        <label>Категория<select name="category" required><option value="Автомобили">Автомобили</option><option value="Недвижимость">Недвижимость</option><option value="Готовый бизнес">Готовый бизнес</option><option value="Инвестиции">Инвестиции</option></select></label>
+        <label>Название<input name="title" required placeholder="Например: Skoda Octavia 1.6"></label>
         <fieldset id="vehicleListingFields" class="vehicle-listing-fields" hidden>
           <legend>Характеристики автомобиля</legend>
-          <div class="listing-progress" aria-label="Этапы создания объявления">
-            <div class="listing-progress-step is-active"><span>1</span><small>Основное</small></div>
-            <i aria-hidden="true"></i><div class="listing-progress-step"><span>2</span><small>Детали</small></div>
-            <i aria-hidden="true"></i><div class="listing-progress-step"><span>3</span><small>Фото</small></div>
-            <i aria-hidden="true"></i><div class="listing-progress-step"><span>4</span><small>Публикация</small></div>
-          </div>
-          <label>Марка автомобиля<span class="vehicle-make-control"><select name="vehicle_make_slug" id="vehicleListingMake" aria-describedby="vehicleListingMakeStatus"><option value="">Выберите марку</option></select><span class="vehicle-make-spinner hidden" id="vehicleListingMakeSpinner" aria-hidden="true"></span></span><span class="vehicle-make-load-status" id="vehicleListingMakeStatus" role="status" aria-live="polite"></span></label>
-          <label>Модель автомобиля<select name="vehicle_model_slug" id="vehicleListingModel" disabled><option value="">Сначала выберите марку</option></select></label>
+          <label>Марка<select name="vehicle_make_slug" id="vehicleListingMake"><option value="">Выберите марку</option></select></label>
+          <label>Модель<select name="vehicle_model_slug" id="vehicleListingModel" disabled><option value="">Сначала выберите марку</option></select></label>
           <label>Год выпуска<input name="vehicle_year" type="number" min="1900" max="2100" placeholder="2018"></label>
-          <button type="button" class="btn btn-primary full" id="vehicleListingMore">Больше</button>
-          <section id="vehicleMarketPanel" class="vehicle-market-panel" hidden aria-live="polite">
-            <h3>Ориентировочная рыночная цена</h3>
-            <p id="vehicleMarketPrice" class="vehicle-market-price">Укажите марку, модель и год выпуска</p>
-            <div class="market-price-scale" role="img" aria-label="Шкала рыночной цены"><span></span><i></i></div>
-            <div class="market-price-scale-labels"><span>Ниже рынка</span><span>Рыночная цена</span><span>Выше рынка</span></div>
-            <p id="vehicleMarketNote" class="muted">Оценка зависит от доступных сопоставимых объявлений.</p>
-            <div id="vehicleMarketAuthPrompt" class="vehicle-market-auth">
-              <p>Войдите или зарегистрируйтесь, чтобы получить более точную рыночную оценку и продолжить заполнение объявления.</p>
-              <div class="vehicle-market-auth-actions"><button type="button" class="btn btn-primary" id="vehicleMarketLogin">Вход</button><button type="button" class="btn" id="vehicleMarketRegister">Регистрация</button></div>
-            </div>
-          </section>
-          <div id="vehicleAdvancedFields" class="vehicle-advanced-fields" hidden>
           <label>Тип кузова<select name="vehicle_body_type"><option value="">Выберите тип кузова</option><option value="Седан">Седан</option><option value="Хетчбек">Хетчбек</option><option value="Универсал">Универсал</option><option value="Позашляховик">Внедорожник / SUV</option><option value="Купе">Купе</option><option value="Мінівен">Минивэн</option><option value="Пікап">Пикап</option><option value="Інший">Другой</option></select></label>
           <label>Топливо<select name="vehicle_fuel_type"><option value="">Выберите топливо</option><option value="Бензин">Бензин</option><option value="Дизель">Дизель</option><option value="Газ/бензин">Газ/бензин</option><option value="Електро">Электро</option><option value="Гібрид">Гибрид</option></select></label>
           <label>Объём двигателя, л<input name="vehicle_engine_liters" type="number" min="0" max="20" step="0.1" placeholder="1.6"></label>
           <label>Мощность, л.с.<input name="vehicle_power_hp" type="number" min="1" max="3000" placeholder="110"></label>
           <label>Коробка передач<select name="vehicle_transmission"><option value="">Выберите коробку</option><option value="Механічна">Механическая</option><option value="Автоматична">Автоматическая</option><option value="Варіатор">Вариатор</option><option value="Робот">Робот</option></select></label>
-          <label>Привод<select name="vehicle_drive"><option value="">Выберите привод</option><option value="Передній">Передний</option><option value="Задній">Задний</option><option value="Повний">Полный</option><option value="Повний підключаємий">Полный подключаемый</option></select></label>
+          <label>Привод<select name="vehicle_drive"><option value="">Выберите привод</option><option value="Передній">Передний</option><option value="Задній">Задний</option><option value="Повний">Полный</option></select></label>
           <label>Пробег, км<input name="vehicle_mileage_km" type="number" min="0" placeholder="125000"></label>
-          <label>Тип авто<select name="vehicle_condition"><option value="">Выберите тип</option><option value="new">Новое</option><option value="used">С пробегом</option></select></label>
-          <label style="grid-column:1 / -1;">Техническое состояние<div id="vehicleListingConditions" role="group" aria-label="Техническое состояние"></div></label>
-          <label>Количество дверей<select name="vehicle_doors"><option value="">Выберите количество</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></label>
-          <label>Цвет<select name="vehicle_color"><option value="">Выберите цвет</option><option value="white">Белый</option><option value="black">Чёрный</option><option value="gray">Серый</option><option value="silver">Серебристый</option><option value="red">Красный</option><option value="blue">Синий</option><option value="green">Зелёный</option><option value="brown">Коричневый</option><option value="yellow">Жёлтый</option><option value="other">Другой</option></select></label>
+          <label>Состояние<select name="vehicle_condition"><option value="">Выберите состояние</option><option value="Новий">Новый</option><option value="Вживаний">С пробегом</option><option value="Після ДТП">После ДТП</option></select></label>
+          <label>Цвет<input name="vehicle_color" type="text" placeholder="Серый"></label>
           <label>Тип продавца<select name="seller_type"><option value="private">Частное лицо</option><option value="business">Компания / бизнес</option></select></label>
-          </div>
         </fieldset>
-        <div id="listingAdvancedCommonFields" class="listing-advanced-common" hidden>
         <label>Город<div class="city-search"><input id="citySearchInput" type="search" required autocomplete="off" placeholder="Введите название города" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="citySuggestions"><div id="citySuggestions" class="city-suggestions" role="listbox" hidden></div><input type="hidden" name="city_id" id="citySelect"></div></label><label>Область / регион<select id="cityRegionSelect" aria-label="Область"><option value="">Все области</option></select></label>
         <label>Цена, грн<input name="price" type="number" min="0" required placeholder="450000"></label><label>Описание<textarea name="description" rows="4" placeholder="Коротко опишите предложение"></textarea></label>
+        <label class="hot-toggle"><input type="checkbox" name="is_hot"> ⚡ Горячее объявление</label>
+        <label class="hot-toggle"><input type="checkbox" name="is_urgent"> ⏱ Срочное объявление</label>
         <fieldset id="photoFields" class="photo-fields"><legend id="photoLabel">Фотографии</legend><button id="photoPickerButton" class="btn" type="button">Добавить фотографии</button><input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple hidden aria-labelledby="photoLabel" aria-describedby="photoHint photoMessage"><p id="photoHint" class="muted">До 10 фото: JPEG, PNG или WebP, до 10 МБ каждое. Первое фото — главное.</p><p id="photoMessage" class="form-message" role="status" aria-live="polite"></p><div id="photoPreview" class="photo-preview"></div></fieldset>
-        <button class="btn btn-primary full" type="submit">Опубликовать</button><p id="formMessage" class="form-message"></p></div></form></div></div>
+        <button class="btn btn-primary full" type="submit">Опубликовать</button><p id="formMessage" class="form-message"></p></form></div></div>
   <div class="modal hidden" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authTitle"><div class="modal-card auth-card"><button class="modal-close" id="authClose" type="button" aria-label="Закрыть">×</button><p class="eyebrow" id="authEyebrow">Аккаунт</p><h2 id="authTitle">Настройки аккаунта</h2>
     <section id="authGuest"><div class="auth-tabs" role="tablist" aria-label="Авторизация"><button class="auth-tab active" type="button" data-auth-tab="login" role="tab" aria-selected="true">Вход</button><button class="auth-tab" type="button" data-auth-tab="register" role="tab" aria-selected="false">Регистрация</button></div>
       <form id="authLoginForm" class="auth-form"><label><span>Электронная почта</span><input type="email" name="email" autocomplete="email" required></label><label><span>Пароль</span>

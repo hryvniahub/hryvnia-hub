@@ -9,8 +9,6 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <input type="checkbox" id="menuToggle" class="menu-toggle" hidden aria-hidden="true">
-
   <header class="header">
     <div class="container nav">
       <a class="brand" href="#">
@@ -42,19 +40,6 @@
       </div>
     </div>
   </header>
-
-  <!-- Скрытые элементы мобильного меню (добавлен класс hidden) -->
-  <label for="menuToggle" class="mobile-menu-overlay hidden" aria-hidden="true"></label>
-  <nav class="mobile-menu hidden" aria-label="Mobile menu">
-    <div class="mobile-menu-header">
-      <span>Menu</span>
-      <label for="menuToggle" class="icon-btn" aria-label="Close">×</label>
-    </div>
-    <ul class="mobile-menu-list">
-      <li><a href="#">♡ Favorites</a></li>
-      <li><a href="#">👤 Profile</a></li>
-    </ul>
-  </nav>
 
   <section class="categories-section container" aria-label="Categories">
     <div class="categories-grid">
@@ -398,7 +383,7 @@
           <button type="button" class="password-toggle" aria-label="Показать пароль" aria-pressed="false" data-password-toggle><span class="password-toggle-icon" aria-hidden="true">👁</span></button>
         </div>
       </label><button class="btn btn-primary full" type="submit">Сохранить пароль</button><p class="form-message" role="status" aria-live="polite"></p></form>
-    </section><section id="authLoggedIn" class="hidden"><p class="muted">Вы вошли как:</p><p id="authUserEmail" class="auth-user-email"></p><button class="auth-menu-btn" id="authOpenMenu" type="button">Меню / Настройки</button><button class="btn btn-primary full" id="authSignOut" type="button">Выход</button><p id="authSignOutMessage" class="form-message" role="status" aria-live="polite"></p></section>
+    </section><section id="authLoggedIn" class="hidden"><p class="muted">Вы вошли как:</p><p id="authUserEmail" class="auth-user-email"></p><button class="btn btn-primary full" id="authSignOut" type="button">Выход</button><p id="authSignOutMessage" class="form-message" role="status" aria-live="polite"></p></section>
   </div></div>
   <div class="modal hidden" id="favoritesModal" role="dialog" aria-modal="true" aria-labelledby="favoritesTitle"><div class="modal-card"><button class="modal-close" id="closeFavorites" type="button" aria-label="Закрыть">×</button><h2 id="favoritesTitle" data-i18n="Избранное">Избранное</h2><div id="favoritesList" class="favorites-list"></div></div></div>
   <div class="modal hidden" id="messagesModal" role="dialog" aria-modal="true" aria-labelledby="messagesTitle"><div class="modal-card messages-card"><button class="modal-close" id="closeMessages" type="button" aria-label="Закрыть">×</button><h2 id="messagesTitle" data-i18n="Сообщения">Сообщения</h2><div id="messagesContent"><p class="muted" id="messagesGuestHint">Войдите, чтобы видеть сообщения.</p><div id="conversationsList" class="conversations-list hidden"></div><div id="messagesThread" class="messages-thread hidden"><button class="link-btn" id="backToConvs" type="button">← К списку</button><div id="threadMessages" class="thread-messages"></div><form id="sendMessageForm" class="send-message-form"><input type="text" name="body" placeholder="Ваше сообщение..." required maxlength="2000" autocomplete="off"><button class="btn btn-primary" type="submit">Отправить</button></form></div></div></div></div>

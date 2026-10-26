@@ -14,7 +14,7 @@
   --accent-light: #e8f3c8;
   --accent-border: #7fa800;
   --accent-input: #c4d7a0;
-  --dark: #203b31;
+  --dark: #174C3A;
   --radius: 14px;
   --radius-lg: 20px;
   --radius-btn: 12px;
@@ -53,8 +53,8 @@ button { font-family: inherit; }
 .header {
   position: sticky; top: 0; z-index: 40;
   /* Match the bottom navigation; leave header buttons and logo styling untouched. */
-  background: #203b31;
-  border-bottom: 1px solid #203b31;
+  background: #174C3A;
+  border-bottom: 1px solid #174C3A;
   box-shadow: 0 2px 7px rgba(30, 42, 16, .055);
 }
 .nav { min-height: 58px; display: flex; align-items: center; gap: 10px; padding: 3px 0; }
@@ -212,7 +212,7 @@ button { font-family: inherit; }
    ============================================================ */
 .market-ticker {
   margin-top: 6px; padding: 6px 8px;
-  background: rgba(255,255,255,.97); border: 1px solid #203b31;
+  background: rgba(255,255,255,.97); border: 1px solid #174C3A;
   border-radius: 10px; box-shadow: var(--shadow-sm);
 }
 .ticker-scroll { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
@@ -242,7 +242,7 @@ button { font-family: inherit; }
    ============================================================ */
 .search-ai-section { margin-top: 6px; display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 8px; }
 .search-panel {
-  background: #203b31; border: 2px solid var(--accent-border); border-radius: var(--radius);
+  background: #174C3A; border: 2px solid var(--accent-border); border-radius: var(--radius);
   padding: 12px; display: flex; flex-direction: column; gap: 8px;
 }
 .search-input-row { display: grid; grid-template-columns: 1fr; gap: 8px; }
@@ -276,11 +276,11 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
 /* AI Панель */
 .ai-panel {
   background: linear-gradient(135deg, #fbffea 0%, #ffffff 100%);
-  border: 2px solid #203b31; border-radius: var(--radius);
+  border: 2px solid #174C3A; border-radius: var(--radius);
   padding: 12px; display: flex; flex-direction: column; justify-content: space-between;
 }
-.ai-badge { background: #203b31; color: var(--accent); font-weight: 800; font-size: 10px; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 6px; }
-.ai-panel h3 { margin: 0 0 4px; font-size: 15px; line-height: 1.2; color: #203b31; }
+.ai-badge { background: #174C3A; color: var(--accent); font-weight: 800; font-size: 10px; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 6px; }
+.ai-panel h3 { margin: 0 0 4px; font-size: 15px; line-height: 1.2; color: #174C3A; }
 .ai-subtitle { margin: 0 0 8px; font-size: 11px; color: var(--muted); }
 .btn-ai { background: var(--accent); color: #12140a; font-weight: 800; padding: 8px; border-radius: 8px; border: 0; cursor: pointer; width: 100%; height: 42px; font-size: 13px; }
 
@@ -322,7 +322,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
   .vehicle-price-range label { font-size: 12px; }
   .bottom-nav {
     display: grid; grid-template-columns: repeat(3, 1fr); position: fixed; bottom: 0; left: 0; right: 0;
-    background: #203b31; border-top: 2px solid var(--accent-border); z-index: 1010; padding-bottom: env(safe-area-inset-bottom);
+    background: #174C3A; border-top: 2px solid var(--accent-border); z-index: 1010; padding-bottom: env(safe-area-inset-bottom);
   }
   .bottom-nav-btn {
   position: relative;
@@ -406,7 +406,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
 
 /* --- Авторизация (Вкладки и пароли) --- */
 .auth-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 16px; }
-.auth-tab { min-width: 0; min-height: 46px; border: 2px solid var(--accent); border-radius: 10px; background: #fff; color: #203b31; font: inherit; font-weight: 700; cursor: pointer; }
+.auth-tab { min-width: 0; min-height: 46px; border: 2px solid var(--accent); border-radius: 10px; background: #fff; color: #174C3A; font: inherit; font-weight: 700; cursor: pointer; }
 .auth-tab.active { background: var(--accent); color: #17210a; }
 .auth-tab[data-auth-tab="register"] { background: var(--accent); border-color: #7fa800; color: #17210a; }
 .auth-tab[data-auth-tab="login"] { background: #ffffff; border-color: #9abf24; color: #17210a; }
@@ -565,7 +565,7 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
   line-height: 1.25;
   font-weight: 800;
 }
-.hot-listing-badge { background: #ff941f; color: #203b31; }
+.hot-listing-badge { background: #ff941f; color: #174C3A; }
 .urgent-listing-badge { background: #ffe0a3; color: #583800; }
 .owner-listing-badge { background: var(--accent-soft); color: var(--text); }
 

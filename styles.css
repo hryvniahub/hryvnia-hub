@@ -8,13 +8,13 @@
   --text: #202824;
   --muted: #707a75;
   --line: #dce3df;
-  --accent: #d4ff00;
+  --accent: #A8C928;
   --accent-hover: #c3ed00;
   --accent-soft: #f0f6d9;
   --accent-light: #e8f3c8;
   --accent-border: #7fa800;
   --accent-input: #c4d7a0;
-  --dark: #203b31;
+  --dark: #174C3A;
   --radius: 14px;
   --radius-lg: 20px;
   --radius-btn: 12px;
@@ -53,8 +53,8 @@ button { font-family: inherit; }
 .header {
   position: sticky; top: 0; z-index: 40;
   /* Match the bottom navigation; leave header buttons and logo styling untouched. */
-  background: #203b31;
-  border-bottom: 1px solid #203b31;
+  background: #174C3A;
+  border-bottom: 1px solid #174C3A;
   box-shadow: 0 2px 7px rgba(30, 42, 16, .055);
 }
 .nav { min-height: 58px; display: flex; align-items: center; gap: 10px; padding: 3px 0; }
@@ -212,7 +212,7 @@ button { font-family: inherit; }
    ============================================================ */
 .market-ticker {
   margin-top: 6px; padding: 6px 8px;
-  background: rgba(255,255,255,.97); border: 1px solid #203b31;
+  background: rgba(255,255,255,.97); border: 1px solid #174C3A;
   border-radius: 10px; box-shadow: var(--shadow-sm);
 }
 .ticker-scroll { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
@@ -242,7 +242,7 @@ button { font-family: inherit; }
    ============================================================ */
 .search-ai-section { margin-top: 6px; display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 8px; }
 .search-panel {
-  background: #203b31; border: 2px solid var(--accent-border); border-radius: var(--radius);
+  background: #174C3A; border: 2px solid var(--accent-border); border-radius: var(--radius);
   padding: 12px; display: flex; flex-direction: column; gap: 8px;
 }
 .search-input-row { display: grid; grid-template-columns: 1fr; gap: 8px; }
@@ -263,7 +263,7 @@ input, select, textarea {
   width: 100%; border: 2px solid var(--accent-input); border-radius: 10px;
   padding: 11px 12px; font: inherit; font-size: 14px; color: var(--text); outline: none; min-width: 0; background: #fff; transition: border-color 0.15s, box-shadow 0.15s;
 }
-input:focus, select:focus, textarea:focus { border-color: var(--accent-border); box-shadow: 0 0 0 3px rgba(212, 255, 0, 0.3); }
+input:focus, select:focus, textarea:focus { border-color: var(--accent-border); box-shadow: 0 0 0 3px rgba(168,  201,  40, 0.3); }
 
 .btn {
   border: 0; border-radius: 10px; padding: 11px 16px; font: inherit; font-weight: 700; font-size: 14px;
@@ -276,11 +276,11 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
 /* AI Панель */
 .ai-panel {
   background: linear-gradient(135deg, #fbffea 0%, #ffffff 100%);
-  border: 2px solid #203b31; border-radius: var(--radius);
+  border: 2px solid #174C3A; border-radius: var(--radius);
   padding: 12px; display: flex; flex-direction: column; justify-content: space-between;
 }
-.ai-badge { background: #203b31; color: var(--accent); font-weight: 800; font-size: 10px; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 6px; }
-.ai-panel h3 { margin: 0 0 4px; font-size: 15px; line-height: 1.2; color: #203b31; }
+.ai-badge { background: #174C3A; color: var(--accent); font-weight: 800; font-size: 10px; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 6px; }
+.ai-panel h3 { margin: 0 0 4px; font-size: 15px; line-height: 1.2; color: #174C3A; }
 .ai-subtitle { margin: 0 0 8px; font-size: 11px; color: var(--muted); }
 .btn-ai { background: var(--accent); color: #12140a; font-weight: 800; padding: 8px; border-radius: 8px; border: 0; cursor: pointer; width: 100%; height: 42px; font-size: 13px; }
 
@@ -322,7 +322,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
   .vehicle-price-range label { font-size: 12px; }
   .bottom-nav {
     display: grid; grid-template-columns: repeat(3, 1fr); position: fixed; bottom: 0; left: 0; right: 0;
-    background: #203b31; border-top: 2px solid var(--accent-border); z-index: 1010; padding-bottom: env(safe-area-inset-bottom);
+    background: #174C3A; border-top: 2px solid var(--accent-border); z-index: 1010; padding-bottom: env(safe-area-inset-bottom);
   }
   .bottom-nav-btn {
   position: relative;
@@ -406,7 +406,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
 
 /* --- Авторизация (Вкладки и пароли) --- */
 .auth-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 16px; }
-.auth-tab { min-width: 0; min-height: 46px; border: 2px solid var(--accent); border-radius: 10px; background: #fff; color: #203b31; font: inherit; font-weight: 700; cursor: pointer; }
+.auth-tab { min-width: 0; min-height: 46px; border: 2px solid var(--accent); border-radius: 10px; background: #fff; color: #174C3A; font: inherit; font-weight: 700; cursor: pointer; }
 .auth-tab.active { background: var(--accent); color: #17210a; }
 .auth-tab[data-auth-tab="register"] { background: var(--accent); border-color: #7fa800; color: #17210a; }
 .auth-tab[data-auth-tab="login"] { background: #ffffff; border-color: #9abf24; color: #17210a; }
@@ -436,7 +436,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
 .category-menu-close { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border: 1px solid rgba(255, 255, 255, .22); border-radius: 50%; background: rgba(255, 255, 255, .07); color: #f7f9f5; font-size: 24px; cursor: pointer; }
 .category-menu-options { display: flex; flex-direction: column; width: 100%; }
 .category-menu-option { display: flex; align-items: center; justify-content: flex-start; gap: 12px; width: 100%; padding: 12px 8px; border: 0; border-bottom: 1px solid rgba(255, 255, 255, .16); background: transparent; color: #f7f9f5; text-align: left; font-size: 16px; cursor: pointer; }
-.category-menu-option:hover { background: rgba(212, 255, 0, .07); color: var(--accent); }
+.category-menu-option:hover { background: rgba(168,  201,  40, .07); color: var(--accent); }
 .category-menu-option span:last-child { margin-left: auto; color: var(--accent); }
 .category-menu-icon { flex: 0 0 28px; width: 28px; text-align: center; color: var(--accent); }
 
@@ -565,7 +565,7 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
   line-height: 1.25;
   font-weight: 800;
 }
-.hot-listing-badge { background: #ff941f; color: #203b31; }
+.hot-listing-badge { background: #ff941f; color: #174C3A; }
 .urgent-listing-badge { background: #ffe0a3; color: #583800; }
 .owner-listing-badge { background: var(--accent-soft); color: var(--text); }
 
@@ -810,7 +810,7 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
   max-height: 84dvh;
   overflow: auto;
   padding: 24px;
-  border: 1px solid rgba(212,255,0,.45);
+  border: 1px solid rgba(168, 201, 40,.45);
   border-radius: 22px;
   background: rgba(18,39,29,.97);
   color: #f7f9f5;
@@ -823,7 +823,7 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 .vehicle-search-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .vehicle-price-range { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0,1fr) 102px minmax(0,1fr); gap: 10px; align-items: end; }
 .vehicle-price-range label { display: grid; gap: 6px; min-width: 0; color: #f7f9f5; font-size: 14px; font-weight: 650; }
-.vehicle-price-range input, .vehicle-price-range select { width: 100%; min-width: 0; min-height: 44px; padding: 9px 10px; border: 1px solid rgba(212,255,0,.38); border-radius: 10px; background: rgba(255,255,255,.97); color: #20352b; font: inherit; font-weight: 400; }
+.vehicle-price-range input, .vehicle-price-range select { width: 100%; min-width: 0; min-height: 44px; padding: 9px 10px; border: 1px solid rgba(168, 201, 40,.38); border-radius: 10px; background: rgba(255,255,255,.97); color: #20352b; font: inherit; font-weight: 400; }
 .vehicle-price-range .vehicle-currency-label { font-size: 12px; }
 .vehicle-search-grid label { display: grid; gap: 6px; min-width: 0; color: #f7f9f5; font-size: 14px; font-weight: 650; }
 .vehicle-search-grid input,
@@ -832,7 +832,7 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
   min-width: 0;
   min-height: 44px;
   padding: 9px 10px;
-  border: 1px solid rgba(212,255,0,.38);
+  border: 1px solid rgba(168, 201, 40,.38);
   border-radius: 10px;
   background: rgba(255,255,255,.97);
   color: #20352b;
@@ -852,7 +852,7 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
   align-items: center;
   justify-content: center;
   min-height: 150px;
-  background: linear-gradient(135deg, rgba(212,255,0,.20), rgba(13,70,43,.08));
+  background: linear-gradient(135deg, rgba(168, 201, 40,.20), rgba(13,70,43,.08));
   color: #24583c;
   border-radius: 12px;
 }
@@ -1046,15 +1046,15 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 
 /* Валюта в поиске автомобилей — отдельный фирменный акцент. */
 .vehicle-price-range .vehicle-currency-label select {
-  border: 2px solid var(--accent, #d4ff00);
+  border: 2px solid var(--accent, #A8C928);
   background: rgba(18,39,29,.98);
   color: #f7f9f5;
-  box-shadow: inset 0 0 0 1px rgba(212,255,0,.12);
+  box-shadow: inset 0 0 0 1px rgba(168, 201, 40,.12);
   text-align: center;
-  accent-color: var(--accent, #d4ff00);
+  accent-color: var(--accent, #A8C928);
 }
 .vehicle-price-range .vehicle-currency-label select:focus-visible {
-  outline: 2px solid rgba(212,255,0,.6);
+  outline: 2px solid rgba(168, 201, 40,.6);
   outline-offset: 2px;
 }
 .vehicle-price-range .vehicle-currency-label select option { background: #12271d; color: #f7f9f5; }
@@ -1063,13 +1063,13 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 .vehicle-make-spinner {
   position: absolute; right: 12px; top: 50%; width: 16px; height: 16px;
   margin-top: -8px; border: 2px solid rgba(32,53,43,.18);
-  border-top-color: var(--accent, #d4ff00); border-right-color: var(--accent, #d4ff00);
+  border-top-color: var(--accent, #A8C928); border-right-color: var(--accent, #A8C928);
   border-radius: 50%; animation: vehicle-make-spin .7s linear infinite; pointer-events: none;
 }
 .vehicle-make-spinner.hidden { display: none; }
 .vehicle-make-load-status { display: block; min-height: 0; color: rgba(247,249,245,.78); font-size: 12px; font-weight: 500; line-height: 1.35; }
 .vehicle-make-load-status:empty { display: none; }
-.vehicle-make-load-status button { margin-left: 6px; padding: 0; border: 0; background: transparent; color: var(--accent, #d4ff00); font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
+.vehicle-make-load-status button { margin-left: 6px; padding: 0; border: 0; background: transparent; color: var(--accent, #A8C928); font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
 @keyframes vehicle-make-spin { to { transform: rotate(360deg); } }
 
 /* Remove the extra currency-ticker caption to save vertical space. */
@@ -1077,13 +1077,13 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 
 /* Hryvnia Hub: расширенный поиск автомобилей */
 .vehicle-search-toggle {
-  border: 1px solid rgba(212,255,0,.55);
+  border: 1px solid rgba(168, 201, 40,.55);
   background: transparent;
   color: var(--accent);
   font-weight: 700;
 }
 .vehicle-search-toggle:hover {
-  background: rgba(212,255,0,.12);
+  background: rgba(168, 201, 40,.12);
 }
 @media (max-width: 420px) {
   .vehicle-search-actions {
@@ -1119,7 +1119,7 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
   max-height: 88dvh;
   overflow: auto;
   padding: 24px;
-  border: 1px solid rgba(212,255,0,.45);
+  border: 1px solid rgba(168, 201, 40,.45);
   border-radius: 22px;
   background: rgba(18,39,29,.98);
   color: #f7f9f5;
@@ -1153,7 +1153,7 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
   color: #f7f9f5;
   font-size: 25px;
 }
-#addModal .modal-close:hover { background: rgba(212,255,0,.12); color: var(--accent); }
+#addModal .modal-close:hover { background: rgba(168, 201, 40,.12); color: var(--accent); }
 #addModal #addForm {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1185,7 +1185,7 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
   min-height: 44px;
   margin: 0;
   padding: 10px 12px;
-  border: 1px solid rgba(212,255,0,.42);
+  border: 1px solid rgba(168, 201, 40,.42);
   border-radius: 11px;
   outline: none;
   background: rgba(255,255,255,.97);
@@ -1199,7 +1199,7 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 #addModal #addForm select:focus,
 #addModal #addForm textarea:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(212,255,0,.14);
+  box-shadow: 0 0 0 3px rgba(168, 201, 40,.14);
 }
 #addModal #addForm input::placeholder,
 #addModal #addForm textarea::placeholder { color: #7b827e; opacity: 1; }
@@ -1208,7 +1208,7 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
   min-width: 0;
   margin: 0;
   padding: 14px;
-  border: 1px solid rgba(212,255,0,.58);
+  border: 1px solid rgba(168, 201, 40,.58);
   border-radius: 15px;
   color: #f7f9f5;
 }
@@ -1289,7 +1289,7 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 
 /* Listing-form vehicle make loading state */
 #addModal #vehicleListingMake:disabled { opacity: .82; cursor: progress; }
-#addModal #vehicleListingMakeSpinner { border-color: rgba(32,53,43,.2); border-top-color: var(--accent, #d4ff00); border-right-color: var(--accent, #d4ff00); }
+#addModal #vehicleListingMakeSpinner { border-color: rgba(32,53,43,.2); border-top-color: var(--accent, #A8C928); border-right-color: var(--accent, #A8C928); }
 #addModal #vehicleListingMakeStatus { color: rgba(247,249,245,.78); }
 
 
@@ -1301,7 +1301,7 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
   max-height: min(92dvh, 980px);
   overflow: auto;
   padding: clamp(16px, 3vw, 28px);
-  border: 1px solid var(--accent-border, rgba(212,255,0,.35));
+  border: 1px solid var(--accent-border, rgba(168, 201, 40,.35));
   border-radius: 20px;
   background: var(--card, #fff);
   color: var(--text, #1b2b20);
@@ -1319,7 +1319,7 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
   background: var(--input-bg, var(--card, #fff)); color: inherit; font: inherit; font-weight: 400;
   transition: border-color .15s ease, box-shadow .15s ease;
 }
-.listing-edit-form input:focus, .listing-edit-form select:focus, .listing-edit-form textarea:focus { outline: none; border-color: var(--accent, #d4ff00); box-shadow: 0 0 0 3px rgba(212,255,0,.18); }
+.listing-edit-form input:focus, .listing-edit-form select:focus, .listing-edit-form textarea:focus { outline: none; border-color: var(--accent, #A8C928); box-shadow: 0 0 0 3px rgba(168, 201, 40,.18); }
 .listing-edit-form textarea { resize: vertical; }
 .listing-edit-form .vehicle-listing-fields { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px 16px; margin: 0; padding: 16px; border: 1px solid var(--line, #d8dfd3); border-radius: 14px; }
 .listing-edit-form .vehicle-listing-fields legend { padding: 0 8px; font-size: 1rem; font-weight: 800; }
@@ -1328,7 +1328,7 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 .listing-edit-form .edit-photo-fields { grid-column: 1 / -1; min-width: 0; width: 100%; box-sizing: border-box; }
 .listing-edit-form > .hot-toggle { grid-column: 1 / -1; }
 .listing-edit-form .hot-toggle { display: flex; align-items: center; gap: 9px; font-weight: 600; }
-.listing-edit-form .hot-toggle input { width: 18px; height: 18px; accent-color: var(--accent, #d4ff00); }
+.listing-edit-form .hot-toggle input { width: 18px; height: 18px; accent-color: var(--accent, #A8C928); }
 .listing-edit-form > .hot-toggle { justify-self: start; margin: 0; }
 .listing-edit-form .muted, .listing-edit-form .form-message { grid-column: 1 / -1; margin: 0; overflow-wrap: anywhere; }
 .listing-edit-form .edit-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; padding-top: 8px; border-top: 1px solid var(--line, #e3e8df); }
@@ -1351,7 +1351,7 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 }
 .listing-edit-header {
   border-bottom: 1px solid #c6dcca;
-  background: linear-gradient(100deg, rgba(17, 82, 49, .09), rgba(212, 255, 0, .12));
+  background: linear-gradient(100deg, rgba(17, 82, 49, .09), rgba(168,  201,  40, .12));
   border-radius: 12px;
   padding: 12px 14px 14px;
 }
@@ -1374,7 +1374,7 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 }
 .listing-edit-form .vehicle-listing-fields {
   border: 1px solid #8db69a;
-  background: linear-gradient(145deg, rgba(20, 87, 51, .055), rgba(212, 255, 0, .055));
+  background: linear-gradient(145deg, rgba(20, 87, 51, .055), rgba(168,  201,  40, .055));
   border-radius: 15px;
 }
 .listing-edit-form .vehicle-listing-fields legend { color: #185333; }
@@ -1429,15 +1429,15 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 .listing-edit-dialog {
   background: linear-gradient(160deg, #102b1e 0%, #173a29 100%);
   color: #f4f8f2;
-  border: 1px solid rgba(212, 255, 0, .58);
+  border: 1px solid rgba(168,  201,  40, .58);
   box-shadow: 0 24px 80px rgba(0, 0, 0, .48);
 }
 .listing-edit-header {
   background: linear-gradient(110deg, #1b4933 0%, #244b30 72%, #304b20 100%);
-  border: 1px solid rgba(212, 255, 0, .25);
-  border-bottom-color: rgba(212, 255, 0, .38);
+  border: 1px solid rgba(168,  201,  40, .25);
+  border-bottom-color: rgba(168,  201,  40, .38);
 }
-.listing-edit-header .eyebrow { color: #d4ff00; }
+.listing-edit-header .eyebrow { color: #A8C928; }
 .listing-edit-header h2,
 .listing-edit-form > label,
 .listing-edit-form .vehicle-listing-fields legend,
@@ -1450,7 +1450,7 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 .listing-edit-form textarea {
   padding: 9px 11px;
   min-height: 40px;
-  border: 1px solid rgba(212, 255, 0, .55);
+  border: 1px solid rgba(168,  201,  40, .55);
   border-radius: 10px;
   background: #f7f8f5;
   color: #20382a;
@@ -1458,20 +1458,20 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 .listing-edit-form input:focus,
 .listing-edit-form select:focus,
 .listing-edit-form textarea:focus {
-  border-color: #d4ff00;
-  box-shadow: 0 0 0 3px rgba(212, 255, 0, .2);
+  border-color: #A8C928;
+  box-shadow: 0 0 0 3px rgba(168,  201,  40, .2);
 }
 .listing-edit-form .vehicle-listing-fields {
   gap: 8px 12px;
   padding: 10px 12px 12px;
-  border: 1px solid rgba(212, 255, 0, .5);
+  border: 1px solid rgba(168,  201,  40, .5);
   border-radius: 13px;
   background: linear-gradient(145deg, rgba(8, 27, 18, .62), rgba(27, 67, 43, .72));
 }
 .listing-edit-form .vehicle-listing-fields label { gap: 4px; font-size: .86rem; }
-.listing-edit-form .edit-actions { padding-top: 7px; border-top-color: rgba(212, 255, 0, .25); }
+.listing-edit-form .edit-actions { padding-top: 7px; border-top-color: rgba(168,  201,  40, .25); }
 .listing-edit-form .edit-actions button:not(.btn-primary) {
-  border-color: rgba(212, 255, 0, .55);
+  border-color: rgba(168,  201,  40, .55);
   background: #203f2d;
   color: #f4f8f2;
 }
@@ -1506,12 +1506,12 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
 #addModal .listing-progress-step span { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.12); font-weight: 800; }
 #addModal .listing-progress-step small { font-size: 10px; white-space: nowrap; }
 #addModal .listing-progress-step.is-active { color: #f7f9f5; }
-#addModal .listing-progress-step.is-active span { color: #14271c; background: var(--accent, #d4ff00); border-color: var(--accent, #d4ff00); }
+#addModal .listing-progress-step.is-active span { color: #14271c; background: var(--accent, #A8C928); border-color: var(--accent, #A8C928); }
 #addModal .listing-progress-step.is-complete span { color: #14271c; background: #78d98b; }
 #addModal .listing-progress > i { height: 2px; flex: 1; margin-top: 13px; background: rgba(255,255,255,.15); }
 #addModal .listing-progress > i.is-complete { background: #78d98b; }
 #addModal #vehicleListingMore { grid-column: 1 / -1; margin: 4px 0 8px; }
-#addModal .vehicle-market-panel { grid-column: 1 / -1; padding: 15px; border: 1px solid rgba(212,255,0,.28); border-radius: 16px; background: rgba(5,24,17,.62); }
+#addModal .vehicle-market-panel { grid-column: 1 / -1; padding: 15px; border: 1px solid rgba(168, 201, 40,.28); border-radius: 16px; background: rgba(5,24,17,.62); }
 #addModal .vehicle-market-panel h3 { margin: 0 0 7px; font-size: 14px; color: rgba(247,249,245,.82); }
 #addModal .vehicle-market-price { margin: 0 0 10px; font-size: clamp(20px, 4vw, 27px); font-weight: 850; color: #fff; }
 #addModal .market-price-scale { position: relative; height: 13px; border-radius: 999px; background: linear-gradient(90deg,#20b76b 0%,#9ee51d 28%,#f2df19 50%,#ff9c1a 72%,#f04432 100%); }
@@ -1718,4 +1718,67 @@ body:has(#menuToggle:checked) .mobile-menu-overlay { display: block; opacity: 1;
   .listing-card-horizontal .listing-card-specs { font-size: 12px; }
   .listing-card-condition { font-size: 12px; }
   .listing-card-horizontal .city { font-size: 13px; }
+}
+
+
+/* Hryvnia Hub — final requested card refinements (2026-10-25) */
+/* Keep the favorite button white, with a clear brand-green heart outline. */
+.listing-card-horizontal .listing-card-heading .fav-btn {
+  color: #16833b;
+  border: 1px solid rgba(22, 131, 59, .18);
+}
+.listing-card-horizontal .listing-card-heading .fav-btn.active {
+  color: #16833b;
+  background: #f0f8f1;
+}
+/* Softer orange hot badge instead of vivid red. */
+.hot-card-media > .hot-listing-badge,
+.listing-card-media > .hot-listing-badge {
+  background: #ff8a24;
+  color: #fff;
+}
+/* Make the former price easier to read without competing with the current price. */
+.listing-card-horizontal .old-price {
+  color: #7b8580;
+  opacity: .9;
+  font-size: .52em;
+  font-weight: 600;
+  text-decoration-thickness: 1px;
+}
+@media (max-width: 720px) {
+  .listing-card-horizontal .old-price { font-size: 10px; }
+}
+@media (max-width: 390px) {
+  .listing-card-horizontal .old-price { font-size: 9.5px; }
+}
+
+
+/* Hryvnia Hub — final visual alignment with bottom navigation (2026-10-25) */
+/* Favorite heart uses the same lime accent as the home, favorites and messages icons. */
+.listing-card-horizontal .listing-card-heading .fav-btn,
+.listing-card-horizontal .listing-card-heading .fav-btn.active {
+  color: #A8C928;
+  background: #fff;
+  border: 1px solid rgba(168,  201,  40, .45);
+}
+/* Keep the agreed softer orange badge. */
+.hot-card-media > .hot-listing-badge,
+.listing-card-media > .hot-listing-badge {
+  background: #ff8a24;
+  color: #fff;
+}
+/* Slightly clearer former price, without changing the current price. */
+.listing-card-horizontal .old-price {
+  color: #6f7973;
+  opacity: 1;
+  font-size: .54em;
+  font-weight: 600;
+  text-decoration-thickness: 1px;
+  text-decoration-color: #6f7973;
+}
+@media (max-width: 720px) {
+  .listing-card-horizontal .old-price { font-size: 11px; }
+}
+@media (max-width: 390px) {
+  .listing-card-horizontal .old-price { font-size: 10px; }
 }

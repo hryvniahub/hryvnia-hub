@@ -452,6 +452,9 @@ const searchBtn = document.getElementById("searchBtn");
 const catalogCitySearchInput = document.getElementById("catalogCitySearchInput");
 const catalogCitySuggestions = document.getElementById("catalogCitySuggestions");
 const catalogRegionSelect = document.getElementById("catalogRegionSelect");
+const vehicleSearchCityInput = document.getElementById("vehicleSearchCity");
+const vehicleSearchCitySuggestions = document.getElementById("vehicleSearchCitySuggestions");
+const vehicleSearchRegionSelect = document.getElementById("vehicleSearchRegion");
 const cityRegionSelect = document.getElementById("cityRegionSelect");
 const citySearchInput = document.getElementById("citySearchInput");
 const citySuggestions = document.getElementById("citySuggestions");
@@ -2092,6 +2095,83 @@ function updateCatalogCitySearchLanguage() {
   if (selectedCity) catalogCitySearchInput.value = cityName(selectedCity);
   if (document.activeElement === catalogCitySearchInput && !catalogCitySuggestions.hidden) renderCatalogCitySuggestions();
 }
+function closeVehicleSearchCitySuggestions() {
+  if (!vehicleSearchCitySuggestions) return;
+  vehicleSearchCitySuggestions.hidden = true;
+  vehicleSearchCityInput?.setAttribute("aria-expanded", "false");
+}
+function renderVehicleSearchCitySuggestions() {
+  if (!vehicleSearchCitySuggestions || !vehicleSearchCityInput) return;
+  const term = vehicleSearchCityInput.value;
+  const queryVariants = getQueryVariants(term);
+  const base = activeRegionCode ? citySearchIndex.filter(entry => String(entry.city.region_katottg_code) === String(activeRegionCode)) : citySearchIndex;
+  const ranked = term ? base.map(entry => ({ entry, rank: rankCityEntry(entry, queryVariants) }))
+    .filter(item => item.rank >= 0)
+    .sort((a, b) => a.rank - b.rank || cityName(a.entry.city).localeCompare(cityName(b.entry.city)))
+    .slice(0, 12).map(item => item.entry) : [];
+  vehicleSearchCitySuggestions.innerHTML = ranked.length
+    ? ranked.map(entry => renderCitySuggestionButton(entry, "catalog-city-suggestion")).join("")
+    : `<div class="city-suggestion-empty" role="status">${escapeHtml(cityTranslation(term ? "Город не найден" : "Введите название города"))}</div>`;
+  vehicleSearchCitySuggestions.hidden = false;
+  vehicleSearchCityInput.setAttribute("aria-expanded", "true");
+}
+function selectVehicleSearchCity(city) {
+  selectedCatalogCityId = String(city.id);
+  if (vehicleSearchCityInput) vehicleSearchCityInput.value = cityName(city);
+  const isCapital = String(city.official_code || "") === "UA80000000000093317" || Number(city.id) === 29707;
+  activeRegionCode = isCapital ? "" : String(city.region_katottg_code || "");
+  if (vehicleSearchRegionSelect) vehicleSearchRegionSelect.value = activeRegionCode;
+  if (catalogCitySearchInput) catalogCitySearchInput.value = cityName(city);
+  if (catalogRegionSelect) catalogRegionSelect.value = activeRegionCode;
+  closeVehicleSearchCitySuggestions();
+}
+if (vehicleSearchRegionSelect) {
+  vehicleSearchRegionSelect.addEventListener("focus", () => { if (!availableCities.length) loadCities().catch(error => console.error("Не удалось загрузить города:", error)); }, { once: true });
+  vehicleSearchRegionSelect.addEventListener("change", () => {
+    activeRegionCode = vehicleSearchRegionSelect.value;
+    selectedCatalogCityId = "";
+    if (vehicleSearchCityInput) vehicleSearchCityInput.value = "";
+    if (catalogCitySearchInput) catalogCitySearchInput.value = "";
+    if (catalogRegionSelect) catalogRegionSelect.value = activeRegionCode;
+    renderVehicleSearchCitySuggestions();
+  });
+}
+if (vehicleSearchCityInput) {
+  vehicleSearchCityInput.addEventListener("input", () => {
+    selectedCatalogCityId = "";
+    if (catalogCitySearchInput) catalogCitySearchInput.value = vehicleSearchCityInput.value;
+    renderVehicleSearchCitySuggestions();
+  });
+  vehicleSearchCityInput.addEventListener("focus", async () => {
+    if (!availableCities.length) {
+      if (vehicleSearchCitySuggestions) { vehicleSearchCitySuggestions.innerHTML = `<div class="city-suggestion-empty" role="status">${escapeHtml(cityTranslation("Загрузка городов…"))}</div>`; vehicleSearchCitySuggestions.hidden = false; }
+      try { await loadCities(); } catch (error) { console.error("Не удалось загрузить города:", error); }
+    }
+    renderVehicleSearchCitySuggestions();
+  });
+  vehicleSearchCityInput.addEventListener("keydown", event => {
+    if (event.key === "Escape") closeVehicleSearchCitySuggestions();
+    if (event.key === "ArrowDown" && !vehicleSearchCitySuggestions.hidden) {
+      const firstOption = vehicleSearchCitySuggestions.querySelector("[data-city-id]");
+      if (firstOption) { event.preventDefault(); firstOption.focus(); }
+    }
+    if (event.key === "Enter" && !vehicleSearchCitySuggestions.hidden) {
+      const firstOption = vehicleSearchCitySuggestions.querySelector("[data-city-id]");
+      const city = availableCities.find(item => String(item.id) === firstOption?.dataset.cityId);
+      if (city) { event.preventDefault(); selectVehicleSearchCity(city); }
+    }
+  });
+}
+if (vehicleSearchCitySuggestions) {
+  vehicleSearchCitySuggestions.addEventListener("mousedown", event => { if (event.target.closest("[data-city-id]")) event.preventDefault(); });
+  vehicleSearchCitySuggestions.addEventListener("click", event => {
+    const option = event.target.closest("[data-city-id]");
+    if (!option) return;
+    const city = availableCities.find(item => String(item.id) === option.dataset.cityId);
+    if (city) selectVehicleSearchCity(city);
+  });
+}
+
 function closeCitySuggestions() {
   if (!citySuggestions) return;
   citySuggestions.hidden = true;
@@ -2134,7 +2214,7 @@ function updateCities(items, names = {}) {
   citySearchIndex = availableCities.map(buildCityEntry);
   const regionCodes = [...new Set(availableCities.map(city => city.region_katottg_code).filter(code => code !== null && code !== undefined && code !== ""))].map(String).sort();
   const allRegionsLabel = cityTranslation("Все области");
-  [[catalogRegionSelect, activeRegionCode], [cityRegionSelect, formRegionCode]].forEach(([select, current]) => {
+  [[catalogRegionSelect, activeRegionCode], [vehicleSearchRegionSelect, activeRegionCode], [cityRegionSelect, formRegionCode]].forEach(([select, current]) => {
     if (!select) return;
     const capitalOption = select === cityRegionSelect ? `<option value="__capital__">${escapeHtml(cityTranslation("Столица Украины"))}</option>` : "";
     select.innerHTML = `<option value="">${escapeHtml(allRegionsLabel)}</option>` + capitalOption +
@@ -2145,6 +2225,7 @@ function updateCities(items, names = {}) {
   });
   updateCitySearchLanguage();
   updateCatalogCitySearchLanguage();
+  if (vehicleSearchCityInput) { const selectedVehicleCity = availableCities.find(city => String(city.id) === selectedCatalogCityId); if (selectedVehicleCity) vehicleSearchCityInput.value = cityName(selectedVehicleCity); }
 }
 async function loadCities() {
   if (!db || availableCities.length) return availableCities;
@@ -2272,6 +2353,7 @@ if (citySuggestions) {
 document.addEventListener("click", event => {
   if (citySearchInput && !citySearchInput.parentElement.contains(event.target)) closeCitySuggestions();
   if (catalogCitySearchInput && !catalogCitySearchInput.parentElement.contains(event.target)) closeCatalogCitySuggestions();
+  if (vehicleSearchCityInput && !vehicleSearchCityInput.parentElement.contains(event.target) && !vehicleSearchCitySuggestions?.contains(event.target)) closeVehicleSearchCitySuggestions();
 });
 
 let currentCategory = "";
@@ -3005,6 +3087,9 @@ function resetCatalogFilters() {
   if (searchInput) searchInput.value = "";
   if (catalogCitySearchInput) catalogCitySearchInput.value = "";
   if (catalogRegionSelect) catalogRegionSelect.value = "";
+  if (vehicleSearchCityInput) vehicleSearchCityInput.value = "";
+  if (vehicleSearchRegionSelect) vehicleSearchRegionSelect.value = "";
+  closeVehicleSearchCitySuggestions();
   const categoryLabel = document.getElementById("categorySelectLabel");
   if (categoryLabel) categoryLabel.textContent = t("Все категории");
   document.querySelectorAll(".category").forEach(button => button.classList.remove("active"));
@@ -3352,6 +3437,12 @@ document.getElementById("vehicleSearchToggleAdvanced")?.addEventListener("click"
 document.getElementById("vehicleSearchReset")?.addEventListener("click", () => {
   ["vehicleSearchMake","vehicleSearchModel","vehicleYearFrom","vehicleYearTo","vehiclePriceFrom","vehiclePriceTo","vehicleMileageFrom","vehicleMileageTo","vehicleEngineFrom","vehicleEngineTo","vehicleBodyType","vehicleFuel","vehicleTransmission","vehicleSearchStatus","vehiclePowerFrom","vehiclePowerTo","vehicleDoors","vehicleDrive","vehicleColor","vehicleSellerType","vehicleSearchOperationalCondition"].forEach(id => { const el=document.getElementById(id); if(el) el.value=""; });
   const currency = document.getElementById("vehiclePriceCurrency"); if (currency) currency.value = "UAH";
+  selectedCatalogCityId = ""; activeRegionCode = "";
+  if (vehicleSearchCityInput) vehicleSearchCityInput.value = "";
+  if (vehicleSearchRegionSelect) vehicleSearchRegionSelect.value = "";
+  if (catalogCitySearchInput) catalogCitySearchInput.value = "";
+  if (catalogRegionSelect) catalogRegionSelect.value = "";
+  closeVehicleSearchCitySuggestions();
   const make = document.getElementById("vehicleSearchMake");
   const model = document.getElementById("vehicleSearchModel");
   if (model) {

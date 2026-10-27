@@ -2225,3 +2225,48 @@ main {
 .hh-ai-prompt p { margin: 0 0 16px; color: rgba(247,249,245,.84); line-height: 1.45; }
 .hh-ai-prompt .hh-ai-prompt-ok { width: 100%; min-height: 44px; border: 0; border-radius: 12px; background: #d4ff00; color: #14271e; font: inherit; font-weight: 800; }
 @media (max-width: 700px) { .hh-ai-prompt-backdrop { align-items: center; } .hh-ai-prompt { margin-top: 0; } }
+
+
+/* Hryvnia Hub — fix vehicle specification icons in listing cards */
+.listing-card-horizontal .vehicle-card-specs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  min-width: 0;
+}
+.listing-card-horizontal .vehicle-spec-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  color: #89928b;
+  line-height: 1.25;
+}
+.listing-card-horizontal .vehicle-spec-icon {
+  display: inline-flex;
+  flex: 0 0 16px;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  max-width: 16px;
+  max-height: 16px;
+  overflow: hidden;
+  color: #89928b;
+  font-size: 14px;
+  line-height: 1;
+}
+.listing-card-horizontal .vehicle-spec-icon svg {
+  display: block;
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  min-height: 16px;
+  max-width: 16px;
+  max-height: 16px;
+  fill: none;
+  stroke: currentColor;
+  overflow: hidden;
+}

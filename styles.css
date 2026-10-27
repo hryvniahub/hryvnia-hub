@@ -1987,3 +1987,73 @@ main {
 .listing-card-horizontal .fav-btn { color: #a8c928; border: 1px solid rgba(168, 201, 40, .58); font-size: 27px; -webkit-text-stroke: .55px currentColor; }
 .listing-card-horizontal .fav-btn.active { color: #a8c928; background: #f7fbe9; border-color: rgba(168, 201, 40, .7); }
 @media (max-width: 720px) { .listing-card-horizontal .fav-btn { font-size: 22px; } }
+
+
+/* Mobile messaging: keep the composer visible above the keyboard and bottom navigation. */
+.messages-card { display: flex; flex-direction: column; min-height: 0; }
+#messagesContent, .messages-thread { min-height: 0; }
+.thread-messages {
+  min-height: 80px;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.send-message-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  padding-top: 4px;
+  background: #fff;
+}
+.send-message-form input { width: 0; }
+@media (max-width: 720px) {
+  #messagesModal {
+    padding: 0;
+    align-items: flex-end;
+    height: var(--hh-visual-viewport-height, 100dvh);
+    min-height: 0;
+    overflow: hidden;
+  }
+  #messagesModal .messages-card {
+    width: 100%;
+    max-width: none;
+    height: min(88%, 760px);
+    max-height: 100%;
+    margin: 0;
+    padding: 18px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+    border-radius: 18px 18px 0 0;
+    overflow: hidden;
+  }
+  #messagesModal #messagesTitle { flex: 0 0 auto; margin: 0 42px 12px 0; }
+  #messagesModal #messagesContent {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+  #messagesModal .conversations-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+    overscroll-behavior: contain;
+  }
+  #messagesModal .messages-thread {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+  }
+  #messagesModal .thread-messages {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+    padding-bottom: 8px;
+  }
+  #messagesModal .send-message-form {
+    position: relative;
+    flex: 0 0 auto;
+    padding: 8px 0 0;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  #messagesModal .send-message-form input { min-width: 0; }
+}

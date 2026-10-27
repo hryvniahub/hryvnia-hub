@@ -1804,7 +1804,9 @@ main {
 }
 .header .lang-btn { flex: 0 1 188px; min-width: 170px; }
 .header .lang-trigger {
+  box-sizing: border-box;
   width: 100%;
+  height: 100%;
   min-width: 0;
   padding: 0 12px;
   display: flex;
@@ -1814,6 +1816,14 @@ main {
   background: transparent;
   color: #f7faf4;
   font-size: 14px;
+  line-height: 1;
+}
+.header .lang-city,
+.header .lang-clock {
+  display: inline-flex;
+  align-items: center;
+  align-self: stretch;
+  line-height: 1;
 }
 .header .lang-flag { flex: 0 0 auto; font-size: 19px; }
 .header .lang-city { min-width: 0; font-size: 14px; font-weight: 700; color: #f7faf4; }
@@ -1904,14 +1914,18 @@ main {
   }
 
   .header-actions .lang-trigger {
+    box-sizing: border-box;
     display: grid;
     grid-template-columns: 18px minmax(0, 1fr) 38px;
+    grid-template-rows: minmax(0, 1fr);
     align-items: center;
     justify-content: initial;
     gap: 5px;
     width: 100%;
+    height: 100%;
     min-width: 0;
     padding: 0 6px;
+    line-height: 1;
   }
 
   .header-actions .lang-flag {
@@ -1925,6 +1939,10 @@ main {
   }
 
   .header-actions .lang-city {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: stretch;
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1935,6 +1953,10 @@ main {
   }
 
   .header-actions .lang-clock {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: stretch;
     width: 38px;
     min-width: 38px;
     text-align: center;
@@ -1943,6 +1965,7 @@ main {
     border-left: 0;
     white-space: nowrap;
     font-size: 10px;
+    line-height: 1;
     font-variant-numeric: tabular-nums;
   }
 
@@ -2029,15 +2052,15 @@ main {
     width: min(540px, calc(100vw - 32px));
     max-width: none;
     height: auto;
-    max-height: min(78dvh, 680px);
+    max-height: calc(100% - 32px);
     margin: 0;
     padding: 18px 14px;
     border-radius: 22px;
     overflow: hidden;
   }
   #messagesModal .messages-card.is-thread-open {
-    height: min(78dvh, 680px);
-    max-height: 100%;
+    height: min(78%, 680px);
+    max-height: calc(100% - 32px);
   }
   #messagesModal #messagesTitle {
     flex: 0 0 auto;

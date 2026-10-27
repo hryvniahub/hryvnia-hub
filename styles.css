@@ -157,8 +157,8 @@ button { font-family: inherit; }
 .hero { margin-top: 0; }
 .main-banner {
   position: relative; border-radius: var(--radius-lg); overflow: hidden;
-  height: clamp(112px, 12vw, 145px); display: flex; align-items: center; justify-content: center;
-  padding: 14px 20px 28px; color: #fff;
+  height: clamp(150px, 14vw, 172px); display: flex; align-items: center; justify-content: center;
+  padding: 16px 20px 34px; color: #fff;
 }
 .main-banner-img {
   position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 52%; z-index: 0;
@@ -175,6 +175,7 @@ button { font-family: inherit; }
   margin: 0; font-size: clamp(18px, 2vw, 26px); font-weight: 800; line-height: 1.1;
   text-shadow: 0 2px 4px rgba(0,0,0,0.8);
 }
+.banner-title-accent { color: #b9cf63; }
 .banner-title::after {
   content: ""; display: block; width: 40px; height: 3px; margin: 4px auto 0;
   border-radius: 2px; background: var(--accent);
@@ -850,12 +851,12 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
 @media (max-width: 720px) {
   body { padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px)); }
   /* Единые мобильные настройки баннера: без повторных переопределений */
-  .main-banner { height: 56px; padding: 4px 10px 15px; }
-  .banner-content { gap: 2px; padding-bottom: 0; }
-  .banner-title { font-size: 16px; line-height: 1.05; transform: none; }
-  .banner-title::after { width: 25px; height: 2px; margin-top: 2px; }
-  .hero-text { font-size: 12px; line-height: 1.1; }
-  .banner-icons { bottom: 3px; gap: 12px; }
+  .main-banner { height: clamp(104px, 20vw, 124px); padding: 10px 12px 24px; }
+  .banner-content { gap: 5px; padding-bottom: 0; }
+  .banner-title { font-size: clamp(17px, 3.1vw, 22px); line-height: 1.08; transform: none; }
+  .banner-title::after { width: 25px; height: 2px; margin-top: 3px; }
+  .hero-text { font-size: clamp(12px, 2.3vw, 15px); line-height: 1.18; max-width: 100%; }
+  .banner-icons { bottom: 4px; gap: 12px; }
   .banner-icon { width: 14px; height: 14px; }
   .ticker-icon { flex-basis: 18px; width: 18px; height: 18px; font-size: 11px; }
   .ticker-label { font-size: 8px; }

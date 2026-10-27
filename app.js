@@ -458,6 +458,7 @@ const citySuggestions = document.getElementById("citySuggestions");
 const citySelect = document.getElementById("citySelect");
 let availableCities = [];
 let citySearchIndex = [];
+let citiesLoadPromise = null;
 let regionNames = {};
 let selectedCatalogCityId = "";
 let activeRegionCode = "";
@@ -2146,8 +2147,11 @@ function updateCities(items, names = {}) {
   updateCatalogCitySearchLanguage();
 }
 async function loadCities() {
-  if (!db) return;
-  if (window.hryvniaCitiesLoaded) return;
+  if (!db || availableCities.length) return availableCities;
+  // Share one in-flight catalog request between all callers; never download the same catalog twice.
+  if (citiesLoadPromise) return citiesLoadPromise;
+  if (window.hryvniaCitiesLoaded && availableCities.length) return availableCities;
+  citiesLoadPromise = (async () => {
   const allCities = [];
   const pageSize = 1000;
   let from = 0;
@@ -2177,16 +2181,28 @@ async function loadCities() {
   } catch (err) { console.error("Не удалось загрузить регионы:", err); }
   updateCities(allCities, regionNames);
   window.hryvniaCitiesLoaded = regionsLoaded;
+    return availableCities;
+  })();
+  try {
+    return await citiesLoadPromise;
+  } catch (error) {
+    citiesLoadPromise = null;
+    throw error;
+  } finally {
+    if (!availableCities.length) citiesLoadPromise = null;
+  }
 }
 if (catalogRegionSelect) {
+  catalogRegionSelect.addEventListener("focus", () => { if (!availableCities.length) loadCities().catch(error => console.error("Не удалось загрузить города:", error)); }, { once: true });
   catalogRegionSelect.addEventListener("change", () => {
     activeRegionCode = catalogRegionSelect.value;
     selectedCatalogCityId = "";
     if (catalogCitySearchInput) catalogCitySearchInput.value = "";
-    loadListings();
+    scheduleListingSearch();
   });
 }
 if (cityRegionSelect) {
+  cityRegionSelect.addEventListener("focus", () => { if (!availableCities.length) loadCities().catch(error => console.error("Не удалось загрузить города:", error)); }, { once: true });
   cityRegionSelect.addEventListener("change", () => {
     formRegionCode = cityRegionSelect.value === "__capital__" ? "" : cityRegionSelect.value;
     if (citySelect) citySelect.value = "";
@@ -2196,7 +2212,14 @@ if (cityRegionSelect) {
 }
 if (catalogCitySearchInput) {
   catalogCitySearchInput.addEventListener("input", () => { selectedCatalogCityId = ""; renderCatalogCitySuggestions(); });
-  catalogCitySearchInput.addEventListener("focus", renderCatalogCitySuggestions);
+  catalogCitySearchInput.addEventListener("focus", async () => {
+    if (!availableCities.length) {
+      catalogCitySuggestions && (catalogCitySuggestions.innerHTML = `<div class="city-suggestion-empty" role="status">${escapeHtml(cityTranslation("Загрузка городов…"))}</div>`);
+      catalogCitySuggestions && (catalogCitySuggestions.hidden = false);
+      try { await loadCities(); } catch (error) { console.error("Не удалось загрузить города:", error); }
+    }
+    renderCatalogCitySuggestions();
+  });
   catalogCitySearchInput.addEventListener("keydown", event => {
     if (event.key === "Escape") closeCatalogCitySuggestions();
     if (event.key === "ArrowDown" && !catalogCitySuggestions.hidden) {
@@ -2221,7 +2244,14 @@ if (catalogCitySuggestions) {
 }
 if (citySearchInput) {
   citySearchInput.addEventListener("input", () => { if (citySelect) citySelect.value = ""; renderCitySuggestions(); });
-  citySearchInput.addEventListener("focus", renderCitySuggestions);
+  citySearchInput.addEventListener("focus", async () => {
+    if (!availableCities.length) {
+      citySuggestions && (citySuggestions.innerHTML = `<div class="city-suggestion-empty" role="status">${escapeHtml(cityTranslation("Загрузка городов…"))}</div>`);
+      citySuggestions && (citySuggestions.hidden = false);
+      try { await loadCities(); } catch (error) { console.error("Не удалось загрузить города:", error); }
+    }
+    renderCitySuggestions();
+  });
   citySearchInput.addEventListener("keydown", event => {
     if (event.key === "Escape") closeCitySuggestions();
     if (event.key === "ArrowDown" && !citySuggestions.hidden) {
@@ -2247,7 +2277,13 @@ document.addEventListener("click", event => {
 let currentCategory = "";
 let visibleListings = [];
 let isSearching = false;
+let pendingListingsReload = false;
+let listingSearchTimer = null;
 let vehicleClientFilters = null;
+function scheduleListingSearch(delay = 250) {
+  if (listingSearchTimer) clearTimeout(listingSearchTimer);
+  listingSearchTimer = setTimeout(() => { listingSearchTimer = null; loadListings(); }, delay);
+}
 
 function categoryLabel(item) { return escapeHtml(translations[item.category]?.[lang] || item.category); }
 
@@ -2817,7 +2853,7 @@ if (listing) {
 }
 
 async function loadListings() {
-  if (isSearching) return;
+  if (isSearching) { pendingListingsReload = true; return; }
   if (!db) {
     renderListings([
       { id: "demo-1", category: "Автомобили", title: "Пример: Skoda Octavia 1.6", city: "Днепр", price: 250000, description: "Демо-карточка." },
@@ -2900,7 +2936,9 @@ async function loadListings() {
     if (operationalCondition) query = query.eq("vehicle_operational_condition", operationalCondition);
   }
   isSearching = true;
-  setButtonLoading(searchBtn, true, "");
+  setButtonLoading(searchBtn, true, t("Ищем…"));
+  const vehicleApplyButton = currentCategory === "Автомобили" ? document.getElementById("vehicleSearchApply") : null;
+  if (vehicleApplyButton) setButtonLoading(vehicleApplyButton, true, t("Ищем автомобили…"));
   try {
     const { data, error } = await query;
     if (error) { if (listing) listing.innerHTML = `<div class="empty">${escapeHtml(t("Ошибка") + ": " + error.message)}</div>`; return; }
@@ -2941,6 +2979,11 @@ async function loadListings() {
   } finally {
     isSearching = false;
     setButtonLoading(searchBtn, false);
+    if (vehicleApplyButton) setButtonLoading(vehicleApplyButton, false);
+    if (pendingListingsReload) {
+      pendingListingsReload = false;
+      loadListings();
+    }
   }
 }
 
@@ -3741,7 +3784,6 @@ updateClock();
 loadMarketQuotes();
 setInterval(loadMarketQuotes, 5 * 60 * 1000);
 loadListings();
-loadCities();
 initAuth();
 
 

@@ -2282,8 +2282,18 @@ main {
   overflow-x: auto;
   scrollbar-width: thin;
 }
+.vehicle-search-tab-item {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: stretch;
+  overflow: hidden;
+  border: 1px solid rgba(212,255,0,.28);
+  border-radius: 9px;
+  background: rgba(255,255,255,.06);
+}
 .vehicle-search-tab,
-.vehicle-search-tab-add {
+.vehicle-search-tab-add,
+.vehicle-search-tab-close {
   flex: 0 0 auto;
   min-height: 34px;
   border: 1px solid rgba(212,255,0,.28);
@@ -2295,9 +2305,27 @@ main {
   font-weight: 700;
   cursor: pointer;
 }
-.vehicle-search-tab { max-width: 180px; padding: 7px 12px; }
+.vehicle-search-tab { max-width: 180px; padding: 7px 10px 7px 12px; }
+.vehicle-search-tab-close {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  flex: 0 0 25px;
+  width: 25px;
+  min-width: 25px;
+  padding: 0 5px 2px 0;
+  color: rgba(247,249,245,.68);
+  font-size: 18px;
+  line-height: 1;
+  transition: color .15s ease, background .15s ease;
+}
+.vehicle-search-tab-close:hover,
+.vehicle-search-tab-item.is-active .vehicle-search-tab-close { color: var(--accent, #d4ff00); }
+.vehicle-search-tab-close:hover { background: rgba(212,255,0,.08); }
 .vehicle-search-tab span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.vehicle-search-tab.is-active { border-color: var(--accent, #d4ff00); background: rgba(212,255,0,.13); color: var(--accent, #d4ff00); }
+.vehicle-search-tab-item.is-active { border-color: var(--accent, #d4ff00); background: rgba(212,255,0,.13); }
+.vehicle-search-tab.is-active { color: var(--accent, #d4ff00); }
 .vehicle-search-tab-add { width: 36px; padding: 0; font-size: 22px; line-height: 1; color: var(--accent, #d4ff00); }
 .vehicle-search-tab:disabled,
+.vehicle-search-tab-close:disabled,
 .vehicle-search-tab-add:disabled { opacity: .5; cursor: wait; }

@@ -1718,7 +1718,7 @@ async function startConversation(item) {
   if (!currentUser) { alert(t("Войдите, чтобы написать продавцу.")); return; }
   if (!item?.user_id) { alert(t("У объявления нет автора.")); return; }
   if (String(item.user_id) === String(currentUser.id)) { alert(t("Это ваше объявление.")); return; }
-  if (!db) { alert(t("Supabase не подключён.")); return; }
+  if (!db) { showAiCategoryPrompt(t("Не вдалося підключитися до сервера. Перевірте з’єднання та спробуйте ще раз."), "AI Deal Finder"); return; }
 
   try {
     // First try to reuse the existing conversation.
@@ -1775,21 +1775,31 @@ document.querySelectorAll("[data-nav]").forEach(btn => {
     else if (nav === "messages") openMessagesModal();
   });
 });
-function showAiCategoryPrompt(message) {
+function showAiCategoryPrompt(message, title = "AI Deal Finder") {
   document.querySelector(".hh-ai-prompt-backdrop")?.remove();
+  const anchor = document.querySelector("#aiSearchBtn") || document.querySelector(".ai-panel");
+  const rect = anchor?.getBoundingClientRect();
   const backdrop = document.createElement("div");
   backdrop.className = "hh-ai-prompt-backdrop";
-  backdrop.innerHTML = `<section class="hh-ai-prompt" role="dialog" aria-modal="true" aria-labelledby="hhAiPromptTitle"><div class="hh-ai-prompt-badge" aria-hidden="true">AI</div><h3 id="hhAiPromptTitle">${escapeHtml(t("AI Deal Finder"))}</h3><p>${escapeHtml(message)}</p><button type="button">${escapeHtml(t("Зрозуміло"))}</button></section>`;
+  backdrop.innerHTML = `<section class="hh-ai-prompt" role="dialog" aria-modal="false" aria-labelledby="hhAiPromptTitle"><button class="hh-ai-prompt-close" type="button" aria-label="Close">×</button><div class="hh-ai-prompt-badge" aria-hidden="true">AI</div><h3 id="hhAiPromptTitle">${escapeHtml(t(title))}</h3><p>${escapeHtml(message)}</p><button class="hh-ai-prompt-ok" type="button">${escapeHtml(t("Зрозуміло"))}</button></section>`;
+  const panel = backdrop.querySelector(".hh-ai-prompt");
+  // Keep the branded message beside the AI panel when space allows; never scroll to the page footer.
+  if (rect && window.innerWidth > 700) {
+    panel.style.position = "fixed";
+    panel.style.left = `${Math.max(16, Math.min(rect.left, window.innerWidth - 376))}px`;
+    panel.style.top = `${Math.max(80, Math.min(rect.bottom + 10, window.innerHeight - 260))}px`;
+  }
   const close = () => backdrop.remove();
   backdrop.addEventListener("click", event => { if (event.target === backdrop || event.target.closest("button")) close(); });
-  document.addEventListener("keydown", function onEscape(event) { if (event.key === "Escape") { close(); document.removeEventListener("keydown", onEscape); } });
+  const onEscape = event => { if (event.key === "Escape") { close(); document.removeEventListener("keydown", onEscape); } };
+  document.addEventListener("keydown", onEscape);
   document.body.appendChild(backdrop);
-  backdrop.querySelector("button")?.focus();
+  backdrop.querySelector(".hh-ai-prompt-ok")?.focus({ preventScroll: true });
 }
 
 const aiSearchBtn = document.getElementById("aiSearchBtn");
 async function runAiSearch() {
-  if (!db) { alert(t("Supabase не подключён.")); return; }
+  if (!db) { showAiCategoryPrompt(t("Не вдалося підключитися до сервера. Перевірте з’єднання та спробуйте ще раз."), "AI Deal Finder"); return; }
   if (!aiSearchBtn) return;
   if (!currentCategory) {
     const categoryPrompt = ({
@@ -1808,15 +1818,15 @@ async function runAiSearch() {
     if (selectedCatalogCityId) query = query.eq("city_id", selectedCatalogCityId);
     else if (activeRegionCode) query = query.eq("cities.region_katottg_code", activeRegionCode);
     const { data, error } = await query;
-    if (error) { alert(t("Ошибка") + ": " + error.message); return; }
+    if (error) { showAiCategoryPrompt(t("Не вдалося завантажити пропозиції. Перевірте інтернет і спробуйте ще раз."), "AI Deal Finder"); return; }
     const items = data || [];
-    if (!items.length) { alert(t("AI не нашёл предложений ниже среднего.")); return; }
+    if (!items.length) { showAiCategoryPrompt(t("Поки що немає достатньо оголошень у цій категорії для підбору. Спробуйте пізніше або змініть фільтри."), "AI Deal Finder"); return; }
     const prices = items.map(x => Number(x.price)).filter(Number.isFinite).sort((a, b) => a - b);
-    if (!prices.length) { alert(t("AI не нашёл предложений ниже среднего.")); return; }
+    if (!prices.length) { showAiCategoryPrompt(t("Для цієї категорії поки недостатньо цінових даних для порівняння."), "AI Deal Finder"); return; }
     const median = prices[Math.floor(prices.length / 2)];
     const threshold = median * 0.85;
     const belowMedian = items.filter(x => Number(x.price) < threshold);
-    if (!belowMedian.length) { alert(t("AI не нашёл предложений ниже среднего.")); return; }
+    if (!belowMedian.length) { showAiCategoryPrompt(t("Зараз не знайдено оголошень, які помітно дешевші за типову ціну. Спробуйте пізніше."), "AI Deal Finder"); return; }
     belowMedian.sort((a, b) => Number(a.price) - Number(b.price));
     const listingLabelEl = document.getElementById("listingLabel");
     const latestListingsTitleEl = document.getElementById("latestListingsTitle");
@@ -1868,6 +1878,19 @@ async function fetchJsonWithFallback(url) {
     return await response.json();
   }
 }
+const TICKER_CACHE_PREFIX = "hryvniaHubQuoteCache:";
+async function fetchCachedQuote(url, ttlMs) {
+  const key = TICKER_CACHE_PREFIX + url;
+  try {
+    const cached = JSON.parse(localStorage.getItem(key) || "null");
+    if (cached && cached.savedAt && Date.now() - cached.savedAt < ttlMs && cached.data) return cached.data;
+  } catch {}
+  const data = await fetchJsonWithFallback(url);
+  try { localStorage.setItem(key, JSON.stringify({ savedAt: Date.now(), data })); } catch {}
+  return data;
+}
+const FIAT_QUOTE_TTL = 12 * 60 * 60 * 1000;
+const LIVE_ASSET_QUOTE_TTL = 60 * 60 * 1000;
 function tickerBaseCurrency() { return lang === "pl" ? "PLN" : lang === "en" ? "USD" : "UAH"; }
 function tickerDate(dateValue) {
   if (!dateValue) return "";
@@ -1908,10 +1931,10 @@ async function loadMarketQuotes() {
 
   try {
     const [usdResult, plnResult, btcResult, xauResult] = await Promise.allSettled([
-      fetchJsonWithFallback("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=USD&json"),
-      fetchJsonWithFallback("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=PLN&json"),
-      fetchJsonWithFallback("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=uah"),
-      fetchJsonWithFallback("https://api.coingecko.com/api/v3/simple/price?ids=tether-gold&vs_currencies=usd")
+      fetchCachedQuote("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=USD&json", FIAT_QUOTE_TTL),
+      fetchCachedQuote("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=PLN&json", FIAT_QUOTE_TTL),
+      fetchCachedQuote("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=uah", LIVE_ASSET_QUOTE_TTL),
+      fetchCachedQuote("https://api.coingecko.com/api/v3/simple/price?ids=tether-gold&vs_currencies=usd", LIVE_ASSET_QUOTE_TTL)
     ]);
     if (usdResult.status !== "fulfilled" || plnResult.status !== "fulfilled") {
       throw new Error("NBU exchange rates unavailable");
@@ -3885,7 +3908,7 @@ if (langTrigger && langDropdown) {
 setInterval(updateClock, 30000);
 updateClock();
 loadMarketQuotes();
-setInterval(loadMarketQuotes, 5 * 60 * 1000);
+setInterval(loadMarketQuotes, 15 * 60 * 1000);
 loadListings();
 initAuth();
 

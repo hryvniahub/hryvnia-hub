@@ -1343,10 +1343,12 @@ async function updateUnreadMessageIndicators() {
 
 function openMessagesModal() {
   messagesModal?.classList.remove("hidden");
+  messagesModal?.querySelector(".messages-card")?.classList.remove("is-thread-open");
   renderMessagesModal();
 }
 function closeMessagesModal() {
   messagesModal?.classList.add("hidden");
+  messagesModal?.querySelector(".messages-card")?.classList.remove("is-thread-open");
   currentConversation = null;
   messagesThread?.classList.add("hidden");
   conversationsList?.classList.remove("hidden");
@@ -1504,6 +1506,7 @@ async function markConversationRead(id) {
 }
 async function openConversation(id) {
   if (!db || !currentUser) return;
+  messagesModal?.querySelector(".messages-card")?.classList.add("is-thread-open");
   currentConversation = id;
   renderedMessageIds.clear();
   conversationsList?.classList.add("hidden");
@@ -1696,6 +1699,7 @@ sendMessageForm?.addEventListener("submit", async (e) => {
   }
 });
 backToConvs?.addEventListener("click", () => {
+  messagesModal?.querySelector(".messages-card")?.classList.remove("is-thread-open");
   currentConversation = null;
   renderedMessageIds.clear();
   messagesThread?.classList.add("hidden");
@@ -1767,30 +1771,6 @@ document.querySelectorAll("[data-nav]").forEach(btn => {
     else if (nav === "messages") openMessagesModal();
   });
 });
-if (window.visualViewport) {
-  const viewport = window.visualViewport;
-  const bottomNavEl = document.querySelector(".bottom-nav");
-  const updateViewportLayout = () => {
-    const keyboardOpen = viewport.height < window.innerHeight * 0.85;
-    bottomNavEl?.classList.toggle("keyboard-open", keyboardOpen);
-
-    if (!messagesModal) return;
-    if (window.matchMedia("(max-width: 720px)").matches) {
-      // Align the fixed overlay to the visible viewport, not the obscured layout viewport.
-      messagesModal.style.top = `${Math.round(viewport.offsetTop)}px`;
-      messagesModal.style.bottom = "auto";
-      messagesModal.style.setProperty("--hh-visual-viewport-height", `${Math.round(viewport.height)}px`);
-    } else {
-      messagesModal.style.removeProperty("top");
-      messagesModal.style.removeProperty("bottom");
-      messagesModal.style.removeProperty("--hh-visual-viewport-height");
-    }
-  };
-  viewport.addEventListener("resize", updateViewportLayout);
-  viewport.addEventListener("scroll", updateViewportLayout);
-  window.addEventListener("resize", updateViewportLayout);
-  updateViewportLayout();
-}
 const aiSearchBtn = document.getElementById("aiSearchBtn");
 async function runAiSearch() {
   if (!db) { alert(t("Supabase не подключён.")); return; }
@@ -3764,3 +3744,32 @@ loadListings();
 loadCities();
 initAuth();
 
+
+// Keep keyboard and modal viewport behavior in one place.
+(() => {
+  const modal = document.getElementById("messagesModal");
+  const bottomNav = document.querySelector(".bottom-nav");
+  const viewport = window.visualViewport;
+  if (!modal) return;
+
+  const updateVisibleViewport = () => {
+    const isMobile = window.matchMedia("(max-width: 720px)").matches;
+    const keyboardOpen = Boolean(viewport && viewport.height < window.innerHeight * 0.85);
+    bottomNav?.classList.toggle("keyboard-open", keyboardOpen);
+
+    if (isMobile && viewport) {
+      modal.style.top = `${Math.round(viewport.offsetTop)}px`;
+      modal.style.bottom = "auto";
+      modal.style.height = `${Math.round(viewport.height)}px`;
+    } else {
+      modal.style.removeProperty("top");
+      modal.style.removeProperty("bottom");
+      modal.style.removeProperty("height");
+    }
+  };
+
+  viewport?.addEventListener("resize", updateVisibleViewport);
+  viewport?.addEventListener("scroll", updateVisibleViewport);
+  window.addEventListener("resize", updateVisibleViewport);
+  updateVisibleViewport();
+})();

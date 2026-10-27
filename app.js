@@ -1775,6 +1775,18 @@ document.querySelectorAll("[data-nav]").forEach(btn => {
     else if (nav === "messages") openMessagesModal();
   });
 });
+function showAiCategoryPrompt(message) {
+  document.querySelector(".hh-ai-prompt-backdrop")?.remove();
+  const backdrop = document.createElement("div");
+  backdrop.className = "hh-ai-prompt-backdrop";
+  backdrop.innerHTML = `<section class="hh-ai-prompt" role="dialog" aria-modal="true" aria-labelledby="hhAiPromptTitle"><div class="hh-ai-prompt-badge" aria-hidden="true">AI</div><h3 id="hhAiPromptTitle">${escapeHtml(t("AI Deal Finder"))}</h3><p>${escapeHtml(message)}</p><button type="button">${escapeHtml(t("Зрозуміло"))}</button></section>`;
+  const close = () => backdrop.remove();
+  backdrop.addEventListener("click", event => { if (event.target === backdrop || event.target.closest("button")) close(); });
+  document.addEventListener("keydown", function onEscape(event) { if (event.key === "Escape") { close(); document.removeEventListener("keydown", onEscape); } });
+  document.body.appendChild(backdrop);
+  backdrop.querySelector("button")?.focus();
+}
+
 const aiSearchBtn = document.getElementById("aiSearchBtn");
 async function runAiSearch() {
   if (!db) { alert(t("Supabase не подключён.")); return; }
@@ -1786,7 +1798,7 @@ async function runAiSearch() {
       en: "Please select a category first: automobiles, real estate, ready businesses, or investments.",
       pl: "Najpierw wybierz kategorię: samochody, nieruchomości, gotowe firmy lub inwestycje."
     })[lang] || "Сначала выберите категорию.";
-    alert(categoryPrompt);
+    showAiCategoryPrompt(categoryPrompt);
     return;
   }
   setButtonLoading(aiSearchBtn, true, t("Поиск лучших предложений…"));

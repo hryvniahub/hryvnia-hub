@@ -1970,56 +1970,111 @@ main {
   }
 }
 
-/* ============================================================
-   МОБИЛЬНАЯ ДОРАБОТКА: центрирование города/времени и счётчик объявлений
-   Только мобильная версия; десктоп и функциональность не меняются.
-   ============================================================ */
+
+/* Hryvnia Hub — message timestamps, conversation listing thumbnails, muted-lime favorites. */
+.message-day-divider { align-self: center; margin: 8px 0 4px; padding: 4px 10px; border-radius: 999px; background: #edf3e6; color: #53624e; font-size: 11px; font-weight: 700; line-height: 1.3; }
+.bubble-time { display: block; margin-top: 4px; text-align: right; color: currentColor; opacity: .62; font-size: 10px; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.conversation-card { grid-template-columns: 56px minmax(0, 1fr) auto; }
+.conv-thumb { display: block; width: 56px; height: 56px; min-width: 56px; border-radius: 10px; object-fit: cover; background: #eaf3d8; }
+.conversation-card .conv-icon { width: 56px; height: 56px; flex-basis: 56px; }
 @media (max-width: 720px) {
-  .header-actions .lang-trigger {
-    grid-template-columns: 18px minmax(0, 1fr) 38px;
-    align-items: center;
-  }
-
-  .header-actions .lang-city {
-    display: block;
-    align-self: center;
-    justify-self: stretch;
-    text-align: center;
-    line-height: 1.15;
-    margin: 0;
-  }
-
-  .header-actions .lang-clock {
-    display: block;
-    align-self: center;
-    justify-self: center;
-    line-height: 1.15;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    text-align: center;
-  }
-
-  /* Оставляем только счётчик; подпись и заголовок дублируют его смысл. */
-  .listing-section .section-head > div {
-    display: none;
-  }
-
-  .listing-section .section-head {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 0;
-    margin-bottom: 12px;
-  }
-
-  .listing-section #resultCount {
-    display: block;
-    margin: 0;
-    font-size: 13px;
-    line-height: 1.3;
-    color: #c8d5c0;
-  }
+  .conversation-card { grid-template-columns: 48px minmax(0, 1fr) auto; gap: 9px; }
+  .conv-thumb, .conversation-card .conv-icon { width: 48px; height: 48px; min-width: 48px; flex-basis: 48px; }
 }
+/* Muted lime rather than red/grey: clearer outline, same Hryvnia Hub accent. */
+.fav-btn { color: #a8c928; border-color: rgba(168, 201, 40, .55); -webkit-text-stroke: .45px currentColor; font-weight: 700; }
+.fav-btn.active { color: #a8c928; border-color: rgba(168, 201, 40, .65); background: #f7fbe9; }
+.listing-card-horizontal .fav-btn { color: #a8c928; border: 1px solid rgba(168, 201, 40, .58); font-size: 27px; -webkit-text-stroke: .55px currentColor; }
+.listing-card-horizontal .fav-btn.active { color: #a8c928; background: #f7fbe9; border-color: rgba(168, 201, 40, .7); }
+@media (max-width: 720px) { .listing-card-horizontal .fav-btn { font-size: 22px; } }
 
+
+/* Messaging modal: compact conversation list, usable thread and composer on mobile. */
+.messages-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+#messagesContent,
+.messages-thread {
+  min-height: 0;
+}
+.thread-messages {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+.send-message-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  padding-top: 4px;
+  background: #fff;
+}
+.send-message-form input { flex: 1 1 auto; width: auto; min-width: 0; }
+
+@media (max-width: 720px) {
+  #messagesModal {
+    z-index: 1200;
+    padding: 16px;
+    place-items: center;
+    min-height: 0;
+    overflow: hidden;
+  }
+  #messagesModal .messages-card {
+    box-sizing: border-box;
+    width: min(540px, calc(100vw - 32px));
+    max-width: none;
+    height: auto;
+    max-height: min(78dvh, 680px);
+    margin: 0;
+    padding: 18px 14px;
+    border-radius: 22px;
+    overflow: hidden;
+  }
+  #messagesModal .messages-card.is-thread-open {
+    height: min(78dvh, 680px);
+    max-height: 100%;
+  }
+  #messagesModal #messagesTitle {
+    flex: 0 0 auto;
+    margin: 0 42px 12px 0;
+  }
+  #messagesModal #messagesContent {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+  #messagesModal .conversations-list {
+    flex: 0 1 auto;
+    min-height: 0;
+    max-height: min(62dvh, 520px);
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  #messagesModal .messages-thread {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+  #messagesModal .thread-messages {
+    flex: 1 1 0;
+    min-height: 0;
+    max-height: none;
+    padding-bottom: 8px;
+  }
+  #messagesModal .send-message-form {
+    position: relative;
+    flex: 0 0 auto;
+    padding: 8px 0 0;
+  }
+  #messagesModal .send-message-form input { min-width: 0; }
+}

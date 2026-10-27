@@ -1343,10 +1343,12 @@ async function updateUnreadMessageIndicators() {
 
 function openMessagesModal() {
   messagesModal?.classList.remove("hidden");
+  messagesModal?.querySelector(".messages-card")?.classList.remove("is-thread-open");
   renderMessagesModal();
 }
 function closeMessagesModal() {
   messagesModal?.classList.add("hidden");
+  messagesModal?.querySelector(".messages-card")?.classList.remove("is-thread-open");
   currentConversation = null;
   messagesThread?.classList.add("hidden");
   conversationsList?.classList.remove("hidden");
@@ -1424,6 +1426,33 @@ async function loadConversations() {
   }
 
   const locale = ({ ru:"ru-RU", uk:"uk-UA", en:"en-GB", pl:"pl-PL" })[lang] || "uk-UA";
+
+  // Resolve each conversation to its listing cover without changing the RPC.
+  // If either lookup is unavailable, the existing category/message icon remains.
+  const conversationIds = data.map(c => c.conversation_id).filter(Boolean);
+  let listingByConversation = {};
+  if (conversationIds.length) {
+    const { data: links, error: linksError } = await db.from("conversations")
+      .select("id, listing_id")
+      .in("id", conversationIds);
+    if (!linksError && links?.length) {
+      const listingIds = [...new Set(links.map(x => x.listing_id).filter(Boolean))];
+      if (listingIds.length) {
+        const { data: listingRows, error: listingsError } = await db.from("listings")
+          .select("id, image_url, image_urls")
+          .in("id", listingIds);
+        if (!listingsError && listingRows?.length) {
+          const listingMap = new Map(listingRows.map(item => {
+            const urls = [item.image_url, ...(Array.isArray(item.image_urls) ? item.image_urls : [])]
+              .filter(url => typeof url === "string" && /^https?:\/\//i.test(url));
+            return [String(item.id), urls[0] || ""];
+          }));
+          for (const link of links) listingByConversation[String(link.id)] = listingMap.get(String(link.listing_id)) || "";
+        }
+      }
+    }
+  }
+
   const cards = data.map(c => {
     const when = c.last_message_at || c.updated_at;
     let timeLabel = "";
@@ -1445,12 +1474,13 @@ async function loadConversations() {
       preview: c.preview || "",
       timeLabel,
       unreadCount,
+      imageUrl: listingByConversation[String(c.conversation_id)] || "",
     };
   });
 
   conversationsList.innerHTML = cards.map(c => `
     <button type="button" class="conversation-card ${c.unreadCount > 0 ? "is-unread" : ""}" data-conv-id="${escapeHtml(String(c.id))}" aria-label="${escapeHtml(c.title)}">
-      <span class="conv-icon" aria-hidden="true">✉</span>
+      ${c.imageUrl ? `<img class="conv-thumb" src="${escapeHtml(c.imageUrl)}" alt="" loading="lazy">` : `<span class="conv-icon" aria-hidden="true">✉</span>`}
       <span class="conv-main"><span class="conv-title">${escapeHtml(c.title)}</span><span class="conv-last">${escapeHtml(c.preview || "—")}</span></span>
       <span class="conv-side"><span class="conv-time">${escapeHtml(c.timeLabel)}</span>${c.unreadCount > 0 ? `<span class="conv-unread">${c.unreadCount > 99 ? "99+" : c.unreadCount}</span>` : ""}</span>
     </button>`).join("");
@@ -1476,6 +1506,7 @@ async function markConversationRead(id) {
 }
 async function openConversation(id) {
   if (!db || !currentUser) return;
+  messagesModal?.querySelector(".messages-card")?.classList.add("is-thread-open");
   currentConversation = id;
   renderedMessageIds.clear();
   conversationsList?.classList.add("hidden");
@@ -1514,19 +1545,41 @@ function appendMessageBubble(m) {
   const placeholder = threadMessages.querySelector(".muted");
   if (placeholder) placeholder.remove();
 
+  const locale = ({ ru:"ru-RU", uk:"uk-UA", en:"en-GB", pl:"pl-PL" })[lang] || "uk-UA";
+  const date = m.created_at ? new Date(m.created_at) : null;
+  const validDate = date && !Number.isNaN(date.getTime());
+  const dateKey = validDate ? `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}` : "unknown";
+  const previousBubble = [...threadMessages.querySelectorAll(".bubble[data-date-key]")].at(-1);
+  if (validDate && previousBubble?.dataset.dateKey !== dateKey) {
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+    const isToday = date.toDateString() === today.toDateString();
+    const isYesterday = date.toDateString() === yesterday.toDateString();
+    const dayLabel = isToday
+      ? ({ ru:"Сегодня", uk:"Сьогодні", en:"Today", pl:"Dzisiaj" })[lang]
+      : isYesterday
+        ? ({ ru:"Вчера", uk:"Учора", en:"Yesterday", pl:"Wczoraj" })[lang]
+        : date.toLocaleDateString(locale, { day:"numeric", month:"long", year: date.getFullYear() !== today.getFullYear() ? "numeric" : undefined });
+    const divider = document.createElement("div");
+    divider.className = "message-day-divider";
+    divider.textContent = dayLabel;
+    divider.dataset.dateKey = dateKey;
+    threadMessages.appendChild(divider);
+  }
+
   const mine = String(m.sender_id || "") === String(currentUser?.id || "");
   const el = document.createElement("div");
   el.className = `bubble ${mine ? "bubble-mine" : "bubble-theirs"}`;
   el.dataset.senderType = mine ? "mine" : "theirs";
+  el.dataset.dateKey = dateKey;
 
-  // Apply the bubble layout inline as a fallback if the deployed CSS is stale
-  // or does not include the message-bubble rules.
   Object.assign(el.style, {
     display: "block",
     boxSizing: "border-box",
     width: "fit-content",
     maxWidth: "82%",
-    padding: "8px 12px",
+    padding: "8px 12px 6px",
     borderRadius: "14px",
     fontSize: "14px",
     lineHeight: "1.4",
@@ -1545,17 +1598,21 @@ function appendMessageBubble(m) {
 
   const senderLabel = document.createElement("div");
   senderLabel.textContent = mine ? t("Вы") : t("Собеседник");
-  Object.assign(senderLabel.style, {
-    fontSize: "10px",
-    fontWeight: "700",
-    opacity: ".72",
-    marginBottom: "3px"
-  });
+  Object.assign(senderLabel.style, { fontSize:"10px", fontWeight:"700", opacity:".72", marginBottom:"3px" });
   const messageText = document.createElement("div");
   messageText.textContent = String(m.body ?? "");
   el.append(senderLabel, messageText);
+
+  if (validDate) {
+    const timestamp = document.createElement("time");
+    timestamp.className = "bubble-time";
+    timestamp.dateTime = date.toISOString();
+    timestamp.textContent = date.toLocaleTimeString(locale, { hour:"2-digit", minute:"2-digit" });
+    el.appendChild(timestamp);
+  }
   threadMessages.appendChild(el);
 }
+
 function subscribeToThread(id) {
   if (!db) return;
   if (messagesChannel) { try { db.removeChannel(messagesChannel); } catch {} }
@@ -1642,6 +1699,7 @@ sendMessageForm?.addEventListener("submit", async (e) => {
   }
 });
 backToConvs?.addEventListener("click", () => {
+  messagesModal?.querySelector(".messages-card")?.classList.remove("is-thread-open");
   currentConversation = null;
   renderedMessageIds.clear();
   messagesThread?.classList.add("hidden");
@@ -1713,14 +1771,6 @@ document.querySelectorAll("[data-nav]").forEach(btn => {
     else if (nav === "messages") openMessagesModal();
   });
 });
-if (window.visualViewport) {
-  const bottomNavEl = document.querySelector(".bottom-nav");
-  window.visualViewport.addEventListener("resize", () => {
-    if (!bottomNavEl) return;
-    const keyboardOpen = window.visualViewport.height < window.innerHeight * 0.85;
-    bottomNavEl.classList.toggle("keyboard-open", keyboardOpen);
-  });
-}
 const aiSearchBtn = document.getElementById("aiSearchBtn");
 async function runAiSearch() {
   if (!db) { alert(t("Supabase не подключён.")); return; }
@@ -3693,3 +3743,33 @@ setInterval(loadMarketQuotes, 5 * 60 * 1000);
 loadListings();
 loadCities();
 initAuth();
+
+
+// Keep keyboard and modal viewport behavior in one place.
+(() => {
+  const modal = document.getElementById("messagesModal");
+  const bottomNav = document.querySelector(".bottom-nav");
+  const viewport = window.visualViewport;
+  if (!modal) return;
+
+  const updateVisibleViewport = () => {
+    const isMobile = window.matchMedia("(max-width: 720px)").matches;
+    const keyboardOpen = Boolean(viewport && viewport.height < window.innerHeight * 0.85);
+    bottomNav?.classList.toggle("keyboard-open", keyboardOpen);
+
+    if (isMobile && viewport) {
+      modal.style.top = `${Math.round(viewport.offsetTop)}px`;
+      modal.style.bottom = "auto";
+      modal.style.height = `${Math.round(viewport.height)}px`;
+    } else {
+      modal.style.removeProperty("top");
+      modal.style.removeProperty("bottom");
+      modal.style.removeProperty("height");
+    }
+  };
+
+  viewport?.addEventListener("resize", updateVisibleViewport);
+  viewport?.addEventListener("scroll", updateVisibleViewport);
+  window.addEventListener("resize", updateVisibleViewport);
+  updateVisibleViewport();
+})();

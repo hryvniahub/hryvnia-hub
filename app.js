@@ -60,11 +60,23 @@ const translations = {
   "English": { ru: "Russian", uk: "Ukrainian", en: "English", pl: "Polish" },
   "Polski": { ru: "Rosyjski", uk: "Ukraiński", en: "English", pl: "Polski" },
   "+ Добавить объявление": { ru: "+ Добавить объявление", uk: "+ Додати оголошення", en: "+ Add listing", pl: "+ Dodaj ogłoszenie" },
-  "Find the best deals in Ukraine": {
-    ru: "Найдите лучшие предложения в Украине",
-    uk: "Знайдіть найкращі пропозиції в Україні",
-    en: "Find the best deals in Ukraine",
-    pl: "Znajdź najlepsze oferty w Ukrainie"
+  "More than just listings": {
+    ru: "Больше",
+    uk: "Більше",
+    en: "More",
+    pl: "Więcej"
+  },
+  "than just listings": {
+    ru: "чем просто объявления",
+    uk: "ніж просто оголошення",
+    en: "than just listings",
+    pl: "niż tylko ogłoszenia"
+  },
+  "We open opportunities for entrepreneurs, business and investment": {
+    ru: "Мы открываем возможности для предпринимателей, бизнеса и инвестиций.",
+    uk: "Ми відкриваємо можливості для підприємців, бізнесу та інвестицій.",
+    en: "We open opportunities for entrepreneurs, business and investment.",
+    pl: "Otwieramy możliwości dla przedsiębiorców, biznesu i inwestycji."
   },
   "AI Deal Finder": { ru: "AI-поиск выгодных предложений", uk: "AI-пошук вигідних пропозицій", en: "AI Deal Finder", pl: "AI — wyszukiwarka okazji" },
   "Find better offers with artificial intelligence": {
@@ -77,12 +89,7 @@ const translations = {
   "Find urgent deals": { ru: "Поиск срочных продаж", uk: "Пошук термінових продажів", en: "Find urgent deals", pl: "Znajduj pilne okazje" },
   "✨ Try AI Search": { ru: "✨ Попробовать AI-поиск", uk: "✨ Спробувати AI-пошук", en: "✨ Try AI Search", pl: "✨ Wypróbuj AI" },
   "Quote unavailable": { ru: "Нет данных", uk: "Немає даних", en: "Unavailable", pl: "Brak danych" },
-  "Автомобили, недвижимость и бизнес в одном месте.": {
-    ru: "Автомобили, недвижимость и бизнес в одном месте.",
-    uk: "Автомобілі, нерухомість і бізнес в одному місці.",
-    en: "Cars, real estate and business all in one place.",
-    pl: "Samochody, nieruchomości i biznes wszystko w jednym miejscu."
-  },
+
   "Что ищете? Например: Skoda Octavia": {
     ru: "Что ищете? Например: Skoda Octavia",
     uk: "Що шукаєте? Наприклад: Skoda Octavia",
@@ -3528,8 +3535,9 @@ function translatePage(selectedLanguage) {
   translateVehicleSearchUI();
   translateTextElement(document.getElementById("openAdd"), "+ Добавить объявление");
   translateTextElement(document.getElementById("addCategoryTitle"), "Выберите категорию объявления");
-  translateTextElement(document.querySelector(".hero-text"), "Автомобили, недвижимость и бизнес в одном месте.");
-  translateTextElement(document.querySelector(".banner-title"), "Find the best deals in Ukraine");
+  translateTextElement(document.querySelector(".hero-text"), "We open opportunities for entrepreneurs, business and investment");
+  translateTextElement(document.querySelector(".banner-title-accent"), "More than just listings");
+  translateTextElement(document.querySelector('.banner-title span[data-i18n="than just listings"]'), "than just listings");
   if (searchInput) {
     const placeholder = translations["Что ищете? Например: Skoda Octavia"];
     if (placeholder) searchInput.placeholder = placeholder[lang];

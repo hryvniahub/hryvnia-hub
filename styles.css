@@ -2166,3 +2166,9 @@ main {
     font-variant-numeric: tabular-nums;
   }
 }
+
+
+/* Vehicle search geography filters */
+.vehicle-search-city-field { position: relative; display: grid; gap: 6px; min-width: 0; color: #f7f9f5; font-size: 14px; font-weight: 650; }
+.vehicle-search-city-field input { width: 100%; min-width: 0; min-height: 44px; padding: 9px 10px; border: 1px solid rgba(168, 201, 40,.38); border-radius: 10px; background: rgba(255,255,255,.97); color: #20352b; font: inherit; font-weight: 400; }
+.vehicle-search-city-suggestions { top: calc(100% + 4px); max-height: 220px; overflow-y: auto; z-index: 10020; }

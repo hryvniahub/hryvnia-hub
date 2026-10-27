@@ -1969,3 +1969,57 @@ main {
     pointer-events: none;
   }
 }
+
+/* ============================================================
+   МОБИЛЬНАЯ ДОРАБОТКА: центрирование города/времени и счётчик объявлений
+   Только мобильная версия; десктоп и функциональность не меняются.
+   ============================================================ */
+@media (max-width: 720px) {
+  .header-actions .lang-trigger {
+    grid-template-columns: 18px minmax(0, 1fr) 38px;
+    align-items: center;
+  }
+
+  .header-actions .lang-city {
+    display: block;
+    align-self: center;
+    justify-self: stretch;
+    text-align: center;
+    line-height: 1.15;
+    margin: 0;
+  }
+
+  .header-actions .lang-clock {
+    display: block;
+    align-self: center;
+    justify-self: center;
+    line-height: 1.15;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    text-align: center;
+  }
+
+  /* Оставляем только счётчик; подпись и заголовок дублируют его смысл. */
+  .listing-section .section-head > div {
+    display: none;
+  }
+
+  .listing-section .section-head {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0;
+    margin-bottom: 12px;
+  }
+
+  .listing-section #resultCount {
+    display: block;
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.3;
+    color: #c8d5c0;
+  }
+}
+

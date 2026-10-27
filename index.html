@@ -224,6 +224,14 @@
     <h2 id="vehicleSearchTitle">Автомобілі</h2>
     <p class="vehicle-search-intro">Оберіть параметри автомобіля</p>
     <div class="vehicle-search-grid" id="vehicleSearchMain">
+      <div class="vehicle-search-city-field">
+        <label for="vehicleSearchCity">Місто</label>
+        <input id="vehicleSearchCity" type="search" autocomplete="off" placeholder="Введіть назву міста" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="vehicleSearchCitySuggestions">
+        <div id="vehicleSearchCitySuggestions" class="catalog-city-suggestions vehicle-search-city-suggestions" role="listbox" hidden></div>
+      </div>
+      <label>Область
+        <select id="vehicleSearchRegion" aria-label="Область"><option value="">Всі області</option></select>
+      </label>
       <label class="vehicle-make-filter">Марка
         <span class="vehicle-make-control"><select id="vehicleSearchMake" aria-describedby="vehicleMakeLoadStatus"><option value="">Усі марки</option></select><span class="vehicle-make-spinner hidden" id="vehicleMakeSpinner" aria-hidden="true"></span></span>
         <span class="vehicle-make-load-status" id="vehicleMakeLoadStatus" role="status" aria-live="polite"></span>

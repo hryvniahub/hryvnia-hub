@@ -452,12 +452,16 @@ const searchBtn = document.getElementById("searchBtn");
 const catalogCitySearchInput = document.getElementById("catalogCitySearchInput");
 const catalogCitySuggestions = document.getElementById("catalogCitySuggestions");
 const catalogRegionSelect = document.getElementById("catalogRegionSelect");
+const vehicleSearchCityInput = document.getElementById("vehicleSearchCity");
+const vehicleSearchCitySuggestions = document.getElementById("vehicleSearchCitySuggestions");
+const vehicleSearchRegionSelect = document.getElementById("vehicleSearchRegion");
 const cityRegionSelect = document.getElementById("cityRegionSelect");
 const citySearchInput = document.getElementById("citySearchInput");
 const citySuggestions = document.getElementById("citySuggestions");
 const citySelect = document.getElementById("citySelect");
 let availableCities = [];
 let citySearchIndex = [];
+let citiesLoadPromise = null;
 let regionNames = {};
 let selectedCatalogCityId = "";
 let activeRegionCode = "";
@@ -1714,7 +1718,7 @@ async function startConversation(item) {
   if (!currentUser) { alert(t("Войдите, чтобы написать продавцу.")); return; }
   if (!item?.user_id) { alert(t("У объявления нет автора.")); return; }
   if (String(item.user_id) === String(currentUser.id)) { alert(t("Это ваше объявление.")); return; }
-  if (!db) { alert(t("Supabase не подключён.")); return; }
+  if (!db) { showAiCategoryPrompt(t("Не вдалося підключитися до сервера. Перевірте з’єднання та спробуйте ще раз."), "AI Deal Finder"); return; }
 
   try {
     // First try to reuse the existing conversation.
@@ -1771,9 +1775,31 @@ document.querySelectorAll("[data-nav]").forEach(btn => {
     else if (nav === "messages") openMessagesModal();
   });
 });
+function showAiCategoryPrompt(message, title = "AI Deal Finder") {
+  document.querySelector(".hh-ai-prompt-backdrop")?.remove();
+  const anchor = document.querySelector("#aiSearchBtn") || document.querySelector(".ai-panel");
+  const rect = anchor?.getBoundingClientRect();
+  const backdrop = document.createElement("div");
+  backdrop.className = "hh-ai-prompt-backdrop";
+  backdrop.innerHTML = `<section class="hh-ai-prompt" role="dialog" aria-modal="false" aria-labelledby="hhAiPromptTitle"><button class="hh-ai-prompt-close" type="button" aria-label="Close">×</button><div class="hh-ai-prompt-badge" aria-hidden="true">AI</div><h3 id="hhAiPromptTitle">${escapeHtml(t(title))}</h3><p>${escapeHtml(message)}</p><button class="hh-ai-prompt-ok" type="button">${escapeHtml(t("Зрозуміло"))}</button></section>`;
+  const panel = backdrop.querySelector(".hh-ai-prompt");
+  // Keep the branded message beside the AI panel when space allows; never scroll to the page footer.
+  if (rect && window.innerWidth > 700) {
+    panel.style.position = "fixed";
+    panel.style.left = `${Math.max(16, Math.min(rect.left, window.innerWidth - 376))}px`;
+    panel.style.top = `${Math.max(80, Math.min(rect.bottom + 10, window.innerHeight - 260))}px`;
+  }
+  const close = () => backdrop.remove();
+  backdrop.addEventListener("click", event => { if (event.target === backdrop || event.target.closest("button")) close(); });
+  const onEscape = event => { if (event.key === "Escape") { close(); document.removeEventListener("keydown", onEscape); } };
+  document.addEventListener("keydown", onEscape);
+  document.body.appendChild(backdrop);
+  backdrop.querySelector(".hh-ai-prompt-ok")?.focus({ preventScroll: true });
+}
+
 const aiSearchBtn = document.getElementById("aiSearchBtn");
 async function runAiSearch() {
-  if (!db) { alert(t("Supabase не подключён.")); return; }
+  if (!db) { showAiCategoryPrompt(t("Не вдалося підключитися до сервера. Перевірте з’єднання та спробуйте ще раз."), "AI Deal Finder"); return; }
   if (!aiSearchBtn) return;
   if (!currentCategory) {
     const categoryPrompt = ({
@@ -1782,7 +1808,7 @@ async function runAiSearch() {
       en: "Please select a category first: automobiles, real estate, ready businesses, or investments.",
       pl: "Najpierw wybierz kategorię: samochody, nieruchomości, gotowe firmy lub inwestycje."
     })[lang] || "Сначала выберите категорию.";
-    alert(categoryPrompt);
+    showAiCategoryPrompt(categoryPrompt);
     return;
   }
   setButtonLoading(aiSearchBtn, true, t("Поиск лучших предложений…"));
@@ -1792,15 +1818,15 @@ async function runAiSearch() {
     if (selectedCatalogCityId) query = query.eq("city_id", selectedCatalogCityId);
     else if (activeRegionCode) query = query.eq("cities.region_katottg_code", activeRegionCode);
     const { data, error } = await query;
-    if (error) { alert(t("Ошибка") + ": " + error.message); return; }
+    if (error) { showAiCategoryPrompt(t("Не вдалося завантажити пропозиції. Перевірте інтернет і спробуйте ще раз."), "AI Deal Finder"); return; }
     const items = data || [];
-    if (!items.length) { alert(t("AI не нашёл предложений ниже среднего.")); return; }
+    if (!items.length) { showAiCategoryPrompt(t("Поки що немає достатньо оголошень у цій категорії для підбору. Спробуйте пізніше або змініть фільтри."), "AI Deal Finder"); return; }
     const prices = items.map(x => Number(x.price)).filter(Number.isFinite).sort((a, b) => a - b);
-    if (!prices.length) { alert(t("AI не нашёл предложений ниже среднего.")); return; }
+    if (!prices.length) { showAiCategoryPrompt(t("Для цієї категорії поки недостатньо цінових даних для порівняння."), "AI Deal Finder"); return; }
     const median = prices[Math.floor(prices.length / 2)];
     const threshold = median * 0.85;
     const belowMedian = items.filter(x => Number(x.price) < threshold);
-    if (!belowMedian.length) { alert(t("AI не нашёл предложений ниже среднего.")); return; }
+    if (!belowMedian.length) { showAiCategoryPrompt(t("Зараз не знайдено оголошень, які помітно дешевші за типову ціну. Спробуйте пізніше."), "AI Deal Finder"); return; }
     belowMedian.sort((a, b) => Number(a.price) - Number(b.price));
     const listingLabelEl = document.getElementById("listingLabel");
     const latestListingsTitleEl = document.getElementById("latestListingsTitle");
@@ -1852,6 +1878,19 @@ async function fetchJsonWithFallback(url) {
     return await response.json();
   }
 }
+const TICKER_CACHE_PREFIX = "hryvniaHubQuoteCache:";
+async function fetchCachedQuote(url, ttlMs) {
+  const key = TICKER_CACHE_PREFIX + url;
+  try {
+    const cached = JSON.parse(localStorage.getItem(key) || "null");
+    if (cached && cached.savedAt && Date.now() - cached.savedAt < ttlMs && cached.data) return cached.data;
+  } catch {}
+  const data = await fetchJsonWithFallback(url);
+  try { localStorage.setItem(key, JSON.stringify({ savedAt: Date.now(), data })); } catch {}
+  return data;
+}
+const FIAT_QUOTE_TTL = 12 * 60 * 60 * 1000;
+const LIVE_ASSET_QUOTE_TTL = 60 * 60 * 1000;
 function tickerBaseCurrency() { return lang === "pl" ? "PLN" : lang === "en" ? "USD" : "UAH"; }
 function tickerDate(dateValue) {
   if (!dateValue) return "";
@@ -1892,10 +1931,10 @@ async function loadMarketQuotes() {
 
   try {
     const [usdResult, plnResult, btcResult, xauResult] = await Promise.allSettled([
-      fetchJsonWithFallback("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=USD&json"),
-      fetchJsonWithFallback("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=PLN&json"),
-      fetchJsonWithFallback("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=uah"),
-      fetchJsonWithFallback("https://api.coingecko.com/api/v3/simple/price?ids=tether-gold&vs_currencies=usd")
+      fetchCachedQuote("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=USD&json", FIAT_QUOTE_TTL),
+      fetchCachedQuote("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=PLN&json", FIAT_QUOTE_TTL),
+      fetchCachedQuote("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=uah", LIVE_ASSET_QUOTE_TTL),
+      fetchCachedQuote("https://api.coingecko.com/api/v3/simple/price?ids=tether-gold&vs_currencies=usd", LIVE_ASSET_QUOTE_TTL)
     ]);
     if (usdResult.status !== "fulfilled" || plnResult.status !== "fulfilled") {
       throw new Error("NBU exchange rates unavailable");
@@ -2091,6 +2130,83 @@ function updateCatalogCitySearchLanguage() {
   if (selectedCity) catalogCitySearchInput.value = cityName(selectedCity);
   if (document.activeElement === catalogCitySearchInput && !catalogCitySuggestions.hidden) renderCatalogCitySuggestions();
 }
+function closeVehicleSearchCitySuggestions() {
+  if (!vehicleSearchCitySuggestions) return;
+  vehicleSearchCitySuggestions.hidden = true;
+  vehicleSearchCityInput?.setAttribute("aria-expanded", "false");
+}
+function renderVehicleSearchCitySuggestions() {
+  if (!vehicleSearchCitySuggestions || !vehicleSearchCityInput) return;
+  const term = vehicleSearchCityInput.value;
+  const queryVariants = getQueryVariants(term);
+  const base = activeRegionCode ? citySearchIndex.filter(entry => String(entry.city.region_katottg_code) === String(activeRegionCode)) : citySearchIndex;
+  const ranked = term ? base.map(entry => ({ entry, rank: rankCityEntry(entry, queryVariants) }))
+    .filter(item => item.rank >= 0)
+    .sort((a, b) => a.rank - b.rank || cityName(a.entry.city).localeCompare(cityName(b.entry.city)))
+    .slice(0, 12).map(item => item.entry) : [];
+  vehicleSearchCitySuggestions.innerHTML = ranked.length
+    ? ranked.map(entry => renderCitySuggestionButton(entry, "catalog-city-suggestion")).join("")
+    : `<div class="city-suggestion-empty" role="status">${escapeHtml(cityTranslation(term ? "Город не найден" : "Введите название города"))}</div>`;
+  vehicleSearchCitySuggestions.hidden = false;
+  vehicleSearchCityInput.setAttribute("aria-expanded", "true");
+}
+function selectVehicleSearchCity(city) {
+  selectedCatalogCityId = String(city.id);
+  if (vehicleSearchCityInput) vehicleSearchCityInput.value = cityName(city);
+  const isCapital = String(city.official_code || "") === "UA80000000000093317" || Number(city.id) === 29707;
+  activeRegionCode = isCapital ? "" : String(city.region_katottg_code || "");
+  if (vehicleSearchRegionSelect) vehicleSearchRegionSelect.value = activeRegionCode;
+  if (catalogCitySearchInput) catalogCitySearchInput.value = cityName(city);
+  if (catalogRegionSelect) catalogRegionSelect.value = activeRegionCode;
+  closeVehicleSearchCitySuggestions();
+}
+if (vehicleSearchRegionSelect) {
+  vehicleSearchRegionSelect.addEventListener("focus", () => { if (!availableCities.length) loadCities().catch(error => console.error("Не удалось загрузить города:", error)); }, { once: true });
+  vehicleSearchRegionSelect.addEventListener("change", () => {
+    activeRegionCode = vehicleSearchRegionSelect.value;
+    selectedCatalogCityId = "";
+    if (vehicleSearchCityInput) vehicleSearchCityInput.value = "";
+    if (catalogCitySearchInput) catalogCitySearchInput.value = "";
+    if (catalogRegionSelect) catalogRegionSelect.value = activeRegionCode;
+    renderVehicleSearchCitySuggestions();
+  });
+}
+if (vehicleSearchCityInput) {
+  vehicleSearchCityInput.addEventListener("input", () => {
+    selectedCatalogCityId = "";
+    if (catalogCitySearchInput) catalogCitySearchInput.value = vehicleSearchCityInput.value;
+    renderVehicleSearchCitySuggestions();
+  });
+  vehicleSearchCityInput.addEventListener("focus", async () => {
+    if (!availableCities.length) {
+      if (vehicleSearchCitySuggestions) { vehicleSearchCitySuggestions.innerHTML = `<div class="city-suggestion-empty" role="status">${escapeHtml(cityTranslation("Загрузка городов…"))}</div>`; vehicleSearchCitySuggestions.hidden = false; }
+      try { await loadCities(); } catch (error) { console.error("Не удалось загрузить города:", error); }
+    }
+    renderVehicleSearchCitySuggestions();
+  });
+  vehicleSearchCityInput.addEventListener("keydown", event => {
+    if (event.key === "Escape") closeVehicleSearchCitySuggestions();
+    if (event.key === "ArrowDown" && !vehicleSearchCitySuggestions.hidden) {
+      const firstOption = vehicleSearchCitySuggestions.querySelector("[data-city-id]");
+      if (firstOption) { event.preventDefault(); firstOption.focus(); }
+    }
+    if (event.key === "Enter" && !vehicleSearchCitySuggestions.hidden) {
+      const firstOption = vehicleSearchCitySuggestions.querySelector("[data-city-id]");
+      const city = availableCities.find(item => String(item.id) === firstOption?.dataset.cityId);
+      if (city) { event.preventDefault(); selectVehicleSearchCity(city); }
+    }
+  });
+}
+if (vehicleSearchCitySuggestions) {
+  vehicleSearchCitySuggestions.addEventListener("mousedown", event => { if (event.target.closest("[data-city-id]")) event.preventDefault(); });
+  vehicleSearchCitySuggestions.addEventListener("click", event => {
+    const option = event.target.closest("[data-city-id]");
+    if (!option) return;
+    const city = availableCities.find(item => String(item.id) === option.dataset.cityId);
+    if (city) selectVehicleSearchCity(city);
+  });
+}
+
 function closeCitySuggestions() {
   if (!citySuggestions) return;
   citySuggestions.hidden = true;
@@ -2133,7 +2249,7 @@ function updateCities(items, names = {}) {
   citySearchIndex = availableCities.map(buildCityEntry);
   const regionCodes = [...new Set(availableCities.map(city => city.region_katottg_code).filter(code => code !== null && code !== undefined && code !== ""))].map(String).sort();
   const allRegionsLabel = cityTranslation("Все области");
-  [[catalogRegionSelect, activeRegionCode], [cityRegionSelect, formRegionCode]].forEach(([select, current]) => {
+  [[catalogRegionSelect, activeRegionCode], [vehicleSearchRegionSelect, activeRegionCode], [cityRegionSelect, formRegionCode]].forEach(([select, current]) => {
     if (!select) return;
     const capitalOption = select === cityRegionSelect ? `<option value="__capital__">${escapeHtml(cityTranslation("Столица Украины"))}</option>` : "";
     select.innerHTML = `<option value="">${escapeHtml(allRegionsLabel)}</option>` + capitalOption +
@@ -2144,10 +2260,14 @@ function updateCities(items, names = {}) {
   });
   updateCitySearchLanguage();
   updateCatalogCitySearchLanguage();
+  if (vehicleSearchCityInput) { const selectedVehicleCity = availableCities.find(city => String(city.id) === selectedCatalogCityId); if (selectedVehicleCity) vehicleSearchCityInput.value = cityName(selectedVehicleCity); }
 }
 async function loadCities() {
-  if (!db) return;
-  if (window.hryvniaCitiesLoaded) return;
+  if (!db || availableCities.length) return availableCities;
+  // Share one in-flight catalog request between all callers; never download the same catalog twice.
+  if (citiesLoadPromise) return citiesLoadPromise;
+  if (window.hryvniaCitiesLoaded && availableCities.length) return availableCities;
+  citiesLoadPromise = (async () => {
   const allCities = [];
   const pageSize = 1000;
   let from = 0;
@@ -2177,16 +2297,28 @@ async function loadCities() {
   } catch (err) { console.error("Не удалось загрузить регионы:", err); }
   updateCities(allCities, regionNames);
   window.hryvniaCitiesLoaded = regionsLoaded;
+    return availableCities;
+  })();
+  try {
+    return await citiesLoadPromise;
+  } catch (error) {
+    citiesLoadPromise = null;
+    throw error;
+  } finally {
+    if (!availableCities.length) citiesLoadPromise = null;
+  }
 }
 if (catalogRegionSelect) {
+  catalogRegionSelect.addEventListener("focus", () => { if (!availableCities.length) loadCities().catch(error => console.error("Не удалось загрузить города:", error)); }, { once: true });
   catalogRegionSelect.addEventListener("change", () => {
     activeRegionCode = catalogRegionSelect.value;
     selectedCatalogCityId = "";
     if (catalogCitySearchInput) catalogCitySearchInput.value = "";
-    loadListings();
+    scheduleListingSearch();
   });
 }
 if (cityRegionSelect) {
+  cityRegionSelect.addEventListener("focus", () => { if (!availableCities.length) loadCities().catch(error => console.error("Не удалось загрузить города:", error)); }, { once: true });
   cityRegionSelect.addEventListener("change", () => {
     formRegionCode = cityRegionSelect.value === "__capital__" ? "" : cityRegionSelect.value;
     if (citySelect) citySelect.value = "";
@@ -2196,7 +2328,14 @@ if (cityRegionSelect) {
 }
 if (catalogCitySearchInput) {
   catalogCitySearchInput.addEventListener("input", () => { selectedCatalogCityId = ""; renderCatalogCitySuggestions(); });
-  catalogCitySearchInput.addEventListener("focus", renderCatalogCitySuggestions);
+  catalogCitySearchInput.addEventListener("focus", async () => {
+    if (!availableCities.length) {
+      catalogCitySuggestions && (catalogCitySuggestions.innerHTML = `<div class="city-suggestion-empty" role="status">${escapeHtml(cityTranslation("Загрузка городов…"))}</div>`);
+      catalogCitySuggestions && (catalogCitySuggestions.hidden = false);
+      try { await loadCities(); } catch (error) { console.error("Не удалось загрузить города:", error); }
+    }
+    renderCatalogCitySuggestions();
+  });
   catalogCitySearchInput.addEventListener("keydown", event => {
     if (event.key === "Escape") closeCatalogCitySuggestions();
     if (event.key === "ArrowDown" && !catalogCitySuggestions.hidden) {
@@ -2221,7 +2360,14 @@ if (catalogCitySuggestions) {
 }
 if (citySearchInput) {
   citySearchInput.addEventListener("input", () => { if (citySelect) citySelect.value = ""; renderCitySuggestions(); });
-  citySearchInput.addEventListener("focus", renderCitySuggestions);
+  citySearchInput.addEventListener("focus", async () => {
+    if (!availableCities.length) {
+      citySuggestions && (citySuggestions.innerHTML = `<div class="city-suggestion-empty" role="status">${escapeHtml(cityTranslation("Загрузка городов…"))}</div>`);
+      citySuggestions && (citySuggestions.hidden = false);
+      try { await loadCities(); } catch (error) { console.error("Не удалось загрузить города:", error); }
+    }
+    renderCitySuggestions();
+  });
   citySearchInput.addEventListener("keydown", event => {
     if (event.key === "Escape") closeCitySuggestions();
     if (event.key === "ArrowDown" && !citySuggestions.hidden) {
@@ -2242,12 +2388,19 @@ if (citySuggestions) {
 document.addEventListener("click", event => {
   if (citySearchInput && !citySearchInput.parentElement.contains(event.target)) closeCitySuggestions();
   if (catalogCitySearchInput && !catalogCitySearchInput.parentElement.contains(event.target)) closeCatalogCitySuggestions();
+  if (vehicleSearchCityInput && !vehicleSearchCityInput.parentElement.contains(event.target) && !vehicleSearchCitySuggestions?.contains(event.target)) closeVehicleSearchCitySuggestions();
 });
 
 let currentCategory = "";
 let visibleListings = [];
 let isSearching = false;
+let pendingListingsReload = false;
+let listingSearchTimer = null;
 let vehicleClientFilters = null;
+function scheduleListingSearch(delay = 250) {
+  if (listingSearchTimer) clearTimeout(listingSearchTimer);
+  listingSearchTimer = setTimeout(() => { listingSearchTimer = null; loadListings(); }, delay);
+}
 
 function categoryLabel(item) { return escapeHtml(translations[item.category]?.[lang] || item.category); }
 
@@ -2817,7 +2970,7 @@ if (listing) {
 }
 
 async function loadListings() {
-  if (isSearching) return;
+  if (isSearching) { pendingListingsReload = true; return; }
   if (!db) {
     renderListings([
       { id: "demo-1", category: "Автомобили", title: "Пример: Skoda Octavia 1.6", city: "Днепр", price: 250000, description: "Демо-карточка." },
@@ -2900,7 +3053,9 @@ async function loadListings() {
     if (operationalCondition) query = query.eq("vehicle_operational_condition", operationalCondition);
   }
   isSearching = true;
-  setButtonLoading(searchBtn, true, "");
+  setButtonLoading(searchBtn, true, t("Ищем…"));
+  const vehicleApplyButton = currentCategory === "Автомобили" ? document.getElementById("vehicleSearchApply") : null;
+  if (vehicleApplyButton) setButtonLoading(vehicleApplyButton, true, t("Ищем автомобили…"));
   try {
     const { data, error } = await query;
     if (error) { if (listing) listing.innerHTML = `<div class="empty">${escapeHtml(t("Ошибка") + ": " + error.message)}</div>`; return; }
@@ -2941,6 +3096,11 @@ async function loadListings() {
   } finally {
     isSearching = false;
     setButtonLoading(searchBtn, false);
+    if (vehicleApplyButton) setButtonLoading(vehicleApplyButton, false);
+    if (pendingListingsReload) {
+      pendingListingsReload = false;
+      loadListings();
+    }
   }
 }
 
@@ -2962,6 +3122,9 @@ function resetCatalogFilters() {
   if (searchInput) searchInput.value = "";
   if (catalogCitySearchInput) catalogCitySearchInput.value = "";
   if (catalogRegionSelect) catalogRegionSelect.value = "";
+  if (vehicleSearchCityInput) vehicleSearchCityInput.value = "";
+  if (vehicleSearchRegionSelect) vehicleSearchRegionSelect.value = "";
+  closeVehicleSearchCitySuggestions();
   const categoryLabel = document.getElementById("categorySelectLabel");
   if (categoryLabel) categoryLabel.textContent = t("Все категории");
   document.querySelectorAll(".category").forEach(button => button.classList.remove("active"));
@@ -3309,6 +3472,12 @@ document.getElementById("vehicleSearchToggleAdvanced")?.addEventListener("click"
 document.getElementById("vehicleSearchReset")?.addEventListener("click", () => {
   ["vehicleSearchMake","vehicleSearchModel","vehicleYearFrom","vehicleYearTo","vehiclePriceFrom","vehiclePriceTo","vehicleMileageFrom","vehicleMileageTo","vehicleEngineFrom","vehicleEngineTo","vehicleBodyType","vehicleFuel","vehicleTransmission","vehicleSearchStatus","vehiclePowerFrom","vehiclePowerTo","vehicleDoors","vehicleDrive","vehicleColor","vehicleSellerType","vehicleSearchOperationalCondition"].forEach(id => { const el=document.getElementById(id); if(el) el.value=""; });
   const currency = document.getElementById("vehiclePriceCurrency"); if (currency) currency.value = "UAH";
+  selectedCatalogCityId = ""; activeRegionCode = "";
+  if (vehicleSearchCityInput) vehicleSearchCityInput.value = "";
+  if (vehicleSearchRegionSelect) vehicleSearchRegionSelect.value = "";
+  if (catalogCitySearchInput) catalogCitySearchInput.value = "";
+  if (catalogRegionSelect) catalogRegionSelect.value = "";
+  closeVehicleSearchCitySuggestions();
   const make = document.getElementById("vehicleSearchMake");
   const model = document.getElementById("vehicleSearchModel");
   if (model) {
@@ -3739,9 +3908,8 @@ if (langTrigger && langDropdown) {
 setInterval(updateClock, 30000);
 updateClock();
 loadMarketQuotes();
-setInterval(loadMarketQuotes, 5 * 60 * 1000);
+setInterval(loadMarketQuotes, 15 * 60 * 1000);
 loadListings();
-loadCities();
 initAuth();
 
 

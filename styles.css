@@ -2166,3 +2166,62 @@ main {
     font-variant-numeric: tabular-nums;
   }
 }
+
+
+/* Vehicle search geography filters */
+.vehicle-search-city-field { position: relative; display: grid; gap: 6px; min-width: 0; color: #f7f9f5; font-size: 14px; font-weight: 650; }
+.vehicle-search-city-field input { width: 100%; min-width: 0; min-height: 44px; padding: 9px 10px; border: 1px solid rgba(168, 201, 40,.38); border-radius: 10px; background: rgba(255,255,255,.97); color: #20352b; font: inherit; font-weight: 400; }
+.vehicle-search-city-suggestions { top: calc(100% + 4px); max-height: 220px; overflow-y: auto; z-index: 10020; }
+
+
+/* Компактніша валютна стрічка: прибираємо зайві проміжки та робимо напрямок курсу помітним. */
+.ticker-scroll { gap: 0; }
+.ticker-item { padding-left: 2px; padding-right: 2px; gap: 3px; }
+.ticker-main { gap: 2px; }
+.ticker-arrow { flex: 0 0 11px; min-width: 11px; margin-left: 0; font-size: 11px; font-weight: 900; opacity: 1; }
+.ticker-arrow.up { color: #16843b; }
+.ticker-arrow.down { color: #d12f24; }
+@media (max-width: 420px) {
+  .ticker-scroll { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .ticker-item { padding-left: 1px; padding-right: 1px; gap: 2px; }
+  .ticker-icon { flex-basis: 17px; width: 17px; height: 17px; font-size: 10px; }
+  .ticker-label { font-size: 7px; letter-spacing: -.15px; }
+  .ticker-value { font-size: 9px; letter-spacing: -.2px; }
+  .ticker-arrow { flex-basis: 9px; min-width: 9px; font-size: 9px; }
+}
+
+/* Branded AI category prompt */
+.hh-ai-prompt-backdrop { position: fixed; inset: 0; z-index: 12000; display: grid; place-items: center; padding: 20px; background: rgba(3, 17, 12, .72); backdrop-filter: blur(7px); }
+.hh-ai-prompt { width: min(100%, 360px); padding: 24px; border: 1px solid rgba(212,255,0,.42); border-radius: 22px; background: linear-gradient(145deg, #173c2d, #10271e); color: #f7f9f5; box-shadow: 0 22px 70px rgba(0,0,0,.42); text-align: center; }
+.hh-ai-prompt-badge { display: inline-grid; place-items: center; width: 48px; height: 48px; margin: 0 auto 12px; border-radius: 15px; background: #d4ff00; color: #173c2d; font-weight: 900; font-size: 20px; }
+.hh-ai-prompt h3 { margin: 0 0 8px; font-size: 21px; }
+.hh-ai-prompt p { margin: 0 0 18px; color: rgba(247,249,245,.78); line-height: 1.45; }
+.hh-ai-prompt button { width: 100%; min-height: 46px; border: 0; border-radius: 12px; background: #d4ff00; color: #14271e; font: inherit; font-weight: 800; cursor: pointer; }
+
+
+/* Market ticker: tighter mobile spacing and readable movement indicators. */
+.market-ticker { padding-left: 6px; padding-right: 6px; }
+.ticker-scroll { column-gap: 0 !important; }
+.ticker-item { padding-left: 1px !important; padding-right: 1px !important; gap: 2px !important; }
+.ticker-details { min-width: 0; }
+.ticker-main { gap: 1px !important; }
+.ticker-arrow { flex: 0 0 10px !important; min-width: 10px !important; font-size: 10px !important; line-height: 1; }
+.ticker-arrow.up { color: #16843b !important; }
+.ticker-arrow.down { color: #d12f24 !important; }
+@media (max-width: 420px) {
+  .market-ticker { padding-left: 4px; padding-right: 4px; }
+  .ticker-item { gap: 1px !important; }
+  .ticker-icon { flex-basis: 16px; width: 16px; }
+  .ticker-label { font-size: 7px; }
+  .ticker-value { font-size: 9px; }
+  .ticker-arrow { flex-basis: 9px !important; min-width: 9px !important; font-size: 9px !important; }
+}
+/* AI prompt is an anchored branded popover, not a page-bottom alert. */
+.hh-ai-prompt-backdrop { position: fixed; inset: 0; z-index: 12000; display: flex; align-items: flex-start; justify-content: center; padding: 16px; background: rgba(3,17,12,.24); backdrop-filter: blur(2px); }
+.hh-ai-prompt { position: relative; margin-top: min(28vh, 220px); width: min(100%, 360px); padding: 22px 20px 18px; border: 1px solid rgba(212,255,0,.55); border-radius: 20px; background: linear-gradient(145deg,#173c2d,#10271e); color: #f7f9f5; box-shadow: 0 18px 55px rgba(0,0,0,.35); text-align: center; }
+.hh-ai-prompt-close { position: absolute; top: 8px; right: 10px; width: 32px; height: 32px; border: 1px solid rgba(255,255,255,.18); border-radius: 50%; background: rgba(255,255,255,.08); color: #fff; font-size: 23px; line-height: 1; }
+.hh-ai-prompt-badge { display: inline-grid; place-items: center; width: 44px; height: 44px; margin: 0 auto 10px; border-radius: 14px; background: #d4ff00; color: #173c2d; font-weight: 900; font-size: 19px; }
+.hh-ai-prompt h3 { margin: 0 0 8px; font-size: 20px; color: #f7f9f5; }
+.hh-ai-prompt p { margin: 0 0 16px; color: rgba(247,249,245,.84); line-height: 1.45; }
+.hh-ai-prompt .hh-ai-prompt-ok { width: 100%; min-height: 44px; border: 0; border-radius: 12px; background: #d4ff00; color: #14271e; font: inherit; font-weight: 800; }
+@media (max-width: 700px) { .hh-ai-prompt-backdrop { align-items: center; } .hh-ai-prompt { margin-top: 0; } }

@@ -2445,7 +2445,38 @@ function captureVehicleSearchTab() {
 function renderVehicleSearchTabs() {
   const host = document.getElementById("vehicleSearchTabs");
   if (!host) return;
-  host.innerHTML = vehicleSearchTabs.map((tab, index) => `<button type="button" class="vehicle-search-tab${tab.id === activeVehicleSearchTabId ? " is-active" : ""}" data-vehicle-tab="${escapeHtml(tab.id)}" aria-pressed="${tab.id === activeVehicleSearchTabId ? "true" : "false"}"><span>${escapeHtml(tab.title || `${t("Пошук")} ${index + 1}`)}</span></button>`).join("") + `<button type="button" class="vehicle-search-tab-add" id="vehicleSearchTabAdd" aria-label="${escapeHtml(t("Новий пошук"))}" title="${escapeHtml(t("Новий пошук"))}">+</button>`;
+  host.innerHTML = vehicleSearchTabs.map((tab, index) => `<div class="vehicle-search-tab-item${tab.id === activeVehicleSearchTabId ? " is-active" : ""}"><button type="button" class="vehicle-search-tab${tab.id === activeVehicleSearchTabId ? " is-active" : ""}" data-vehicle-tab="${escapeHtml(tab.id)}" aria-pressed="${tab.id === activeVehicleSearchTabId ? "true" : "false"}"><span>${escapeHtml(tab.title || `${t("Пошук")} ${index + 1}`)}</span></button><button type="button" class="vehicle-search-tab-close" data-close-vehicle-tab="${escapeHtml(tab.id)}" aria-label="${escapeHtml(t("Закрыть"))}" title="${escapeHtml(t("Закрыть"))}">×</button></div>`).join("") + `<button type="button" class="vehicle-search-tab-add" id="vehicleSearchTabAdd" aria-label="${escapeHtml(t("Новий пошук"))}" title="${escapeHtml(t("Новий пошук"))}">+</button>`;
+}
+function closeVehicleSearchTab(id) {
+  if (isSearching) return;
+  const index = vehicleSearchTabs.findIndex(tab => tab.id === id);
+  if (index < 0) return;
+  const wasActive = vehicleSearchTabs[index].id === activeVehicleSearchTabId;
+  if (vehicleSearchTabs.length === 1) {
+    const replacement = newVehicleSearchTab();
+    vehicleSearchTabs = [replacement];
+    activeVehicleSearchTabId = replacement.id;
+    restoreVehicleSearchTab(replacement);
+    document.getElementById("vehicleSearchReset")?.click();
+    replacement.filters = Object.fromEntries(VEHICLE_SEARCH_FILTER_IDS.map(filterId => [filterId, document.getElementById(filterId)?.value ?? ""]));
+    replacement.selectedCityId = "";
+    replacement.regionCode = "";
+    replacement.advanced = false;
+    replacement.listings = null;
+    renderListings([]);
+    renderVehicleSearchTabs();
+    openVehicleSearch();
+    return;
+  }
+  vehicleSearchTabs.splice(index, 1);
+  if (wasActive) {
+    const next = vehicleSearchTabs[Math.min(index, vehicleSearchTabs.length - 1)];
+    activeVehicleSearchTabId = next.id;
+    restoreVehicleSearchTab(next);
+    openVehicleSearch();
+  } else {
+    renderVehicleSearchTabs();
+  }
 }
 function restoreVehicleSearchTab(tab) {
   if (!tab) return;
@@ -3314,6 +3345,8 @@ function prepareVehicleSearchUI() {
     const heading = menu.querySelector("h2");
     heading?.insertAdjacentElement("afterend", tabs);
     tabs.addEventListener("click", event => {
+      const closeButton = event.target.closest("[data-close-vehicle-tab]");
+      if (closeButton) { event.preventDefault(); event.stopPropagation(); closeVehicleSearchTab(closeButton.dataset.closeVehicleTab); return; }
       const tabButton = event.target.closest("[data-vehicle-tab]");
       if (tabButton) { switchVehicleSearchTab(tabButton.dataset.vehicleTab); return; }
       if (event.target.closest("#vehicleSearchTabAdd")) addVehicleSearchTab();

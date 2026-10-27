@@ -2896,10 +2896,10 @@ function vehicleCardSpecs(item) {
     }
   };
   if (item.vehicle_year) add("▦", item.vehicle_year, t("Год"));
-  if (item.vehicle_engine_liters != null && item.vehicle_engine_liters !== "") add('<svg viewBox="0 0 24 24" focusable="false"><path d="M7 7h8l2 3h3v7h-3l-2 2H8l-2-3H4v-6h3z"/><path d="M9 7V4h4v3M17 10V7h2M9 12h4v4H9z"/></svg>', `${String(item.vehicle_engine_liters).replace(/\.0$/, "")} л`, t("Объём двигателя, л"));
+  if (item.vehicle_engine_liters != null && item.vehicle_engine_liters !== "") add('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false" aria-hidden="true"><path d="M7 7h8l2 3h3v7h-3l-2 2H8l-2-3H4v-6h3z"/><path d="M9 7V4h4v3M17 10V7h2M9 12h4v4H9z"/></svg>', `${String(item.vehicle_engine_liters).replace(/\.0$/, "")} л`, t("Объём двигателя, л"));
   if (item.vehicle_fuel_type) add("⛽", item.vehicle_fuel_type, t("Топливо"));
   if (item.vehicle_mileage_km != null && item.vehicle_mileage_km !== "") { const mileage = Number(item.vehicle_mileage_km); const mileageText = mileage >= 10000 ? `${Math.round(mileage / 1000).toLocaleString(lang === "en" ? "en-US" : lang === "pl" ? "pl-PL" : lang === "uk" ? "uk-UA" : "ru-RU")} ${lang === "en" ? "k km" : "тис. км"}` : `${mileage.toLocaleString(lang === "en" ? "en-US" : lang === "pl" ? "pl-PL" : lang === "uk" ? "uk-UA" : "ru-RU")} ${lang === "en" ? "km" : "км"}`; add("◉", mileageText, t("Пробег, км")); }
-  if (item.vehicle_transmission) add('<svg viewBox="0 0 24 24" focusable="false"><path d="M6 4v16M18 4v16M6 8h12M6 16h12"/><circle cx="6" cy="4" r="2"/><circle cx="18" cy="4" r="2"/><circle cx="6" cy="20" r="2"/><circle cx="18" cy="20" r="2"/></svg>', item.vehicle_transmission, t("Коробка передач"));
+  if (item.vehicle_transmission) add('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false" aria-hidden="true"><path d="M6 4v16M18 4v16M6 8h12M6 16h12"/><circle cx="6" cy="4" r="2"/><circle cx="18" cy="4" r="2"/><circle cx="6" cy="20" r="2"/><circle cx="18" cy="20" r="2"/></svg>', item.vehicle_transmission, t("Коробка передач"));
   return specs.length ? [specs] : [];
 }
 

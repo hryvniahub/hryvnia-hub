@@ -3747,3 +3747,30 @@ setInterval(loadMarketQuotes, 5 * 60 * 1000);
 loadListings();
 loadCities();
 initAuth();
+
+
+// Keep the messages modal aligned with the actually visible viewport when the
+// mobile keyboard opens. This is limited to the modal and does not alter page layout.
+(() => {
+  const modal = document.getElementById("messagesModal");
+  const viewport = window.visualViewport;
+  if (!modal || !viewport) return;
+  const updateMessagesViewport = () => {
+    if (window.matchMedia("(max-width: 720px)").matches) {
+      modal.style.setProperty("--hh-visual-viewport-height", `${Math.round(viewport.height)}px`);
+      if (document.activeElement?.closest?.("#sendMessageForm")) {
+        requestAnimationFrame(() => {
+          document.getElementById("sendMessageForm")?.scrollIntoView({ block: "nearest", behavior: "auto" });
+        });
+      }
+    } else {
+      modal.style.removeProperty("--hh-visual-viewport-height");
+    }
+  };
+  viewport.addEventListener("resize", updateMessagesViewport);
+  viewport.addEventListener("scroll", updateMessagesViewport);
+  window.addEventListener("resize", updateMessagesViewport);
+  document.getElementById("sendMessageForm")?.querySelector('input[name="body"]')
+    ?.addEventListener("focus", () => setTimeout(updateMessagesViewport, 80));
+  updateMessagesViewport();
+})();

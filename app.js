@@ -2889,13 +2889,18 @@ function renderHotListings(items) {
 
 function vehicleCardSpecs(item) {
   if (String(item.category || "") !== "Автомобили") return [];
-  const engineAndFuel = [];
-  const transmissionAndYear = [];
-  if (item.vehicle_engine_liters != null && item.vehicle_engine_liters !== "") engineAndFuel.push(`${String(item.vehicle_engine_liters).replace(/\.0$/, "")} л`);
-  if (item.vehicle_fuel_type) engineAndFuel.push(String(item.vehicle_fuel_type));
-  if (item.vehicle_transmission) transmissionAndYear.push(String(item.vehicle_transmission));
-  if (item.vehicle_year) transmissionAndYear.push(String(item.vehicle_year));
-  return [engineAndFuel, transmissionAndYear].filter(row => row.length);
+  const specs = [];
+  const add = (icon, value, label) => {
+    if (value !== null && value !== undefined && String(value).trim() !== "") {
+      specs.push(`<span class="vehicle-spec-item" title="${escapeHtml(label)}"><span class="vehicle-spec-icon" aria-hidden="true">${icon}</span><span>${escapeHtml(String(value))}</span></span>`);
+    }
+  };
+  if (item.vehicle_year) add("▦", item.vehicle_year, t("Год"));
+  if (item.vehicle_engine_liters != null && item.vehicle_engine_liters !== "") add('<svg viewBox="0 0 24 24" focusable="false"><path d="M7 7h8l2 3h3v7h-3l-2 2H8l-2-3H4v-6h3z"/><path d="M9 7V4h4v3M17 10V7h2M9 12h4v4H9z"/></svg>', `${String(item.vehicle_engine_liters).replace(/\.0$/, "")} л`, t("Объём двигателя, л"));
+  if (item.vehicle_fuel_type) add("⛽", item.vehicle_fuel_type, t("Топливо"));
+  if (item.vehicle_mileage_km != null && item.vehicle_mileage_km !== "") { const mileage = Number(item.vehicle_mileage_km); const mileageText = mileage >= 10000 ? `${Math.round(mileage / 1000).toLocaleString(lang === "en" ? "en-US" : lang === "pl" ? "pl-PL" : lang === "uk" ? "uk-UA" : "ru-RU")} ${lang === "en" ? "k km" : "тис. км"}` : `${mileage.toLocaleString(lang === "en" ? "en-US" : lang === "pl" ? "pl-PL" : lang === "uk" ? "uk-UA" : "ru-RU")} ${lang === "en" ? "km" : "км"}`; add("◉", mileageText, t("Пробег, км")); }
+  if (item.vehicle_transmission) add('<svg viewBox="0 0 24 24" focusable="false"><path d="M6 4v16M18 4v16M6 8h12M6 16h12"/><circle cx="6" cy="4" r="2"/><circle cx="18" cy="4" r="2"/><circle cx="6" cy="20" r="2"/><circle cx="18" cy="20" r="2"/></svg>', item.vehicle_transmission, t("Коробка передач"));
+  return specs.length ? [specs] : [];
 }
 
 function renderListings(items) {
@@ -2939,7 +2944,7 @@ function renderListings(items) {
           <h3>${escapeHtml(item.title || "")}</h3>
           <button class="fav-btn ${fav ? "active" : ""}" data-fav-id="${escapeHtml(String(item.id))}" type="button" aria-pressed="${fav ? "true" : "false"}" aria-label="${fav ? "Убрать из избранного" : "В избранное"}"><span aria-hidden="true">${fav ? "♥" : "♡"}</span></button>
         </div>
-        ${specs.map(row => `<p class="listing-card-specs">${row.map(escapeHtml).join(" <span aria-hidden=\"true\">·</span> ")}</p>`).join("")}
+        ${specs.map(row => `<div class="listing-card-specs vehicle-card-specs">${row.join("")}</div>`).join("")}
         ${String(item.category || "") === "Автомобили" && item.vehicle_operational_condition ? `<p class="listing-card-condition">${escapeHtml(t(item.vehicle_operational_condition))}</p>` : ""}
         <p class="price"><span class="current-price">${money(item.price, item.currency || "UAH")}</span>${item.previous_price != null && Number(item.previous_price) !== Number(item.price) ? `<span class="old-price">${money(item.previous_price, item.currency || "UAH")}</span>` : ""}</p>
         ${marketScale}

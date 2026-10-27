@@ -853,9 +853,9 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
   /* Единые мобильные настройки баннера: без повторных переопределений */
   .main-banner { height: clamp(104px, 20vw, 124px); padding: 10px 12px 24px; }
   .banner-content { gap: 5px; padding-bottom: 0; }
-  .banner-title { font-size: clamp(17px, 3.1vw, 22px); line-height: 1.08; transform: none; }
+  .banner-title { font-size: 17px; line-height: 1.08; transform: none; }
   .banner-title::after { width: 25px; height: 2px; margin-top: 3px; }
-  .hero-text { font-size: clamp(12px, 2.3vw, 15px); line-height: 1.18; max-width: 100%; }
+  .hero-text { font-size: 14px; line-height: 1.18; max-width: 100%; }
   .banner-icons { bottom: 4px; gap: 12px; }
   .banner-icon { width: 14px; height: 14px; }
   .ticker-icon { flex-basis: 18px; width: 18px; height: 18px; font-size: 11px; }

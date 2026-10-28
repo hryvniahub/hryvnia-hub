@@ -1855,7 +1855,7 @@ function loadTickerPrev() {
 function saveTickerPrev(data) {
   try { localStorage.setItem(TICKER_PREV_KEY, JSON.stringify(data)); } catch {}
 }
-function setTickerValue(key, display, numeric, comparisonKey = key, digits = 2) {
+function setTickerValue(key, display, numeric, comparisonKey = key, digits = 2, arrowOnly = false) {
   const el = document.querySelector(`[data-ticker="${key}"]`);
   if (el) el.textContent = display;
   const arrow = document.querySelector(`[data-ticker-arrow="${key}"]`);
@@ -1872,15 +1872,15 @@ function setTickerValue(key, display, numeric, comparisonKey = key, digits = 2) 
     const delta = numeric - prevVal;
     if (delta > 0) {
       if (arrow) { arrow.textContent = "▲"; arrow.classList.add("up"); }
-      if (change) { change.textContent = `+${formatTickerNumber(Math.abs(delta), digits)}`; change.classList.add("up"); }
+      if (change && !arrowOnly) { change.textContent = `+${formatTickerNumber(Math.abs(delta), digits)}`; change.classList.add("up"); }
       if (badge) { badge.classList.remove("is-empty"); badge.classList.add("up"); }
     } else if (delta < 0) {
       if (arrow) { arrow.textContent = "▼"; arrow.classList.add("down"); }
-      if (change) { change.textContent = `−${formatTickerNumber(Math.abs(delta), digits)}`; change.classList.add("down"); }
+      if (change && !arrowOnly) { change.textContent = `−${formatTickerNumber(Math.abs(delta), digits)}`; change.classList.add("down"); }
       if (badge) { badge.classList.remove("is-empty"); badge.classList.add("down"); }
     } else {
-      if (change) { change.textContent = formatTickerNumber(0, digits); change.classList.add("flat"); }
-      if (badge) { badge.classList.remove("is-empty"); badge.classList.add("flat"); }
+      if (change && !arrowOnly) { change.textContent = formatTickerNumber(0, digits); change.classList.add("flat"); }
+      if (badge && !arrowOnly) { badge.classList.remove("is-empty"); badge.classList.add("flat"); }
     }
   }
   prev[comparisonKey] = numeric;
@@ -2009,7 +2009,7 @@ async function loadMarketQuotes() {
     setTickerValue("pln", formatTickerNumber(rates.pln, base === "USD" ? 4 : 2), rates.pln, pairs[base].pln, base === "USD" ? 4 : 2);
 
     if (Number.isFinite(btcUah) && btcUah > 0) {
-      setTickerValue("btc", formatTickerNumber(rates.btc, 0), rates.btc, pairs[base].btc, 0);
+      setTickerValue("btc", formatTickerNumber(rates.btc, 0), rates.btc, pairs[base].btc, 0, true);
       tickerSetText("source", "btc", `CoinGecko · ${assetDate}`);
     } else {
       setTickerValue("btc", unavailable(), null);
@@ -2018,7 +2018,7 @@ async function loadMarketQuotes() {
 
     if (Number.isFinite(rates.xau) && rates.xau > 0) {
       const digits = base === "USD" ? 2 : 0;
-      setTickerValue("xau", formatTickerNumber(rates.xau, digits), rates.xau, pairs[base].xau, digits);
+      setTickerValue("xau", formatTickerNumber(rates.xau, digits), rates.xau, pairs[base].xau, digits, true);
       tickerSetText("source", "xau", `CoinGecko · ${assetDate}`);
     } else {
       setTickerValue("xau", unavailable(), null);

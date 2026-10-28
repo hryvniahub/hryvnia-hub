@@ -1855,20 +1855,36 @@ function loadTickerPrev() {
 function saveTickerPrev(data) {
   try { localStorage.setItem(TICKER_PREV_KEY, JSON.stringify(data)); } catch {}
 }
-function setTickerValue(key, display, numeric, comparisonKey = key) {
+function setTickerValue(key, display, numeric, comparisonKey = key, digits = 2, arrowOnly = false) {
   const el = document.querySelector(`[data-ticker="${key}"]`);
   if (el) el.textContent = display;
   const arrow = document.querySelector(`[data-ticker-arrow="${key}"]`);
-  if (!arrow) return;
-  arrow.className = "ticker-arrow"; arrow.textContent = "";
+  const change = document.querySelector(`[data-ticker-change="${key}"]`);
+  const badge = change?.closest(".ticker-change-badge");
+  if (arrow) { arrow.className = "ticker-arrow"; arrow.textContent = ""; }
+  if (change) { change.className = "ticker-change"; change.textContent = ""; }
+  if (badge) { badge.classList.remove("up", "down", "flat"); badge.classList.add("is-empty"); }
   if (!Number.isFinite(numeric)) return;
-  const prev = loadTickerPrev(); const prevVal = Number(prev[comparisonKey]);
+
+  const prev = loadTickerPrev();
+  const prevVal = Number(prev[comparisonKey]);
   if (Number.isFinite(prevVal) && prevVal !== 0) {
-    if (numeric > prevVal) { arrow.textContent = "▲"; arrow.classList.add("up"); }
-    else if (numeric < prevVal) { arrow.textContent = "▼"; arrow.classList.add("down"); }
-    else { arrow.textContent = "•"; arrow.classList.add("flat"); }
+    const delta = numeric - prevVal;
+    if (delta > 0) {
+      if (arrow) { arrow.textContent = "▲"; arrow.classList.add("up"); }
+      if (change && !arrowOnly) { change.textContent = `+${formatTickerNumber(Math.abs(delta), digits)}`; change.classList.add("up"); }
+      if (badge) { badge.classList.remove("is-empty"); badge.classList.add("up"); }
+    } else if (delta < 0) {
+      if (arrow) { arrow.textContent = "▼"; arrow.classList.add("down"); }
+      if (change && !arrowOnly) { change.textContent = `−${formatTickerNumber(Math.abs(delta), digits)}`; change.classList.add("down"); }
+      if (badge) { badge.classList.remove("is-empty"); badge.classList.add("down"); }
+    } else {
+      if (change && !arrowOnly) { change.textContent = formatTickerNumber(0, digits); change.classList.add("flat"); }
+      if (badge && !arrowOnly) { badge.classList.remove("is-empty"); badge.classList.add("flat"); }
+    }
   }
-  prev[comparisonKey] = numeric; saveTickerPrev(prev);
+  prev[comparisonKey] = numeric;
+  saveTickerPrev(prev);
 }
 const tickerLocale = { ru: "ru-RU", uk: "uk-UA", en: "en-US", pl: "pl-PL" };
 function formatTickerNumber(value, digits = 2) {
@@ -1902,8 +1918,13 @@ const LIVE_ASSET_QUOTE_TTL = 60 * 60 * 1000;
 function tickerBaseCurrency() { return lang === "pl" ? "PLN" : lang === "en" ? "USD" : "UAH"; }
 function tickerDate(dateValue) {
   if (!dateValue) return "";
-  const parsed = new Date(dateValue);
-  if (Number.isNaN(parsed.getTime())) return "";
+  const raw = String(dateValue).trim();
+  // The NBU API commonly returns dates as DD.MM.YYYY; parse that format explicitly.
+  const nbuDate = raw.match(/^(\\d{1,2})\\.(\\d{1,2})\\.(\\d{4})$/);
+  const parsed = nbuDate
+    ? new Date(Number(nbuDate[3]), Number(nbuDate[2]) - 1, Number(nbuDate[1]))
+    : new Date(raw);
+  if (Number.isNaN(parsed.getTime())) return raw;
   return new Intl.DateTimeFormat(tickerLocale[lang] || "uk-UA", { day: "2-digit", month: "2-digit", year: "numeric" }).format(parsed);
 }
 function tickerSetText(attribute, key, value) {
@@ -1925,9 +1946,15 @@ async function loadMarketQuotes() {
       ? { usd: "🇺🇸", pln: "🇺🇦", xau: "🥇" }
       : { usd: "🇵🇱", pln: "🇺🇦", xau: "🥇" };
   for (const key of ["usd", "pln", "btc", "xau"]) tickerSetText("label", key, pairs[base][key]);
+  const tickerSubtitles = {
+    uk: { usd: "Долар США", pln: "Злотий", btc: "Біткоїн", xau: "Золото (за тройську унцію)" },
+    ru: { usd: "Доллар США", pln: "Злотый", btc: "Биткоин", xau: "Золото (за тройскую унцию)" },
+    en: { usd: "US Dollar", pln: "Polish Zloty", btc: "Bitcoin", xau: "Gold (per troy ounce)" },
+    pl: { usd: "Dolar amerykański", pln: "Złoty", btc: "Bitcoin", xau: "Złoto (za uncję trojańską)" }
+  };
+  for (const key of ["usd", "pln", "btc", "xau"]) tickerSetText("subtitle", key, (tickerSubtitles[lang] || tickerSubtitles.uk)[key]);
   tickerSetText("icon", "usd", icons.usd);
   tickerSetText("icon", "pln", icons.pln);
-  tickerSetText("icon", "xau", icons.xau);
 
   const goldUnitLabel = lang === "pl"
     ? "za uncję trojańską"
@@ -1976,14 +2003,14 @@ async function loadMarketQuotes() {
 
     const date = tickerDate(usdRow?.exchangedate || plnRow?.exchangedate);
     const sourceDate = date || (lang === "pl" ? "data NBP" : lang === "en" ? "NBU rate" : "курс НБУ");
-    const checkedAt = new Intl.DateTimeFormat(tickerLocale[lang] || "uk-UA", { hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date());
+    const assetDate = tickerDate(new Date());
 
-    setTickerValue("usd", formatTickerNumber(rates.usd, 2), rates.usd, pairs[base].usd);
-    setTickerValue("pln", formatTickerNumber(rates.pln, base === "USD" ? 4 : 2), rates.pln, pairs[base].pln);
+    setTickerValue("usd", formatTickerNumber(rates.usd, 2), rates.usd, pairs[base].usd, 2);
+    setTickerValue("pln", formatTickerNumber(rates.pln, base === "USD" ? 4 : 2), rates.pln, pairs[base].pln, base === "USD" ? 4 : 2);
 
     if (Number.isFinite(btcUah) && btcUah > 0) {
-      setTickerValue("btc", formatTickerNumber(rates.btc, 0), rates.btc, pairs[base].btc);
-      tickerSetText("source", "btc", `CoinGecko · ${checkedAt}`);
+      setTickerValue("btc", formatTickerNumber(rates.btc, 0), rates.btc, pairs[base].btc, 0, true);
+      tickerSetText("source", "btc", `CoinGecko · ${assetDate}`);
     } else {
       setTickerValue("btc", unavailable(), null);
       tickerSetText("source", "btc", "");
@@ -1991,8 +2018,8 @@ async function loadMarketQuotes() {
 
     if (Number.isFinite(rates.xau) && rates.xau > 0) {
       const digits = base === "USD" ? 2 : 0;
-      setTickerValue("xau", formatTickerNumber(rates.xau, digits), rates.xau, pairs[base].xau);
-      tickerSetText("source", "xau", `Gold · ${goldUnitLabel} · ${checkedAt}`);
+      setTickerValue("xau", formatTickerNumber(rates.xau, digits), rates.xau, pairs[base].xau, digits, true);
+      tickerSetText("source", "xau", `CoinGecko · ${assetDate}`);
     } else {
       setTickerValue("xau", unavailable(), null);
       tickerSetText("source", "xau", "");
@@ -2000,13 +2027,7 @@ async function loadMarketQuotes() {
 
     tickerSetText("source", "usd", `${lang === "pl" ? "NBP" : "НБУ"} · ${sourceDate}`);
     tickerSetText("source", "pln", `${lang === "pl" ? "NBP" : "НБУ"} · ${sourceDate}`);
-    if (note) note.textContent = lang === "pl"
-      ? `Kursy walut · sprawdzono ${checkedAt}`
-      : lang === "en"
-        ? `Currency rates · checked ${checkedAt}`
-        : lang === "ru"
-          ? `Курсы валют · проверено ${checkedAt}`
-          : `Курси валют · перевірено ${checkedAt}`;
+    if (note) note.textContent = "";
   } catch (error) {
     console.warn("Currency ticker unavailable:", error);
     if (listingRates) {
@@ -2015,10 +2036,10 @@ async function loadMarketQuotes() {
         : base === "PLN"
           ? { usd: listingRates.usdUah / listingRates.plnUah, pln: 1 / listingRates.plnUah }
           : { usd: listingRates.plnUah / listingRates.usdUah, pln: 1 / listingRates.usdUah };
-      setTickerValue("usd", formatTickerNumber(rates.usd, 2), rates.usd, pairs[base].usd);
-      setTickerValue("pln", formatTickerNumber(rates.pln, base === "USD" ? 4 : 2), rates.pln, pairs[base].pln);
-      tickerSetText("source", "usd", `NBU · ${listingRates.rateDate || "last saved rate"}`);
-      tickerSetText("source", "pln", `NBU · ${listingRates.rateDate || "last saved rate"}`);
+      setTickerValue("usd", formatTickerNumber(rates.usd, 2), rates.usd, pairs[base].usd, 2);
+      setTickerValue("pln", formatTickerNumber(rates.pln, base === "USD" ? 4 : 2), rates.pln, pairs[base].pln, base === "USD" ? 4 : 2);
+      tickerSetText("source", "usd", `${lang === "pl" ? "NBP" : lang === "en" ? "NBU" : "НБУ"} · ${tickerDate(listingRates.rateDate) || (lang === "pl" ? "ostatni kurs" : lang === "en" ? "last rate" : "останній курс")}`);
+      tickerSetText("source", "pln", `${lang === "pl" ? "NBP" : lang === "en" ? "NBU" : "НБУ"} · ${tickerDate(listingRates.rateDate) || (lang === "pl" ? "ostatni kurs" : lang === "en" ? "last rate" : "останній курс")}`);
       setTickerValue("xau", unavailable(), null);
       tickerSetText("source", "btc", "");
       tickerSetText("source", "xau", "");

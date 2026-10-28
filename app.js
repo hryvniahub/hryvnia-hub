@@ -2612,6 +2612,7 @@ function openListing(item, galleryOnly = false) {
       <p class="city">${escapeHtml(item.cities?.[`name_${lang}`] || item.cities?.name_ru || item.city || "")}</p>
       ${item.created_at ? `<p class="listing-published-date">${escapeHtml(({ru:"Опубликовано",uk:"Опубліковано",en:"Published",pl:"Opublikowano"})[lang] || "Published")}: ${escapeHtml(new Date(item.created_at).toLocaleDateString(({ru:"ru-RU",uk:"uk-UA",en:"en-GB",pl:"pl-PL"})[lang] || "uk-UA"))}</p>` : ""}
       <p class="price">${item.previous_price != null && Number(item.previous_price) !== Number(item.price) ? `<span class="old-price">${money(item.previous_price, item.currency || "UAH")}</span> ` : ""}${money(item.price, item.currency || "UAH")}</p>
+      ${item.property_details ? `<div class="property-detail-specs">${propertyCardSpecs(item).flat().join("")}</div>` : ""}
       <p class="desc" style="white-space:pre-wrap">${escapeHtml(item.description || "")}</p>
       ${isOwner ? `<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
         <button type="button" class="btn btn-primary" data-owner-edit="${escapeHtml(String(item.id))}">${escapeHtml(ownerLabels.edit)}</button>
@@ -3073,6 +3074,24 @@ function vehicleCardSpecs(item) {
   return specs.length ? [specs] : [];
 }
 
+function propertyCardSpecs(item) {
+  if (String(item.category || "") !== "Недвижимость" || !item.property_details) return [];
+  const details = item.property_details;
+  const locale = lang === "en" ? "en-US" : lang === "pl" ? "pl-PL" : lang === "uk" ? "uk-UA" : "ru-RU";
+  const specs = [];
+  const add = (icon, value, label) => {
+    if (value !== null && value !== undefined && String(value).trim() !== "") {
+      specs.push(`<span class="vehicle-spec-item" title="${escapeHtml(label)}"><span class="vehicle-spec-icon" aria-hidden="true">${icon}</span><span>${escapeHtml(String(value))}</span></span>`);
+    }
+  };
+  if (details.area_m2 != null) add("▱", `${details.area_m2} м²`, ({ru:"Общая площадь",uk:"Загальна площа",en:"Total area",pl:"Powierzchnia"})[lang]);
+  if (details.rooms) add("▦", `${details.rooms} ${({ru:"комн.",uk:"кімн.",en:"rooms",pl:"pok."})[lang] || "rooms"}`, ({ru:"Количество комнат",uk:"Кількість кімнат",en:"Rooms",pl:"Liczba pokoi"})[lang]);
+  if (details.floor != null && details.floors_total != null) add("⌂", `${details.floor}/${details.floors_total}`, ({ru:"Этаж / этажность",uk:"Поверх / поверховість",en:"Floor / floors",pl:"Piętro / liczba pięter"})[lang]);
+  else if (details.floor != null) add("⌂", details.floor, ({ru:"Этаж",uk:"Поверх",en:"Floor",pl:"Piętro"})[lang]);
+  if (details.furniture) add("▤", ({ru:{"Есть":"С мебелью","Нет":"Без мебели","Частично":"Частично"},uk:{"Есть":"З меблями","Нет":"Без меблів","Частично":"Частково"},en:{"Есть":"Furnished","Нет":"Unfurnished","Частично":"Partly furnished"},pl:{"Есть":"Umeblowane","Нет":"Bez mebli","Частично":"Częściowo umeblowane"}}[lang] || {})[details.furniture] || details.furniture, ({ru:"Мебель",uk:"Меблі",en:"Furniture",pl:"Meble"})[lang]);
+  return specs.length ? [specs] : [];
+}
+
 function renderListings(items) {
   visibleListings = items;
   renderHotListings(items.filter(item => item.is_hot || item.is_urgent));
@@ -3098,7 +3117,7 @@ function renderListings(items) {
     const hasCover = cover !== "";
     const isOwner = Boolean(currentUser?.id && item.user_id && String(currentUser.id) === String(item.user_id));
     const myListingLabel = ({ uk: "Моє оголошення", ru: "Моё объявление", en: "My listing", pl: "Moje ogłoszenie" })[lang] || "My listing";
-    const specs = vehicleCardSpecs(item);
+    const specs = [...vehicleCardSpecs(item), ...propertyCardSpecs(item)];
     const city = item.cities?.[`name_${lang}`] || item.cities?.name_ru || item.city || "";
     const marketScale = String(item.category || "") === "Автомобили" && Number(item.price) > 0
       ? `<div class="listing-market" aria-label="${escapeHtml(({ru:"Декоративный индикатор цены",uk:"Декоративний індикатор ціни",en:"Decorative price indicator",pl:"Dekoracyjny wskaźnik ceny"})[lang] || "Decorative price indicator")}"><span class="listing-market-bar" aria-hidden="true"></span></div>`
@@ -3552,16 +3571,39 @@ function setVehicleAdvancedFields(expanded) {
   const lines = vehicleListingFields?.querySelectorAll(".listing-progress > i") || [];
   lines.forEach((line, index) => line.classList.toggle("is-complete", expanded && index === 0));
 }
+const propertyListingFields = document.getElementById("propertyListingFields");
+const propertyTypeSelect = document.getElementById("propertyType");
+const propertyOperationSelect = document.getElementById("propertyOperation");
+const listingCurrencyField = document.getElementById("listingCurrencyField");
+
+function syncPropertyListingFields() {
+  if (!propertyListingFields) return;
+  const type = propertyTypeSelect?.value || "";
+  propertyListingFields.hidden = listingCategorySelect?.value !== "Недвижимость";
+  propertyListingFields.disabled = listingCategorySelect?.value !== "Недвижимость";
+  propertyListingFields.querySelectorAll("[data-property-for]").forEach(field => {
+    const allowedTypes = (field.dataset.propertyFor || "").split(",").map(value => value.trim());
+    const visible = !type || allowedTypes.includes(type);
+    field.hidden = !visible;
+    field.querySelectorAll("input,select").forEach(control => {
+      control.disabled = propertyListingFields.disabled || !visible;
+    });
+  });
+  if (listingCurrencyField) listingCurrencyField.hidden = listingCategorySelect?.value !== "Недвижимость";
+}
+
 function syncVehicleListingFields() {
   const category = listingCategorySelect?.value || "";
   const isVehicle = category === "Автомобили";
-  const hidesManualTitle = isVehicle || category === "Недвижимость";
+  const isProperty = category === "Недвижимость";
+  const hidesManualTitle = isVehicle || isProperty;
   if (vehicleListingFields) vehicleListingFields.hidden = !isVehicle;
   if (vehicleListingMore) vehicleListingMore.hidden = !isVehicle;
   if (vehicleMarketPanel) vehicleMarketPanel.hidden = true;
   if (vehicleAdvancedFields) vehicleAdvancedFields.hidden = true;
   if (listingAdvancedCommonFields) listingAdvancedCommonFields.hidden = isVehicle;
   vehicleListingFields?.querySelectorAll("input,select").forEach(el => { el.disabled = !isVehicle; });
+  syncPropertyListingFields();
   if (listingTitleField) {
     listingTitleField.hidden = hidesManualTitle;
     const titleInput = listingTitleField.querySelector('input[name="title"]');
@@ -3572,6 +3614,7 @@ function syncVehicleListingFields() {
   }
   if (isVehicle) loadVehicleListingMakes();
 }
+propertyTypeSelect?.addEventListener("change", syncPropertyListingFields);
 async function loadVehicleListingMakes() {
   if (!vehicleListingMake || !db || vehicleListingMake.dataset.loaded === "1" || vehicleListingMake.dataset.loading === "1") return;
   vehicleListingMake.dataset.loading = "1";
@@ -3680,6 +3723,22 @@ document.getElementById("vehicleMarketRegister")?.addEventListener("click", () =
 });
 
 categorySelectTrigger?.addEventListener("click", () => openCategoryMenu());
+
+function openPropertyListingForm(propertyType = "", operation = "") {
+  const categorySelect = addForm?.querySelector('select[name="category"]');
+  if (!categorySelect || ![...categorySelect.options].some(option => option.value === "Недвижимость")) return;
+  categorySelect.value = "Недвижимость";
+  if (propertyTypeSelect) propertyTypeSelect.value = propertyType || "";
+  if (propertyOperationSelect) {
+    propertyOperationSelect.value = ["Продажа", "Аренда"].includes(operation) ? operation : "";
+  }
+  syncVehicleListingFields();
+  closeCategoryMenu();
+  closeAddCategoryMenu();
+  addModal?.classList.remove("hidden");
+  if (formMessage) formMessage.textContent = "";
+}
+
 categoryMenuOptions?.addEventListener("click", event => {
   const dealTab = event.target.closest("[data-real-estate-deal]");
   if (dealTab) {
@@ -3698,6 +3757,10 @@ categoryMenuOptions?.addEventListener("click", event => {
     return;
   }
   const subcategory = option.dataset.searchSubcategory;
+  if (category === "Недвижимость" && subcategory) {
+    openPropertyListingForm(subcategory, categoryMenu.dataset.realEstateDeal || "Все");
+    return;
+  }
   // A category change starts a fresh catalog query; do not carry stale vehicle or city filters.
   resetCatalogFilters();
   if (category !== "Автомобили") { vehicleSearchTabs = []; activeVehicleSearchTabId = ""; }
@@ -3786,6 +3849,11 @@ document.getElementById("addCategoryOptions")?.addEventListener("click", event =
   const option = event.target.closest("[data-add-category]");
   if (!option) return;
   const category = option.dataset.addCategory;
+  if (category === "Недвижимость") {
+    closeAddCategoryMenu();
+    openCategoryMenu("Недвижимость");
+    return;
+  }
   const categorySelect = addForm?.querySelector('select[name="category"]');
   if (!categorySelect || ![...categorySelect.options].some(item => item.value === category)) return;
   categorySelect.value = category;
@@ -3821,11 +3889,48 @@ if (addForm) {
       title: selectedCategory === "Недвижимость" ? generatedRealEstateTitle : String(form.get("title") || "").trim(),
       city_id: Number(form.get("city_id")),
       price: Number(form.get("price")),
+      currency: String(form.get("price_currency") || "UAH"),
       description,
       is_hot: false,
       is_urgent: false,
       user_id: currentUser?.id || null
     };
+    if (selectedCategory === "Недвижимость") {
+      const propertyType = String(form.get("property_type") || "").trim();
+      const propertyOperation = String(form.get("property_operation") || "").trim();
+      if (!propertyType || !propertyOperation) {
+        if (formMessage) formMessage.textContent = "Выберите операцию и тип недвижимости.";
+        (!propertyOperation ? propertyOperationSelect : propertyTypeSelect)?.focus();
+        return;
+      }
+      const optionalNumber = name => {
+        const value = String(form.get(name) || "").trim();
+        return value === "" ? null : Number(value);
+      };
+      Object.assign(payload, {
+        property_details: {
+          operation: propertyOperation,
+          type: propertyType,
+          area_m2: optionalNumber("property_area"),
+          rooms: String(form.get("property_rooms") || "") || null,
+          floor: optionalNumber("property_floor"),
+          floors_total: optionalNumber("property_floors_total"),
+          kitchen_area_m2: optionalNumber("property_kitchen_area"),
+          building_type: String(form.get("property_building_type") || "") || null,
+          condition: String(form.get("property_condition") || "") || null,
+          land_area_sotkas: optionalNumber("property_land_area"),
+          furniture: String(form.get("property_furniture") || "") || null,
+          balcony: String(form.get("property_balcony") || "") || null,
+          loggia: String(form.get("property_loggia") || "") || null,
+          metro_distance_m: optionalNumber("property_metro_distance"),
+          school_distance_m: optionalNumber("property_school_distance"),
+          stop_distance_m: optionalNumber("property_stop_distance")
+        }
+      });
+      const typeLabel = translations[propertyType]?.[lang] || propertyType;
+      const operationLabel = translations[propertyOperation]?.[lang] || propertyOperation;
+      payload.title = `${typeLabel} — ${operationLabel.toLocaleLowerCase(lang === "uk" ? "uk-UA" : lang === "pl" ? "pl-PL" : lang === "en" ? "en-US" : "ru-RU")}`;
+    }
     if (selectedCategory === "Автомобили") {
       const makeSlug = String(form.get("vehicle_make_slug") || "").trim();
       const modelSlug = String(form.get("vehicle_model_slug") || "").trim();

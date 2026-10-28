@@ -191,34 +191,173 @@ button { font-family: inherit; }
 .banner-icon { width: 18px; height: 18px; color: var(--accent); filter: drop-shadow(0 1px 2px rgba(0,0,0,0.6)); }
 
 /* ============================================================
-   ВАЛЮТНАЯ ЛЕНТА
+   ВАЛЮТНАЯ ЛЕНТА — единый компактный горизонтальный тикер
    ============================================================ */
 .market-ticker {
-  margin-top: 6px; padding: 6px 8px;
-   border: 1px solid #174C3A;
-  border-radius: 10px; box-shadow: var(--shadow-sm);
-}
-.ticker-scroll { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
-.ticker-item {
-  display: flex; align-items: center; gap: 6px; min-width: 0;
-  padding: 0 4px; border-left: 1px solid var(--line);
-}
-.ticker-item:first-child { border-left: 0; padding-left: 0; }
-.ticker-icon {
-  flex: 0 0 22px; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
-  border-radius: 50%; background: #f1f4ef; font-size: 12px;
-}
-.ticker-icon-btc { background: #ff951b; color: #fff; font-weight: 800; }
-.ticker-details { display: flex; flex-direction: column; gap: 2px; overflow: hidden; }
-.ticker-label { font-size: 9px; font-weight: 800; color: var(--text); }
-.ticker-value { font-size: 12px; font-weight: 800; white-space: nowrap; }
-.ticker-source {
   display: block;
-  color: var(--muted);
-  font-size: 8px;
-  line-height: 1.2;
+  width: 100%;
+  margin: 7px 0 0;
+  padding: 7px 8px 6px;
+  background: #fff;
+  border: 1px solid #e4e9e5;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
 }
-.ticker-note {  margin-top: 2px; color: var(--muted); font-size: 10px; }
+.ticker-scroll {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 0;
+  width: 100%;
+  min-width: 0;
+}
+.ticker-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  min-width: 0;
+  padding: 1px 6px;
+  border-left: 1px solid #dfe5e1;
+}
+.ticker-item:first-child { border-left: 0; padding-left: 1px; }
+.ticker-icon {
+  display: flex;
+  flex: 0 0 22px;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin-top: 1px;
+  border-radius: 50%;
+  background: #f1f4ef;
+  font-size: 12px;
+  line-height: 1;
+}
+.ticker-icon-btc { background: #f7931a; color: #fff; font-weight: 800; }
+.ticker-details {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  overflow: hidden;
+}
+.ticker-label {
+  display: block;
+  overflow: hidden;
+  color: #174c3a;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.1;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.ticker-main {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  min-width: 0;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+.ticker-value {
+  display: inline-block;
+  min-width: 0;
+  color: #172c24;
+  font-size: 14px;
+  font-weight: 850;
+  line-height: 1.1;
+  letter-spacing: -.25px;
+  white-space: nowrap;
+}
+.ticker-meta {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  margin-top: 1px;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+.ticker-arrow {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  font-size: 9px;
+  font-weight: 900;
+  line-height: 1;
+  opacity: 1;
+}
+.ticker-change {
+  flex: 0 1 auto;
+  min-width: 0;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+.ticker-arrow.up, .ticker-change.up { color: #16843b; }
+.ticker-arrow.down, .ticker-change.down { color: #d12f24; }
+.ticker-arrow.flat, .ticker-change.flat { color: #758078; }
+.ticker-source {
+  display: flex;
+  align-items: center;
+  flex: 0 1 auto;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: #748078;
+  font-size: 7px;
+  font-weight: 600;
+  line-height: 1.1;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+/* Small official-building mark before the NBU/NBP attribution. */
+.ticker-item[data-ticker-item="usd"] .ticker-source::before,
+.ticker-item[data-ticker-item="pln"] .ticker-source::before {
+  content: "";
+  display: inline-block;
+  flex: 0 0 11px;
+  width: 11px;
+  height: 11px;
+  margin-right: 3px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23748078' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 9h18L12 3 3 9Z'/%3E%3Cpath d='M5 10v8M9 10v8M15 10v8M19 10v8M3 20h18M2 22h20'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.ticker-note { display: none; }
+
+@media (max-width: 720px) {
+  .market-ticker { margin-top: 6px; padding: 6px 5px; border-radius: 12px; }
+  .ticker-scroll { gap: 0; }
+  .ticker-item { gap: 3px; padding: 1px 3px; }
+  .ticker-icon { flex-basis: 17px; width: 17px; height: 17px; font-size: 10px; }
+  .ticker-details { gap: 3px; }
+  .ticker-label { font-size: 8px; letter-spacing: -.15px; }
+  .ticker-value { font-size: clamp(9px, 2.8vw, 12px); letter-spacing: -.3px; }
+  .ticker-meta { gap: 1px; }
+  .ticker-arrow { font-size: 8px; }
+  .ticker-change { font-size: 7px; letter-spacing: -.15px; }
+  .ticker-source { font-size: 6px; letter-spacing: -.15px; }
+  .ticker-item[data-ticker-item="usd"] .ticker-source::before,
+  .ticker-item[data-ticker-item="pln"] .ticker-source::before {
+    flex-basis: 9px;
+    width: 9px;
+    height: 9px;
+    margin-right: 2px;
+  }
+}
+@media (max-width: 380px) {
+  .market-ticker { padding: 5px 3px; }
+  .ticker-item { gap: 2px; padding-left: 2px; padding-right: 2px; }
+  .ticker-icon { flex-basis: 14px; width: 14px; height: 14px; font-size: 9px; }
+  .ticker-label { font-size: 7px; }
+  .ticker-value { font-size: 9px; }
+  .ticker-change { font-size: 6px; }
+  .ticker-source { font-size: 5.5px; }
+}
 
 /* ============================================================
    ПОИСК И AI
@@ -340,14 +479,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
   .category-card[data-category="Готовый бизнес"] .category-card-long-word { display: block; font-size: 15px; white-space: normal; }
 
 
-  /* Валюты */
-  .market-ticker { margin-top: 6px; padding: 6px 8px; }
-  .ticker-scroll { gap: 4px; }
-  .ticker-item { padding: 0 4px; gap: 4px; }
-  
-  
-  .ticker-source { display: none; font-size: 7px; }
-
   /* Поиск и AI */
   .search-ai-section { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 8px; }
   
@@ -444,10 +575,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-border); 
 .lang-clock { font-size: 10px; font-variant-numeric: tabular-nums; }
 .search-input-row-stacked { grid-template-columns: minmax(0, 1fr); }
 .search-input-row-stacked > input, .search-input-row-stacked > button { width: 100%; min-width: 0; }
-.ticker-main { display: flex; align-items: center; gap: 4px; min-width: 0; }
-.ticker-icon-usd { background: #edf2fb; }
-.ticker-icon-pln { background: #f8e8e8; }
-.ticker-icon-xau { background: #fff2c7; }
 .category-menu-option .category-menu-option-label { flex: 1 1 auto; min-width: 0; font-size: 15px; font-weight: 650; line-height: 1.25; overflow-wrap: anywhere; }
 .password-toggle-icon { display: inline-flex; align-items: center; justify-content: center; line-height: 1; }
 .password-field.is-visible .password-toggle-icon { font-size: 15px; }
@@ -559,21 +686,6 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
 .hot-toggle { display: flex; align-items: center; gap: 8px; min-width: 0; margin: 8px 0; }
 .hot-toggle input { width: auto; flex: 0 0 auto; }
 
-/* Стрелки направления котировок */
-.ticker-arrow {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 10px;
-  margin-left: 2px;
-  font-size: 10px;
-  line-height: 1;
-  opacity: 0;
-  transition: opacity .15s ease;
-}
-.ticker-arrow.up { color: #198a43; opacity: 1; }
-.ticker-arrow.down { color: #d4381e; opacity: 1; }
-.ticker-arrow.flat { color: #909a95; opacity: 1; font-size: 9px; }
 
 /* Избранное */
 .favorites-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
@@ -858,10 +970,6 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
   .hero-text { font-size: 14px; line-height: 1.18; max-width: 100%; }
   .banner-icons { bottom: 4px; gap: 12px; }
   .banner-icon { width: 14px; height: 14px; }
-  .ticker-icon { flex-basis: 18px; width: 18px; height: 18px; font-size: 11px; }
-  .ticker-label { font-size: 8px; }
-  .ticker-value { font-size: 10px; }
-  .ticker-arrow { font-size: 9px; }
   .search-panel { padding: 8px 10px; gap: 6px; }
   .search-filters-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
   .ai-panel { padding: 8px; }
@@ -961,7 +1069,7 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
 @keyframes vehicle-make-spin { to { transform: rotate(360deg); } }
 
 /* Remove the extra currency-ticker caption to save vertical space. */
-.ticker-note { display: none !important; }
+.ticker-note { display: none; }
 
 /* Hryvnia Hub: расширенный поиск автомобилей */
 .vehicle-search-toggle {
@@ -1606,11 +1714,6 @@ main {
   background: transparent;
 }
 
-/* Тикер валют остаётся светлым, как в согласованном макете. */
-.market-ticker {
-  background: #ffffff;
-}
-
 /* Логотип: только текст HRYVNIA HUB, без старой иконки H. */
 .brand .logo {
   display: none;
@@ -2174,22 +2277,6 @@ main {
 .vehicle-search-city-suggestions { top: calc(100% + 4px); max-height: 220px; overflow-y: auto; z-index: 10020; }
 
 
-/* Компактніша валютна стрічка: прибираємо зайві проміжки та робимо напрямок курсу помітним. */
-.ticker-scroll { gap: 0; }
-.ticker-item { padding-left: 2px; padding-right: 2px; gap: 3px; }
-.ticker-main { gap: 2px; }
-.ticker-arrow { flex: 0 0 11px; min-width: 11px; margin-left: 0; font-size: 11px; font-weight: 900; opacity: 1; }
-.ticker-arrow.up { color: #16843b; }
-.ticker-arrow.down { color: #d12f24; }
-@media (max-width: 420px) {
-  .ticker-scroll { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .ticker-item { padding-left: 1px; padding-right: 1px; gap: 2px; }
-  .ticker-icon { flex-basis: 17px; width: 17px; height: 17px; font-size: 10px; }
-  .ticker-label { font-size: 7px; letter-spacing: -.15px; }
-  .ticker-value { font-size: 9px; letter-spacing: -.2px; }
-  .ticker-arrow { flex-basis: 9px; min-width: 9px; font-size: 9px; }
-}
-
 /* Branded AI category prompt */
 .hh-ai-prompt-backdrop { position: fixed; inset: 0; z-index: 12000; display: grid; place-items: center; padding: 20px; background: rgba(3, 17, 12, .72); backdrop-filter: blur(7px); }
 .hh-ai-prompt { width: min(100%, 360px); padding: 24px; border: 1px solid rgba(212,255,0,.42); border-radius: 22px; background: linear-gradient(145deg, #173c2d, #10271e); color: #f7f9f5; box-shadow: 0 22px 70px rgba(0,0,0,.42); text-align: center; }
@@ -2199,23 +2286,6 @@ main {
 .hh-ai-prompt button { width: 100%; min-height: 46px; border: 0; border-radius: 12px; background: #d4ff00; color: #14271e; font: inherit; font-weight: 800; cursor: pointer; }
 
 
-/* Market ticker: tighter mobile spacing and readable movement indicators. */
-.market-ticker { padding-left: 6px; padding-right: 6px; }
-.ticker-scroll { column-gap: 0 !important; }
-.ticker-item { padding-left: 1px !important; padding-right: 1px !important; gap: 2px !important; }
-.ticker-details { min-width: 0; }
-.ticker-main { gap: 1px !important; }
-.ticker-arrow { flex: 0 0 10px !important; min-width: 10px !important; font-size: 10px !important; line-height: 1; }
-.ticker-arrow.up { color: #16843b !important; }
-.ticker-arrow.down { color: #d12f24 !important; }
-@media (max-width: 420px) {
-  .market-ticker { padding-left: 4px; padding-right: 4px; }
-  .ticker-item { gap: 1px !important; }
-  .ticker-icon { flex-basis: 16px; width: 16px; }
-  .ticker-label { font-size: 7px; }
-  .ticker-value { font-size: 9px; }
-  .ticker-arrow { flex-basis: 9px !important; min-width: 9px !important; font-size: 9px !important; }
-}
 /* AI prompt is an anchored branded popover, not a page-bottom alert. */
 .hh-ai-prompt-backdrop { position: fixed; inset: 0; z-index: 12000; display: flex; align-items: flex-start; justify-content: center; padding: 16px; background: rgba(3,17,12,.24); backdrop-filter: blur(2px); }
 .hh-ai-prompt { position: relative; margin-top: min(28vh, 220px); width: min(100%, 360px); padding: 22px 20px 18px; border: 1px solid rgba(212,255,0,.55); border-radius: 20px; background: linear-gradient(145deg,#173c2d,#10271e); color: #f7f9f5; box-shadow: 0 18px 55px rgba(0,0,0,.35); text-align: center; }
@@ -2331,112 +2401,6 @@ main {
 .vehicle-search-tab-add:disabled { opacity: .5; cursor: wait; }
 
 
-/* ============================================================
-   HRYVNIA HUB — TICKER V1: RATE + MOVEMENT + OFFICIAL SOURCE
-   ============================================================ */
-.market-ticker {
-  padding: 5px 6px 4px;
-  background: #fff;
-}
-.ticker-scroll {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 3px;
-}
-.ticker-item {
-  align-items: flex-start;
-  gap: 4px;
-  padding: 0 4px;
-  min-width: 0;
-}
-.ticker-icon {
-  flex: 0 0 18px;
-  width: 18px;
-  height: 18px;
-  font-size: 10px;
-  margin-top: 1px;
-}
-.ticker-details {
-  flex: 1 1 auto;
-  min-width: 0;
-  gap: 2px;
-}
-.ticker-label {
-  display: block;
-  font-size: 9px;
-  line-height: 1.1;
-  white-space: nowrap;
-}
-.ticker-main {
-  display: flex;
-  align-items: center;
-  min-width: 0;
-  gap: 0;
-  line-height: 1.1;
-}
-.ticker-value {
-  display: block;
-  font-size: 11px;
-  line-height: 1.15;
-  font-weight: 800;
-  white-space: nowrap;
-}
-.ticker-meta {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  min-width: 0;
-  white-space: nowrap;
-  line-height: 1.1;
-}
-.ticker-arrow {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 8px !important;
-  min-width: 8px !important;
-  margin: 0;
-  font-size: 8px !important;
-  font-weight: 900;
-  line-height: 1;
-  opacity: 1;
-}
-.ticker-change {
-  flex: 0 1 auto;
-  min-width: 0;
-  font-size: 8px;
-  line-height: 1.1;
-  font-weight: 700;
-  white-space: nowrap;
-}
-.ticker-arrow.up, .ticker-change.up { color: #16843b !important; }
-.ticker-arrow.down, .ticker-change.down { color: #d12f24 !important; }
-.ticker-arrow.flat, .ticker-change.flat { color: #707a75 !important; }
-.ticker-source {
-  display: block !important;
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: #707a75;
-  font-size: 7px;
-  line-height: 1.1;
-  margin-left: 2px;
-}
-.ticker-note { display: none !important; }
-
-@media (max-width: 420px) {
-  .market-ticker { padding: 4px 3px 3px; }
-  .ticker-scroll { gap: 1px; }
-  .ticker-item { gap: 2px; padding-left: 2px !important; padding-right: 2px !important; }
-  .ticker-icon { flex-basis: 14px; width: 14px; height: 14px; font-size: 9px; }
-  .ticker-label { font-size: 7px; }
-  .ticker-value { font-size: 9px; }
-  .ticker-meta { gap: 1px; }
-  .ticker-arrow { flex-basis: 7px !important; min-width: 7px !important; font-size: 7px !important; }
-  .ticker-change { font-size: 7px; }
-  .ticker-source { font-size: 6px; margin-left: 1px; }
-}
-
 /* Hryvnia Hub — slightly larger and bolder listing-card specifications */
 .listing-card-horizontal .vehicle-spec-item {
   color: #4b554e;
@@ -2458,99 +2422,4 @@ main {
   .listing-card-horizontal .vehicle-spec-item {
     font-size: 12.5px;
   }
-}
-
-
-/* ============================================================
-   HRYVNIA HUB — FINAL EXCHANGE-RATE PANEL
-   ============================================================ */
-.market-ticker {
-  margin-top: 14px;
-  padding: 10px 12px;
-  background: #fff;
-  border-radius: 22px;
-  color: #123d31;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
-  overflow: hidden;
-}
-.ticker-scroll {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0;
-}
-.ticker-item {
-  display: grid;
-  grid-template-columns: 40px minmax(0, 1fr);
-  align-items: start;
-  gap: 10px;
-  min-width: 0;
-  padding: 4px 16px;
-  border-left: 1px solid #dfe5e1;
-}
-.ticker-item:first-child { border-left: 0; padding-left: 4px; }
-.ticker-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: none;
-  width: 40px; height: 40px;
-  margin-top: 2px;
-  border-radius: 50%;
-  font-size: 27px; line-height: 1;
-}
-.ticker-icon-usd, .ticker-icon-pln { background: #f4f6f6; }
-.ticker-icon-btc { background: #ff951b; color: #fff; font-weight: 800; }
-.ticker-icon-xau { background: #fff5d7; }
-.ticker-details { display: flex; flex-direction: column; gap: 0; min-width: 0; overflow: hidden; }
-.ticker-heading { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.ticker-label { display: block; color: #103c30; font-size: 17px; line-height: 1.12; font-weight: 800; white-space: nowrap; }
-.ticker-subtitle { display: block; color: #78858a; font-size: 12px; line-height: 1.2; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ticker-main { display: flex; align-items: center; gap: 10px; min-width: 0; margin-top: 8px; line-height: 1.1; }
-.ticker-value { display: block; color: #102f27; font-size: clamp(19px, 2vw, 29px); line-height: 1.1; font-weight: 850; letter-spacing: -.5px; white-space: nowrap; }
-.ticker-movement { display: inline-flex; align-items: center; justify-content: center; gap: 4px; flex: none; padding: 6px 9px; border-radius: 999px; background: #e8f5e9; color: #16843b; white-space: nowrap; }
-.ticker-arrow { display: inline-flex; align-items: center; justify-content: center; flex: none !important; min-width: 0 !important; margin: 0; font-size: 14px !important; font-weight: 900; line-height: 1; }
-.ticker-change { flex: none; min-width: 0; font-size: 14px; line-height: 1; font-weight: 800; white-space: nowrap; }
-.ticker-movement:has(.down) { background: #fdebed; color: #d12f3d; }
-.ticker-arrow.up, .ticker-change.up { color: #16843b !important; }
-.ticker-arrow.down, .ticker-change.down { color: #d12f3d !important; }
-.ticker-arrow.flat, .ticker-change.flat { color: #77827d !important; }
-.ticker-source-row { display: flex; align-items: center; gap: 7px; min-width: 0; margin-top: 17px; padding-left: 0; color: #69777c; line-height: 1.15; }
-.ticker-source-row-nbu { margin-left: -1px; }
-.ticker-nbu-icon { display: block; width: 20px; height: 20px; flex: 0 0 20px; color: #65757b; }
-.ticker-source { display: block !important; flex: 1 1 auto; min-width: 0; overflow: hidden; color: #69777c; font-size: 12px; line-height: 1.15; font-weight: 550; text-overflow: ellipsis; white-space: nowrap; margin: 0; }
-.ticker-note { display: none !important; }
-@media (max-width: 900px) {
-  .market-ticker { padding: 8px 7px; border-radius: 17px; }
-  .ticker-item { grid-template-columns: 30px minmax(0, 1fr); gap: 6px; padding: 4px 8px; }
-  .ticker-item:first-child { padding-left: 2px; }
-  .ticker-icon { width: 30px; height: 30px; font-size: 21px; }
-  .ticker-label { font-size: 13px; }
-  .ticker-subtitle { font-size: 10px; }
-  .ticker-main { flex-wrap: wrap; gap: 4px 6px; margin-top: 7px; }
-  .ticker-value { font-size: clamp(16px, 2.5vw, 22px); letter-spacing: -.3px; }
-  .ticker-movement { gap: 3px; padding: 4px 6px; }
-  .ticker-arrow { font-size: 11px !important; }
-  .ticker-change { font-size: 11px; }
-  .ticker-source-row { gap: 4px; margin-top: 12px; }
-  .ticker-nbu-icon { width: 15px; height: 15px; flex-basis: 15px; }
-  .ticker-source { font-size: 9px; }
-}
-@media (max-width: 560px) {
-  .market-ticker { padding: 7px 5px; margin-top: 8px; border-radius: 14px; }
-  .ticker-scroll { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 0; }
-  .ticker-item { grid-template-columns: 26px minmax(0, 1fr); gap: 6px; padding: 9px 7px; border-left: 0; }
-  .ticker-item:nth-child(even) { border-left: 1px solid #dfe5e1; }
-  .ticker-item:nth-child(n+3) { border-top: 1px solid #dfe5e1; }
-  .ticker-item:first-child { padding-left: 7px; }
-  .ticker-icon { width: 26px; height: 26px; font-size: 18px; }
-  .ticker-label { font-size: 12px; }
-  .ticker-subtitle { font-size: 9px; }
-  .ticker-main { flex-wrap: nowrap; gap: 5px; margin-top: 6px; }
-  .ticker-value { font-size: clamp(15px, 4.5vw, 21px); letter-spacing: -.4px; }
-  .ticker-movement { gap: 2px; padding: 4px 5px; }
-  .ticker-arrow { font-size: 10px !important; }
-  .ticker-change { font-size: 10px; }
-  .ticker-source-row { margin-top: 10px; gap: 4px; }
-  .ticker-nbu-icon { width: 13px; height: 13px; flex-basis: 13px; }
-  .ticker-source { font-size: 8px; }
 }

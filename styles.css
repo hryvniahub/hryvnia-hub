@@ -1329,12 +1329,12 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
 .listing-card-heading{ display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; min-width: 0; }
 .listing-card-horizontal h3{ margin: 0 0 8px; color: #111;  line-height: 1.18; letter-spacing: -.02em; }
 .listing-card-horizontal .fav-btn{ position: static; flex: 0 0 40px; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 50%; background: #f3f6f2; color: #17241c; font-size: 25px; line-height: 1; }
-.listing-card-horizontal .listing-card-specs{ margin: 0 0 2px; color: #303a34; font-weight: 600; line-height: 1.35; overflow-wrap: anywhere; }
+.listing-card-horizontal .listing-card-specs{ margin: 0 0 2px; color: #303a34; font-weight: 600; line-height: 1.35; letter-spacing: -0.3px; overflow-wrap: anywhere; }
 .listing-card-horizontal .listing-card-specs span{ color: #424b45; padding: 0 3px; }
 .listing-card-horizontal .price{ display: flex; flex-wrap: nowrap; align-items: baseline; justify-content: flex-start; gap: 4px 8px; min-width: 0; margin: 0 0 5px; color: #080b09; font-size: clamp(25px, 2.7vw, 38px); line-height: 1.1; font-weight: 850; }
 .listing-card-horizontal .current-price{ flex: 0 1 auto; min-width: 0; white-space: nowrap; }
 .listing-card-horizontal .old-price{ flex: 0 0 auto; margin: 0;   line-height: 1.2;  white-space: nowrap; }
-.listing-card-condition{ margin: 5px 0 5px; color: #424b45; font-size: 14px; font-weight: 500; line-height: 1.25; white-space: nowrap; }
+.listing-card-condition{ margin: 5px 0 5px; color: #424b45; font-size: 14px; font-weight: 500; line-height: 1.25; letter-spacing: -0.3px; white-space: nowrap; }
 .listing-card-meta{ display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: auto; padding-top: 12px; }
 .listing-card-horizontal .city{ color: #59635c;  }
 .listing-card-horizontal .hot-listing-badge, .listing-card-horizontal .urgent-listing-badge, .listing-card-horizontal .owner-listing-badge{ font-size: 11px; }

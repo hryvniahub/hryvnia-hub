@@ -2429,22 +2429,45 @@ main{
 }
 
 
-/* Hryvnia Hub photo watermark: discreet two-tone brand mark, no opaque panel. */
-.listing-card-media::before, .listing-card-media::after,
-.hot-card-media::before, .hot-card-media::after{
-  position: absolute;
-  bottom: 10px;
-  z-index: 1;
+/* Hryvnia Hub watermark is anchored to the actual image, not the empty media area. */
+.listing-photo-wrap{
+  position: relative;
   display: block;
+  width: 100%;
+  min-width: 0;
+  line-height: 0;
+}
+.listing-photo-wrap > .listing-photo{
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 310px;
+  min-height: 0;
+  object-fit: contain;
+  margin: 0;
+  border-radius: 0;
+}
+.photo-watermark{
+  position: absolute;
+  right: 8px;
+  bottom: 7px;
+  z-index: 2;
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
   font-size: clamp(9px, 1.05vw, 12px);
   font-weight: 850;
-  letter-spacing: .055em;
-  line-height: 1.2;
-  text-shadow: 0 1px 3px rgba(255,255,255,.85), 0 0 2px rgba(255,255,255,.7);
+  letter-spacing: .045em;
+  line-height: 1.1;
+  text-shadow: 0 1px 3px rgba(255,255,255,.9), 0 0 2px rgba(255,255,255,.8);
   pointer-events: none;
 }
-.listing-card-media::before, .hot-card-media::before{ content: "HRYVNIA"; right: 43px; color: #17452f; }
-.listing-card-media::after, .hot-card-media::after{ content: "HUB"; right: 10px; color: #a8c928; }
-.hot-card-media::before, .hot-card-media::after{ bottom: 7px; font-size: 9px; }
-.hot-card-media::before{ right: 36px; }
-.hot-card-media::after{ right: 7px; }
+.photo-watermark span:first-child{ color: #17452f; }
+.photo-watermark span:last-child{ color: #a8c928; }
+.hot-card-media > .listing-photo-wrap{ overflow: hidden; }
+.hot-card-media .photo-watermark{ right: 7px; bottom: 6px; font-size: 9px; gap: 5px; }
+@media (max-width: 720px){
+  .listing-card-media > .listing-photo-wrap{ width: 100%; flex: 0 1 auto; }
+  .listing-card-media > .listing-photo-wrap > .listing-photo{ width: 100%; height: auto; max-height: none; }
+  .listing-card-media .photo-watermark{ right: 7px; bottom: 6px; font-size: 9px; gap: 5px; }
+}

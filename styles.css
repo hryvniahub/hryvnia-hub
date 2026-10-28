@@ -386,72 +386,16 @@ input:focus, select:focus, textarea:focus{ border-color: var(--accent-border); b
   display: none;
 }
 
-/* --- Единая дизайн-система меню категорий --- */
-:root{
-  --menu-bg: #102d22;
-  --menu-text: #f5f7f3;
-  --menu-accent: var(--accent);
-  --menu-divider: rgba(205, 225, 205, .16);
-  --menu-icon-border: rgba(168, 201, 40, .38);
-  --menu-icon-bg: rgba(168, 201, 40, .08);
-}
-.category-menu-backdrop{
-  position:fixed; inset:0; z-index:999;
-  background:rgba(8,18,13,.46);
-  -webkit-backdrop-filter:blur(8px);
-  backdrop-filter:blur(8px);
-}
-.category-menu{
-  position:fixed; z-index:1000; left:50%; top:50%;
-  transform:translate(-50%,-50%);
-  width:min(92vw,430px); max-height:min(82dvh,620px);
-  overflow:auto; padding:20px;
-  border:1px solid rgba(168,201,40,.16);
-  border-radius:22px;
-  background:var(--menu-bg);
-  color:var(--menu-text);
-  box-shadow:0 24px 80px rgba(0,0,0,.28);
-}
-.category-menu h2{
-  margin:0 42px 16px 0;
-  color:#fff; font-size:22px; font-weight:800; line-height:1.2;
-}
-.category-menu-close{
-  position:absolute; top:12px; right:12px;
-  display:inline-flex; align-items:center; justify-content:center;
-  width:38px; height:38px; padding:0;
-  border:1px solid rgba(245,247,243,.22); border-radius:50%;
-  background:rgba(245,247,243,.07); color:var(--menu-text);
-  font-size:24px; line-height:1; cursor:pointer;
-  transition:background .15s ease,border-color .15s ease;
-}
-.category-menu-close:hover{
-  background:rgba(168,201,40,.12);
-  border-color:var(--menu-icon-border);
-}
-.category-menu-options{display:flex; flex-direction:column; width:100%;}
-.category-menu-option{
-  display:flex; align-items:center; justify-content:flex-start;
-  gap:12px; width:100%; min-height:49px; padding:10px 7px;
-  border:0; border-bottom:1px solid var(--menu-divider);
-  background:transparent; color:var(--menu-text);
-  text-align:left; font-size:16px; cursor:pointer;
-  transition:background .15s ease,color .15s ease;
-}
-.category-menu-option:hover,
-.category-menu-option:focus-visible{
-  background:rgba(168,201,40,.07); color:var(--menu-text);
-}
-.category-menu-option span:last-child{
-  flex:0 0 auto; margin-left:auto; color:var(--menu-accent);
-}
-.category-menu-icon{
-  flex:0 0 30px; width:30px; height:30px;
-  display:inline-flex; align-items:center; justify-content:center;
-  border:1px solid var(--menu-icon-border); border-radius:6px;
-  background:var(--menu-icon-bg); color:var(--menu-accent);
-  text-align:center; font-size:18px; line-height:1;
-}
+/* --- Меню категорий (Темная стеклянная тема) --- */
+.category-menu-backdrop{ position: fixed; inset: 0; z-index: 999; background: rgba(8, 18, 13, .46); backdrop-filter: blur(8px); }
+.category-menu{ position: fixed; z-index: 1000; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(92vw, 430px); max-height: min(82dvh, 620px); overflow: auto; padding: 20px; border-radius: 22px; background: rgba(18, 39, 29, .96); color: #f7f9f5; box-shadow: 0 24px 80px rgba(0,0,0,.28); }
+.category-menu h2{ margin: 0 34px 18px 0; font-size: 22px; color: #fff; }
+.category-menu-close{ position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border: 1px solid rgba(255, 255, 255, .22); border-radius: 50%; background: rgba(255, 255, 255, .07); color: #f7f9f5; font-size: 24px; cursor: pointer; }
+.category-menu-options{ display: flex; flex-direction: column; width: 100%; }
+.category-menu-option{ display: flex; align-items: center; justify-content: flex-start; gap: 12px; width: 100%; padding: 12px 8px; border: 0; border-bottom: 1px solid rgba(255, 255, 255, .16); background: transparent; color: #f7f9f5; text-align: left; font-size: 16px; cursor: pointer; }
+.category-menu-option:hover{ background: rgba(168,  201,  40, .07); color: var(--accent); }
+.category-menu-option span:last-child{ margin-left: auto; color: var(--accent); }
+.category-menu-icon{ flex: 0 0 28px; width: 28px; text-align: center; color: var(--accent); }
 
 /* --- Выпадающие подсказки городов --- */
 .city-search{ position: relative; min-width: 0; margin-top: 6px; }
@@ -2635,22 +2579,30 @@ main{
   padding:11px 7px;
   gap:10px;
 }
-.real-estate-option .category-menu-icon{font-size:19px;}
+.real-estate-option .category-menu-icon{
+  flex-basis:30px;
+  width:30px;
+  height:30px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid rgba(168,201,40,.38);
+  border-radius:6px;
+  background:rgba(168,201,40,.08);
+  font-size:19px;
+}
 .real-estate-option .category-menu-option-label{
   font-size:15px;
   font-weight:650;
 }
-.real-estate-option-arrow{color:var(--menu-accent);font-size:23px;line-height:1;}
+.real-estate-option-arrow{color:var(--accent);font-size:23px;line-height:1;}
 @media(max-width:480px){
   .category-menu{width:min(94vw,430px);padding:16px;max-height:84dvh;}
   .category-menu h2{font-size:20px;margin-bottom:14px;}
-  .category-menu-close{width:36px;height:36px;top:10px;right:10px;}
-  .category-menu-option{min-height:46px;padding:10px 5px;gap:8px;}
-  .category-menu-icon{flex-basis:30px;width:30px;height:30px;}
   .real-estate-tabs{gap:4px;padding:4px;margin-bottom:9px;}
   .real-estate-tab{min-height:38px;font-size:13px;}
   .category-menu-option.real-estate-option{min-height:46px;padding:10px 5px;gap:8px;}
-  .category-menu-option .category-menu-option-label{font-size:14px;}
+  .real-estate-option .category-menu-option-label{font-size:14px;}
 }
 
 

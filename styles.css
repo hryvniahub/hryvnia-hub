@@ -2459,3 +2459,14 @@ main{
   .market-ticker .ticker-item[data-ticker-item="usd"] .ticker-source::before,
   .market-ticker .ticker-item[data-ticker-item="pln"] .ticker-source::before { flex-basis: 7px; width: 7px; height: 7px; margin-right: 1px; }
 }
+
+/* Hryvnia Hub — final micro-adjustments (2026-10-28)
+   Category arrows are ~20% larger; listing condition text is darker and lighter in weight. */
+.category-card::after{
+  font-size: 30px;
+}
+
+.listing-card-condition{
+  color: #424b45;
+  font-weight: 500;
+}

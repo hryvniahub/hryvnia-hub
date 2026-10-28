@@ -50,6 +50,14 @@ const translations = {
   "Категорії": { ru: "Категории", uk: "Категорії", en: "Categories", pl: "Kategorie" },
   "Автомобили": { ru: "Автомобили", uk: "Автомобілі", en: "Cars", pl: "Samochody" },
   "Недвижимость": { ru: "Недвижимость", uk: "Нерухомість", en: "Real estate", pl: "Nieruchomości" },
+  "Продажа": { ru: "Продажа", uk: "Продаж", en: "For sale", pl: "Sprzedaż" },
+  "Аренда": { ru: "Аренда", uk: "Оренда", en: "For rent", pl: "Wynajem" },
+  "Квартиры": { ru: "Квартиры", uk: "Квартири", en: "Apartments", pl: "Mieszkania" },
+  "Дома": { ru: "Дома", uk: "Будинки", en: "Houses", pl: "Domy" },
+  "Комнаты": { ru: "Комнаты", uk: "Кімнати", en: "Rooms", pl: "Pokoje" },
+  "Коммерческая недвижимость": { ru: "Коммерческая недвижимость", uk: "Комерційна нерухомість", en: "Commercial property", pl: "Nieruchomości komercyjne" },
+  "Гаражи и парковочные места": { ru: "Гаражи и парковочные места", uk: "Гаражі та паркомісця", en: "Garages and parking spaces", pl: "Garaże i miejsca parkingowe" },
+  "Земельные участки": { ru: "Земельные участки", uk: "Земельні ділянки", en: "Land plots", pl: "Działki" },
   "Готовый бизнес": { ru: "Готовый бизнес", uk: "Готовий бізнес", en: "Ready-made business", pl: "Gotowy biznes" },
   "Инвестиции": { ru: "Инвестиции", uk: "Інвестиції", en: "Investments", pl: "Inwestycje" },
   "Все категории": { ru: "Все категории", uk: "Усі категорії", en: "All categories", pl: "Wszystkie kategorie" },
@@ -3284,7 +3292,7 @@ async function loadListings() {
 
 // === Справочник марок/моделей ===
 const categorySubcategories = {
-  "Недвижимость": ["Купівля", "Оренда"],
+  "Недвижимость": ["Квартиры", "Дома", "Комнаты", "Коммерческая недвижимость", "Гаражи и парковочные места", "Земельные участки"],
   "Готовый бизнес": ["Куплю готовый бизнес", "Продам готовый бизнес", "Ищу бизнес-партнёра", "Услуги"],
   "Инвестиции": ["Ищу инвестора", "Стану инвестором", "Стартапы"]
 };
@@ -3333,10 +3341,34 @@ function closeCategoryMenu() {
 function closeVehicleSearch() { vehicleSearchMenu?.classList.add("hidden"); vehicleSearchBackdrop?.classList.add("hidden"); }
 function openCategoryMenu(parentCategory = "") {
   if (!categoryMenu || !categoryMenuOptions) return;
+
   const cats = [
     ["", "▦", "Все категории"], ["Автомобили", "🚗"], ["Недвижимость", "⌂"], ["Готовый бизнес", "▣"], ["Инвестиции", "▥"]
   ];
-  if (parentCategory) {
+
+  if (parentCategory === "Недвижимость") {
+    categoryMenuTitle.textContent = t("Недвижимость");
+    const propertyTypes = categorySubcategories[parentCategory] || [];
+    categoryMenuOptions.innerHTML = `
+      <div class="real-estate-tabs" role="tablist" aria-label="${escapeHtml(t("Недвижимость"))}">
+        ${["Все", "Продажа", "Аренда"].map((label, index) => `
+          <button type="button" class="real-estate-tab${index === 0 ? " active" : ""}"
+            role="tab" aria-selected="${index === 0 ? "true" : "false"}"
+            data-real-estate-deal="${escapeHtml(label)}">${escapeHtml(t(label))}</button>
+        `).join("")}
+      </div>
+      <div class="real-estate-options">
+        ${propertyTypes.map((label, index) => `
+          <button type="button" class="category-menu-option real-estate-option"
+            data-search-category="Недвижимость" data-search-subcategory="${escapeHtml(label)}">
+            <span class="category-menu-icon" aria-hidden="true">${["⌂", "⌂", "▤", "▦", "▰", "▱"][index]}</span>
+            <span class="category-menu-option-label">${escapeHtml(t(label))}</span>
+            <span class="real-estate-option-arrow" aria-hidden="true">›</span>
+          </button>
+        `).join("")}
+      </div>`;
+    categoryMenu.dataset.realEstateDeal = "Все";
+  } else if (parentCategory) {
     categoryMenuTitle.textContent = t(parentCategory === "Готовый бизнес" ? "Бизнес и предпринимательство" : parentCategory);
     const options = categorySubcategories[parentCategory] || [];
     categoryMenuOptions.innerHTML = options.map(label => `<button type="button" class="category-menu-option" data-search-category="${escapeHtml(parentCategory)}" data-search-subcategory="${escapeHtml(label)}"><span class="category-menu-icon" aria-hidden="true">•</span><span class="category-menu-option-label">${escapeHtml(t(label))}</span><span aria-hidden="true">›</span></button>`).join("");
@@ -3344,7 +3376,8 @@ function openCategoryMenu(parentCategory = "") {
     categoryMenuTitle.textContent = t("Категорії");
     categoryMenuOptions.innerHTML = cats.map(([key, icon, label]) => `<button type="button" class="category-menu-option" data-search-category="${escapeHtml(key)}" ${key ? 'data-open-submenu="1"' : 'data-all-categories="1"'}><span class="category-menu-icon" aria-hidden="true">${icon}</span><span class="category-menu-option-label">${escapeHtml(t(label || (key === "Готовый бизнес" ? "Бизнес и предпринимательство" : key)))}</span><span aria-hidden="true">›</span></button>`).join("");
   }
-  categoryMenu.classList.remove("hidden"); categoryMenuBackdrop?.classList.remove("hidden");
+  categoryMenu.classList.remove("hidden");
+  categoryMenuBackdrop?.classList.remove("hidden");
   categorySelectTrigger?.setAttribute("aria-expanded", "true");
 }
 function setVehicleSearchAdvanced(isOpen) {
@@ -3612,6 +3645,16 @@ document.getElementById("vehicleMarketRegister")?.addEventListener("click", () =
 
 categorySelectTrigger?.addEventListener("click", () => openCategoryMenu());
 categoryMenuOptions?.addEventListener("click", event => {
+  const dealTab = event.target.closest("[data-real-estate-deal]");
+  if (dealTab) {
+    categoryMenu.dataset.realEstateDeal = dealTab.dataset.realEstateDeal || "Все";
+    categoryMenuOptions.querySelectorAll("[data-real-estate-deal]").forEach(tab => {
+      const active = tab === dealTab;
+      tab.classList.toggle("active", active);
+      tab.setAttribute("aria-selected", String(active));
+    });
+    return;
+  }
   const option = event.target.closest("[data-search-category]"); if (!option) return;
   const category = option.dataset.searchCategory || "";
   if (option.hasAttribute("data-open-submenu")) {

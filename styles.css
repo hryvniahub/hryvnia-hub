@@ -2329,3 +2329,133 @@ main {
 .vehicle-search-tab:disabled,
 .vehicle-search-tab-close:disabled,
 .vehicle-search-tab-add:disabled { opacity: .5; cursor: wait; }
+
+
+/* ============================================================
+   HRYVNIA HUB — TICKER V1: RATE + MOVEMENT + OFFICIAL SOURCE
+   ============================================================ */
+.market-ticker {
+  padding: 5px 6px 4px;
+  background: #fff;
+}
+.ticker-scroll {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 3px;
+}
+.ticker-item {
+  align-items: flex-start;
+  gap: 4px;
+  padding: 0 4px;
+  min-width: 0;
+}
+.ticker-icon {
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
+  margin-top: 1px;
+}
+.ticker-details {
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 2px;
+}
+.ticker-label {
+  display: block;
+  font-size: 9px;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+.ticker-main {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 0;
+  line-height: 1.1;
+}
+.ticker-value {
+  display: block;
+  font-size: 11px;
+  line-height: 1.15;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.ticker-meta {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  white-space: nowrap;
+  line-height: 1.1;
+}
+.ticker-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 8px !important;
+  min-width: 8px !important;
+  margin: 0;
+  font-size: 8px !important;
+  font-weight: 900;
+  line-height: 1;
+  opacity: 1;
+}
+.ticker-change {
+  flex: 0 1 auto;
+  min-width: 0;
+  font-size: 8px;
+  line-height: 1.1;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.ticker-arrow.up, .ticker-change.up { color: #16843b !important; }
+.ticker-arrow.down, .ticker-change.down { color: #d12f24 !important; }
+.ticker-arrow.flat, .ticker-change.flat { color: #707a75 !important; }
+.ticker-source {
+  display: block !important;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #707a75;
+  font-size: 7px;
+  line-height: 1.1;
+  margin-left: 2px;
+}
+.ticker-note { display: none !important; }
+
+@media (max-width: 420px) {
+  .market-ticker { padding: 4px 3px 3px; }
+  .ticker-scroll { gap: 1px; }
+  .ticker-item { gap: 2px; padding-left: 2px !important; padding-right: 2px !important; }
+  .ticker-icon { flex-basis: 14px; width: 14px; height: 14px; font-size: 9px; }
+  .ticker-label { font-size: 7px; }
+  .ticker-value { font-size: 9px; }
+  .ticker-meta { gap: 1px; }
+  .ticker-arrow { flex-basis: 7px !important; min-width: 7px !important; font-size: 7px !important; }
+  .ticker-change { font-size: 7px; }
+  .ticker-source { font-size: 6px; margin-left: 1px; }
+}
+
+/* Hryvnia Hub — slightly larger and bolder listing-card specifications */
+.listing-card-horizontal .vehicle-spec-item {
+  color: #4b554e;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.listing-card-horizontal .listing-card-specs {
+  font-weight: 550;
+}
+@media (max-width: 720px) {
+  .listing-card-horizontal .vehicle-spec-item {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+}
+@media (max-width: 380px) {
+  .listing-card-horizontal .vehicle-spec-item {
+    font-size: 12.5px;
+  }
+}

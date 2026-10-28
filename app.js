@@ -3380,6 +3380,31 @@ function openCategoryMenu(parentCategory = "") {
   categoryMenuBackdrop?.classList.remove("hidden");
   categorySelectTrigger?.setAttribute("aria-expanded", "true");
 }
+
+// Shared entry point for category cards and the category picker.
+function openCategorySubmenu(category) {
+  if (!category) return;
+
+  selectedSearchCategory = category;
+  currentCategory = category;
+
+  if (categorySelectLabel) {
+    categorySelectLabel.textContent = t(
+      category === "Готовый бизнес" ? "Бизнес и предпринимательство" : category
+    );
+  }
+
+  document.querySelectorAll(".category").forEach(button => {
+    button.classList.toggle("active", (button.dataset.category || "") === category);
+  });
+
+  if (category === "Автомобили") {
+    openVehicleSearch();
+    return;
+  }
+
+  openCategoryMenu(category);
+}
 function setVehicleSearchAdvanced(isOpen) {
   const advanced = document.getElementById("vehicleSearchAdvanced");
   const toggle = document.getElementById("vehicleSearchToggleAdvanced");
@@ -3658,14 +3683,8 @@ categoryMenuOptions?.addEventListener("click", event => {
   const option = event.target.closest("[data-search-category]"); if (!option) return;
   const category = option.dataset.searchCategory || "";
   if (option.hasAttribute("data-open-submenu")) {
-    if (category === "Автомобили") {
-      selectedSearchCategory = category; currentCategory = category;
-      if (categorySelectLabel) categorySelectLabel.textContent = t(category);
-      document.querySelectorAll(".category").forEach(b => b.classList.toggle("active", (b.dataset.category || "") === category));
-      openVehicleSearch();
-      return;
-    }
-    openCategoryMenu(category); return;
+    openCategorySubmenu(category);
+    return;
   }
   const subcategory = option.dataset.searchSubcategory;
   // A category change starts a fresh catalog query; do not carry stale vehicle or city filters.
@@ -3690,10 +3709,7 @@ document.querySelectorAll(".category").forEach(button => {
     if (button.classList.contains("category-card") && category) {
       resetCatalogFilters();
       if (category !== "Автомобили") { vehicleSearchTabs = []; activeVehicleSearchTabId = ""; }
-      selectedSearchCategory = category; currentCategory = category;
-      if (categorySelectLabel) categorySelectLabel.textContent = t(category === "Готовый бизнес" ? "Бизнес и предпринимательство" : category);
-      if (category === "Автомобили") { openVehicleSearch(); return; }
-      openCategoryMenu(category);
+      openCategorySubmenu(category);
       return;
     }
     document.querySelectorAll(".category").forEach(b => b.classList.remove("active")); button.classList.add("active");

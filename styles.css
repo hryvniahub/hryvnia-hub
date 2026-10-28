@@ -2518,3 +2518,10 @@ main{
   .category-card[data-category="Готовый бизнес"] .category-card-long-word{ font-size: 12px; }
   .banner-title > span[data-i18n="than just listings"]{ font-size: 14px; }
 }
+
+
+/* Hryvnia Hub — align the supporting banner text with “ніж просто оголошення”. */
+.hero-text{ font-size: clamp(12px, calc(1.2vw), 15px); }
+@media (max-width: 720px){
+  .hero-text{ font-size: 14px; }
+}

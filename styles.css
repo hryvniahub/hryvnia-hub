@@ -2428,3 +2428,23 @@ main{
   font-size: 30px;
 }
 
+
+/* Hryvnia Hub photo watermark: discreet two-tone brand mark, no opaque panel. */
+.listing-card-media::before, .listing-card-media::after,
+.hot-card-media::before, .hot-card-media::after{
+  position: absolute;
+  bottom: 10px;
+  z-index: 1;
+  display: block;
+  font-size: clamp(9px, 1.05vw, 12px);
+  font-weight: 850;
+  letter-spacing: .055em;
+  line-height: 1.2;
+  text-shadow: 0 1px 3px rgba(255,255,255,.85), 0 0 2px rgba(255,255,255,.7);
+  pointer-events: none;
+}
+.listing-card-media::before, .hot-card-media::before{ content: "HRYVNIA"; right: 43px; color: #17452f; }
+.listing-card-media::after, .hot-card-media::after{ content: "HUB"; right: 10px; color: #a8c928; }
+.hot-card-media::before, .hot-card-media::after{ bottom: 7px; font-size: 9px; }
+.hot-card-media::before{ right: 36px; }
+.hot-card-media::after{ right: 7px; }

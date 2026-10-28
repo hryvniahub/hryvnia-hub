@@ -2295,7 +2295,7 @@ main{
   gap: 9px;
   min-width: 0;
   padding: 0 12px;
-  border-left: 1px solid #dfe5e1;
+  border-left: 3px solid #174c3a; /* фирменный тёмно-зелёный разделитель */
 }
 .market-ticker .ticker-item:first-child { border-left: 0; padding-left: 2px; }
 .market-ticker .ticker-icon {

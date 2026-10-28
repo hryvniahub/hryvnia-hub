@@ -2295,7 +2295,7 @@ main{
   gap: 9px;
   min-width: 0;
   padding: 0 12px;
-  border-left: 1px solid #dfe5e1;
+  border-left: 3px solid #174c3a; /* фирменный тёмно-зелёный разделитель */
 }
 .market-ticker .ticker-item:first-child { border-left: 0; padding-left: 2px; }
 .market-ticker .ticker-icon {
@@ -2504,17 +2504,38 @@ main{
   box-shadow: none !important;
 }
 
-/* Hryvnia Hub — second micro-adjustment to category and banner typography. */
-.category-card-label{ font-size: 14px; }
+/* Hryvnia Hub — third micro-adjustment to category and banner typography. */
+.category-card-label{ font-size: 13px; }
 .category-card-long-word{ font-size: 12px; }
 .category-card[data-category="Готовый бизнес"] .category-card-long-word{ font-size: 12px; }
-.banner-title .banner-title-accent{ font-size: calc(1em + 2px); }
+.banner-title .banner-title-accent{ font-size: calc(1em + 3px); }
 /* Match “ніж просто оголошення” to the lower supporting banner text. */
-.banner-title > span[data-i18n="than just listings"]{ font-size: clamp(13px, calc(1.2vw + 1px), 16px); }
+.banner-title > span[data-i18n="than just listings"]{ font-size: clamp(12px, calc(1.2vw), 15px); }
 
 @media (max-width: 720px){
-  .category-card-label{ font-size: 15px; }
+  .category-card-label{ font-size: 14px; }
   .category-card-long-word{ font-size: 12px; }
   .category-card[data-category="Готовый бизнес"] .category-card-long-word{ font-size: 12px; }
-  .banner-title > span[data-i18n="than just listings"]{ font-size: 15px; }
+  .banner-title > span[data-i18n="than just listings"]{ font-size: 14px; }
+}
+
+
+/* Hryvnia Hub — align the supporting banner text with “ніж просто оголошення”. */
+.hero-text{ font-size: clamp(12px, calc(1.2vw), 15px); }
+@media (max-width: 720px){
+  .hero-text{ font-size: 14px; }
+}
+
+/* Hryvnia Hub — move category labels and icons 6px left and down. */
+.category-card-label{
+  left: 6px !important;
+  bottom: 3px !important;
+  max-width: calc(100% - 12px) !important;
+}
+@media (max-width: 720px){
+  .category-card-label{
+    left: 2px !important;
+    bottom: 1px !important;
+    max-width: calc(100% - 4px) !important;
+  }
 }

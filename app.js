@@ -1860,8 +1860,10 @@ function setTickerValue(key, display, numeric, comparisonKey = key, digits = 2) 
   if (el) el.textContent = display;
   const arrow = document.querySelector(`[data-ticker-arrow="${key}"]`);
   const change = document.querySelector(`[data-ticker-change="${key}"]`);
+  const badge = change?.closest(".ticker-change-badge");
   if (arrow) { arrow.className = "ticker-arrow"; arrow.textContent = ""; }
-  if (change) { change.className = "ticker-change"; change.textContent = "—"; }
+  if (change) { change.className = "ticker-change"; change.textContent = ""; }
+  if (badge) { badge.classList.remove("up", "down", "flat"); badge.classList.add("is-empty"); }
   if (!Number.isFinite(numeric)) return;
 
   const prev = loadTickerPrev();
@@ -1871,12 +1873,14 @@ function setTickerValue(key, display, numeric, comparisonKey = key, digits = 2) 
     if (delta > 0) {
       if (arrow) { arrow.textContent = "▲"; arrow.classList.add("up"); }
       if (change) { change.textContent = `+${formatTickerNumber(Math.abs(delta), digits)}`; change.classList.add("up"); }
+      if (badge) { badge.classList.remove("is-empty"); badge.classList.add("up"); }
     } else if (delta < 0) {
       if (arrow) { arrow.textContent = "▼"; arrow.classList.add("down"); }
       if (change) { change.textContent = `−${formatTickerNumber(Math.abs(delta), digits)}`; change.classList.add("down"); }
+      if (badge) { badge.classList.remove("is-empty"); badge.classList.add("down"); }
     } else {
-      if (arrow) { arrow.textContent = "•"; arrow.classList.add("flat"); }
       if (change) { change.textContent = formatTickerNumber(0, digits); change.classList.add("flat"); }
+      if (badge) { badge.classList.remove("is-empty"); badge.classList.add("flat"); }
     }
   }
   prev[comparisonKey] = numeric;
@@ -1942,9 +1946,15 @@ async function loadMarketQuotes() {
       ? { usd: "🇺🇸", pln: "🇺🇦", xau: "🥇" }
       : { usd: "🇵🇱", pln: "🇺🇦", xau: "🥇" };
   for (const key of ["usd", "pln", "btc", "xau"]) tickerSetText("label", key, pairs[base][key]);
+  const tickerSubtitles = {
+    uk: { usd: "Долар США", pln: "Злотий", btc: "Біткоїн", xau: "Золото (за тройську унцію)" },
+    ru: { usd: "Доллар США", pln: "Злотый", btc: "Биткоин", xau: "Золото (за тройскую унцию)" },
+    en: { usd: "US Dollar", pln: "Polish Zloty", btc: "Bitcoin", xau: "Gold (per troy ounce)" },
+    pl: { usd: "Dolar amerykański", pln: "Złoty", btc: "Bitcoin", xau: "Złoto (za uncję trojańską)" }
+  };
+  for (const key of ["usd", "pln", "btc", "xau"]) tickerSetText("subtitle", key, (tickerSubtitles[lang] || tickerSubtitles.uk)[key]);
   tickerSetText("icon", "usd", icons.usd);
   tickerSetText("icon", "pln", icons.pln);
-  tickerSetText("icon", "xau", icons.xau);
 
   const goldUnitLabel = lang === "pl"
     ? "za uncję trojańską"

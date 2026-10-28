@@ -2456,13 +2456,13 @@ main{
   z-index: 2;
   display: flex;
   align-items: baseline;
-  gap: 5px;
-  padding: 4px 7px;
+  gap: 4.5px;
+  padding: 3.6px 6.3px;
   border: 1px solid #17452f;
-  border-radius: 9px;
+  border-radius: 8px;
   background: rgba(255,255,255,.96);
   box-sizing: border-box;
-  font-size: clamp(8px, .9vw, 10px);
+  font-size: clamp(7.2px, .81vw, 9px);
   font-weight: 850;
   letter-spacing: .045em;
   line-height: 1.1;
@@ -2476,7 +2476,7 @@ main{
   paint-order: stroke fill;
 }
 .hot-card-media > .listing-photo-wrap{ overflow: hidden; }
-.hot-card-media .photo-watermark{ right: 6px; bottom: 5px; padding: 3px 5px; font-size: 8px; gap: 4px; border-radius: 7px; }
+.hot-card-media .photo-watermark{ right: 6px; bottom: 5px; padding: 2.7px 4.5px; font-size: 7.2px; gap: 3.6px; border-radius: 6.3px; }
 .detail-photo-wrap{
   position: relative;
   width: 100%;
@@ -2488,10 +2488,10 @@ main{
   width: 100%;
   box-sizing: border-box;
 }
-.detail-photo-watermark{ right: 9px; bottom: 9px; }
+.detail-photo-watermark{ right: 9px; bottom: 9px; font-size: 9px; padding: 3.6px 5.4px; gap: 4.5px; border-radius: 8px; }
 @media (max-width: 720px){
   .listing-card-media > .listing-photo-wrap{ width: 100%; flex: 0 1 auto; }
   .listing-card-media > .listing-photo-wrap > .listing-photo{ width: 100%; height: auto; max-height: none; }
-  .listing-card-media .photo-watermark{ right: 6px; bottom: 5px; padding: 3px 5px; font-size: 8px; gap: 4px; border-radius: 7px; }
-  .detail-photo-watermark{ right: 7px; bottom: 7px; padding: 4px 6px; font-size: 9px; }
+  .listing-card-media .photo-watermark{ right: 6px; bottom: 5px; padding: 2.7px 4.5px; font-size: 7.2px; gap: 3.6px; border-radius: 6.3px; }
+  .detail-photo-watermark{ right: 7px; bottom: 7px; padding: 3.6px 5.4px; font-size: 8.1px; gap: 4.5px; border-radius: 8px; }
 }

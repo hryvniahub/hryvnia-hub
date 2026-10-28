@@ -172,7 +172,7 @@ button{ font-family: inherit; }
   display: flex; flex-direction: column; gap: 4px; align-items: center;
 }
 .banner-title{
-  margin: 0; font-size: clamp(18px, 2vw, 26px); font-weight: 800; line-height: 1.1;
+  margin: 0; font-size: clamp(19px, calc(2vw + 1px), 27px); font-weight: 800; line-height: 1.1;
   text-shadow: 0 2px 4px rgba(0,0,0,0.8);
 }
 .banner-title-accent{ color: #b9cf63; }
@@ -181,7 +181,7 @@ button{ font-family: inherit; }
   border-radius: 2px; background: var(--accent);
 }
 .hero-text{
-  margin: 0; font-size: clamp(12px, 1.2vw, 15px); font-weight: 600; line-height: 1.2;
+  margin: 0; font-size: clamp(13px, calc(1.2vw + 1px), 16px); font-weight: 600; line-height: 1.2;
   text-shadow: 0 1px 3px rgba(0,0,0,0.9);
 }
 .banner-icons{
@@ -626,6 +626,7 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
 /* Индикатор новых сообщений и нижняя навигация */
 .bottom-nav-btn{ position: relative; }
 .bottom-nav-btn .bottom-nav-icon svg, .bottom-nav-btn .bottom-nav-icon img{ display: block; width: 22px; height: 22px; }
+.bottom-nav-btn[data-nav="home"] .bottom-nav-icon svg{ width: 25px; height: 25px; }
 .bottom-nav-btn.active{ color: var(--accent); }
 .bottom-nav-btn.active .bottom-nav-label{ color: var(--accent); }
 .bottom-nav-btn[data-nav="home"] .bottom-nav-label{ color: #fff; }
@@ -821,9 +822,9 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
   /* Единые мобильные настройки баннера: без повторных переопределений */
   .main-banner{ height: clamp(104px, 20vw, 124px); padding: 10px 12px 24px; }
   .banner-content{ gap: 5px; padding-bottom: 0; }
-  .banner-title{ font-size: 17px; line-height: 1.08; transform: none; }
+  .banner-title{ font-size: 18px; line-height: 1.08; transform: none; }
   .banner-title::after{ width: 25px; height: 2px; margin-top: 3px; }
-  .hero-text{ font-size: 14px; line-height: 1.18; max-width: 100%; }
+  .hero-text{ font-size: 15px; line-height: 1.18; max-width: 100%; }
   .banner-icons{ bottom: 4px; gap: 12px; }
   .banner-icon{ width: 14px; height: 14px; }
   
@@ -1328,8 +1329,8 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
 .listing-card-heading{ display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; min-width: 0; }
 .listing-card-horizontal h3{ margin: 0 0 8px; color: #111;  line-height: 1.18; letter-spacing: -.02em; }
 .listing-card-horizontal .fav-btn{ position: static; flex: 0 0 40px; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 50%; background: #f3f6f2; color: #17241c; font-size: 25px; line-height: 1; }
-.listing-card-horizontal .listing-card-specs{ margin: 0 0 2px; color: #3f4642;  line-height: 1.35; overflow-wrap: anywhere; }
-.listing-card-horizontal .listing-card-specs span{ color: #89928b; padding: 0 3px; }
+.listing-card-horizontal .listing-card-specs{ margin: 0 0 2px; color: #303a34;  line-height: 1.35; overflow-wrap: anywhere; }
+.listing-card-horizontal .listing-card-specs span{ color: #68736c; padding: 0 3px; }
 .listing-card-horizontal .price{ display: flex; flex-wrap: nowrap; align-items: baseline; justify-content: flex-start; gap: 4px 8px; min-width: 0; margin: 0 0 5px; color: #080b09; font-size: clamp(25px, 2.7vw, 38px); line-height: 1.1; font-weight: 850; }
 .listing-card-horizontal .current-price{ flex: 0 1 auto; min-width: 0; white-space: nowrap; }
 .listing-card-horizontal .old-price{ flex: 0 0 auto; margin: 0;   line-height: 1.2;  white-space: nowrap; }
@@ -1663,9 +1664,9 @@ main{
   max-width: calc(100% - 24px);
   justify-content: flex-start;
   text-align: left;
-  font-size: 17px;
+  font-size: 16px;
 }
-.category-card-long-word{ font-size: 15px; }
+.category-card-long-word{ font-size: 14px; }
 
 @media (max-width: 720px) {
   .brand{
@@ -1680,7 +1681,7 @@ main{
     left: 8px;
     bottom: 7px;
     max-width: calc(100% - 16px);
-    font-size: 18px;
+    font-size: 17px;
     gap: 5px;
     flex-direction: row;
     align-items: center;
@@ -1694,7 +1695,7 @@ main{
   }
   .category-card[data-category="Готовый бизнес"] .category-card-long-word{
     display: block;
-    font-size: 15px;
+    font-size: 14px;
     white-space: normal;
   }
 
@@ -2258,9 +2259,9 @@ main{
 
 
 
-/* Hryvnia Hub — slightly larger and bolder listing-card specifications */
+/* Hryvnia Hub — improved contrast for listing-card specifications */
 .listing-card-horizontal .vehicle-spec-item{
-  color: #4b554e;
+  color: #354139;
   font-size: 14px;
   font-weight: 650;
   line-height: 1.3;

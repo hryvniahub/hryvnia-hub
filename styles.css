@@ -2525,3 +2525,17 @@ main{
 @media (max-width: 720px){
   .hero-text{ font-size: 14px; }
 }
+
+/* Hryvnia Hub — move category labels and icons 6px left and down. */
+.category-card-label{
+  left: 6px !important;
+  bottom: 3px !important;
+  max-width: calc(100% - 12px) !important;
+}
+@media (max-width: 720px){
+  .category-card-label{
+    left: 2px !important;
+    bottom: 1px !important;
+    max-width: calc(100% - 4px) !important;
+  }
+}

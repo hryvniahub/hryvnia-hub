@@ -2604,3 +2604,55 @@ main{
   .category-menu-option.real-estate-option{min-height:46px;padding:10px 5px;gap:8px;}
   .real-estate-option .category-menu-option-label{font-size:14px;}
 }
+
+
+/* Universal real-estate listing fields */
+.property-listing-fields{
+  min-width:0;
+  margin:8px 0 14px;
+  padding:14px;
+  border:1px solid var(--accent-border);
+  border-radius:14px;
+}
+.property-listing-fields[hidden]{display:none!important}
+.property-listing-fields legend{padding:0 6px;font-size:14px;font-weight:800;color:#174C3A}
+.property-listing-context,.property-listing-grid,.listing-price-row{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.property-listing-fields label,.listing-price-row label{
+  display:block;
+  min-width:0;
+  margin:0;
+  font-size:13px;
+  font-weight:700;
+}
+.property-listing-fields input,.property-listing-fields select,.listing-price-row input,.listing-price-row select{
+  display:block;
+  margin-top:6px;
+  min-width:0;
+}
+.property-listing-grid{margin-top:10px}
+.listing-price-row{grid-template-columns:minmax(0,1fr) 110px;margin:0 0 12px}
+#listingCurrencyField[hidden]{display:none!important}
+@media(max-width:560px){
+  .property-listing-context,.property-listing-grid{grid-template-columns:minmax(0,1fr)}
+  .listing-price-row{grid-template-columns:minmax(0,1fr) 100px}
+  .property-listing-fields{padding:11px}
+}
+
+.property-detail-specs{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px 12px;
+  margin:10px 0;
+}
+.property-detail-specs .vehicle-spec-item{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  font-size:13px;
+  font-weight:650;
+  color:var(--text);
+}

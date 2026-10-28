@@ -3366,26 +3366,41 @@ function openCategoryMenu(parentCategory = "") {
   ];
 
   if (parentCategory === "Недвижимость") {
+    // Keep the existing real-estate categories available. The new tabbed menu
+    // is intentionally limited to Apartments only.
     categoryMenuTitle.textContent = t("Недвижимость");
     const propertyTypes = categorySubcategories[parentCategory] || [];
     categoryMenuOptions.innerHTML = `
-      <div class="real-estate-tabs" role="tablist" aria-label="${escapeHtml(t("Недвижимость"))}">
-        ${["Все", "Продажа", "Аренда"].map((label, index) => `
-          <button type="button" class="real-estate-tab${index === 0 ? " active" : ""}"
-            role="tab" aria-selected="${index === 0 ? "true" : "false"}"
-            data-real-estate-deal="${escapeHtml(label)}">${escapeHtml(t(label))}</button>
-        `).join("")}
-      </div>
       <div class="real-estate-options">
         ${propertyTypes.map((label, index) => `
           <button type="button" class="category-menu-option real-estate-option"
-            data-search-category="Недвижимость" data-search-subcategory="${escapeHtml(label)}">
+            data-search-category="Недвижимость"
+            data-search-subcategory="${escapeHtml(label)}"
+            ${label === "Квартиры" ? 'data-apartment-menu="1"' : ""}>
             <span class="category-menu-icon" aria-hidden="true">${["⌂", "⌂", "▤", "▦", "▰", "▱"][index]}</span>
             <span class="category-menu-option-label">${escapeHtml(t(label))}</span>
             <span class="real-estate-option-arrow" aria-hidden="true">›</span>
           </button>
         `).join("")}
       </div>`;
+    delete categoryMenu.dataset.realEstateDeal;
+  } else if (parentCategory === "Квартиры") {
+    categoryMenuTitle.textContent = t("Квартиры");
+    categoryMenuOptions.innerHTML = `
+      <div class="real-estate-tabs" role="tablist" aria-label="${escapeHtml(t("Квартиры"))}">
+        ${["Все", "Продажа", "Аренда"].map((label, index) => `
+          <button type="button" class="real-estate-tab${index === 0 ? " active" : ""}"
+            role="tab" aria-selected="${index === 0 ? "true" : "false"}"
+            data-real-estate-deal="${escapeHtml(label)}">${escapeHtml(t(label))}</button>
+        `).join("")}
+      </div>
+      <button type="button" class="category-menu-option real-estate-option"
+        data-search-category="Недвижимость" data-search-subcategory="Квартиры"
+        data-apartment-search="1">
+        <span class="category-menu-icon" aria-hidden="true">⌂</span>
+        <span class="category-menu-option-label">${escapeHtml(t("Показать квартиры"))}</span>
+        <span class="real-estate-option-arrow" aria-hidden="true">›</span>
+      </button>`;
     categoryMenu.dataset.realEstateDeal = "Все";
   } else if (parentCategory) {
     delete categoryMenu.dataset.realEstateDeal;
@@ -3752,13 +3767,32 @@ categoryMenuOptions?.addEventListener("click", event => {
   }
   const option = event.target.closest("[data-search-category]"); if (!option) return;
   const category = option.dataset.searchCategory || "";
+  if (option.hasAttribute("data-apartment-menu")) {
+    openCategoryMenu("Квартиры");
+    return;
+  }
   if (option.hasAttribute("data-open-submenu")) {
     openCategorySubmenu(category);
     return;
   }
   const subcategory = option.dataset.searchSubcategory;
+  if (option.hasAttribute("data-apartment-search") && category === "Недвижимость") {
+    // This is a search action, not listing creation. The selected deal tab is
+    // retained in menu state for the apartment flow; filtering by operation
+    // requires a confirmed listing-schema field, so don't guess one here.
+    resetCatalogFilters();
+    selectedSearchCategory = "Недвижимость";
+    currentCategory = "Недвижимость";
+    if (searchInput) searchInput.value = "Квартиры";
+    if (categorySelectLabel) categorySelectLabel.textContent = t("Квартиры");
+    document.querySelectorAll(".category").forEach(button => button.classList.remove("active"));
+    closeCategoryMenu();
+    loadListings();
+    return;
+  }
   if (category === "Недвижимость" && subcategory) {
-    openPropertyListingForm(subcategory, categoryMenu.dataset.realEstateDeal || "Все");
+    // Preserve the existing behavior for every non-apartment property type.
+    openPropertyListingForm(subcategory, "");
     return;
   }
   // A category change starts a fresh catalog query; do not carry stale vehicle or city filters.

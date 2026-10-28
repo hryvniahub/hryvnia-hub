@@ -1927,21 +1927,10 @@ function tickerSetText(attribute, key, value) {
   const el = document.querySelector(`[data-ticker-${attribute}="${key}"]`);
   if (el) el.textContent = value;
 }
-function tickerSetSubtitles() {
-  const subtitles = {
-    uk: { usd: "Долар США", pln: "Злотий", btc: "Біткоїн", xau: "Золото (за тройську унцію)" },
-    ru: { usd: "Доллар США", pln: "Злотый", btc: "Биткоин", xau: "Золото (за тройскую унцию)" },
-    en: { usd: "US dollar", pln: "Polish złoty", btc: "Bitcoin", xau: "Gold (per troy ounce)" },
-    pl: { usd: "Dolar amerykański", pln: "Złoty polski", btc: "Bitcoin", xau: "Złoto (za uncję trojańską)" }
-  };
-  const labels = subtitles[lang] || subtitles.uk;
-  for (const key of ["usd", "pln", "btc", "xau"]) tickerSetText("subtitle", key, labels[key]);
-}
 async function loadMarketQuotes() {
   const note = document.getElementById("tickerNote");
   const unavailable = () => (translations["Quote unavailable"]?.[lang] || "Unavailable");
   const base = tickerBaseCurrency();
-  tickerSetSubtitles();
   const pairs = {
     UAH: { usd: "USD/UAH", pln: "PLN/UAH", btc: "BTC/UAH", xau: "XAU/UAH" },
     PLN: { usd: "USD/PLN", pln: "UAH/PLN", btc: "BTC/PLN", xau: "XAU/PLN" },
@@ -1956,6 +1945,14 @@ async function loadMarketQuotes() {
   tickerSetText("icon", "usd", icons.usd);
   tickerSetText("icon", "pln", icons.pln);
   tickerSetText("icon", "xau", icons.xau);
+
+  const goldUnitLabel = lang === "pl"
+    ? "za uncję trojańską"
+    : lang === "en"
+      ? "per troy ounce"
+      : lang === "ru"
+        ? "за тройскую унцию"
+        : "за тройську унцію";
 
   try {
     const [usdResult, plnResult, btcResult, xauResult] = await Promise.allSettled([
@@ -1996,13 +1993,14 @@ async function loadMarketQuotes() {
 
     const date = tickerDate(usdRow?.exchangedate || plnRow?.exchangedate);
     const sourceDate = date || (lang === "pl" ? "data NBP" : lang === "en" ? "NBU rate" : "курс НБУ");
+    const assetDate = tickerDate(new Date());
 
     setTickerValue("usd", formatTickerNumber(rates.usd, 2), rates.usd, pairs[base].usd, 2);
     setTickerValue("pln", formatTickerNumber(rates.pln, base === "USD" ? 4 : 2), rates.pln, pairs[base].pln, base === "USD" ? 4 : 2);
 
     if (Number.isFinite(btcUah) && btcUah > 0) {
       setTickerValue("btc", formatTickerNumber(rates.btc, 0), rates.btc, pairs[base].btc, 0);
-      tickerSetText("source", "btc", `CoinGecko · ${date || sourceDate}`);
+      tickerSetText("source", "btc", `CoinGecko · ${assetDate}`);
     } else {
       setTickerValue("btc", unavailable(), null);
       tickerSetText("source", "btc", "");
@@ -2011,7 +2009,7 @@ async function loadMarketQuotes() {
     if (Number.isFinite(rates.xau) && rates.xau > 0) {
       const digits = base === "USD" ? 2 : 0;
       setTickerValue("xau", formatTickerNumber(rates.xau, digits), rates.xau, pairs[base].xau, digits);
-      tickerSetText("source", "xau", `CoinGecko · ${date || sourceDate}`);
+      tickerSetText("source", "xau", `CoinGecko · ${assetDate}`);
     } else {
       setTickerValue("xau", unavailable(), null);
       tickerSetText("source", "xau", "");
@@ -2019,7 +2017,7 @@ async function loadMarketQuotes() {
 
     tickerSetText("source", "usd", `${lang === "pl" ? "NBP" : "НБУ"} · ${sourceDate}`);
     tickerSetText("source", "pln", `${lang === "pl" ? "NBP" : "НБУ"} · ${sourceDate}`);
-    if (note) note.textContent = lang === "pl" ? "Kursy walut" : lang === "en" ? "Currency rates" : lang === "ru" ? "Курсы валют" : "Курси валют";
+    if (note) note.textContent = "";
   } catch (error) {
     console.warn("Currency ticker unavailable:", error);
     if (listingRates) {

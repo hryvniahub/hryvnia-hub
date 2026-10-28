@@ -2459,3 +2459,98 @@ main {
     font-size: 12.5px;
   }
 }
+
+
+/* ============================================================
+   HRYVNIA HUB — FINAL EXCHANGE-RATE PANEL
+   ============================================================ */
+.market-ticker {
+  margin-top: 14px;
+  padding: 10px 12px;
+  background: #fff;
+  border-radius: 22px;
+  color: #123d31;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
+  overflow: hidden;
+}
+.ticker-scroll {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+}
+.ticker-item {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  min-width: 0;
+  padding: 4px 16px;
+  border-left: 1px solid #dfe5e1;
+}
+.ticker-item:first-child { border-left: 0; padding-left: 4px; }
+.ticker-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 40px; height: 40px;
+  margin-top: 2px;
+  border-radius: 50%;
+  font-size: 27px; line-height: 1;
+}
+.ticker-icon-usd, .ticker-icon-pln { background: #f4f6f6; }
+.ticker-icon-btc { background: #ff951b; color: #fff; font-weight: 800; }
+.ticker-icon-xau { background: #fff5d7; }
+.ticker-details { display: flex; flex-direction: column; gap: 0; min-width: 0; overflow: hidden; }
+.ticker-heading { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ticker-label { display: block; color: #103c30; font-size: 17px; line-height: 1.12; font-weight: 800; white-space: nowrap; }
+.ticker-subtitle { display: block; color: #78858a; font-size: 12px; line-height: 1.2; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ticker-main { display: flex; align-items: center; gap: 10px; min-width: 0; margin-top: 8px; line-height: 1.1; }
+.ticker-value { display: block; color: #102f27; font-size: clamp(19px, 2vw, 29px); line-height: 1.1; font-weight: 850; letter-spacing: -.5px; white-space: nowrap; }
+.ticker-movement { display: inline-flex; align-items: center; justify-content: center; gap: 4px; flex: none; padding: 6px 9px; border-radius: 999px; background: #e8f5e9; color: #16843b; white-space: nowrap; }
+.ticker-arrow { display: inline-flex; align-items: center; justify-content: center; flex: none !important; min-width: 0 !important; margin: 0; font-size: 14px !important; font-weight: 900; line-height: 1; }
+.ticker-change { flex: none; min-width: 0; font-size: 14px; line-height: 1; font-weight: 800; white-space: nowrap; }
+.ticker-movement:has(.down) { background: #fdebed; color: #d12f3d; }
+.ticker-arrow.up, .ticker-change.up { color: #16843b !important; }
+.ticker-arrow.down, .ticker-change.down { color: #d12f3d !important; }
+.ticker-arrow.flat, .ticker-change.flat { color: #77827d !important; }
+.ticker-source-row { display: flex; align-items: center; gap: 7px; min-width: 0; margin-top: 17px; padding-left: 0; color: #69777c; line-height: 1.15; }
+.ticker-source-row-nbu { margin-left: -1px; }
+.ticker-nbu-icon { display: block; width: 20px; height: 20px; flex: 0 0 20px; color: #65757b; }
+.ticker-source { display: block !important; flex: 1 1 auto; min-width: 0; overflow: hidden; color: #69777c; font-size: 12px; line-height: 1.15; font-weight: 550; text-overflow: ellipsis; white-space: nowrap; margin: 0; }
+.ticker-note { display: none !important; }
+@media (max-width: 900px) {
+  .market-ticker { padding: 8px 7px; border-radius: 17px; }
+  .ticker-item { grid-template-columns: 30px minmax(0, 1fr); gap: 6px; padding: 4px 8px; }
+  .ticker-item:first-child { padding-left: 2px; }
+  .ticker-icon { width: 30px; height: 30px; font-size: 21px; }
+  .ticker-label { font-size: 13px; }
+  .ticker-subtitle { font-size: 10px; }
+  .ticker-main { flex-wrap: wrap; gap: 4px 6px; margin-top: 7px; }
+  .ticker-value { font-size: clamp(16px, 2.5vw, 22px); letter-spacing: -.3px; }
+  .ticker-movement { gap: 3px; padding: 4px 6px; }
+  .ticker-arrow { font-size: 11px !important; }
+  .ticker-change { font-size: 11px; }
+  .ticker-source-row { gap: 4px; margin-top: 12px; }
+  .ticker-nbu-icon { width: 15px; height: 15px; flex-basis: 15px; }
+  .ticker-source { font-size: 9px; }
+}
+@media (max-width: 560px) {
+  .market-ticker { padding: 7px 5px; margin-top: 8px; border-radius: 14px; }
+  .ticker-scroll { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 0; }
+  .ticker-item { grid-template-columns: 26px minmax(0, 1fr); gap: 6px; padding: 9px 7px; border-left: 0; }
+  .ticker-item:nth-child(even) { border-left: 1px solid #dfe5e1; }
+  .ticker-item:nth-child(n+3) { border-top: 1px solid #dfe5e1; }
+  .ticker-item:first-child { padding-left: 7px; }
+  .ticker-icon { width: 26px; height: 26px; font-size: 18px; }
+  .ticker-label { font-size: 12px; }
+  .ticker-subtitle { font-size: 9px; }
+  .ticker-main { flex-wrap: nowrap; gap: 5px; margin-top: 6px; }
+  .ticker-value { font-size: clamp(15px, 4.5vw, 21px); letter-spacing: -.4px; }
+  .ticker-movement { gap: 2px; padding: 4px 5px; }
+  .ticker-arrow { font-size: 10px !important; }
+  .ticker-change { font-size: 10px; }
+  .ticker-source-row { margin-top: 10px; gap: 4px; }
+  .ticker-nbu-icon { width: 13px; height: 13px; flex-basis: 13px; }
+  .ticker-source { font-size: 8px; }
+}

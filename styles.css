@@ -2503,3 +2503,18 @@ main{
   border-radius: 14px !important;
   box-shadow: none !important;
 }
+
+/* Hryvnia Hub — second micro-adjustment to category and banner typography. */
+.category-card-label{ font-size: 14px; }
+.category-card-long-word{ font-size: 12px; }
+.category-card[data-category="Готовый бизнес"] .category-card-long-word{ font-size: 12px; }
+.banner-title .banner-title-accent{ font-size: calc(1em + 2px); }
+/* Match “ніж просто оголошення” to the lower supporting banner text. */
+.banner-title > span[data-i18n="than just listings"]{ font-size: clamp(13px, calc(1.2vw + 1px), 16px); }
+
+@media (max-width: 720px){
+  .category-card-label{ font-size: 15px; }
+  .category-card-long-word{ font-size: 12px; }
+  .category-card[data-category="Готовый бизнес"] .category-card-long-word{ font-size: 12px; }
+  .banner-title > span[data-i18n="than just listings"]{ font-size: 15px; }
+}

@@ -571,7 +571,7 @@ function listingPhotos(item) {
 function listingCover(item) {
   const url = listingPhotos(item)[0];
   if (typeof url === "string" && /^https?:\/\//i.test(url)) {
-    return `<img class="listing-photo" tabindex="0" role="button" src="${escapeHtml(url)}" alt="${escapeHtml(item.title)}" loading="lazy">`;
+    return `<span class="listing-photo-wrap"><img class="listing-photo" tabindex="0" role="button" src="${escapeHtml(url)}" alt="${escapeHtml(item.title)}" loading="lazy"><span class="photo-watermark" aria-hidden="true"><span>HRYVNIA</span><span>HUB</span></span></span>`;
   }
   const category = String(item.category || "");
   const drawings = {

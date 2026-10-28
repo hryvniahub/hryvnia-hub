@@ -2495,3 +2495,11 @@ main{
   .listing-card-media .photo-watermark{ right: 6px; bottom: 5px; padding: 2.7px 4.5px; font-size: 7.2px; gap: 3.6px; border-radius: 6.3px; }
   .detail-photo-watermark{ right: 7px; bottom: 7px; padding: 3.6px 5.4px; font-size: 8.1px; gap: 4.5px; border-radius: 8px; }
 }
+
+/* Hryvnia Hub — unify header logo frame with the photo watermark style. */
+.header .brand{
+  background: #ffffff !important;
+  border: 1px solid #17452f !important;
+  border-radius: 14px !important;
+  box-shadow: none !important;
+}

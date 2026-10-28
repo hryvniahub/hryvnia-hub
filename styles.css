@@ -1334,7 +1334,7 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
 .listing-card-horizontal .price{ display: flex; flex-wrap: nowrap; align-items: baseline; justify-content: flex-start; gap: 4px 8px; min-width: 0; margin: 0 0 5px; color: #080b09; font-size: clamp(25px, 2.7vw, 38px); line-height: 1.1; font-weight: 850; }
 .listing-card-horizontal .current-price{ flex: 0 1 auto; min-width: 0; white-space: nowrap; }
 .listing-card-horizontal .old-price{ flex: 0 0 auto; margin: 0;   line-height: 1.2;  white-space: nowrap; }
-.listing-card-condition{ margin: 5px 0 5px; color: #424A46; font-size: 15px; font-weight: 600; line-height: 1.25; white-space: nowrap; }
+.listing-card-condition{ margin: 5px 0 5px; color: #68736c; font-size: 14px; font-weight: 600; line-height: 1.25; white-space: nowrap; }
 .listing-card-meta{ display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: auto; padding-top: 12px; }
 .listing-card-horizontal .city{ color: #59635c;  }
 .listing-card-horizontal .hot-listing-badge, .listing-card-horizontal .urgent-listing-badge, .listing-card-horizontal .owner-listing-badge{ font-size: 11px; }
@@ -1424,7 +1424,7 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
 /* 2) Slightly improve text readability without enlarging the price or photos. */
 .listing-card-horizontal h3{ font-size: clamp(15px, 3.9vw, 20px); }
 .listing-card-horizontal .listing-card-specs{ font-size: clamp(11px, 2.9vw, 15px); }
-.listing-card-condition{ font-size: 15px; }
+.listing-card-condition{ font-size: 14px; }
 .listing-card-horizontal .city{ font-size: 12px; }
 
 /* 3) The standalone hot heading was removed from index.html; keep its section compact. */
@@ -1455,15 +1455,15 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
 /* 4) Fine-tune mobile listing typography: slightly larger specs, condition and city. */
 @media (max-width: 720px) {
   .listing-card-horizontal .listing-card-specs{
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
-    color: #424A46;
+    color: #68736c;
     line-height: 1.25;
   }
   .listing-card-condition{
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
-    color: #424A46;
+    color: #68736c;
     line-height: 1.25;
     white-space: nowrap;
   }
@@ -1474,8 +1474,8 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
   }
 }
 @media (max-width: 380px) {
-  .listing-card-horizontal .listing-card-specs{ font-size: 15px; }
-  .listing-card-condition{ font-size: 15px; }
+  .listing-card-horizontal .listing-card-specs{ font-size: 14px; }
+  .listing-card-condition{ font-size: 14px; }
   .listing-card-horizontal .city{ font-size: 13px; }
 }
 
@@ -2262,8 +2262,8 @@ main{
 
 /* Hryvnia Hub — unified vehicle-specification typography */
 .listing-card-horizontal .vehicle-spec-item{
-  color: #424A46;
-  font-size: 15px;
+  color: #68736c;
+  font-size: 14px;
   font-weight: 600;
   line-height: 1.25;
 }
@@ -2272,15 +2272,15 @@ main{
 }
 @media (max-width: 720px) {
   .listing-card-horizontal .vehicle-spec-item{
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     line-height: 1.25;
-    color: #424A46;
+    color: #68736c;
   }
 }
 @media (max-width: 380px) {
   .listing-card-horizontal .vehicle-spec-item{
-    font-size: 15px;
+    font-size: 14px;
   }
 }
 

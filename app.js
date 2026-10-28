@@ -571,7 +571,7 @@ function listingPhotos(item) {
 function listingCover(item) {
   const url = listingPhotos(item)[0];
   if (typeof url === "string" && /^https?:\/\//i.test(url)) {
-    return `<img class="listing-photo" tabindex="0" role="button" src="${escapeHtml(url)}" alt="${escapeHtml(item.title)}" loading="lazy">`;
+    return `<span class="listing-photo-wrap"><img class="listing-photo" tabindex="0" role="button" src="${escapeHtml(url)}" alt="${escapeHtml(item.title)}" loading="lazy"><span class="photo-watermark" aria-hidden="true"><span>HRYVNIA</span><span>HUB</span></span></span>`;
   }
   const category = String(item.category || "");
   const drawings = {
@@ -2590,7 +2590,10 @@ function openListing(item, galleryOnly = false) {
     <button type="button" class="modal-close" aria-label="${labels[0]}" data-close>×</button>
     <h2 id="listingDialogTitle" style="padding-right:24px">${escapeHtml(item.title)}</h2>
     ${photos.length ? `<section aria-label="${labels[3]}">
-      <img data-gallery-image alt="${escapeHtml(item.title)}" style="display:block;width:100%;height:auto;max-height:55dvh;object-fit:contain;border-radius:10px">
+      <div class="detail-photo-wrap">
+        <img data-gallery-image alt="${escapeHtml(item.title)}" style="display:block;width:100%;height:auto;max-height:55dvh;object-fit:contain;border-radius:10px">
+        <span class="photo-watermark detail-photo-watermark" aria-hidden="true"><span>HRYVNIA</span><span>HUB</span></span>
+      </div>
       <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0">
         <button type="button" class="btn" data-previous aria-label="${labels[1]}" ${photos.length < 2 ? "disabled" : ""}>←</button>
         <span data-counter role="status" aria-live="polite"></span>

@@ -2135,9 +2135,9 @@ main{
   align-items: center;
   gap: 5px;
   min-width: 0;
-  color: #68736c;
+  color: #424b45;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.25;
 }
 .listing-card-horizontal .vehicle-spec-icon{

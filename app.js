@@ -3369,10 +3369,12 @@ function openCategoryMenu(parentCategory = "") {
       </div>`;
     categoryMenu.dataset.realEstateDeal = "Все";
   } else if (parentCategory) {
+    delete categoryMenu.dataset.realEstateDeal;
     categoryMenuTitle.textContent = t(parentCategory === "Готовый бизнес" ? "Бизнес и предпринимательство" : parentCategory);
     const options = categorySubcategories[parentCategory] || [];
     categoryMenuOptions.innerHTML = options.map(label => `<button type="button" class="category-menu-option" data-search-category="${escapeHtml(parentCategory)}" data-search-subcategory="${escapeHtml(label)}"><span class="category-menu-icon" aria-hidden="true">•</span><span class="category-menu-option-label">${escapeHtml(t(label))}</span><span aria-hidden="true">›</span></button>`).join("");
   } else {
+    delete categoryMenu.dataset.realEstateDeal;
     categoryMenuTitle.textContent = t("Категорії");
     categoryMenuOptions.innerHTML = cats.map(([key, icon, label]) => `<button type="button" class="category-menu-option" data-search-category="${escapeHtml(key)}" ${key ? 'data-open-submenu="1"' : 'data-all-categories="1"'}><span class="category-menu-icon" aria-hidden="true">${icon}</span><span class="category-menu-option-label">${escapeHtml(t(label || (key === "Готовый бизнес" ? "Бизнес и предпринимательство" : key)))}</span><span aria-hidden="true">›</span></button>`).join("");
   }
@@ -3381,9 +3383,17 @@ function openCategoryMenu(parentCategory = "") {
   categorySelectTrigger?.setAttribute("aria-expanded", "true");
 }
 
-// Shared entry point for category cards and the category picker.
+// Single entry point for category cards and the text category picker.
+// Keep state reset, labels, active card and menu selection in one place.
 function openCategorySubmenu(category) {
   if (!category) return;
+
+  resetCatalogFilters();
+  if (category !== "Автомобили") {
+    vehicleSearchTabs = [];
+    activeVehicleSearchTabId = "";
+    closeVehicleSearch();
+  }
 
   selectedSearchCategory = category;
   currentCategory = category;
@@ -3403,6 +3413,7 @@ function openCategorySubmenu(category) {
     return;
   }
 
+  // Real estate always opens the full tabbed menu, never the old Buy/Rent-only menu.
   openCategoryMenu(category);
 }
 function setVehicleSearchAdvanced(isOpen) {
@@ -3707,8 +3718,6 @@ document.querySelectorAll(".category").forEach(button => {
   button.addEventListener("click", () => {
     const category = button.dataset.category || "";
     if (button.classList.contains("category-card") && category) {
-      resetCatalogFilters();
-      if (category !== "Автомобили") { vehicleSearchTabs = []; activeVehicleSearchTabId = ""; }
       openCategorySubmenu(category);
       return;
     }

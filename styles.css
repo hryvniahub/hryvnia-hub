@@ -1225,7 +1225,7 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
 #addModal .listing-progress-step.is-complete span{ color: #14271c; background: #78d98b; }
 #addModal .listing-progress > i{ height: 2px; flex: 1; margin-top: 13px; background: rgba(255,255,255,.15); }
 #addModal .listing-progress > i.is-complete{ background: #78d98b; }
-#addModal #vehicleListingMore{ grid-column: 1 / -1; margin: 4px 0 8px; }
+#addModal #vehicleListingMore{ grid-column: 1 / -1; margin: 10px 0 8px; }
 #addModal .vehicle-market-panel{ grid-column: 1 / -1; padding: 15px; border: 1px solid rgba(168, 201, 40,.28); border-radius: 16px; background: rgba(5,24,17,.62); }
 #addModal .vehicle-market-panel h3{ margin: 0 0 7px; font-size: 14px; color: rgba(247,249,245,.82); }
 #addModal .vehicle-market-price{ margin: 0 0 10px; font-size: clamp(20px, 4vw, 27px); font-weight: 850; color: #fff; }

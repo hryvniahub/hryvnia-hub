@@ -2957,17 +2957,6 @@ main{
   .property-search-menu .property-more-fields .property-search-amenities .property-amenity-grid label{font-size:12px !important;gap:6px !important;}
 }
 
-/* Hryvnia Hub — real-estate listing cards use the same typography as vehicle specs. */
-.listing-card-horizontal .property-card-specs{
-  display:block;
-  margin:0 0 3px;
-  color:#424b45;
-  font-size:14px;
-  font-weight:500;
-  line-height:1.25;
-  letter-spacing:0;
-  overflow-wrap:anywhere;
-}
 
 
 /* Property listing card: compact three-row specs aligned with vehicle cards. */

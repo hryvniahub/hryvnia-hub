@@ -2519,10 +2519,3 @@ main{
 .property-more-fields label{min-width:0;}
 .category-menu-options{overscroll-behavior:contain;-webkit-overflow-scrolling:touch;}
 @media(max-width:640px){.edit-property-grid{grid-template-columns:minmax(0,1fr);}.listing-edit-dialog{max-height:90dvh;overflow-y:auto;overscroll-behavior:contain;}}
-
-/* Compact property search: currency selector and icon-only advanced-filter toggle */
-.property-more-toggle{justify-content:flex-end;min-height:28px;padding:0 2px;}
-.property-more-toggle-label{display:none!important;}
-.property-more-toggle .property-section-chevron{color:var(--accent,#b5d63a);font-size:24px;line-height:1;}
-.property-more-fields .property-currency-field{grid-column:1/-1;max-width:100%;}
-.property-more-fields select{width:100%;min-width:0;box-sizing:border-box;padding:12px;border:1px solid rgba(219,240,228,.28);border-radius:12px;background:#fff;color:#173b2b;font:inherit;font-weight:700;}

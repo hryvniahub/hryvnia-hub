@@ -3851,8 +3851,8 @@ function preparePropertySearchMenu() {
       building: document.getElementById("propertyFilterBuilding")?.value || "",
       condition: document.getElementById("propertyFilterCondition")?.value || "",
       furniture: document.getElementById("propertyFilterFurniture")?.value || "",
-      balcony: document.getElementById("propertyFilterBalcony")?.value || "",
-      loggia: document.getElementById("propertyFilterLoggia")?.value || "",
+      balcony: document.getElementById("propertyFilterBalcony")?.checked ? "Есть" : "",
+      loggia: document.getElementById("propertyFilterLoggia")?.checked ? "Есть" : "",
       metroFrom: numFilter("propertyFilterMetroFrom"), metroTo: numFilter("propertyFilterMetroTo"),
       landFrom: numFilter("propertyFilterLandFrom"), landTo: numFilter("propertyFilterLandTo"),
       amenities: {
@@ -3969,19 +3969,23 @@ function openCategoryMenu(parentCategory = "") {
             <label>${escapeHtml(t("Площа кухні, м² до"))}<input id="propertyFilterKitchenTo" type="number" min="0" step="0.1"></label>
             <label>${escapeHtml(t("Стан"))}<select id="propertyFilterCondition"><option value="">${escapeHtml(t("Будь-який"))}</option>${["Новостройка","Новый ремонт","Жилое состояние","Нужен ремонт","Под ремонт"].map(v=>`<option value="${v}">${escapeHtml(t(v))}</option>`).join("")}</select></label>
             <label>${escapeHtml(t("Меблі"))}<select id="propertyFilterFurniture"><option value="">${escapeHtml(t("Будь-який"))}</option>${["Есть","Нет","Частично"].map(v=>`<option value="${v}">${escapeHtml(t(v))}</option>`).join("")}</select></label>
-            <label>${escapeHtml(t("Балкон"))}<select id="propertyFilterBalcony"><option value="">${escapeHtml(t("Будь-який"))}</option><option value="Есть">${escapeHtml(t("Есть"))}</option><option value="Нет">${escapeHtml(t("Нет"))}</option></select></label>
-            <label>${escapeHtml(t("Лоджія"))}<select id="propertyFilterLoggia"><option value="">${escapeHtml(t("Будь-який"))}</option><option value="Есть">${escapeHtml(t("Есть"))}</option><option value="Нет">${escapeHtml(t("Нет"))}</option></select></label>
+            <div class="property-search-amenities property-search-yesno">
+              <div class="property-amenity-grid">
+                <label><input type="checkbox" id="propertyFilterBalcony"><span>${escapeHtml(t("Балкон"))}</span></label>
+                <label><input type="checkbox" id="propertyFilterLoggia"><span>${escapeHtml(t("Лоджія"))}</span></label>
+              </div>
+            </div>
             <label>${escapeHtml(t("До метро, м від"))}<input id="propertyFilterMetroFrom" type="number" min="0"></label>
             <label>${escapeHtml(t("До метро, м до"))}<input id="propertyFilterMetroTo" type="number" min="0"></label>
             <label>${escapeHtml(t("Площа ділянки, соток від"))}<input id="propertyFilterLandFrom" type="number" min="0" step="0.1"></label>
             <label>${escapeHtml(t("Площа ділянки, соток до"))}<input id="propertyFilterLandTo" type="number" min="0" step="0.1"></label>
+            <label>${escapeHtml(t("Санузел"))}<select id="propertyFilterBathroom"><option value="">${escapeHtml(t("Будь-який"))}</option><option value="separate">${escapeHtml(t("Раздельный"))}</option><option value="combined">${escapeHtml(t("Совмещённый"))}</option></select></label>
             <div class="property-search-amenities">
               <strong>${escapeHtml(t("Удобства"))}</strong>
               <div class="property-amenity-grid">
                 ${[["Refrigerator","Холодильник"],["WashingMachine","Стиральная машина"],["Stove","Плита"],["Dishwasher","Посудомоечная машина"],["AirConditioning","Кондиционер"],["Internet","Интернет"],["Parking","Парковка"]].map(([id,label])=>`<label><input type="checkbox" id="propertyFilterAmenity${id}"><span>${escapeHtml(t(label))}</span></label>`).join("")}
               </div>
             </div>
-            <label>${escapeHtml(t("Санузел"))}<select id="propertyFilterBathroom"><option value="">${escapeHtml(t("Будь-який"))}</option><option value="separate">${escapeHtml(t("Раздельный"))}</option><option value="combined">${escapeHtml(t("Совмещённый"))}</option></select></label>
           </div>
         </section>
         <div class="property-search-actions">

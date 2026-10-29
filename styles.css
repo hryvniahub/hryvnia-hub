@@ -2382,9 +2382,53 @@ main{
 .listing-price-row{grid-template-columns:minmax(0,1fr) 110px;margin:0 0 12px}
 #listingCurrencyField[hidden]{display:none!important}
 @media(max-width:560px){
-  .property-listing-context,.property-listing-grid{grid-template-columns:minmax(0,1fr)}
+  /* Keep the property form's primary fields in the compact two-column layout
+     from the approved mobile design. The search menu has its own selectors. */
+  #addModal #addForm #propertyListingFields .property-listing-context,
+  #addModal #addForm #propertyListingFields .property-listing-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:9px;
+  }
+  #addModal #addForm .listing-advanced-common > label.property-location-field{
+    min-width:0;
+  }
+  #addModal #addForm #propertyAddressField{grid-column:1 / 2;}
+  #addModal #addForm #propertyRadiusField{grid-column:2 / 3;}
+  #addModal #addForm #propertyListingFields .property-listing-more,
+  #addModal #addForm #propertyListingFields .property-market-panel,
+  #addModal #addForm #propertyListingFields #propertyAdvancedFields{
+    grid-column:1 / -1;
+  }
+  #addModal #addForm #propertyListingFields .property-advanced-fields .property-listing-grid > label{
+    min-width:0;
+  }
   .listing-price-row{grid-template-columns:minmax(0,1fr) 100px}
   .property-listing-fields{padding:11px}
+}
+/* Property advanced parameters stay in two columns even on narrow phones. */
+#addModal #addForm #propertyListingFields #propertyAdvancedFields .property-listing-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  align-items:start;
+}
+#addModal #addForm #propertyListingFields #propertyAdvancedFields .property-listing-grid > label{
+  min-width:0;
+  grid-column:auto;
+}
+#addModal #addForm #propertyListingFields #propertyAdvancedFields h3{
+  grid-column:1 / -1;
+}
+@media(max-width:360px){
+  #addModal #addForm #propertyListingFields .property-listing-context,
+  #addModal #addForm #propertyListingFields .property-listing-grid,
+  #addModal #addForm #propertyListingFields #propertyAdvancedFields .property-listing-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:7px;
+  }
+  #addModal #addForm #propertyAddressField{grid-column:1 / 2;}
+  #addModal #addForm #propertyRadiusField{grid-column:2 / 3;}
+  #addModal #addForm #propertyListingFields .property-listing-fields label,
+  #addModal #addForm #propertyListingFields label{min-width:0;}
 }
 
 .property-detail-specs{

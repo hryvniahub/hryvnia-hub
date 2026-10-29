@@ -3215,19 +3215,28 @@ function vehicleCardSpecs(item) {
 function propertyCardSpecs(item) {
   if (String(item.category || "") !== "Недвижимость" || !item.property_details) return [];
   const details = item.property_details;
-  const locale = lang === "en" ? "en-US" : lang === "pl" ? "pl-PL" : lang === "uk" ? "uk-UA" : "ru-RU";
-  const specs = [];
-  const add = (icon, value, label) => {
-    if (value !== null && value !== undefined && String(value).trim() !== "") {
-      specs.push(`<span class="vehicle-spec-item" title="${escapeHtml(label)}"><span class="vehicle-spec-icon" aria-hidden="true">${icon}</span><span>${escapeHtml(String(value))}</span></span>`);
-    }
-  };
-  if (details.area_m2 != null) add("▱", `${details.area_m2} м²`, ({ru:"Общая площадь",uk:"Загальна площа",en:"Total area",pl:"Powierzchnia"})[lang]);
-  if (details.rooms) add("▦", `${details.rooms} ${({ru:"комн.",uk:"кімн.",en:"rooms",pl:"pok."})[lang] || "rooms"}`, ({ru:"Количество комнат",uk:"Кількість кімнат",en:"Rooms",pl:"Liczba pokoi"})[lang]);
-  if (details.floor != null && details.floors_total != null) add("⌂", `${details.floor}/${details.floors_total}`, ({ru:"Этаж / этажность",uk:"Поверх / поверховість",en:"Floor / floors",pl:"Piętro / liczba pięter"})[lang]);
-  else if (details.floor != null) add("⌂", details.floor, ({ru:"Этаж",uk:"Поверх",en:"Floor",pl:"Piętro"})[lang]);
-  if (details.furniture) add("▤", ({ru:{"Есть":"С мебелью","Нет":"Без мебели","Частично":"Частично"},uk:{"Есть":"З меблями","Нет":"Без меблів","Частично":"Частково"},en:{"Есть":"Furnished","Нет":"Unfurnished","Частично":"Partly furnished"},pl:{"Есть":"Umeblowane","Нет":"Bez mebli","Частично":"Częściowo umeblowane"}}[lang] || {})[details.furniture] || details.furniture, ({ru:"Мебель",uk:"Меблі",en:"Furniture",pl:"Meble"})[lang]);
-  return specs.length ? [specs] : [];
+  const words = {
+    ru: { room: "-комнатная", furnished: { "Есть": "С мебелью", "Нет": "Без мебели", "Частично": "Частично с мебелью" } },
+    uk: { room: "-кімнатна", furnished: { "Есть": "З меблями", "Нет": "Без меблів", "Частично": "Частково з меблями" } },
+    en: { room: "-bedroom", furnished: { "Есть": "Furnished", "Нет": "Unfurnished", "Частично": "Partly furnished" } },
+    pl: { room: " pokoje", furnished: { "Есть": "Umeblowane", "Нет": "Bez mebli", "Частично": "Częściowo umeblowane" } }
+  }[lang] || { room: "-bedroom", furnished: {} };
+  const line1 = [];
+  const line2 = [];
+  if (details.rooms !== null && details.rooms !== undefined && String(details.rooms).trim() !== "") {
+    line1.push(`${details.rooms}${words.room}`);
+  }
+  if (details.area_m2 !== null && details.area_m2 !== undefined && String(details.area_m2).trim() !== "") {
+    line1.push(`${details.area_m2} м²`);
+  }
+  if (details.floor !== null && details.floor !== undefined && String(details.floor).trim() !== "") {
+    const floorText = details.floors_total !== null && details.floors_total !== undefined && String(details.floors_total).trim() !== ""
+      ? ({ru:`${details.floor}-й этаж из ${details.floors_total}`,uk:`${details.floor}-й поверх із ${details.floors_total}`,en:`Floor ${details.floor} of ${details.floors_total}`,pl:`Piętro ${details.floor} z ${details.floors_total}`})[lang]
+      : ({ru:`${details.floor}-й этаж`,uk:`${details.floor}-й поверх`,en:`Floor ${details.floor}`,pl:`Piętro ${details.floor}`})[lang];
+    line2.push(floorText);
+  }
+  if (details.furniture) line2.push(words.furnished[details.furniture] || details.furniture);
+  return [line1, line2].filter(line => line.length).map(line => line.map(text => escapeHtml(String(text))).join(" · "));
 }
 
 function renderListings(items) {
@@ -3257,8 +3266,8 @@ function renderListings(items) {
     const myListingLabel = ({ uk: "Моє оголошення", ru: "Моё объявление", en: "My listing", pl: "Moje ogłoszenie" })[lang] || "My listing";
     const specs = [...vehicleCardSpecs(item), ...propertyCardSpecs(item)];
     const city = item.cities?.[`name_${lang}`] || item.cities?.name_ru || item.city || "";
-    const marketScale = String(item.category || "") === "Автомобили" && Number(item.price) > 0
-      ? `<div class="listing-market" aria-label="${escapeHtml(({ru:"Декоративный индикатор цены",uk:"Декоративний індикатор ціни",en:"Decorative price indicator",pl:"Dekoracyjny wskaźnik ceny"})[lang] || "Decorative price indicator")}"><span class="listing-market-bar" aria-hidden="true"></span></div>`
+    const marketScale = ["Автомобили", "Недвижимость"].includes(String(item.category || "")) && Number(item.price) > 0
+      ? `<div class="listing-market" aria-label="${escapeHtml(({ru:"Индикатор цены",uk:"Індикатор ціни",en:"Price indicator",pl:"Wskaźnik ceny"})[lang] || "Price indicator")}"><span class="listing-market-bar" aria-hidden="true"></span></div>`
       : "";
     return `
     <article class="card listing-card-horizontal${hasCover ? " has-cover" : " no-cover"}" data-listing-index="${index}" tabindex="0" role="button" aria-label="${escapeHtml(item.title)}" style="cursor:pointer">
@@ -3271,7 +3280,9 @@ function renderListings(items) {
           <h3>${escapeHtml(item.title || "")}</h3>
           <button class="fav-btn ${fav ? "active" : ""}" data-fav-id="${escapeHtml(String(item.id))}" type="button" aria-pressed="${fav ? "true" : "false"}" aria-label="${fav ? "Убрать из избранного" : "В избранное"}"><span aria-hidden="true">${fav ? "♥" : "♡"}</span></button>
         </div>
-        ${specs.map(row => `<div class="listing-card-specs vehicle-card-specs">${row.join("")}</div>`).join("")}
+        ${String(item.category || "") === "Недвижимость"
+          ? specs.map(row => `<div class="listing-card-specs property-card-specs">${Array.isArray(row) ? row.join("") : row}</div>`).join("")
+          : specs.map(row => `<div class="listing-card-specs vehicle-card-specs">${row.join("")}</div>`).join("")}
         ${String(item.category || "") === "Автомобили" && item.vehicle_operational_condition ? `<p class="listing-card-condition">${escapeHtml(t(item.vehicle_operational_condition))}</p>` : ""}
         <p class="price"><span class="current-price">${money(item.price, item.currency || "UAH")}</span>${item.previous_price != null && Number(item.previous_price) !== Number(item.price) ? `<span class="old-price">${money(item.previous_price, item.currency || "UAH")}</span>` : ""}</p>
         ${marketScale}

@@ -2136,34 +2136,25 @@ function renderCitySuggestionButton(entry, className) {
     ${regionLine}
   </button>`;
 }
-function renderCitySuggestionList({ input, container, className, regionCode = "", limit = 12, emptyPrompt = false, showAllWhenEmpty = false }) {
-  if (!input || !container) return;
-  const term = String(input.value || "").trim();
-  const variants = getQueryVariants(term);
-  const base = regionCode
-    ? citySearchIndex.filter(entry => String(entry.city.region_katottg_code) === String(regionCode))
-    : citySearchIndex;
-  const ranked = term || showAllWhenEmpty
-    ? base.map(entry => ({ entry, rank: term ? rankCityEntry(entry, variants) : 0 }))
-      .filter(item => item.rank >= 0)
-      .sort((a, b) => a.rank - b.rank || cityName(a.entry.city).localeCompare(cityName(b.entry.city)))
-      .slice(0, limit)
-      .map(item => item.entry)
-    : [];
-  container.innerHTML = ranked.length
-    ? ranked.map(entry => renderCitySuggestionButton(entry, className)).join("")
-    : `<div class="city-suggestion-empty" role="status">${escapeHtml(cityTranslation(term || !emptyPrompt ? "Город не найден" : "Введите название города"))}</div>`;
-  container.hidden = false;
-  input.setAttribute("aria-expanded", "true");
-  return ranked;
-}
 function closeCatalogCitySuggestions() {
   if (!catalogCitySuggestions) return;
   catalogCitySuggestions.hidden = true;
   catalogCitySearchInput?.setAttribute("aria-expanded", "false");
 }
 function renderCatalogCitySuggestions() {
-  renderCitySuggestionList({ input: catalogCitySearchInput, container: catalogCitySuggestions, className: "catalog-city-suggestion", regionCode: activeRegionCode, emptyPrompt: true });
+  if (!catalogCitySuggestions || !catalogCitySearchInput) return;
+  const term = catalogCitySearchInput.value;
+  const queryVariants = getQueryVariants(term);
+  const base = activeRegionCode ? citySearchIndex.filter(e => String(e.city.region_katottg_code) === activeRegionCode) : citySearchIndex;
+  const ranked = term ? base.map(entry => ({ entry, rank: rankCityEntry(entry, queryVariants) }))
+    .filter(item => item.rank >= 0)
+    .sort((a, b) => a.rank - b.rank || cityName(a.entry.city).localeCompare(cityName(b.entry.city)))
+    .slice(0, 12).map(item => item.entry) : [];
+  catalogCitySuggestions.innerHTML = ranked.length
+    ? ranked.map(entry => renderCitySuggestionButton(entry, "catalog-city-suggestion")).join("")
+    : `<div class="city-suggestion-empty" role="status">${escapeHtml(term ? cityTranslation("Город не найден") : cityTranslation("Введите название города"))}</div>`;
+  catalogCitySuggestions.hidden = false;
+  catalogCitySearchInput.setAttribute("aria-expanded", "true");
 }
 function selectCatalogCity(city) {
   selectedCatalogCityId = String(city.id);
@@ -2188,7 +2179,19 @@ function closeVehicleSearchCitySuggestions() {
   vehicleSearchCityInput?.setAttribute("aria-expanded", "false");
 }
 function renderVehicleSearchCitySuggestions() {
-  renderCitySuggestionList({ input: vehicleSearchCityInput, container: vehicleSearchCitySuggestions, className: "catalog-city-suggestion", regionCode: activeRegionCode, emptyPrompt: true });
+  if (!vehicleSearchCitySuggestions || !vehicleSearchCityInput) return;
+  const term = vehicleSearchCityInput.value;
+  const queryVariants = getQueryVariants(term);
+  const base = activeRegionCode ? citySearchIndex.filter(entry => String(entry.city.region_katottg_code) === String(activeRegionCode)) : citySearchIndex;
+  const ranked = term ? base.map(entry => ({ entry, rank: rankCityEntry(entry, queryVariants) }))
+    .filter(item => item.rank >= 0)
+    .sort((a, b) => a.rank - b.rank || cityName(a.entry.city).localeCompare(cityName(b.entry.city)))
+    .slice(0, 12).map(item => item.entry) : [];
+  vehicleSearchCitySuggestions.innerHTML = ranked.length
+    ? ranked.map(entry => renderCitySuggestionButton(entry, "catalog-city-suggestion")).join("")
+    : `<div class="city-suggestion-empty" role="status">${escapeHtml(cityTranslation(term ? "Город не найден" : "Введите название города"))}</div>`;
+  vehicleSearchCitySuggestions.hidden = false;
+  vehicleSearchCityInput.setAttribute("aria-expanded", "true");
 }
 function selectVehicleSearchCity(city) {
   selectedCatalogCityId = String(city.id);
@@ -2253,7 +2256,19 @@ function closeCitySuggestions() {
   citySearchInput?.setAttribute("aria-expanded", "false");
 }
 function renderCitySuggestions() {
-  renderCitySuggestionList({ input: citySearchInput, container: citySuggestions, className: "city-suggestion", regionCode: formRegionCode, showAllWhenEmpty: true });
+  if (!citySuggestions || !citySearchInput) return;
+  const term = citySearchInput.value;
+  const queryVariants = getQueryVariants(term);
+  const base = citySearchIndex.filter(entry => !formRegionCode || String(entry.city.region_katottg_code) === formRegionCode);
+  const ranked = base.map(entry => ({ entry, rank: rankCityEntry(entry, queryVariants) }))
+    .filter(item => item.rank >= 0)
+    .sort((a, b) => a.rank - b.rank || cityName(a.entry.city).localeCompare(cityName(b.entry.city)))
+    .slice(0, 12).map(item => item.entry);
+  citySuggestions.innerHTML = ranked.length
+    ? ranked.map(entry => renderCitySuggestionButton(entry, "city-suggestion")).join("")
+    : `<div class="city-suggestion-empty" role="status">${escapeHtml(cityTranslation("Город не найден"))}</div>`;
+  citySuggestions.hidden = false;
+  citySearchInput.setAttribute("aria-expanded", "true");
 }
 function selectCity(city) {
   citySelect.value = String(city.id);
@@ -2841,7 +2856,16 @@ async function editListing(item, labels) {
     editCityInput.setAttribute("aria-expanded", "false");
   };
   const renderEditCitySuggestions = () => {
-    renderCitySuggestionList({ input: editCityInput, container: editCitySuggestions, className: "edit-city-suggestion", showAllWhenEmpty: true });
+    const variants = getQueryVariants(editCityInput.value);
+    const ranked = citySearchIndex.map(entry => ({ entry, rank: rankCityEntry(entry, variants) }))
+      .filter(row => row.rank >= 0)
+      .sort((a, b) => a.rank - b.rank || cityName(a.entry.city).localeCompare(cityName(b.entry.city)))
+      .slice(0, 12).map(row => row.entry);
+    editCitySuggestions.innerHTML = ranked.length
+      ? ranked.map(entry => renderCitySuggestionButton(entry, "edit-city-suggestion")).join("")
+      : `<div class="city-suggestion-empty" role="status">${escapeHtml(cityTranslation("Город не найден"))}</div>`;
+    editCitySuggestions.hidden = false;
+    editCityInput.setAttribute("aria-expanded", "true");
   };
   const chooseEditCity = city => {
     editCityId.value = String(city.id);
@@ -3362,23 +3386,73 @@ function preparePropertySearchMenu() {
   const cityInput = document.getElementById("propertySearchCity");
   const citySuggestions = document.getElementById("propertySearchCitySuggestions");
   const regionSelect = document.getElementById("propertySearchRegion");
-  const typeSelect = document.getElementById("propertySearchType");
+  const typeTrigger = document.getElementById("propertyTypeTrigger");
+  const typeOptions = document.getElementById("propertyTypeOptions");
   if (!cityInput || cityInput.dataset.bound === "1") return;
   cityInput.dataset.bound = "1";
+
+  const closePropertyTypeOptions = () => {
+    if (typeOptions) typeOptions.hidden = true;
+    typeTrigger?.setAttribute("aria-expanded", "false");
+  };
+  typeTrigger?.addEventListener("click", () => {
+    if (!typeOptions) return;
+    const open = typeOptions.hidden;
+    typeOptions.hidden = !open;
+    typeTrigger.setAttribute("aria-expanded", String(open));
+  });
+  typeOptions?.addEventListener("click", event => {
+    const option = event.target.closest("[data-property-type]");
+    if (!option || !typeTrigger) return;
+    typeTrigger.dataset.value = option.dataset.propertyType || "";
+    const selectedLabel = typeTrigger.querySelector(".property-type-label");
+    if (selectedLabel) selectedLabel.textContent = option.textContent.trim();
+    typeOptions.querySelectorAll("[data-property-type]").forEach(item => {
+      const selected = item === option;
+      item.setAttribute("aria-selected", String(selected));
+      item.classList.toggle("is-selected", selected);
+    });
+    closePropertyTypeOptions();
+  });
+  typeTrigger?.addEventListener("keydown", event => {
+    if (event.key === "Escape") closePropertyTypeOptions();
+    if (event.key === "ArrowDown" && typeOptions) {
+      event.preventDefault();
+      typeOptions.hidden = false;
+      typeTrigger.setAttribute("aria-expanded", "true");
+      typeOptions.querySelector("[data-property-type]")?.focus();
+    }
+  });
+  typeOptions?.addEventListener("keydown", event => {
+    const options = [...typeOptions.querySelectorAll("[data-property-type]")];
+    const current = options.indexOf(document.activeElement);
+    if (event.key === "Escape") { closePropertyTypeOptions(); typeTrigger?.focus(); }
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      const delta = event.key === "ArrowDown" ? 1 : -1;
+      options[(current + delta + options.length) % options.length]?.focus();
+    }
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      document.activeElement?.click();
+    }
+  });
   const renderRegions = () => {
     if (!regionSelect) return;
     const codes = [...new Set(availableCities.map(city => String(city.region_katottg_code || "")).filter(Boolean))].sort();
     regionSelect.innerHTML = `<option value="">${escapeHtml(t("Область"))}</option>` + codes.map(code => `<option value="${escapeHtml(code)}">${escapeHtml(regionNames[code] || code)}</option>`).join("");
     regionSelect.value = activeRegionCode || "";
   };
-  const renderSuggestions = () => renderCitySuggestionList({
-    input: cityInput,
-    container: citySuggestions,
-    className: "property-city-suggestion",
-    regionCode: regionSelect?.value || "",
-    limit: 10,
-    emptyPrompt: true
-  });
+  const renderSuggestions = () => {
+    if (!citySuggestions) return;
+    const term = cityInput.value.trim();
+    const variants = getQueryVariants(term);
+    const base = regionSelect?.value ? citySearchIndex.filter(entry => String(entry.city.region_katottg_code) === regionSelect.value) : citySearchIndex;
+    const ranked = term ? base.map(entry => ({entry, rank: rankCityEntry(entry, variants)})).filter(item => item.rank >= 0).sort((a,b) => a.rank-b.rank || cityName(a.entry.city).localeCompare(cityName(b.entry.city))).slice(0,10).map(item => item.entry) : [];
+    citySuggestions.innerHTML = ranked.length ? ranked.map(entry => renderCitySuggestionButton(entry, "property-city-suggestion")).join("") : `<div class="city-suggestion-empty" role="status">${escapeHtml(cityTranslation(term ? "Город не найден" : "Введите название города"))}</div>`;
+    citySuggestions.hidden = false;
+    cityInput.setAttribute("aria-expanded", "true");
+  };
   const initCities = async () => {
     if (!availableCities.length) { try { await loadCities(); } catch (error) { console.error("Не удалось загрузить города для поиска недвижимости:", error); } }
     renderRegions();
@@ -3423,7 +3497,7 @@ function preparePropertySearchMenu() {
   });
   categoryMenuOptions?.querySelectorAll("[data-property-section]").forEach(button => button.addEventListener("click", () => {
     const section = button.dataset.propertySection;
-    const content = section === "location" ? document.getElementById("propertyLocationFields") : section === "category" ? typeSelect?.closest(".property-search-section")?.querySelector(".property-category-field") : button.closest(".property-search-section")?.querySelector(".real-estate-tabs");
+    const content = section === "location" ? document.getElementById("propertyLocationFields") : section === "category" ? typeTrigger?.closest(".property-search-section")?.querySelector(".property-category-field") : button.closest(".property-search-section")?.querySelector(".real-estate-tabs");
     const expanded = button.getAttribute("aria-expanded") !== "true";
     button.setAttribute("aria-expanded", String(expanded));
     if (content) content.hidden = !expanded;
@@ -3446,7 +3520,7 @@ function preparePropertySearchMenu() {
     currentCategory = "Недвижимость";
     selectedSearchCategory = "Недвижимость";
     propertySearchClientFilters = {
-      type: typeSelect?.value || "",
+      type: typeTrigger?.dataset.value || "",
       deal: categoryMenu?.dataset.realEstateDeal || "Все",
       priceFrom: fromNumbers[0], priceTo: fromNumbers[1], areaFrom: fromNumbers[2], areaTo: fromNumbers[3],
       address: document.getElementById("propertySearchAddress")?.value.trim() || "",
@@ -3487,7 +3561,13 @@ function openCategoryMenu(parentCategory = "") {
           <button type="button" class="property-section-heading" aria-expanded="true" data-property-section="category">
             <span class="property-section-icon" aria-hidden="true">⌂</span><span id="propertyCategoryTitle">${escapeHtml(t("Категорія нерухомості"))}</span><span class="property-section-chevron" aria-hidden="true">⌃</span>
           </button>
-          <label class="property-search-field property-category-field"><span class="property-field-icon" aria-hidden="true">▦</span><select id="propertySearchType" aria-label="${escapeHtml(t("Категорія нерухомості"))}"><option value="">${escapeHtml(t("Оберіть категорію"))}</option>${propertyTypes.map(label => `<option value="${escapeHtml(label)}">${escapeHtml(t(label))}</option>`).join("")}</select><span class="property-field-chevron" aria-hidden="true">⌄</span></label>
+          <div class="property-search-field property-category-field">
+            <span class="property-field-icon" aria-hidden="true">▦</span>
+            <button type="button" id="propertyTypeTrigger" class="property-type-trigger" data-value="" aria-haspopup="listbox" aria-expanded="false" aria-controls="propertyTypeOptions" aria-label="${escapeHtml(t("Категорія нерухомості"))}"><span class="property-type-label">${escapeHtml(t("Оберіть категорію"))}</span><span class="property-field-chevron" aria-hidden="true">⌄</span></button>
+            <div id="propertyTypeOptions" class="property-type-options" role="listbox" aria-label="${escapeHtml(t("Категорія нерухомості"))}" hidden>
+              ${[``, ...propertyTypes].map(label => { const value = label; const text = label ? t(label) : t("Оберіть категорію"); return `<button type="button" class="property-type-option${!label ? " is-selected" : ""}" role="option" aria-selected="${!label ? "true" : "false"}" data-property-type="${escapeHtml(value)}">${escapeHtml(text)}<span class="property-type-radio" aria-hidden="true"></span></button>`; }).join("")}
+            </div>
+          </div>
         </section>
         <section class="property-search-section property-deal-section" aria-labelledby="propertyDealTitle">
           <button type="button" class="property-section-heading" aria-expanded="true" data-property-section="deal">
@@ -3862,6 +3942,12 @@ function openPropertyListingForm(propertyType = "", operation = "") {
 }
 
 categoryMenuOptions?.addEventListener("click", event => {
+  if (!event.target.closest(".property-category-field")) {
+    const typeOptions = document.getElementById("propertyTypeOptions");
+    const typeTrigger = document.getElementById("propertyTypeTrigger");
+    if (typeOptions) typeOptions.hidden = true;
+    typeTrigger?.setAttribute("aria-expanded", "false");
+  }
   const dealTab = event.target.closest("[data-real-estate-deal]");
   if (dealTab) {
     categoryMenu.dataset.realEstateDeal = dealTab.dataset.realEstateDeal || "Все";
@@ -3973,7 +4059,7 @@ document.getElementById("addCategoryOptions")?.addEventListener("click", event =
   const category = option.dataset.addCategory;
   if (category === "Недвижимость") {
     closeAddCategoryMenu();
-    openPropertyListingForm();
+    openCategoryMenu("Недвижимость");
     return;
   }
   const categorySelect = addForm?.querySelector('select[name="category"]');

@@ -466,7 +466,34 @@ const translations = {
   "Цена": { ru: "Цена", uk: "Ціна", en: "Price", pl: "Cena" },
   "Фотографии": { ru: "Фотографии", uk: "Фотографії", en: "Photos", pl: "Zdjęcia" },
   "Добавить фотографии": { ru: "Добавить фотографии", uk: "Додати фотографії", en: "Add photos", pl: "Dodaj zdjęcia" },
+  "Комфорт и управление": { ru:"Комфорт и управление", uk:"Комфорт і керування", en:"Comfort and controls", pl:"Komfort i sterowanie" },
+  "Музыка и мультимедиа": { ru:"Музыка и мультимедиа", uk:"Музика та мультимедіа", en:"Audio and multimedia", pl:"Audio i multimedia" },
+  "Документы и принадлежности": { ru:"Документы и принадлежности", uk:"Документи та приладдя", en:"Documents and accessories", pl:"Dokumenty i wyposażenie" },
+  "Гидроусилитель руля": { ru:"ГУР", uk:"ГПК", en:"Power steering", pl:"Wspomaganie kierownicy" },
+  "Электростеклоподъёмники": { ru:"Электростеклоподъёмники", uk:"Електросклопідіймачі", en:"Power windows", pl:"Elektryczne szyby" },
+  "Подогрев сидений": { ru:"Подогрев сидений", uk:"Підігрів сидінь", en:"Heated seats", pl:"Podgrzewane fotele" },
+  "Подогрев заднего стекла": { ru:"Подогрев заднего стекла", uk:"Обігрів заднього скла", en:"Heated rear window", pl:"Podgrzewana tylna szyba" },
+  "Подогрев лобового стекла": { ru:"Подогрев лобового стекла", uk:"Обігрів лобового скла", en:"Heated windshield", pl:"Podgrzewana przednia szyba" },
+  "Подогрев зеркал": { ru:"Подогрев зеркал", uk:"Підігрів дзеркал", en:"Heated mirrors", pl:"Podgrzewane lusterka" },
+  "Магнитола 1 DIN": { ru:"Магнитола 1 DIN", uk:"Магнітола 1 DIN", en:"1-DIN head unit", pl:"Radio 1 DIN" },
+  "Магнитола 2 DIN": { ru:"Магнитола 2 DIN", uk:"Магнітола 2 DIN", en:"2-DIN head unit", pl:"Radio 2 DIN" },
+  "Запасное колесо (запаска)": { ru:"Запасное колесо (запаска)", uk:"Запасне колесо", en:"Spare wheel", pl:"Koło zapasowe" },
+  "Сервисная книжка": { ru:"Сервисная книжка", uk:"Сервісна книжка", en:"Service book", pl:"Książka serwisowa" },
+  "Комплект резины в подарок": { ru:"Комплект резины в подарок", uk:"Комплект шин у подарунок", en:"Tire set included as a gift", pl:"Komplet opon w prezencie" },
+  "Набор инструментов": { ru:"Набор инструментов", uk:"Набір інструментів", en:"Tool kit", pl:"Zestaw narzędzi" },
+  "Огнетушитель": { ru:"Огнетушитель", uk:"Вогнегасник", en:"Fire extinguisher", pl:"Gaśnica" },
+  "Аптечка": { ru:"Аптечка", uk:"Аптечка", en:"First-aid kit", pl:"Apteczka" },
+  "Bluetooth": { ru:"Bluetooth", uk:"Bluetooth", en:"Bluetooth", pl:"Bluetooth" },
+  "USB": { ru:"USB", uk:"USB", en:"USB", pl:"USB" },
   "Удобства": { ru:"Удобства", uk:"Зручності", en:"Amenities", pl:"Udogodnienia" },
+  "Оснащённость автомобиля": { ru:"Оснащённость автомобиля", uk:"Оснащення автомобіля", en:"Vehicle equipment", pl:"Wyposażenie samochodu" },
+  "Гидроусилитель руля": { ru:"Гидроусилитель руля", uk:"Гідропідсилювач керма", en:"Power steering", pl:"Wspomaganie kierownicy" },
+  "Электростеклоподъёмники": { ru:"Электростеклоподъёмники", uk:"Електросклопідіймачі", en:"Power windows", pl:"Elektryczne szyby" },
+  "Музыка": { ru:"Музыка", uk:"Музика", en:"Audio system", pl:"System audio" },
+  "Подогрев сидений": { ru:"Подогрев сидений", uk:"Підігрів сидінь", en:"Heated seats", pl:"Podgrzewane fotele" },
+  "Подогрев заднего стекла": { ru:"Подогрев заднего стекла", uk:"Обігрів заднього скла", en:"Heated rear window", pl:"Podgrzewana tylna szyba" },
+  "Подогрев лобового стекла": { ru:"Подогрев лобового стекла", uk:"Обігрів лобового скла", en:"Heated windshield", pl:"Podgrzewana przednia szyba" },
+  "Подогрев зеркал": { ru:"Подогрев зеркал", uk:"Підігрів дзеркал", en:"Heated mirrors", pl:"Podgrzewane lusterka" },
   "Холодильник": { ru:"Холодильник", uk:"Холодильник", en:"Refrigerator", pl:"Lodówka" },
   "Стиральная машина": { ru:"Стиральная машина", uk:"Пральна машина", en:"Washing machine", pl:"Pralka" },
   "Плита": { ru:"Плита", uk:"Плита", en:"Stove", pl:"Kuchenka" },
@@ -2563,9 +2590,9 @@ function ensureVehicleSearchTabs() {
 }
 function captureVehicleSearchTab() {
   const tab = ensureVehicleSearchTabs();
-  tab.filters = Object.fromEntries(VEHICLE_SEARCH_FILTER_IDS.map(id => {
+  tab.filters = Object.fromEntries([...VEHICLE_SEARCH_FILTER_IDS, ...["air_conditioning","power_steering","power_windows","audio","audio_usb","audio_bluetooth","audio_1din","audio_2din","seat_heating","rear_window_heating","windshield_heating","mirrors_heating","spare_wheel","service_book","tire_set_gift","toolkit","fire_extinguisher","first_aid_kit"].map(key => `vehicleFilter_${key}`)].map(id => {
     const el = document.getElementById(id);
-    return [id, el ? el.value : ""];
+    return [id, el?.type === "checkbox" ? el.checked : (el?.value ?? "")];
   }));
   tab.selectedCityId = selectedCatalogCityId;
   tab.regionCode = activeRegionCode;
@@ -2590,7 +2617,7 @@ function closeVehicleSearchTab(id) {
     activeVehicleSearchTabId = replacement.id;
     restoreVehicleSearchTab(replacement);
     document.getElementById("vehicleSearchReset")?.click();
-    replacement.filters = Object.fromEntries(VEHICLE_SEARCH_FILTER_IDS.map(filterId => [filterId, document.getElementById(filterId)?.value ?? ""]));
+    replacement.filters = Object.fromEntries([...VEHICLE_SEARCH_FILTER_IDS, ...["air_conditioning","power_steering","power_windows","audio","audio_usb","audio_bluetooth","audio_1din","audio_2din","seat_heating","rear_window_heating","windshield_heating","mirrors_heating","spare_wheel","service_book","tire_set_gift","toolkit","fire_extinguisher","first_aid_kit"].map(key => `vehicleFilter_${key}`)].map(filterId => { const el=document.getElementById(filterId); return [filterId, el?.type === "checkbox" ? el.checked : (el?.value ?? "")]; }));
     replacement.selectedCityId = "";
     replacement.regionCode = "";
     replacement.advanced = false;
@@ -2612,9 +2639,9 @@ function closeVehicleSearchTab(id) {
 }
 function restoreVehicleSearchTab(tab) {
   if (!tab) return;
-  VEHICLE_SEARCH_FILTER_IDS.forEach(id => {
+  [...VEHICLE_SEARCH_FILTER_IDS, ...["air_conditioning","power_steering","power_windows","audio","audio_usb","audio_bluetooth","audio_1din","audio_2din","seat_heating","rear_window_heating","windshield_heating","mirrors_heating","spare_wheel","service_book","tire_set_gift","toolkit","fire_extinguisher","first_aid_kit"].map(key => `vehicleFilter_${key}`)].forEach(id => {
     const el = document.getElementById(id);
-    if (el && id !== "vehicleSearchModel") el.value = tab.filters?.[id] ?? "";
+    if (el && id !== "vehicleSearchModel") { if (el.type === "checkbox") el.checked = Boolean(tab.filters?.[id]); else el.value = tab.filters?.[id] ?? ""; }
   });
   selectedCatalogCityId = tab.selectedCityId || "";
   activeRegionCode = tab.regionCode || "";
@@ -2658,7 +2685,7 @@ function addVehicleSearchTab() {
   restoreVehicleSearchTab(tab);
   // A new tab starts with clean filters, without changing any existing search.
   document.getElementById("vehicleSearchReset")?.click();
-  tab.filters = Object.fromEntries(VEHICLE_SEARCH_FILTER_IDS.map(id => [id, document.getElementById(id)?.value ?? ""]));
+  tab.filters = Object.fromEntries([...VEHICLE_SEARCH_FILTER_IDS, ...["air_conditioning","power_steering","power_windows","audio","audio_usb","audio_bluetooth","audio_1din","audio_2din","seat_heating","rear_window_heating","windshield_heating","mirrors_heating","spare_wheel","service_book","tire_set_gift","toolkit","fire_extinguisher","first_aid_kit"].map(key => `vehicleFilter_${key}`)].map(id => { const el=document.getElementById(id); return [id, el?.type === "checkbox" ? el.checked : (el?.value ?? "")]; }));
   tab.selectedCityId = "";
   tab.regionCode = "";
   tab.advanced = false;
@@ -2848,6 +2875,7 @@ async function editListing(item, labels) {
       <label>${escapeHtml(t("Количество дверей"))}<select name="vehicle_doors"><option value="">${escapeHtml(t("Выберите количество"))}</option>${[2,3,4,5].map(n => optPlain(n, item.vehicle_doors, String(n))).join("")}</select></label>
       <label>${escapeHtml(t("Цвет"))}<select name="vehicle_color"><option value="">${escapeHtml(t("Выберите цвет"))}</option>${colors.map((c,i) => `<option value="${c}" ${String(item.vehicle_color || "").toLowerCase() === c ? "selected" : ""}>${escapeHtml(t(colorKeys[i]))}</option>`).join("")}</select></label>
       <label>${escapeHtml(t("Тип продавца"))}<select name="seller_type">${sellerTypes.map(([v,k]) => `<option value="${v}" ${String(item.seller_type || "private") === v ? "selected" : ""}>${escapeHtml(t(k))}</option>`).join("")}</select></label>
+      <section class="vehicle-equipment property-amenities property-amenities-fixed"><h3>${escapeHtml(t("Оснащённость автомобиля"))}</h3><h4>${escapeHtml(t("Комфорт и управление"))}</h4><div class="property-amenity-grid">${[['air_conditioning','Кондиционер'],['power_steering','Гидроусилитель руля'],['power_windows','Электростеклоподъёмники'],['seat_heating','Подогрев сидений'],['rear_window_heating','Подогрев заднего стекла'],['windshield_heating','Подогрев лобового стекла'],['mirrors_heating','Подогрев зеркал']].map(([key,label])=>`<label><input type="checkbox" name="vehicle_equipment_${key}" ${item.vehicle_equipment?.[key] ? "checked" : ""}><span>${escapeHtml(t(label))}</span></label>`).join("")}</div><h4>${escapeHtml(t("Музыка и мультимедиа"))}</h4><div class="property-amenity-grid">${[['audio','Музыка'],['audio_usb','USB'],['audio_bluetooth','Bluetooth'],['audio_1din','Магнитола 1 DIN'],['audio_2din','Магнитола 2 DIN']].map(([key,label])=>`<label><input type="checkbox" name="vehicle_equipment_${key}" ${item.vehicle_equipment?.[key] ? "checked" : ""}><span>${escapeHtml(t(label))}</span></label>`).join("")}</div><h4>${escapeHtml(t("Документы и принадлежности"))}</h4><div class="property-amenity-grid">${[['spare_wheel','Запасное колесо (запаска)'],['service_book','Сервисная книжка'],['tire_set_gift','Комплект резины в подарок'],['toolkit','Набор инструментов'],['fire_extinguisher','Огнетушитель'],['first_aid_kit','Аптечка']].map(([key,label])=>`<label><input type="checkbox" name="vehicle_equipment_${key}" ${item.vehicle_equipment?.[key] ? "checked" : ""}><span>${escapeHtml(t(label))}</span></label>`).join("")}</div></section>
     </fieldset>` : "";
 
   const dialog = document.createElement("dialog");
@@ -2862,7 +2890,7 @@ async function editListing(item, labels) {
       <div class="edit-city-suggestions" id="editCitySuggestions" role="listbox" hidden></div>
     </label>
     <label>${escapeHtml(L.price)}<input name="price" type="number" min="0" step="0.01" required value="${escapeHtml(String(item.price ?? ""))}"></label>
-    ${String(item.category || "") === "Недвижимость" ? (() => { const d=item.property_details||{}; const val=(k)=>escapeHtml(String(d[k]??"")); const select=(name,label,opts,key)=>`<label>${escapeHtml(t(label))}<select name="${name}"><option value="">${escapeHtml(t("Не указано"))}</option>${opts.map(v=>`<option value="${escapeHtml(v)}" ${String(d[key]??"")===v?"selected":""}>${escapeHtml(t(v))}</option>`).join("")}</select></label>`; const num=(name,label,key)=>`<label>${escapeHtml(t(label))}<input name="${name}" type="number" min="0" step="0.1" value="${val(key)}"></label>`; return `<fieldset class="edit-property-fields" aria-label="${escapeHtml(t("Характеристики недвижимости"))}"><div class="edit-property-grid">${select("property_rooms","Кількість кімнат",["1","2","3","4","5+"],"rooms")}<label>${escapeHtml(t("Етаж"))}<input name="property_floor" type="number" min="0" step="1" value="${val("floor")}"></label><label>${escapeHtml(t("Етажність будівлі"))}<input name="property_floors_total" type="number" min="1" step="1" value="${val("floors_total")}"></label>${num("property_area_m2","Загальна площа, м²","area_m2")}${num("property_kitchen_area_m2","Площа кухні, м²","kitchen_area_m2")}${select("property_building_type","Тип будівлі",["Кирпичный","Панельный","Монолитный","Монолитно-кирпичный","Деревянный","Другое"],"building_type")}${select("property_condition","Стан",["Новостройка","Новый ремонт","Жилое состояние","Нужен ремонт","Под ремонт"],"condition")}${select("property_furniture","Меблі",["Есть","Нет","Частично"],"furniture")}${select("property_balcony","Балкон",["Есть","Нет"],"balcony")}${select("property_loggia","Лоджія",["Есть","Нет"],"loggia")}<label>${escapeHtml(t("До метро, м"))}<input name="property_metro_distance_m" type="number" min="0" step="1" value="${val("metro_distance_m")}"></label><label>${escapeHtml(t("До школи, м"))}<input name="property_school_distance_m" type="number" min="0" step="1" value="${val("school_distance_m")}"></label><label>${escapeHtml(t("До зупинки, м"))}<input name="property_stop_distance_m" type="number" min="0" step="1" value="${val("stop_distance_m")}"></label>${num("property_land_area_sotkas","Площа ділянки, соток","land_area_sotkas")}<details class="property-amenities"><summary>${escapeHtml(t("Удобства"))}</summary><div class="property-amenity-grid">${[["refrigerator","Холодильник"],["washing_machine","Стиральная машина"],["stove","Плита"],["dishwasher","Посудомоечная машина"],["air_conditioning","Кондиционер"],["internet","Интернет"],["parking","Парковка"]].map(([key,label])=>`<label><input type="checkbox" name="property_amenity_${key}" ${d.amenities?.[key] ? "checked" : ""}><span>${escapeHtml(t(label))}</span></label>`).join("")}</div><fieldset class="property-bathroom-field"><legend>${escapeHtml(t("Санузел"))}</legend>${[["separate","Раздельный"],["combined","Совмещённый"]].map(([value,label])=>`<label><input type="radio" name="property_bathroom_type" value="${value}" ${d.bathroom_type===value?"checked":""}><span>${escapeHtml(t(label))}</span></label>`).join("")}</fieldset></details></div></fieldset>`; })() : ""}
+    ${String(item.category || "") === "Недвижимость" ? (() => { const d=item.property_details||{}; const val=(k)=>escapeHtml(String(d[k]??"")); const select=(name,label,opts,key)=>`<label>${escapeHtml(t(label))}<select name="${name}"><option value="">${escapeHtml(t("Не указано"))}</option>${opts.map(v=>`<option value="${escapeHtml(v)}" ${String(d[key]??"")===v?"selected":""}>${escapeHtml(t(v))}</option>`).join("")}</select></label>`; const num=(name,label,key)=>`<label>${escapeHtml(t(label))}<input name="${name}" type="number" min="0" step="0.1" value="${val(key)}"></label>`; return `<fieldset class="edit-property-fields" aria-label="${escapeHtml(t("Характеристики недвижимости"))}"><div class="edit-property-grid">${select("property_rooms","Кількість кімнат",["1","2","3","4","5+"],"rooms")}<label>${escapeHtml(t("Етаж"))}<input name="property_floor" type="number" min="0" step="1" value="${val("floor")}"></label><label>${escapeHtml(t("Етажність будівлі"))}<input name="property_floors_total" type="number" min="1" step="1" value="${val("floors_total")}"></label>${num("property_area_m2","Загальна площа, м²","area_m2")}${num("property_kitchen_area_m2","Площа кухні, м²","kitchen_area_m2")}${select("property_building_type","Тип будівлі",["Кирпичный","Панельный","Монолитный","Монолитно-кирпичный","Деревянный","Другое"],"building_type")}${select("property_condition","Стан",["Новостройка","Новый ремонт","Жилое состояние","Нужен ремонт","Под ремонт"],"condition")}${select("property_furniture","Меблі",["Есть","Нет","Частично"],"furniture")}${select("property_balcony","Балкон",["Есть","Нет"],"balcony")}${select("property_loggia","Лоджія",["Есть","Нет"],"loggia")}<label>${escapeHtml(t("До метро, м"))}<input name="property_metro_distance_m" type="number" min="0" step="1" value="${val("metro_distance_m")}"></label><label>${escapeHtml(t("До школи, м"))}<input name="property_school_distance_m" type="number" min="0" step="1" value="${val("school_distance_m")}"></label><label>${escapeHtml(t("До зупинки, м"))}<input name="property_stop_distance_m" type="number" min="0" step="1" value="${val("stop_distance_m")}"></label>${num("property_land_area_sotkas","Площа ділянки, соток","land_area_sotkas")}<section class="property-amenities property-amenities-fixed"><h3>${escapeHtml(t("Удобства"))}</h3><div class="property-amenity-grid">${[["refrigerator","Холодильник"],["washing_machine","Стиральная машина"],["stove","Плита"],["dishwasher","Посудомоечная машина"],["air_conditioning","Кондиционер"],["internet","Интернет"],["parking","Парковка"]].map(([key,label])=>`<label><input type="checkbox" name="property_amenity_${key}" ${d.amenities?.[key] ? "checked" : ""}><span>${escapeHtml(t(label))}</span></label>`).join("")}</div><fieldset class="property-bathroom-field"><legend>${escapeHtml(t("Санузел"))}</legend>${[["separate","Раздельный"],["combined","Совмещённый"]].map(([value,label])=>`<label><input type="radio" name="property_bathroom_type" value="${value}" ${d.bathroom_type===value?"checked":""}><span>${escapeHtml(t(label))}</span></label>`).join("")}</fieldset></section></div></fieldset>`; })() : ""}
     <label>${escapeHtml(L.description)}<textarea name="description" rows="5" maxlength="10000">${escapeHtml(item.description || "")}</textarea></label>
     <fieldset class="edit-photo-fields">
       <legend>${escapeHtml(L.photos)}</legend>
@@ -3088,7 +3116,8 @@ async function editListing(item, labels) {
         vehicle_operational_condition: form.elements.vehicle_operational_condition.value || null,
         vehicle_doors: form.elements.vehicle_doors.value ? Number(form.elements.vehicle_doors.value) : null,
         vehicle_color: form.elements.vehicle_color.value || null,
-        seller_type: form.elements.seller_type.value || "private"
+        seller_type: form.elements.seller_type.value || "private",
+        vehicle_equipment: Object.fromEntries(["air_conditioning","power_steering","power_windows","audio","audio_usb","audio_bluetooth","audio_1din","audio_2din","seat_heating","rear_window_heating","windshield_heating","mirrors_heating","spare_wheel","service_book","tire_set_gift","toolkit","fire_extinguisher","first_aid_kit"].map(key => [key, Boolean(form.elements[`vehicle_equipment_${key}`]?.checked)]))
       });
     } else {
       const title = form.elements.title?.value.trim() || "";
@@ -3337,7 +3366,7 @@ async function loadListings() {
       }
       return;
     }
-    vehicleClientFilters = { make, model, yearFrom, yearTo, priceFrom, priceTo, currency, mileageFrom, mileageTo, engineFrom, engineTo, body, fuel, transmission, status, powerFrom, powerTo, doors, drive, color, sellerType, operationalCondition };
+    vehicleClientFilters = { make, model, yearFrom, yearTo, priceFrom, priceTo, currency, mileageFrom, mileageTo, engineFrom, engineTo, body, fuel, transmission, status, powerFrom, powerTo, doors, drive, color, sellerType, operationalCondition, equipment: Object.fromEntries(["air_conditioning","power_steering","power_windows","audio","audio_usb","audio_bluetooth","audio_1din","audio_2din","seat_heating","rear_window_heating","windshield_heating","mirrors_heating","spare_wheel","service_book","tire_set_gift","toolkit","fire_extinguisher","first_aid_kit"].map(key => [key, document.getElementById(`vehicleFilter_${key}`)?.checked === true])) };
     if (make) query = query.eq("vehicle_make_slug", make);
     if (model) query = query.eq("vehicle_model_slug", model);
     if (yearFrom !== null) query = query.gte("vehicle_year", yearFrom);
@@ -3413,6 +3442,7 @@ async function loadListings() {
         (!f.doors || String(item.vehicle_doors ?? "") === f.doors) &&
         (!f.drive || item.vehicle_drive === f.drive) &&
         (!f.color || String(item.vehicle_color || "").toLowerCase() === f.color) &&
+        Object.entries(f.equipment || {}).every(([key, required]) => !required || item.vehicle_equipment?.[key] === true) &&
         (!f.sellerType || item.seller_type === f.sellerType) &&
         (!f.operationalCondition || item.vehicle_operational_condition === f.operationalCondition) &&
         (String(item.currency || "UAH").toUpperCase() === f.currency)
@@ -4435,6 +4465,7 @@ document.getElementById("vehicleSearchToggleAdvanced")?.addEventListener("click"
 });
 document.getElementById("vehicleSearchReset")?.addEventListener("click", () => {
   ["vehicleSearchMake","vehicleSearchModel","vehicleYearFrom","vehicleYearTo","vehiclePriceFrom","vehiclePriceTo","vehicleMileageFrom","vehicleMileageTo","vehicleEngineFrom","vehicleEngineTo","vehicleBodyType","vehicleFuel","vehicleTransmission","vehicleSearchStatus","vehiclePowerFrom","vehiclePowerTo","vehicleDoors","vehicleDrive","vehicleColor","vehicleSellerType","vehicleSearchOperationalCondition"].forEach(id => { const el=document.getElementById(id); if(el) el.value=""; });
+  ["air_conditioning","power_steering","power_windows","audio","audio_usb","audio_bluetooth","audio_1din","audio_2din","seat_heating","rear_window_heating","windshield_heating","mirrors_heating","spare_wheel","service_book","tire_set_gift","toolkit","fire_extinguisher","first_aid_kit"].forEach(key => { const el=document.getElementById(`vehicleFilter_${key}`); if(el) el.checked=false; });
   const currency = document.getElementById("vehiclePriceCurrency"); if (currency) currency.value = "UAH";
   selectedCatalogCityId = ""; activeRegionCode = "";
   if (vehicleSearchCityInput) vehicleSearchCityInput.value = "";
@@ -4609,7 +4640,8 @@ if (addForm) {
         vehicle_operational_condition: form.get("vehicle_operational_condition") || null,
         vehicle_doors: form.get("vehicle_doors") ? Number(form.get("vehicle_doors")) : null,
         vehicle_color: form.get("vehicle_color") || null,
-        seller_type: form.get("seller_type") || "private"
+        seller_type: form.get("seller_type") || "private",
+        vehicle_equipment: Object.fromEntries(["air_conditioning","power_steering","power_windows","audio","audio_usb","audio_bluetooth","audio_1din","audio_2din","seat_heating","rear_window_heating","windshield_heating","mirrors_heating","spare_wheel","service_book","tire_set_gift","toolkit","fire_extinguisher","first_aid_kit"].map(key => [key, form.querySelector(`[name="vehicle_equipment_${key}"]`)?.checked === true]))
       });
     }
     if (!String(payload.title || "").trim()) {

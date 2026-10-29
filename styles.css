@@ -2399,7 +2399,19 @@ main{
   min-width:0;
   overflow-wrap:anywhere;
 }
+#addModal #addForm #propertyListingFields .property-listing-context{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  column-gap:10px;
+  row-gap:10px;
+}
+#addModal #addForm #propertyListingFields .property-listing-context > label{
+  min-width:0;
+}
 #addModal #addForm #propertyListingFields .property-listing-context select{
+  display:block;
+  width:100%;
+  max-width:100%;
+  box-sizing:border-box;
   padding:10px 9px;
   font-size:15px;
   text-overflow:ellipsis;

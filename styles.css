@@ -2382,6 +2382,10 @@ main{
 .property-section-chevron{margin-left:auto;color:var(--accent);font-size:25px;line-height:1;transition:transform .15s ease;}
 .property-section-heading[aria-expanded="false"] .property-section-chevron,.property-more-toggle[aria-expanded="true"] .property-section-chevron{transform:rotate(180deg);}
 .property-location-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+/* Keep collapsed property-search sections hidden even when their base layout uses grid/flex. */
+.property-location-grid[hidden],
+.property-category-field[hidden],
+.property-deal-section .real-estate-tabs[hidden]{display:none!important;}
 .property-search-field{position:relative;display:flex;align-items:center;gap:12px;min-width:0;min-height:58px;padding:0 13px;border:1px solid rgba(219,240,228,.28);border-radius:17px;background:rgba(0,28,20,.35);color:#f7f9f5;box-sizing:border-box;}
 .property-search-field:focus-within{border-color:rgba(212,255,0,.8);box-shadow:0 0 0 2px rgba(212,255,0,.08);}
 .property-field-icon{flex:0 0 27px;text-align:center;color:var(--accent);font-size:25px;line-height:1;}

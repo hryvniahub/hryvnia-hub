@@ -2957,15 +2957,3 @@ main{
   .property-search-menu .property-more-fields .property-search-amenities .property-amenity-grid label{font-size:12px !important;gap:6px !important;}
 }
 
-
-
-/* Property listing card: compact three-row specs aligned with vehicle cards. */
-.listing-card-horizontal .property-card-specs{
-  display:block;
-  margin:2px 0;
-  font-size:inherit;
-  font-weight:inherit;
-  line-height:1.25;
-  color:inherit;
-  overflow-wrap:anywhere;
-}

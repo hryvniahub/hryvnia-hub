@@ -3214,29 +3214,148 @@ function vehicleCardSpecs(item) {
 
 function propertyCardSpecs(item) {
   if (String(item.category || "") !== "Недвижимость" || !item.property_details) return [];
-  const details = item.property_details;
-  const words = {
-    ru: { room: "-комнатная", furnished: { "Есть": "С мебелью", "Нет": "Без мебели", "Частично": "Частично с мебелью" } },
-    uk: { room: "-кімнатна", furnished: { "Есть": "З меблями", "Нет": "Без меблів", "Частично": "Частково з меблями" } },
-    en: { room: "-bedroom", furnished: { "Есть": "Furnished", "Нет": "Unfurnished", "Частично": "Partly furnished" } },
-    pl: { room: " pokoje", furnished: { "Есть": "Umeblowane", "Нет": "Bez mebli", "Частично": "Częściowo umeblowane" } }
-  }[lang] || { room: "-bedroom", furnished: {} };
-  const line1 = [];
-  const line2 = [];
-  if (details.rooms !== null && details.rooms !== undefined && String(details.rooms).trim() !== "") {
-    line1.push(`${details.rooms}${words.room}`);
+  const d = item.property_details;
+  const typeRaw = String(d.type || item.property_type || "");
+  const isHouse = /дом|house|будин/i.test(typeRaw);
+  const isRoom = /комнат|room/i.test(typeRaw) && !/квартир|apartment/i.test(typeRaw);
+
+  const nonEmpty = value => value !== null && value !== undefined && String(value).trim() !== "";
+  const number = value => nonEmpty(value) && Number.isFinite(Number(value));
+  const language = lang || "ru";
+  const labels = {
+    ru: {
+      room: n => `${n}-комнатная`,
+      house: "Дом",
+      floor: (f, total) => nonEmpty(total) ? `${f}-й этаж из ${total}` : `${f}-й этаж`,
+      floors: n => `${n} этаж${Number(n) === 1 ? "" : Number(n) >= 2 && Number(n) <= 4 ? "а" : "ей"}`,
+      land: n => `участок ${n} соток`,
+      furnished: { "Есть": "С мебелью", "Нет": "Без мебели", "Частично": "Частично с мебелью" },
+      condition: { "Новостройка": "Новостройка", "Новый ремонт": "После ремонта", "Жилое состояние": "Жилое состояние", "Нужен ремонт": "Нужен ремонт", "Под ремонт": "Под ремонт" },
+      building: { "Кирпичный": "Кирпичный дом", "Панельный": "Панельный дом", "Монолитный": "Монолитный дом", "Монолитно-кирпичный": "Монолитно-кирпичный дом", "Деревянный": "Деревянный дом" },
+      balcony: { "Есть": "С балконом", "Нет": "Без балкона" },
+      loggia: { "Есть": "С лоджией", "Нет": "Без лоджии" },
+      bathroom: { separate: "Раздельный санузел", combined: "Совмещённый санузел" },
+      amenity: { air_conditioning: "Кондиционер", washing_machine: "Стиральная машина", dishwasher: "Посудомоечная машина", refrigerator: "Холодильник", stove: "Плита", internet: "Интернет", parking: "Парковка" },
+      kitchen: n => `кухня ${n} м²`, metro: n => `метро ${n} м`, school: n => `школа ${n} м`, stop: n => `остановка ${n} м`
+    },
+    uk: {
+      room: n => `${n}-кімнатна`,
+      house: "Будинок",
+      floor: (f, total) => nonEmpty(total) ? `${f}-й поверх із ${total}` : `${f}-й поверх`,
+      floors: n => `${n} поверх${Number(n) === 1 ? "" : Number(n) >= 2 && Number(n) <= 4 ? "и" : "ів"}`,
+      land: n => `ділянка ${n} соток`,
+      furnished: { "Есть": "З меблями", "Нет": "Без меблів", "Частично": "Частково з меблями" },
+      condition: { "Новостройка": "Новобудова", "Новый ремонт": "Після ремонту", "Жилое состояние": "Житловий стан", "Нужен ремонт": "Потрібен ремонт", "Под ремонт": "Під ремонт" },
+      building: { "Кирпичный": "Цегляний будинок", "Панельный": "Панельний будинок", "Монолитный": "Монолітний будинок", "Монолитно-кирпичный": "Монолітно-цегляний будинок", "Деревянный": "Дерев’яний будинок" },
+      balcony: { "Есть": "З балконом", "Нет": "Без балкона" },
+      loggia: { "Есть": "З лоджією", "Нет": "Без лоджії" },
+      bathroom: { separate: "Роздільний санвузол", combined: "Суміжний санвузол" },
+      amenity: { air_conditioning: "Кондиціонер", washing_machine: "Пральна машина", dishwasher: "Посудомийна машина", refrigerator: "Холодильник", stove: "Плита", internet: "Інтернет", parking: "Паркування" },
+      kitchen: n => `кухня ${n} м²`, metro: n => `метро ${n} м`, school: n => `школа ${n} м`, stop: n => `зупинка ${n} м`
+    },
+    en: {
+      room: n => `${n}-bedroom`,
+      house: "House",
+      floor: (f, total) => nonEmpty(total) ? `Floor ${f} of ${total}` : `Floor ${f}`,
+      floors: n => `${n} floors`,
+      land: n => `${n} sotkas of land`,
+      furnished: { "Есть": "Furnished", "Нет": "Unfurnished", "Частично": "Partly furnished" },
+      condition: { "Новостройка": "New build", "Новый ремонт": "Recently renovated", "Жилое состояние": "Habitable condition", "Нужен ремонт": "Needs renovation", "Под ремонт": "For renovation" },
+      building: { "Кирпичный": "Brick building", "Панельный": "Panel building", "Монолитный": "Monolithic building", "Монолитно-кирпичный": "Brick-monolithic building", "Деревянный": "Wooden building" },
+      balcony: { "Есть": "Balcony", "Нет": "No balcony" },
+      loggia: { "Есть": "Loggia", "Нет": "No loggia" },
+      bathroom: { separate: "Separate bathroom", combined: "Combined bathroom" },
+      amenity: { air_conditioning: "Air conditioning", washing_machine: "Washing machine", dishwasher: "Dishwasher", refrigerator: "Refrigerator", stove: "Stove", internet: "Internet", parking: "Parking" },
+      kitchen: n => `kitchen ${n} m²`, metro: n => `metro ${n} m`, school: n => `school ${n} m`, stop: n => `stop ${n} m`
+    },
+    pl: {
+      room: n => `${n}-pokojowe`,
+      house: "Dom",
+      floor: (f, total) => nonEmpty(total) ? `Piętro ${f} z ${total}` : `Piętro ${f}`,
+      floors: n => `${n} piętra`,
+      land: n => `działka ${n} arów`,
+      furnished: { "Есть": "Umeblowane", "Нет": "Bez mebli", "Частично": "Częściowo umeblowane" },
+      condition: { "Новостройка": "Nowe budownictwo", "Новый ремонт": "Po remoncie", "Жилое состояние": "Do zamieszkania", "Нужен ремонт": "Do remontu", "Под ремонт": "Do remontu" },
+      building: { "Кирпичный": "Budynek z cegły", "Панельный": "Budynek z wielkiej płyty", "Монолитный": "Budynek monolityczny", "Монолитно-кирпичный": "Budynek ceglano-monolityczny", "Деревянный": "Budynek drewniany" },
+      balcony: { "Есть": "Balkon", "Нет": "Bez balkonu" },
+      loggia: { "Есть": "Loggia", "Нет": "Bez loggii" },
+      bathroom: { separate: "Oddzielna łazienka", combined: "Łazienka połączona" },
+      amenity: { air_conditioning: "Klimatyzacja", washing_machine: "Pralka", dishwasher: "Zmywarka", refrigerator: "Lodówka", stove: "Kuchenka", internet: "Internet", parking: "Parking" },
+      kitchen: n => `kuchnia ${n} m²`, metro: n => `metro ${n} m`, school: n => `szkoła ${n} m`, stop: n => `przystanek ${n} m`
+    }
+  }[language] || null;
+  const L = labels || {
+    room: n => `${n}-bedroom`, house: "House",
+    floor: (f, total) => nonEmpty(total) ? `Floor ${f} of ${total}` : `Floor ${f}`,
+    floors: n => `${n} floors`, land: n => `${n} sotkas of land`,
+    furnished: {}, condition: {}, building: {}, balcony: {}, loggia: {}, bathroom: {}, amenity: {},
+    kitchen: n => `kitchen ${n} m²`, metro: n => `metro ${n} m`, school: n => `school ${n} m`, stop: n => `stop ${n} m`
+  };
+
+  const area = d.area_m2 ?? item.property_area_sqm ?? item.property_area ?? item.property_total_area;
+  const rooms = d.rooms;
+  const floor = d.floor;
+  const floorsTotal = d.floors_total;
+  const land = d.land_area_sotkas;
+  const first = [];
+  const second = [];
+
+  // The first two rows are the category's core information.
+  if (isHouse) {
+    first.push(L.house);
+    if (number(area)) first.push(`${area} м²`);
+    if (number(floorsTotal)) second.push(L.floors(floorsTotal));
+    if (number(land)) second.push(L.land(land));
+    if (!number(land) && d.has_land === false) second.push(language === "uk" ? "Без ділянки" : language === "en" ? "No land plot" : language === "pl" ? "Bez działki" : "Без участка");
+  } else {
+    if (nonEmpty(rooms)) first.push(L.room(rooms));
+    if (number(area)) first.push(`${area} м²`);
+    if (number(floor)) second.push(L.floor(floor, floorsTotal));
   }
-  if (details.area_m2 !== null && details.area_m2 !== undefined && String(details.area_m2).trim() !== "") {
-    line1.push(`${details.area_m2} м²`);
-  }
-  if (details.floor !== null && details.floor !== undefined && String(details.floor).trim() !== "") {
-    const floorText = details.floors_total !== null && details.floors_total !== undefined && String(details.floors_total).trim() !== ""
-      ? ({ru:`${details.floor}-й этаж из ${details.floors_total}`,uk:`${details.floor}-й поверх із ${details.floors_total}`,en:`Floor ${details.floor} of ${details.floors_total}`,pl:`Piętro ${details.floor} z ${details.floors_total}`})[lang]
-      : ({ru:`${details.floor}-й этаж`,uk:`${details.floor}-й поверх`,en:`Floor ${details.floor}`,pl:`Piętro ${details.floor}`})[lang];
-    line2.push(floorText);
-  }
-  if (details.furniture) line2.push(words.furnished[details.furniture] || details.furniture);
-  return [line1, line2].filter(line => line.length).map(line => line.map(text => escapeHtml(String(text))).join(" · "));
+
+  // Category-specific priority list. Empty fields are skipped in order.
+  const priorities = isHouse
+    ? ["condition", "building_type", "furniture", "bathroom_type", "balcony", "loggia", "kitchen_area_m2", "metro_distance_m", "school_distance_m", "stop_distance_m"]
+    : ["furniture", "condition", "building_type", "bathroom_type", "balcony", "loggia", "kitchen_area_m2", "metro_distance_m", "school_distance_m", "stop_distance_m"];
+  const extra = [];
+  const seen = new Set();
+  const pushExtra = (key, value) => {
+    if (!nonEmpty(value)) return;
+    const normalized = String(value).trim().toLowerCase();
+    if (seen.has(normalized)) return;
+    seen.add(normalized);
+    extra.push(value);
+  };
+  const mapValue = (key, value) => {
+    if (key === "furniture") return L.furnished[value] || value;
+    if (key === "condition") return L.condition[value] || value;
+    if (key === "building_type") return L.building[value] || value;
+    if (key === "balcony") return L.balcony[value] || value;
+    if (key === "loggia") return L.loggia[value] || value;
+    if (key === "bathroom_type") return L.bathroom[value] || value;
+    if (key === "kitchen_area_m2" && number(value)) return L.kitchen(value);
+    if (key === "metro_distance_m" && number(value)) return L.metro(value);
+    if (key === "school_distance_m" && number(value)) return L.school(value);
+    if (key === "stop_distance_m" && number(value)) return L.stop(value);
+    return value;
+  };
+  priorities.forEach(key => pushExtra(key, mapValue(key, d[key])));
+
+  // Amenities are the fallback pool after all higher-priority details.
+  const amenityOrder = ["air_conditioning", "washing_machine", "dishwasher", "refrigerator", "stove", "internet", "parking"];
+  amenityOrder.forEach(key => {
+    if (d.amenities?.[key] === true) pushExtra(`amenity-${key}`, L.amenity[key] || key);
+  });
+
+  // Exactly three compact description rows maximum; the last row can combine
+  // multiple short details/amenities, but never invents values or repeats them.
+  const third = extra.slice(0, 3);
+  const rows = [
+    first.join(" · "),
+    second.join(" · "),
+    third.join(" · ")
+  ].filter(row => row.trim() !== "");
+  return rows.map(row => escapeHtml(String(row)));
 }
 
 function renderListings(items) {

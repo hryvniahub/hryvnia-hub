@@ -1225,7 +1225,7 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
 #addModal .listing-progress-step.is-complete span{ color: #14271c; background: #78d98b; }
 #addModal .listing-progress > i{ height: 2px; flex: 1; margin-top: 13px; background: rgba(255,255,255,.15); }
 #addModal .listing-progress > i.is-complete{ background: #78d98b; }
-#addModal #vehicleListingMore{ grid-column: 1 / -1; margin: 4px 0 8px; }
+#addModal #vehicleListingMore{ grid-column: 1 / -1; margin: 10px 0 8px; }
 #addModal .vehicle-market-panel{ grid-column: 1 / -1; padding: 15px; border: 1px solid rgba(168, 201, 40,.28); border-radius: 16px; background: rgba(5,24,17,.62); }
 #addModal .vehicle-market-panel h3{ margin: 0 0 7px; font-size: 14px; color: rgba(247,249,245,.82); }
 #addModal .vehicle-market-price{ margin: 0 0 10px; font-size: clamp(20px, 4vw, 27px); font-weight: 850; color: #fff; }
@@ -1249,6 +1249,20 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
   width: 100%;
   min-width: 0;
   box-sizing: border-box;
+}
+/* Property location fields form two aligned rows: city/region, then address/radius. */
+#addModal #addForm #listingAdvancedCommonFields > label.property-location-field{
+  grid-column: auto;
+  min-width: 0;
+}
+#addModal #addForm #propertyAddressField,
+#addModal #addForm #propertyRadiusField{
+  align-self: start;
+}
+#addModal #addForm #propertyAddressField[hidden],
+#addModal #addForm #propertyRadiusField[hidden],
+#addModal #addForm #propertyMarketPanel[hidden]{
+  display: none !important;
 }
 @media (max-width: 480px) {
   #addModal .vehicle-market-panel{ padding: 12px; }
@@ -2360,7 +2374,7 @@ main{
   border-radius:14px;
 }
 .property-listing-fields[hidden]{display:none!important}
-.property-listing-fields legend{padding:0 6px;font-size:14px;font-weight:800;color:#174C3A}
+.property-listing-fields legend{display:inline-block;padding:0 8px;background:#12271d;color:#f7f9f5;font-size:14px;font-weight:800;line-height:1.4}
 .property-listing-context,.property-listing-grid,.listing-price-row{
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
@@ -2375,16 +2389,86 @@ main{
 }
 .property-listing-fields input,.property-listing-fields select,.listing-price-row input,.listing-price-row select{
   display:block;
+  width:100%;
+  min-width:0;
+  box-sizing:border-box;
   margin-top:6px;
+}
+#addModal #addForm #propertyListingFields .property-listing-context > label,
+#addModal #addForm #propertyListingFields .property-listing-grid > label{
+  min-width:0;
+  overflow-wrap:anywhere;
+}
+#addModal #addForm #propertyListingFields .property-listing-context{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  column-gap:10px;
+  row-gap:10px;
+}
+#addModal #addForm #propertyListingFields .property-listing-context > label{
   min-width:0;
 }
+#addModal #addForm #propertyListingFields .property-listing-context select{
+  display:block;
+  width:100%;
+  max-width:100%;
+  box-sizing:border-box;
+  padding:10px 9px;
+  font-size:15px;
+  text-overflow:ellipsis;
+}
 .property-listing-grid{margin-top:10px}
+/* Keep a visible gap between the operation/type selects and the More/Less toggle. */
+#addModal #addForm #propertyListingFields > .property-listing-more{margin-top:10px}
 .listing-price-row{grid-template-columns:minmax(0,1fr) 110px;margin:0 0 12px}
 #listingCurrencyField[hidden]{display:none!important}
 @media(max-width:560px){
-  .property-listing-context,.property-listing-grid{grid-template-columns:minmax(0,1fr)}
+  /* Keep the property form's primary fields in the compact two-column layout
+     from the approved mobile design. The search menu has its own selectors. */
+  #addModal #addForm #propertyListingFields .property-listing-context,
+  #addModal #addForm #propertyListingFields .property-listing-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:9px;
+  }
+  #addModal #addForm .listing-advanced-common > label.property-location-field{
+    min-width:0;
+  }
+  #addModal #addForm #propertyAddressField{grid-column:1 / 2;}
+  #addModal #addForm #propertyRadiusField{grid-column:2 / 3;}
+  #addModal #addForm #propertyListingFields .property-listing-more,
+  #addModal #addForm #propertyListingFields .property-market-panel,
+  #addModal #addForm #propertyListingFields #propertyAdvancedFields{
+    grid-column:1 / -1;
+  }
+  #addModal #addForm #propertyListingFields .property-advanced-fields .property-listing-grid > label{
+    min-width:0;
+  }
   .listing-price-row{grid-template-columns:minmax(0,1fr) 100px}
   .property-listing-fields{padding:11px}
+}
+/* Property advanced parameters stay in two columns even on narrow phones. */
+#addModal #addForm #propertyListingFields #propertyAdvancedFields .property-listing-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  align-items:start;
+}
+#addModal #addForm #propertyListingFields #propertyAdvancedFields .property-listing-grid > label{
+  min-width:0;
+  grid-column:auto;
+}
+#addModal #addForm #propertyListingFields #propertyAdvancedFields h3{
+  grid-column:1 / -1;
+}
+@media(max-width:360px){
+  #addModal #addForm #propertyListingFields .property-listing-context,
+  #addModal #addForm #propertyListingFields .property-listing-grid,
+  #addModal #addForm #propertyListingFields #propertyAdvancedFields .property-listing-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:7px;
+  }
+  #addModal #addForm #propertyAddressField{grid-column:1 / 2;}
+  #addModal #addForm #propertyRadiusField{grid-column:2 / 3;}
+  #addModal #addForm #propertyListingFields .property-listing-fields label,
+  #addModal #addForm #propertyListingFields label{min-width:0;}
 }
 
 .property-detail-specs{

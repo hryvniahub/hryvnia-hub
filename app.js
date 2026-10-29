@@ -417,7 +417,49 @@ const translations = {
   "Пока недостаточно данных для оценки": {ru:"Пока недостаточно данных для оценки",uk:"Поки недостатньо даних для оцінки",en:"Not enough data to estimate yet",pl:"Na razie za mało danych do wyceny"},
   "В базе пока нет достаточно похожих объявлений. Не будем придумывать цену.": {ru:"В базе пока нет достаточно похожих объявлений. Не будем придумывать цену.",uk:"У базі поки недостатньо схожих оголошень. Не будемо вигадувати ціну.",en:"There are not enough similar listings in the database. We won't invent a price.",pl:"W bazie jest za mało podobnych ogłoszeń. Nie będziemy wymyślać ceny."},
   "Войдите или зарегистрируйтесь, чтобы получить более точную рыночную оценку и продолжить заполнение объявления.": {ru:"Войдите или зарегистрируйтесь, чтобы получить более точную рыночную оценку и продолжить заполнение объявления.",uk:"Увійдіть або зареєструйтеся, щоб отримати точнішу ринкову оцінку та продовжити заповнення оголошення.",en:"Sign in or register to get a more accurate market estimate and continue creating your listing.",pl:"Zaloguj się lub zarejestruj, aby uzyskać dokładniejszą wycenę rynkową i kontynuować tworzenie ogłoszenia."},
-  "Не удалось получить сопоставимые объявления.": {ru:"Не удалось получить сопоставимые объявления.",uk:"Не вдалося отримати порівнювані оголошення.",en:"Could not retrieve comparable listings.",pl:"Nie udało się pobrać porównywalnych ogłoszeń."}
+  "Не удалось получить сопоставимые объявления.": {ru:"Не удалось получить сопоставимые объявления.",uk:"Не вдалося отримати порівнювані оголошення.",en:"Could not retrieve comparable listings.",pl:"Nie udało się pobrać porównywalnych ogłoszeń."},
+  "Общая площадь, м²": { ru: "Общая площадь, м²", uk: "Загальна площа, м²", en: "Total area, m²", pl: "Powierzchnia całkowita, m²" },
+  "Количество комнат": { ru: "Количество комнат", uk: "Кількість кімнат", en: "Number of rooms", pl: "Liczba pokoi" },
+  "Этаж": { ru: "Этаж", uk: "Поверх", en: "Floor", pl: "Piętro" },
+  "Этажность здания": { ru: "Этажность здания", uk: "Поверховість будівлі", en: "Building floors", pl: "Liczba pięter budynku" },
+  "Площадь кухни, м²": { ru: "Площадь кухни, м²", uk: "Площа кухні, м²", en: "Kitchen area, m²", pl: "Powierzchnia kuchni, m²" },
+  "Тип здания": { ru: "Тип здания", uk: "Тип будівлі", en: "Building type", pl: "Typ budynku" },
+  "Состояние": { ru: "Состояние", uk: "Стан", en: "Condition", pl: "Stan" },
+  "Мебель": { ru: "Мебель", uk: "Меблі", en: "Furniture", pl: "Meble" },
+  "Балкон": { ru: "Балкон", uk: "Балкон", en: "Balcony", pl: "Balkon" },
+  "Лоджия": { ru: "Лоджия", uk: "Лоджія", en: "Loggia", pl: "Loggia" },
+  "До метро, м": { ru: "До метро, м", uk: "До метро, м", en: "Distance to metro, m", pl: "Odległość do metra, m" },
+  "Площадь участка, соток": { ru: "Площадь участка, соток", uk: "Площа ділянки, соток", en: "Land area, ares", pl: "Powierzchnia działki, arów" },
+  "До школы, м": { ru: "До школы, м", uk: "До школи, м", en: "Distance to school, m", pl: "Odległość od szkoły, m" },
+  "До остановки, м": { ru: "До остановки, м", uk: "До зупинки, м", en: "Distance to stop, m", pl: "Odległość od przystanku, m" },
+  "Операция": { ru: "Операция", uk: "Операція", en: "Transaction", pl: "Transakcja" },
+  "Тип объекта": { ru: "Тип объекта", uk: "Тип об’єкта", en: "Property type", pl: "Typ nieruchomości" },
+  "Выберите операцию": { ru: "Выберите операцию", uk: "Оберіть операцію", en: "Select transaction", pl: "Wybierz transakcję" },
+  "Выберите тип объекта": { ru: "Выберите тип объекта", uk: "Оберіть тип об’єкта", en: "Select property type", pl: "Wybierz typ nieruchomości" },
+  "Не указано": { ru: "Не указано", uk: "Не вказано", en: "Not specified", pl: "Nie określono" },
+  "Кирпичный": { ru: "Кирпичный", uk: "Цегляний", en: "Brick", pl: "Cegła" },
+  "Панельный": { ru: "Панельный", uk: "Панельний", en: "Panel", pl: "Wielka płyta" },
+  "Монолитный": { ru: "Монолитный", uk: "Монолітний", en: "Monolithic", pl: "Monolityczny" },
+  "Монолитно-кирпичный": { ru: "Монолитно-кирпичный", uk: "Монолітно-цегляний", en: "Monolithic brick", pl: "Monolityczno-ceglany" },
+  "Деревянный": { ru: "Деревянный", uk: "Дерев’яний", en: "Wooden", pl: "Drewniany" },
+  "Другое": { ru: "Другое", uk: "Інше", en: "Other", pl: "Inny" },
+  "Новостройка": { ru: "Новостройка", uk: "Новобудова", en: "New build", pl: "Nowe budownictwo" },
+  "Новый ремонт": { ru: "Новый ремонт", uk: "Новий ремонт", en: "Recently renovated", pl: "Po remoncie" },
+  "Жилое состояние": { ru: "Жилое состояние", uk: "Житловий стан", en: "Habitable condition", pl: "Stan do zamieszkania" },
+  "Нужен ремонт": { ru: "Нужен ремонт", uk: "Потребує ремонту", en: "Needs renovation", pl: "Wymaga remontu" },
+  "Под ремонт": { ru: "Под ремонт", uk: "Під ремонт", en: "For renovation", pl: "Do remontu" },
+  "Есть": { ru: "Есть", uk: "Є", en: "Yes", pl: "Tak" },
+  "Нет": { ru: "Нет", uk: "Немає", en: "No", pl: "Nie" },
+  "Частично": { ru: "Частично", uk: "Частково", en: "Partly", pl: "Częściowo" },
+  "Квартира": { ru: "Квартира", uk: "Квартира", en: "Apartment", pl: "Mieszkanie" },
+  "Дом": { ru: "Дом", uk: "Будинок", en: "House", pl: "Dom" },
+  "Комната": { ru: "Комната", uk: "Кімната", en: "Room", pl: "Pokój" },
+  "Гараж / паркоместо": { ru: "Гараж / паркоместо", uk: "Гараж / паркомісце", en: "Garage / parking space", pl: "Garaż / miejsce parkingowe" },
+  "Земельный участок": { ru: "Земельный участок", uk: "Земельна ділянка", en: "Land plot", pl: "Działka" },
+  "Цена": { ru: "Цена", uk: "Ціна", en: "Price", pl: "Cena" },
+  "Фотографии": { ru: "Фотографии", uk: "Фотографії", en: "Photos", pl: "Zdjęcia" },
+  "Добавить фотографии": { ru: "Добавить фотографии", uk: "Додати фотографії", en: "Add photos", pl: "Dodaj zdjęcia" },
+  "Характеристики недвижимости": { ru: "Характеристики недвижимости", uk: "Характеристики нерухомості", en: "Property details", pl: "Szczegóły nieruchomości" },
 };
 const authMessages = {
   ru: { close:"Закрыть", account:"Аккаунт", settings:"Настройки аккаунта", menu:"Меню / Настройки", login:"Вход", register:"Регистрация", email:"Электронная почта", password:"Пароль", confirm:"Подтвердите пароль", forgot:"Забыли пароль?", reset:"Восстановление пароля", resetLink:"Отправить ссылку для сброса", newPassword:"Новый пароль", savePassword:"Сохранить пароль", back:"Назад", signOut:"Выход", signedIn:"Вход выполнен.", signedOut:"Вы вышли из аккаунта.", signingIn:"Вход…", signingUp:"Регистрация…", sending:"Отправка…", saving:"Сохранение…", signingOut:"Выход…", emailRequired:"Введите email", invalidEmail:"Введите корректный email", shortPassword:"Пароль слишком короткий (минимум 6 символов)", mismatch:"Пароли не совпадают", noSupabase:"Supabase не подключён", badLogin:"Неверный email или пароль", confirmEmail:"Подтвердите email", exists:"Пользователь с таким email уже существует", registered:"Регистрация успешна. Проверьте почту для подтверждения.", resetSent:"Ссылка для сброса отправлена. Проверьте почту.", passwordUpdated:"Пароль обновлён.", signOutError:"Не удалось выйти. Попробуйте ещё раз.", signedAs:"Вы вошли как:" },
@@ -950,6 +992,8 @@ async function initAuth() {
     if (error) throw error;
     currentUser = data?.session?.user || null;
     updateAccountButton();
+    const propertyMarketAuthPrompt = document.querySelector("#propertyMarketPanel .vehicle-market-auth");
+    if (propertyMarketAuthPrompt) propertyMarketAuthPrompt.hidden = Boolean(currentUser);
     if (currentUser && authUserEmail) authUserEmail.textContent = currentUser.email || "";
     if (currentUser) {
       await syncFavoritesOnLogin();
@@ -962,6 +1006,8 @@ async function initAuth() {
   db.auth.onAuthStateChange(async (event, session) => {
     currentUser = session?.user || null;
     updateAccountButton();
+    const propertyMarketAuthPrompt = document.querySelector("#propertyMarketPanel .vehicle-market-auth");
+    if (propertyMarketAuthPrompt) propertyMarketAuthPrompt.hidden = Boolean(currentUser);
     if (currentUser) {
       setTimeout(updateUnreadMessageIndicators, 0);
       subscribeToGlobalMessages();
@@ -3826,33 +3872,61 @@ let vehicleMarketRequestId = 0;
 function setVehicleAdvancedFields(expanded) {
   if (vehicleAdvancedFields) vehicleAdvancedFields.hidden = !expanded;
   if (listingAdvancedCommonFields) listingAdvancedCommonFields.hidden = !expanded && listingCategorySelect?.value === "Автомобили";
-  const steps = vehicleListingFields?.querySelectorAll(".listing-progress-step") || [];
+  const steps = addModal?.querySelectorAll(".listing-progress-step") || [];
   steps.forEach((step, index) => {
     step.classList.toggle("is-active", expanded ? index === 1 : index === 0);
     step.classList.toggle("is-complete", expanded && index === 0);
   });
-  const lines = vehicleListingFields?.querySelectorAll(".listing-progress > i") || [];
+  const lines = addModal?.querySelectorAll(".listing-progress > i") || [];
   lines.forEach((line, index) => line.classList.toggle("is-complete", expanded && index === 0));
 }
 const propertyListingFields = document.getElementById("propertyListingFields");
 const propertyTypeSelect = document.getElementById("propertyType");
 const propertyOperationSelect = document.getElementById("propertyOperation");
 const listingCurrencyField = document.getElementById("listingCurrencyField");
+const propertyListingMore = document.getElementById("propertyListingMore");
+const propertyAdvancedFields = document.getElementById("propertyAdvancedFields");
+const propertyAddressField = document.getElementById("propertyAddressField");
+const propertyRadiusField = document.getElementById("propertyRadiusField");
+
+function setPropertyAdvancedFields(expanded) {
+  // The More control reveals both the extra property fields and the market/auth panel.
+  if (propertyAdvancedFields) propertyAdvancedFields.hidden = !expanded;
+  const propertyMarketPanel = document.getElementById("propertyMarketPanel");
+  if (propertyMarketPanel) propertyMarketPanel.hidden = !expanded;
+  // Keep the price estimate visible, but do not prompt an authenticated user to sign in/register.
+  const propertyMarketAuthPrompt = propertyMarketPanel?.querySelector(".vehicle-market-auth");
+  if (propertyMarketAuthPrompt) propertyMarketAuthPrompt.hidden = Boolean(currentUser);
+  propertyListingMore?.setAttribute("aria-expanded", String(expanded));
+  if (propertyListingMore) {
+    const label = propertyListingMore.querySelector("[data-i18n]");
+    if (label) {
+      label.dataset.i18n = expanded ? "Згорнути розширений пошук" : "Більше";
+      label.textContent = t(label.dataset.i18n);
+    }
+    const icon = propertyListingMore.querySelector(".property-listing-more-icon");
+    if (icon) icon.textContent = expanded ? "⌃" : "⌄";
+  }
+}
 
 function syncPropertyListingFields() {
   if (!propertyListingFields) return;
-  const type = propertyTypeSelect?.value || "";
   propertyListingFields.hidden = listingCategorySelect?.value !== "Недвижимость";
   propertyListingFields.disabled = listingCategorySelect?.value !== "Недвижимость";
+  // Keep the full set of property parameters available for every property type.
+  // The “Більше” button controls visibility of the whole advanced section;
+  // choosing a type must not silently remove fields from that section.
   propertyListingFields.querySelectorAll("[data-property-for]").forEach(field => {
-    const allowedTypes = (field.dataset.propertyFor || "").split(",").map(value => value.trim());
-    const visible = !type || allowedTypes.includes(type);
-    field.hidden = !visible;
+    field.hidden = false;
     field.querySelectorAll("input,select").forEach(control => {
-      control.disabled = propertyListingFields.disabled || !visible;
+      control.disabled = propertyListingFields.disabled;
     });
   });
-  if (listingCurrencyField) listingCurrencyField.hidden = listingCategorySelect?.value !== "Недвижимость";
+  const isProperty = listingCategorySelect?.value === "Недвижимость";
+  if (listingCurrencyField) listingCurrencyField.hidden = !isProperty;
+  if (propertyAddressField) propertyAddressField.hidden = !isProperty;
+  if (propertyRadiusField) propertyRadiusField.hidden = !isProperty;
+  if (!isProperty) setPropertyAdvancedFields(false);
 }
 
 function syncVehicleListingFields() {
@@ -3878,6 +3952,16 @@ function syncVehicleListingFields() {
   if (isVehicle) loadVehicleListingMakes();
 }
 propertyTypeSelect?.addEventListener("change", syncPropertyListingFields);
+propertyListingMore?.addEventListener("click", () => setPropertyAdvancedFields(Boolean(propertyAdvancedFields?.hidden)));
+for (const action of ["Login", "Register"]) {
+  document.getElementById(`propertyMarket${action}`)?.addEventListener("click", () => {
+    const authView = action === "Login" ? "login" : "register";
+    openAuthModal();
+    // Select the requested auth form directly; do not rely on a synthetic tab click.
+    showAuthView(authView);
+    document.querySelector(`[data-auth-tab="${authView}"]`)?.setAttribute("aria-selected", "true");
+  });
+}
 async function loadVehicleListingMakes() {
   if (!vehicleListingMake || !db || vehicleListingMake.dataset.loaded === "1" || vehicleListingMake.dataset.loading === "1") return;
   vehicleListingMake.dataset.loading = "1";
@@ -4002,6 +4086,7 @@ function openPropertyListingForm(propertyType = "", operation = "") {
     propertyListingFields.hidden = false;
     propertyListingFields.disabled = false;
   }
+  setPropertyAdvancedFields(false);
   if (vehicleListingFields) vehicleListingFields.hidden = true;
   closeCategoryMenu();
   closeAddCategoryMenu();
@@ -4187,6 +4272,8 @@ if (addForm) {
         property_details: {
           operation: propertyOperation,
           type: propertyType,
+          address: String(form.get("property_address") || "").trim() || null,
+          radius_km: optionalNumber("property_radius_km"),
           area_m2: optionalNumber("property_area"),
           rooms: String(form.get("property_rooms") || "") || null,
           floor: optionalNumber("property_floor"),

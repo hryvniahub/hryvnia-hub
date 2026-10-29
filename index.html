@@ -6,7 +6,7 @@
   <meta name="google" content="notranslate">
   <title>Hryvnia Hub — объявления Украины</title>
   <meta name="description" content="Hryvnia Hub — хаб объявлений: автомобили, недвижимость и бизнес.">
-  <link rel="stylesheet" href="styles.css?v=20261029-compact-property-menus-v4">
+  <link rel="stylesheet" href="styles.css?v=20261029-property-expand-location-v8">
 </head>
 <body>
   <header class="header">
@@ -370,15 +370,15 @@
       <h2>Добавить объявление</h2>
       <form id="addForm">
         <label class="listing-category-field hidden">Категория<select name="category" required><option value="Автомобили">Автомобили</option><option value="Недвижимость">Недвижимость</option><option value="Готовый бизнес">Готовый бизнес</option><option value="Инвестиции">Инвестиции</option></select></label>
-        <label id="listingTitleField">Название<input name="title" required placeholder="Например: Skoda Octavia 1.6"></label>
-        <fieldset id="vehicleListingFields" class="vehicle-listing-fields" hidden>
-          <legend>Характеристики автомобиля</legend>
           <div class="listing-progress" aria-label="Этапы создания объявления">
             <div class="listing-progress-step is-active"><span>1</span><small>Основное</small></div>
             <i aria-hidden="true"></i><div class="listing-progress-step"><span>2</span><small>Детали</small></div>
             <i aria-hidden="true"></i><div class="listing-progress-step"><span>3</span><small>Фото</small></div>
             <i aria-hidden="true"></i><div class="listing-progress-step"><span>4</span><small>Публикация</small></div>
           </div>
+        <label id="listingTitleField">Название<input name="title" required placeholder="Например: Skoda Octavia 1.6"></label>
+        <fieldset id="vehicleListingFields" class="vehicle-listing-fields" hidden>
+          <legend>Характеристики автомобиля</legend>
           <label>Марка автомобиля<span class="vehicle-make-control"><select name="vehicle_make_slug" id="vehicleListingMake" aria-describedby="vehicleListingMakeStatus"><option value="">Выберите марку</option></select><span class="vehicle-make-spinner hidden" id="vehicleListingMakeSpinner" aria-hidden="true"></span></span><span class="vehicle-make-load-status" id="vehicleListingMakeStatus" role="status" aria-live="polite"></span></label>
           <label>Модель автомобиля<select name="vehicle_model_slug" id="vehicleListingModel" disabled><option value="">Сначала выберите марку</option></select></label>
           <label>Год выпуска<input name="vehicle_year" type="number" min="1900" max="2100" placeholder="2018"></label>
@@ -409,28 +409,43 @@
           </div>
         </fieldset>
         <div id="listingAdvancedCommonFields" class="listing-advanced-common" hidden>
-        <label>Город<div class="city-search"><input id="citySearchInput" type="search" required autocomplete="off" placeholder="Введите название города" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="citySuggestions"><div id="citySuggestions" class="city-suggestions" role="listbox" hidden></div><input type="hidden" name="city_id" id="citySelect"></div></label><label>Область / регион<select id="cityRegionSelect" aria-label="Область"><option value="">Все области</option></select></label>
+        <label class="property-location-field">Город<div class="city-search"><input id="citySearchInput" type="search" required autocomplete="off" placeholder="Введите название города" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="citySuggestions"><div id="citySuggestions" class="city-suggestions" role="listbox" hidden></div><input type="hidden" name="city_id" id="citySelect"></div></label><label class="property-location-field">Область / регион<select id="cityRegionSelect" aria-label="Область"><option value="">Все области</option></select></label>
+        <label id="propertyAddressField" class="property-location-field" hidden><span data-i18n="Адреса">Адреса</span><input name="property_address" type="text" autocomplete="street-address" placeholder="Вулиця, будинок"></label>
+        <label id="propertyRadiusField" class="property-location-field" hidden><span data-i18n="Радіус, км">Радіус, км</span><select name="property_radius_km"><option value="5">5</option><option value="10">10</option><option value="20">20</option><option value="50">50</option></select></label>
         <fieldset id="propertyListingFields" class="property-listing-fields" hidden disabled>
+          <legend data-i18n="Недвижимость">Недвижимость</legend>
           <div class="property-listing-context">
-            <label>Операция<select id="propertyOperation" name="property_operation" required><option value="">Выберите операцию</option><option value="Продажа">Продажа</option><option value="Аренда">Аренда</option></select></label>
-            <label>Тип объекта<select id="propertyType" name="property_type" required><option value="">Выберите тип объекта</option><option value="Квартиры">Квартира</option><option value="Дома">Дом</option><option value="Комнаты">Комната</option><option value="Коммерческая недвижимость">Коммерческая недвижимость</option><option value="Гаражи и парковочные места">Гараж / паркоместо</option><option value="Земельные участки">Земельный участок</option></select></label>
+            <label><span data-i18n="Операция">Операция</span><select id="propertyOperation" name="property_operation" required><option value="" data-i18n="Выберите операцию">Выберите операцию</option><option value="Продажа" data-i18n="Продажа">Продажа</option><option value="Аренда" data-i18n="Аренда">Аренда</option></select></label>
+            <label><span data-i18n="Тип объекта">Тип объекта</span><select id="propertyType" name="property_type" required><option value="" data-i18n="Выберите тип объекта">Выберите тип объекта</option><option value="Квартиры" data-i18n="Квартира">Квартира</option><option value="Дома" data-i18n="Дом">Дом</option><option value="Комнаты" data-i18n="Комната">Комната</option><option value="Коммерческая недвижимость" data-i18n="Коммерческая недвижимость">Коммерческая недвижимость</option><option value="Гаражи и парковочные места" data-i18n="Гараж / паркоместо">Гараж / паркоместо</option><option value="Земельные участки" data-i18n="Земельный участок">Земельный участок</option></select></label>
           </div>
+          <button type="button" class="btn btn-primary full property-listing-more" id="propertyListingMore" aria-expanded="false" aria-controls="propertyAdvancedFields"><span data-i18n="Більше">Больше</span><span aria-hidden="true" class="property-listing-more-icon">⌄</span></button>
+          <section id="propertyMarketPanel" class="vehicle-market-panel property-market-panel" hidden aria-live="polite">
+            <h3 data-i18n="Орієнтовна ринкова ціна">Ориентировочная рыночная цена</h3>
+            <p class="property-market-title" data-i18n="Вкажіть параметри об’єкта для оцінки ціни">Укажите параметры объекта для оценки цены</p>
+            <div class="market-price-scale" role="img" aria-label="Шкала рыночной цены"><span></span><i></i></div>
+            <div class="market-price-scale-labels"><span data-i18n="Нижче ринку">Ниже рынка</span><span data-i18n="Ринкова ціна">Рыночная цена</span><span data-i18n="Вище ринку">Выше рынка</span></div>
+            <p class="muted" data-i18n="Для попередньої оцінки потрібні основні параметри об’єкта.">Для предварительной оценки нужны основные параметры объекта.</p>
+            <div class="vehicle-market-auth"><p data-i18n="Увійдіть або зареєструйтеся, щоб отримати точнішу оцінку та продовжити заповнення оголошення.">Войдите или зарегистрируйтесь, чтобы получить более точную оценку и продолжить заполнение объявления.</p><div class="vehicle-market-auth-actions"><button type="button" class="btn btn-primary" id="propertyMarketLogin" data-i18n="Вхід">Войти</button><button type="button" class="btn" id="propertyMarketRegister" data-i18n="Реєстрація">Зарегистрироваться</button></div></div>
+          </section>
+          <section id="propertyAdvancedFields" class="property-advanced-fields" hidden>
+          <h3 data-i18n="Додаткові параметри">Дополнительные параметры</h3>
           <div class="property-listing-grid">
-            <label class="property-field" data-property-for="Квартиры,Дома,Комнаты,Коммерческая недвижимость"><span>Общая площадь, м²</span><input name="property_area" type="number" min="0" step="0.1" placeholder="65"></label>
-            <label class="property-field" data-property-for="Квартиры,Комнаты"><span>Количество комнат</span><select name="property_rooms"><option value="">Не указано</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5+">5+</option></select></label>
-            <label class="property-field" data-property-for="Квартиры,Комнаты,Коммерческая недвижимость"><span>Этаж</span><input name="property_floor" type="number" min="0" step="1" placeholder="4"></label>
-            <label class="property-field" data-property-for="Квартиры,Комнаты,Коммерческая недвижимость"><span>Этажность здания</span><input name="property_floors_total" type="number" min="1" step="1" placeholder="9"></label>
-            <label class="property-field" data-property-for="Квартиры,Дома"><span>Площадь кухни, м²</span><input name="property_kitchen_area" type="number" min="0" step="0.1" placeholder="12"></label>
-            <label class="property-field" data-property-for="Квартиры,Дома,Коммерческая недвижимость,Гаражи и парковочные места"><span>Тип здания</span><select name="property_building_type"><option value="">Не указано</option><option value="Кирпичный">Кирпичный</option><option value="Панельный">Панельный</option><option value="Монолитный">Монолитный</option><option value="Монолитно-кирпичный">Монолитно-кирпичный</option><option value="Деревянный">Деревянный</option><option value="Другое">Другое</option></select></label>
-            <label class="property-field" data-property-for="Квартиры,Дома,Комнаты,Коммерческая недвижимость,Гаражи и парковочные места"><span>Состояние</span><select name="property_condition"><option value="">Не указано</option><option value="Новостройка">Новостройка</option><option value="Новый ремонт">Новый ремонт</option><option value="Жилое состояние">Жилое состояние</option><option value="Нужен ремонт">Нужен ремонт</option><option value="Под ремонт">Под ремонт</option></select></label>
-            <label class="property-field" data-property-for="Квартиры,Дома,Комнаты"><span>Меблі</span><select name="property_furniture"><option value="">Не указано</option><option value="Есть">Есть</option><option value="Нет">Нет</option><option value="Частично">Частично</option></select></label>
-            <label class="property-field" data-property-for="Квартиры,Дома,Комнаты"><span>Балкон</span><select name="property_balcony"><option value="">Не указано</option><option value="Есть">Есть</option><option value="Нет">Нет</option></select></label>
-            <label class="property-field" data-property-for="Квартиры,Дома,Комнаты"><span>Лоджия</span><select name="property_loggia"><option value="">Не указано</option><option value="Есть">Есть</option><option value="Нет">Нет</option></select></label>
-            <label class="property-field" data-property-for="Квартиры,Дома,Комнаты,Коммерческая недвижимость"><span>До метро, м</span><input name="property_metro_distance" type="number" min="0" step="1" placeholder="600"></label>
-            <label class="property-field" data-property-for="Дома,Земельные участки"><span>Площа ділянки, соток</span><input name="property_land_area" type="number" min="0" step="0.1" placeholder="6"></label>
-            <label class="property-field" data-property-for="Квартиры,Дома,Комнаты,Коммерческая недвижимость"><span>До школы, м</span><input name="property_school_distance" type="number" min="0" step="1" placeholder="350"></label>
-            <label class="property-field" data-property-for="Квартиры,Дома,Комнаты,Коммерческая недвижимость,Гаражи и парковочные места,Земельные участки"><span>До остановки, м</span><input name="property_stop_distance" type="number" min="0" step="1" placeholder="150"></label>
+            <label class="property-field" data-property-for="Квартиры,Дома,Комнаты,Коммерческая недвижимость"><span data-i18n="Общая площадь, м²">Общая площадь, м²</span><input name="property_area" type="number" min="0" step="0.1" placeholder="65"></label>
+            <label class="property-field" data-property-for="Квартиры,Комнаты"><span data-i18n="Количество комнат">Количество комнат</span><select name="property_rooms"><option value="" data-i18n="Не указано">Не указано</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5+">5+</option></select></label>
+            <label class="property-field" data-property-for="Квартиры,Комнаты,Коммерческая недвижимость"><span data-i18n="Этаж">Этаж</span><input name="property_floor" type="number" min="0" step="1" placeholder="4"></label>
+            <label class="property-field" data-property-for="Квартиры,Комнаты,Коммерческая недвижимость"><span data-i18n="Этажность здания">Этажность здания</span><input name="property_floors_total" type="number" min="1" step="1" placeholder="9"></label>
+            <label class="property-field" data-property-for="Квартиры,Дома"><span data-i18n="Площадь кухни, м²">Площадь кухни, м²</span><input name="property_kitchen_area" type="number" min="0" step="0.1" placeholder="12"></label>
+            <label class="property-field" data-property-for="Квартиры,Дома,Коммерческая недвижимость,Гаражи и парковочные места"><span data-i18n="Тип здания">Тип здания</span><select name="property_building_type"><option value="" data-i18n="Не указано">Не указано</option><option value="Кирпичный" data-i18n="Кирпичный">Кирпичный</option><option value="Панельный" data-i18n="Панельный">Панельный</option><option value="Монолитный" data-i18n="Монолитный">Монолитный</option><option value="Монолитно-кирпичный" data-i18n="Монолитно-кирпичный">Монолитно-кирпичный</option><option value="Деревянный" data-i18n="Деревянный">Деревянный</option><option value="Другое" data-i18n="Другое">Другое</option></select></label>
+            <label class="property-field" data-property-for="Квартиры,Дома,Комнаты,Коммерческая недвижимость,Гаражи и парковочные места"><span data-i18n="Состояние">Состояние</span><select name="property_condition"><option value="" data-i18n="Не указано">Не указано</option><option value="Новостройка" data-i18n="Новостройка">Новостройка</option><option value="Новый ремонт" data-i18n="Новый ремонт">Новый ремонт</option><option value="Жилое состояние" data-i18n="Жилое состояние">Жилое состояние</option><option value="Нужен ремонт" data-i18n="Нужен ремонт">Нужен ремонт</option><option value="Под ремонт" data-i18n="Под ремонт">Под ремонт</option></select></label>
+            <label class="property-field" data-property-for="Квартиры,Дома,Комнаты"><span data-i18n="Мебель">Меблі</span><select name="property_furniture"><option value="" data-i18n="Не указано">Не указано</option><option value="Есть" data-i18n="Есть">Есть</option><option value="Нет" data-i18n="Нет">Нет</option><option value="Частично" data-i18n="Частично">Частично</option></select></label>
+            <label class="property-field" data-property-for="Квартиры,Дома,Комнаты"><span data-i18n="Балкон">Балкон</span><select name="property_balcony"><option value="" data-i18n="Не указано">Не указано</option><option value="Есть" data-i18n="Есть">Есть</option><option value="Нет" data-i18n="Нет">Нет</option></select></label>
+            <label class="property-field" data-property-for="Квартиры,Дома,Комнаты"><span data-i18n="Лоджия">Лоджия</span><select name="property_loggia"><option value="" data-i18n="Не указано">Не указано</option><option value="Есть" data-i18n="Есть">Есть</option><option value="Нет" data-i18n="Нет">Нет</option></select></label>
+            <label class="property-field" data-property-for="Квартиры,Дома,Комнаты,Коммерческая недвижимость"><span data-i18n="До метро, м">До метро, м</span><input name="property_metro_distance" type="number" min="0" step="1" placeholder="600"></label>
+            <label class="property-field" data-property-for="Дома,Земельные участки"><span data-i18n="Площадь участка, соток">Площа ділянки, соток</span><input name="property_land_area" type="number" min="0" step="0.1" placeholder="6"></label>
+            <label class="property-field" data-property-for="Квартиры,Дома,Комнаты,Коммерческая недвижимость"><span data-i18n="До школы, м">До школы, м</span><input name="property_school_distance" type="number" min="0" step="1" placeholder="350"></label>
+            <label class="property-field" data-property-for="Квартиры,Дома,Комнаты,Коммерческая недвижимость,Гаражи и парковочные места,Земельные участки"><span data-i18n="До остановки, м">До остановки, м</span><input name="property_stop_distance" type="number" min="0" step="1" placeholder="150"></label>
           </div>
+          </section>
         </fieldset>
         <div class="listing-price-row">
           <label>Цена<input name="price" type="number" min="0" required placeholder="450000"></label>
@@ -474,6 +489,6 @@
   </div></div>
   <div class="modal hidden" id="favoritesModal" role="dialog" aria-modal="true" aria-labelledby="favoritesTitle"><div class="modal-card"><button class="modal-close" id="closeFavorites" type="button" aria-label="Закрыть">×</button><h2 id="favoritesTitle" data-i18n="Избранное">Избранное</h2><div id="favoritesList" class="favorites-list"></div></div></div>
   <div class="modal hidden" id="messagesModal" role="dialog" aria-modal="true" aria-labelledby="messagesTitle"><div class="modal-card messages-card"><button class="modal-close" id="closeMessages" type="button" aria-label="Закрыть">×</button><h2 id="messagesTitle" data-i18n="Сообщения">Сообщения</h2><div id="messagesContent"><p class="muted" id="messagesGuestHint">Войдите, чтобы видеть сообщения.</p><div id="conversationsList" class="conversations-list hidden"></div><div id="messagesThread" class="messages-thread hidden"><button class="link-btn" id="backToConvs" type="button">← К списку</button><div id="threadMessages" class="thread-messages"></div><form id="sendMessageForm" class="send-message-form"><input type="text" name="body" placeholder="Ваше сообщение..." required maxlength="2000" autocomplete="off"><button class="btn btn-primary" type="submit">Отправить</button></form></div></div></div></div>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="app.js?v=20261029-compact-property-menus-v4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="app.js?v=20261029-property-expand-location-v7"></script>
 </body>
 </html>

@@ -1977,6 +1977,13 @@ async function loadMarketQuotes() {
   tickerSetText("icon", "usd", icons.usd);
   tickerSetText("icon", "pln", icons.pln);
 
+  const goldUnitLabel = lang === "pl"
+    ? "za uncję trojańską"
+    : lang === "en"
+      ? "per troy ounce"
+      : lang === "ru"
+        ? "за тройскую унцию"
+        : "за тройську унцію";
 
   try {
     const [usdResult, plnResult, btcResult, xauResult] = await Promise.allSettled([
@@ -3380,6 +3387,7 @@ function closeCategoryMenu() {
   categorySelectTrigger?.setAttribute("aria-expanded", "false");
 }
 function closeVehicleSearch() { vehicleSearchMenu?.classList.add("hidden"); vehicleSearchBackdrop?.classList.add("hidden"); }
+let propertySearchCitySuggestionIndex = [];
 let propertySearchClientFilters = null;
 function preparePropertySearchMenu() {
   const cityInput = document.getElementById("propertySearchCity");

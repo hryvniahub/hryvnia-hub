@@ -1,7 +1,3 @@
-/* ============================================================
-   HRYVNIA HUB — ЕДИНЫЙ STYLES.CSS (основа Fix + необходимые компоненты Main)
-   ============================================================ */
-
 :root{
   --bg: #f3f5f4;
   --card: #ffffff;
@@ -52,14 +48,13 @@ button{ font-family: inherit; }
    ============================================================ */
 .header{
   position: sticky; top: 0; z-index: 40;
-  /* Match the bottom navigation; leave header buttons and logo styling untouched. */
+  
   background: #174C3A;
   border-bottom: 1px solid #174C3A;
   box-shadow: 0 2px 7px rgba(30, 42, 16, .055);
 }
 .nav{ min-height: 58px; display: flex; align-items: center; gap: 10px; padding: 3px 0; }
 
-/* Логотип */
 .brand{
   display: inline-flex; align-items: center; gap: 8px;
   text-decoration: none; 
@@ -74,7 +69,6 @@ button{ font-family: inherit; }
 }
 .brand .brand-text{ transform: scale(1.05, 1.25); transform-origin: left center; white-space: nowrap; line-height: 1.1; }
 
-/* Кнопки шапки */
 .header-actions{ display: flex; align-items: center; gap: 8px; margin-left: auto; flex-wrap: nowrap; }
 .header-action, .lang-btn{
   height: 44px; padding: 0 16px; background: var(--accent);
@@ -86,7 +80,6 @@ button{ font-family: inherit; }
 }
 .header-action:hover{ background: var(--accent-hover); }
 
-/* Язык */
 .lang-btn{ padding: 0; display: inline-flex; }
 .lang-trigger{
   height: 100%; padding: 0 12px; background: transparent; border: 0;
@@ -141,7 +134,6 @@ button{ font-family: inherit; }
   white-space: nowrap;
 }
 
-/* Иконки категорий (уменьшены) */
 .category-icon{
   flex: 0 0 24px; width: 24px; height: 24px;
   filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
@@ -194,17 +186,6 @@ button{ font-family: inherit; }
    ВАЛЮТНАЯ ЛЕНТА
    ============================================================ */
 
-
-
-
-
-
-
-
-
-
-
-
 /* ============================================================
    ПОИСК И AI
    ============================================================ */
@@ -216,7 +197,6 @@ button{ font-family: inherit; }
 .search-input-row{ display: grid; grid-template-columns: 1fr; gap: 8px; }
 .search-filters-row{ display: grid; grid-template-columns: 1.5fr 1fr; gap: 8px; }
 
-/* Выпадающий список категорий */
 .category-select-trigger{
   display: flex; align-items: center; gap: 10px; width: 100%; height: 42px;
   padding: 0 12px; background: #f5fbdc; border: 1.5px solid #bfd68e;
@@ -241,7 +221,6 @@ input:focus, select:focus, textarea:focus{ border-color: var(--accent-border); b
 .btn-primary{ background: var(--accent); color: #12140a; box-shadow: 0 4px 14px rgba(160, 190, 0, 0.35); }
 .btn-primary:hover{ background: var(--accent-hover); }
 
-/* AI Панель */
 .ai-panel{
   background: linear-gradient(135deg, #fbffea 0%, #ffffff 100%);
   border: 2px solid #174C3A; border-radius: var(--radius);
@@ -252,7 +231,6 @@ input:focus, select:focus, textarea:focus{ border-color: var(--accent-border); b
 .ai-subtitle{ margin: 0 0 8px; font-size: 11px; color: var(--muted); }
 .btn-ai{ background: var(--accent); color: #12140a; font-weight: 800; padding: 8px; border-radius: 8px; border: 0; cursor: pointer; width: 100%; height: 42px; font-size: 13px; }
 
-/* Поля поиска с иконками */
 .input-with-icon, .select-with-icon{ position: relative; width: 100%; display: flex; align-items: center; min-width: 0; }
 .input-icon{ position: absolute; left: 10px; width: 16px; height: 16px; color: #4a6354; pointer-events: none; z-index: 5; }
 .input-with-icon input, .select-with-icon select{ padding: 8px 28px 8px 34px; height: 40px; font-size: 13px; border-width: 1.5px; background-color: #fff; }
@@ -301,9 +279,8 @@ input:focus, select:focus, textarea:focus{ border-color: var(--accent-border); b
    МОБИЛЬНАЯ АДАПТАЦИЯ (≤ 720px)
    ============================================================ */
 @media (max-width: 720px) {
-  .container{ width: calc(100% - 16px); } /* Уменьшили отступы по краям с 16 до 8 пикселей */
+  .container{ width: calc(100% - 16px); } 
 
-  /* Шапка */
   .nav{ gap: 6px; }
   .brand{ padding: 4px 8px; gap: 4px; }
   .brand .logo{ width: 24px; height: 24px; }
@@ -315,7 +292,6 @@ input:focus, select:focus, textarea:focus{ border-color: var(--accent-border); b
   #openAdd{ padding: 0 6px; font-size: 10px; white-space: normal; line-height: 1.1; text-align: center; }
   .account-btn .account-label{ display: none; }
 
-  /* Категории */
   .categories-grid{ grid-template-columns: repeat(2, 1fr); column-gap: 8px;  }
   .category-card{ aspect-ratio: 3 / 1; padding: 8px; }
   .category-card-label{ left: 8px; bottom: 7px; font-size: 18px; gap: 5px; flex-direction: row; align-items: center; justify-content: flex-start; max-width: calc(100% - 16px); text-align: left; }
@@ -324,32 +300,14 @@ input:focus, select:focus, textarea:focus{ border-color: var(--accent-border); b
   .category-card[data-category="Готовый бизнес"] .category-card-label > span[data-i18n]{ text-align: left; line-height: 1.02; }
   .category-card[data-category="Готовый бизнес"] .category-card-long-word{ display: block; font-size: 15px; white-space: normal; }
 
-
-  /* Валюты */
-  
-  
-  
-  
-  
-  
-
-  /* Поиск и AI */
   .search-ai-section{ grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 8px; }
-  
-  
-   /* Скрываем лишний текст для компактности */
+
   .btn-ai{ font-size: 11px; padding: 6px; }
 
-  /* Списки */
   .urgent-deals{ padding-top: 14px; }
   .urgent-deals-grid{ grid-template-columns: 1fr; gap: 10px; }
 }
-/* ============================================================
-   HRYVNIA HUB — ВОССТАНОВЛЕНИЕ ДИЗАЙНА МОДАЛОК И ФОРМ
-   (Объединённые базовые стили модальных окон и форм)
-   ============================================================ */
 
-/* --- Общие стили модальных окон --- */
 .modal{ position: fixed; inset: 0; background: rgba(8, 10, 14, 0.56); display: grid; place-items: center; padding: 20px; z-index: 60; backdrop-filter: blur(2px); }
 .modal-card{ position: relative; width: min(540px, 100%); max-height: 90dvh; overflow: auto; background: #fff; border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-lg); }
 .modal-card h2{ margin-bottom: 18px; }
@@ -361,7 +319,6 @@ input:focus, select:focus, textarea:focus{ border-color: var(--accent-border); b
 .form-message.error{ color: #c62828; }
 .form-message.success{ color: #247a36; }
 
-/* --- Авторизация (Вкладки и пароли) --- */
 .auth-tabs{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 16px; }
 .auth-tab{ min-width: 0; min-height: 46px; border: 2px solid var(--accent); border-radius: 10px; background: #fff; color: #174C3A; font: inherit; font-weight: 700; cursor: pointer; }
 .auth-tab.active{ background: var(--accent); color: #17210a; }
@@ -373,7 +330,6 @@ input:focus, select:focus, textarea:focus{ border-color: var(--accent-border); b
 .password-toggle:hover{ background: #f3f4f7; }
 #authModal .auth-card{ border: 1px solid #75a983; box-shadow: 0 12px 34px rgba(32, 72, 42, .12); }
 
-/* --- Форма добавления (Фото и характеристики авто) --- */
 .photo-fields{ min-width: 0; margin: 0 0 14px; padding: 14px; border: 1px solid var(--line); border-radius: 12px; display: block; }
 .photo-fields legend{ font-weight: 700; padding: 0 6px; font-size: 14px; }
 .photo-preview{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
@@ -386,7 +342,6 @@ input:focus, select:focus, textarea:focus{ border-color: var(--accent-border); b
   display: none;
 }
 
-/* --- Меню категорий (Темная стеклянная тема) --- */
 .category-menu-backdrop{ position: fixed; inset: 0; z-index: 999; background: rgba(8, 18, 13, .46); backdrop-filter: blur(8px); }
 .category-menu{ position: fixed; z-index: 1000; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(92vw, 430px); max-height: min(82dvh, 620px); overflow: auto; padding: 20px; border-radius: 22px; background: rgba(18, 39, 29, .96); color: #f7f9f5; box-shadow: 0 24px 80px rgba(0,0,0,.28); }
 .category-menu h2{ margin: 0 34px 18px 0; font-size: 22px; color: #fff; }
@@ -397,17 +352,14 @@ input:focus, select:focus, textarea:focus{ border-color: var(--accent-border); b
 .category-menu-option span:last-child{ margin-left: auto; color: var(--accent); }
 .category-menu-icon{ flex: 0 0 28px; width: 28px; text-align: center; color: var(--accent); }
 
-/* --- Выпадающие подсказки городов --- */
 .city-search{ position: relative; min-width: 0; margin-top: 6px; }
 .catalog-city-search{ position: relative; min-width: 0; }
 .city-suggestions, .catalog-city-suggestions{ position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 25; max-height: 240px; overflow: auto; padding: 4px; background: #fff; border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
 .city-suggestion, .catalog-city-suggestion{ display: block; width: 100%; padding: 10px 12px; border: 0; border-radius: 8px; background: transparent; color: var(--text); font: inherit; text-align: left; cursor: pointer; }
 
-/* --- Избранное (Сердечки) --- */
 .fav-btn{ position: absolute; top: 10px; right: 10px; width: 36px; height: 36px; border-radius: 50%; background: rgba(255, 255, 255, .94); border: 1.5px solid #dce3df; color: #6b7570; font-size: 18px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; z-index: 3; }
 .fav-btn.active{ color: #d4381e; border-color: #f0b8ad; background: #fff0ed; }
 
-/* --- Нижняя навигация (Иконки) --- */
 .bottom-nav-btn .bottom-nav-icon{
   display: inline-flex;
   align-items: center;
@@ -416,12 +368,6 @@ input:focus, select:focus, textarea:focus{ border-color: var(--accent-border); b
   height: 28px;
 }
 
-/* ============================================================
-   HRYVNIA HUB — ВОССТАНОВЛЕННЫЕ КОМПОНЕНТЫ MAIN
-   Добавлены только компоненты, используемые HTML или app.js.
-   ============================================================ */
-
-/* Точечные элементы из HTML */
 .brand-name{ font-weight: 800; }
 .flag{ display: inline-flex; align-items: center; justify-content: center; font-size: 16px; line-height: 1; }
 .flag-ru{ display: inline-block; width: 18px; height: 12px; border-radius: 2px; background: linear-gradient(to bottom, #f7f7f7 0 33.33%, #a7a7a7 33.33% 66.66%, #222 66.66% 100%); box-shadow: 0 0 0 1px rgba(0,0,0,.12); vertical-align: middle; }
@@ -430,15 +376,11 @@ input:focus, select:focus, textarea:focus{ border-color: var(--accent-border); b
 .search-input-row-stacked{ grid-template-columns: minmax(0, 1fr); }
 .search-input-row-stacked > input, .search-input-row-stacked > button{ width: 100%; min-width: 0; }
 
-
-
-
 .category-menu-option .category-menu-option-label{ flex: 1 1 auto; min-width: 0; font-size: 15px; font-weight: 650; line-height: 1.25; overflow-wrap: anywhere; }
 .password-toggle-icon{ display: inline-flex; align-items: center; justify-content: center; line-height: 1; }
 .password-field.is-visible .password-toggle-icon{ font-size: 15px; }
 #listingDialog .btn-contact{ margin-top: 12px; }
 
-/* Заголовки секций и общие текстовые элементы */
 .section-head{
   display: flex;
   align-items: flex-end;
@@ -459,7 +401,6 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
 .ai-text{ position: relative; z-index: 1; min-width: 0; max-width: 100%; }
 .ai-visual{ position: relative; z-index: 1; flex: 0 0 auto; font-size: 40px; line-height: 1; }
 
-/* Карточки объявлений: классы создаются динамически в app.js */
 .card{
   position: relative;
   background: var(--card);
@@ -489,7 +430,6 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
 .listing-published-date{ margin: 6px 0 10px; color: var(--muted); font-size: 12px; }
 .card.no-cover .listing-photo{ display: none; }
 
-/* Бейджи горячих, срочных и частных объявлений */
 .hot-listing-badge, .urgent-listing-badge, .owner-listing-badge{
   display: inline-flex;
   align-items: center;
@@ -504,7 +444,6 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
 .urgent-listing-badge{ background: #ffe0a3; color: #583800; }
 .owner-listing-badge{ background: var(--accent-soft); color: var(--text); }
 
-/* Городские подсказки — название и область */
 .city-search > input[type="search"]{ margin-top: 0; }
 .city-suggestion:hover, .city-suggestion:focus, .catalog-city-suggestion:hover, .catalog-city-suggestion:focus{ background: #f0f5e7; outline: none; }
 .city-suggestion-name{ display: block; font-size: 14px; font-weight: 700; }
@@ -513,7 +452,6 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
 .photo-fields .form-message:empty{ display: none; }
 .photo-fields .muted{ margin: 8px 0; font-size: 12.5px; line-height: 1.45; }
 
-/* Форма входа и вспомогательные кнопки */
 .auth-form{ display: grid; gap: 10px; }
 .auth-form label{ display: grid; gap: 5px; min-width: 0; }
 .auth-form label > span{ font-size: 13px; font-weight: 650; }
@@ -539,18 +477,10 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
 .hot-toggle{ display: flex; align-items: center; gap: 8px; min-width: 0; margin: 8px 0; }
 .hot-toggle input{ width: auto; flex: 0 0 auto; }
 
-/* Стрелки направления котировок */
-
-
-
-
-
-/* Избранное */
 .favorites-list{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .favorites-list .fav-card{ min-width: 0; cursor: pointer; }
 .favorites-list .fav-card .listing-photo{ height: 140px; }
 
-/* Сообщения и переписка — DOM создаётся в app.js */
 .messages-card{ max-width: 660px; }
 .messages-card .modal-close{
   display: inline-flex;
@@ -623,7 +553,6 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
 .messages-empty{ display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 30px 16px; border: 1px dashed #cfe0b0; border-radius: 12px; background: #f9fdf1; color: var(--muted); text-align: center; }
 .messages-empty-icon{ color: var(--accent-border); font-size: 40px; line-height: 1; }
 
-/* Индикатор новых сообщений и нижняя навигация */
 .bottom-nav-btn{ position: relative; }
 .bottom-nav-btn .bottom-nav-icon svg, .bottom-nav-btn .bottom-nav-icon img{ display: block; width: 22px; height: 22px; }
 .bottom-nav-btn[data-nav="home"] .bottom-nav-icon svg{ width: 25px; height: 25px; }
@@ -669,14 +598,12 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
 }
 .new-message-toast.visible{ transform: translate(-50%, 0); opacity: 1; pointer-events: auto; cursor: pointer; }
 
-/* Загрузка кнопок */
 .spinner{ display: inline-block; width: 1em; height: 1em; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: hh-spin .7s linear infinite; vertical-align: -.12em; flex: 0 0 auto; }
 .is-loading{ display: inline-flex; align-items: center; justify-content: center; gap: .55em; cursor: wait; }
 .is-loading:disabled{ opacity: .85; }
 @keyframes hh-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .spinner{ animation-duration: 1.5s; } }
 
-/* Фильтры автомобилей — диалог, который открывает app.js */
 .vehicle-search-backdrop{
   position: fixed;
   inset: 0;
@@ -775,7 +702,6 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
 .edit-actions{ display: flex; gap: 10px; flex-wrap: wrap; }
 .listing-edit-form .form-message{ overflow-wrap: anywhere; }
 
-/* Меню аккаунта — единый источник стилей в styles.css */
 #accountMenuRoot{ margin: 18px 0 22px; }
 .account-menu-list{ display: grid; gap: 8px; }
 .account-menu-item{
@@ -816,10 +742,9 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
 .account-listing-row{ display: block; width: 100%; padding: 12px 0; border: 0; border-bottom: 1px solid #e4e7e2; background: none; text-align: left; font: inherit; cursor: pointer; }
 .account-listing-row strong{ display: block; margin-bottom: 4px; }
 
-/* Адаптация восстановленных компонентов */
 @media (max-width: 720px) {
   body{ padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px)); }
-  /* Единые мобильные настройки баннера: без повторных переопределений */
+  
   .main-banner{ height: clamp(104px, 20vw, 124px); padding: 10px 12px 24px; }
   .banner-content{ gap: 5px; padding-bottom: 0; }
   .banner-title{ font-size: 18px; line-height: 1.08; transform: none; }
@@ -827,10 +752,7 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
   .hero-text{ font-size: 15px; line-height: 1.18; max-width: 100%; }
   .banner-icons{ bottom: 4px; gap: 12px; }
   .banner-icon{ width: 14px; height: 14px; }
-  
-  
-  
-  
+
   .search-panel{ padding: 8px 10px; gap: 6px; }
   .search-filters-row{ grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
   .ai-panel{ padding: 8px; }
@@ -876,7 +798,6 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
   .search-filters-row{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-/* Узкие телефоны: шапка не должна выходить за экран */
 @media (max-width: 360px) {
   .brand{ gap: 3px; padding: 3px 5px; font-size: 12px; }
   .brand .brand-text{ font-size: 12px; transform: none; }
@@ -891,17 +812,14 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
   .brand .brand-text{ font-size: 12px; }
 }
 
-/* Search row: keep the general text search visible and category control compact. */
 .search-input-row-stacked #searchInput{ display: block; }
 .search-input-row-stacked .category-select-trigger{ min-height: 42px; height: 42px; }
 
-/* Hryvnia Hub: follow-up fixes */
 @media (max-width: 720px) {
-  /* Keep a tiny visible separation between the two category-card rows. */
+  
   .categories-grid{ row-gap: 2px; }
 }
 
-/* Валюта в поиске автомобилей — отдельный фирменный акцент. */
 .vehicle-price-range .vehicle-currency-label select{
   border: 2px solid var(--accent, #A8C928);
   background: rgba(18,39,29,.98);
@@ -929,10 +847,6 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
 .vehicle-make-load-status button{ margin-left: 6px; padding: 0; border: 0; background: transparent; color: var(--accent, #A8C928); font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
 @keyframes vehicle-make-spin { to { transform: rotate(360deg); } }
 
-/* Remove the extra currency-ticker caption to save vertical space. */
-
-
-/* Hryvnia Hub: расширенный поиск автомобилей */
 .vehicle-search-toggle{
   border: 1px solid rgba(168, 201, 40,.55);
   background: transparent;
@@ -952,15 +866,11 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
   }
 }
 
-/* Компактный выбор категории перед созданием объявления */
 .add-category-menu{ width: min(92vw, 390px); max-height: min(78dvh, 480px); padding: 18px; }
 .add-category-menu h2{ margin-bottom: 10px; padding-right: 20px; font-size: 20px; }
 .add-category-menu .category-menu-option{ padding: 11px 6px; }
 .add-category-menu .category-menu-option:last-child{ border-bottom: 0; }
 
-/* Explicitly respect hidden on form labels; the grid label rule must not override it. */
-
-/* --- Обновлённая форма создания объявления: единый стиль с поиском авто --- */
 #addModal{
   z-index: 1001;
   padding: 12px;
@@ -1122,12 +1032,10 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
   #addModal #addForm > label, #addModal #addForm > fieldset, #addModal #addForm > button, #addModal #addForm > p{ grid-column: 1 / -1; }
 }
 
-/* Listing-form vehicle make loading state */
 #addModal #vehicleListingMake:disabled{ opacity: .82; cursor: progress; }
 #addModal #vehicleListingMakeSpinner{ border-color: rgba(32,53,43,.2); border-top-color: var(--accent, #A8C928); border-right-color: var(--accent, #A8C928); }
 #addModal #vehicleListingMakeStatus{ color: rgba(247,249,245,.78); }
 
-/* Unified listing editor — visually aligned with the Hryvnia Hub search/create UI. */
 .listing-edit-dialog{
   width: min(900px, calc(100% - 24px));
   max-width: 900px;
@@ -1136,9 +1044,7 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
   padding: clamp(16px, 3vw, 28px);
   
   border-radius: 20px;
-  
-  
-  
+
 }
 .listing-edit-dialog::backdrop{ background: rgba(10,14,10,.68); backdrop-filter: blur(3px); }
 .listing-edit-form{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));  }
@@ -1171,7 +1077,6 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
   .listing-edit-form .edit-actions button{ width: 100%; }
 }
 
-/* Hryvnia Hub listing editor: deep-green visual system + searchable city field */
 .listing-edit-header{
   border-bottom: 1px solid #c6dcca;
   
@@ -1191,8 +1096,7 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
 .listing-edit-form .edit-actions .btn-primary:hover{ background: #216b43; }
 .listing-edit-form .edit-actions button:not(.btn-primary){
   border: 1px solid #9cbea5;
-  
-  
+
 }
 .listing-edit-form .edit-city-field{ position: relative; }
 .listing-edit-form .edit-city-suggestions{
@@ -1227,7 +1131,6 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
 .listing-edit-form .edit-city-suggestion .city-suggestion-region{ display: block; margin-top: 2px; color: #617968; font-size: .82em; }
 .listing-edit-form .edit-city-suggestions .city-suggestion-empty{ padding: 10px; color: #617968; }
 
-/* Final compact dark-green listing editor, aligned with the create-listing modal. */
 .listing-edit-dialog{
   background: linear-gradient(160deg, #102b1e 0%, #173a29 100%);
   color: #f4f8f2;
@@ -1287,7 +1190,6 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
   .listing-edit-form .vehicle-listing-fields{ grid-template-columns: minmax(0, 1fr); }
 }
 
-/* Hryvnia Hub listing flow: compact basic form, inline estimate and auth prompt. */
 #addModal #addForm [hidden]{ display: none !important; }
 #addModal .listing-progress{ grid-column: 1 / -1; display: flex; align-items: flex-start; gap: 7px; margin: 0 0 8px; }
 #addModal .listing-progress-step{ display: grid; justify-items: center; gap: 5px; min-width: 48px; color: rgba(247,249,245,.62); }
@@ -1317,10 +1219,8 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
   #addModal .listing-progress-step small{ font-size: 9px; }
 }
 
-/* Keep authentication dialog above the listing form that launched it. */
 #authModal{ z-index: 2000 !important; position: fixed; }
 
-/* Hryvnia Hub — universal horizontal listing cards */
 .listing{ grid-template-columns: minmax(0, 1fr); gap: 14px; }
 .listing-card-horizontal{ display: grid; grid-template-columns: minmax(260px, 44%) minmax(0, 1fr); gap: 0; padding: 0; overflow: hidden; text-align: left;  border: 1px solid #e5e9e4; border-radius: 18px; }
 .listing-card-media{ position: relative; min-width: 0; min-height: 220px; background: #f0f3ef; }
@@ -1362,7 +1262,6 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
   .listing-card-horizontal .price{ font-size: 16px; gap: 3px; }
 }
 
-/* Scoped fix 3: compact photo grid only inside listing edit dialog. */
 .edit-photo-fields{ min-width: 0; width: 100%; box-sizing: border-box; }
 .edit-photo-preview{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; width: 100%; min-width: 0; margin-top: 10px; }
 .edit-photo-item{ min-width: 0; overflow: hidden; }
@@ -1373,7 +1272,6 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
 @media (min-width: 1000px) { .edit-photo-preview{ grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 @media (max-width: 360px) { .edit-photo-preview{ gap: 6px; } .edit-photo-item{ padding: 5px; } .edit-photo-item img{ height: 85px; } .edit-photo-item .photo-actions .btn{ font-size: 11px; padding: 5px 6px; } }
 
-/* Scoped fix 3b: keep add-listing photo manager full-width and tiled. */
 #addModal #photoFields{ grid-column: 1 / -1; width: 100%; min-width: 0; box-sizing: border-box; }
 #addModal #photoPreview{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; width: 100%; min-width: 0; }
 #addModal #photoPreview .photo-item{ min-width: 0; overflow: hidden; }
@@ -1381,7 +1279,6 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
 @media (min-width: 700px) { #addModal #photoPreview{ grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (min-width: 1000px) { #addModal #photoPreview{ grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 
-/* Hryvnia Hub mobile refinements: balanced listing columns, compact market scale, two-row photo rail, unified hot badge. */
 @media (max-width: 720px) {
   .listing-card-horizontal{ grid-template-columns: minmax(0, 50%) minmax(0, 50%); }
   .listing-card-media{ display: flex; align-items: center; overflow: hidden; }
@@ -1395,13 +1292,11 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
   #addModal #photoPreview{ display: grid; grid-auto-flow: column; grid-template-rows: repeat(2, minmax(0, auto)); grid-auto-columns: minmax(100px, 34%); grid-template-columns: none; gap: 8px; width: 100%; overflow-x: auto; overscroll-behavior-x: contain; padding-bottom: 6px; }
   #addModal #photoPreview .photo-item img{ height: 82px; object-fit: contain; background: rgba(255,255,255,.08); }
 }
-/* The same red hot badge is positioned over the photo in both card layouts. */
+
 .hot-card-media{ position: relative; display: block; width: 100%; min-width: 0; overflow: hidden; }
 .hot-card-media > .listing-photo, .hot-card-media > .listing-placeholder{ display: block; width: 100%; height: 120px; object-fit: cover; margin: 0; border-radius: 8px; }
 .hot-card-media > .hot-listing-badge, .listing-card-media > .hot-listing-badge{ position: absolute; top: 8px; left: 8px; z-index: 2; display: inline-flex; align-items: center; padding: 5px 9px; border: 0; border-radius: 6px; background: #f04432; color: #fff; font-size: 12px; line-height: 1.15; font-weight: 800; white-space: nowrap; box-shadow: 0 1px 4px rgba(0,0,0,.18); }
 
-/* Hryvnia Hub — agreed listing-card refinements (2026-10-25) */
-/* 1) Brand rail occupies the existing favorite-control edge, not the photo column. */
 .listing-card-horizontal{
   position: relative;
   
@@ -1411,22 +1306,15 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
   top: 0;
   right: -34px;
   z-index: 3;
-  
-  
-  
-  
+
   border-radius: 50%;
-  
-  
-  
+
 }
 
-/* 2) Slightly improve text readability without enlarging the price or photos. */
 .listing-card-horizontal h3{ font-size: clamp(15px, 3.9vw, 20px); }
 .listing-card-horizontal .listing-card-specs{ font-size: clamp(11px, 2.9vw, 15px); }
 .listing-card-horizontal .city{ font-size: 12px; }
 
-/* 3) The standalone hot heading was removed from index.html; keep its section compact. */
 .urgent-deals{ padding-top: 8px; }
 @media (min-width: 721px) {
   .listing-card-horizontal .listing-card-heading .fav-btn{
@@ -1453,7 +1341,6 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
   .listing-card-horizontal .listing-card-specs{ font-size: 14px; }
 }
 
-/* 4) Fine-tune mobile listing typography: slightly larger city label. */
 @media (max-width: 720px) {
   .listing-card-horizontal .city{
     font-size: 13px;
@@ -1462,30 +1349,22 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
   }
 }
 
-/* Hryvnia Hub — final requested card refinements (2026-10-25) */
-/* Keep the favorite button white, with a clear brand-green heart outline. */
 .listing-card-horizontal .listing-card-heading .fav-btn.active{
   color: #16833b;
   background: #f0f8f1;
 }
-/* Softer orange hot badge instead of vivid red. */
 
-/* Make the former price easier to read without competing with the current price. */
-
-
-/* Hryvnia Hub — final visual alignment with bottom navigation (2026-10-25) */
-/* Favorite heart uses the same lime accent as the home, favorites and messages icons. */
 .listing-card-horizontal .listing-card-heading .fav-btn, .listing-card-horizontal .listing-card-heading .fav-btn.active{
   color: #A8C928;
   background: #fff;
   border: 1px solid rgba(168,  201,  40, .45);
 }
-/* Keep the agreed softer orange badge. */
+
 .hot-card-media > .hot-listing-badge, .listing-card-media > .hot-listing-badge{
   background: #ff8a24;
   color: #fff;
 }
-/* Slightly clearer former price, without changing the current price. */
+
 .listing-card-horizontal .old-price{
   color: #6f7973;
   opacity: 1;
@@ -1501,16 +1380,11 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
   .listing-card-horizontal .old-price{ font-size: 11px; }
 }
 
-/* ============================================================
-   HRYVNIA HUB — фирменный тёмно-зелёный фон (черновик 2026-10-26)
-   Только оформление: размеры блоков и логика приложения не меняются.
-   ============================================================ */
 :root{
   --dark: #174C3A;
   --accent-hover: #B5D63A;
 }
 
-/* Основной фон страницы и свободные промежутки между секциями. */
 html, body{
   background-color: #174C3A;
 }
@@ -1523,10 +1397,6 @@ main{
   background: transparent;
 }
 
-/* Тикер валют остаётся светлым, как в согласованном макете. */
-
-
-/* Логотип: только текст HRYVNIA HUB, без старой иконки H. */
 .brand .logo{
   display: none;
 }
@@ -1546,14 +1416,10 @@ main{
   paint-order: stroke fill;
 }
 
-/* Фон между объявлениями становится фирменным зелёным.
-   Белая поверхность каждой карточки сохраняется; правая цветная полоса убирается. */
 .listing-card-horizontal{
   background: #ffffff;
 }
 
-/* Сердечко остаётся рабочим и находится внутри белой карточки,
-   а не в отдельной зелёной полосе. */
 .listing-card-horizontal .listing-card-content{
   padding-right: 24px;
 }
@@ -1621,17 +1487,9 @@ main{
   }
 }
 
-
-/* ============================================================
-   HRYVNIA HUB — ТОЧЕЧНАЯ ДОРАБОТКА ЛОГОТИПА И КАТЕГОРИЙ
-   Финальные переопределения: радиусы, размер текста и позиционирование.
-   ============================================================ */
-
-/* Более прямые углы: четыре карточки категорий и главный баннер. */
 .category-card{ border-radius: 8px; }
 .main-banner{ border-radius: 8px; }
 
-/* Увеличиваем текстовый логотип, сохраняя его компактность. */
 .brand{
   padding: 7px 13px;
   min-height: 42px;
@@ -1642,7 +1500,6 @@ main{
   line-height: 1.1;
 }
 
-/* Подписи категорий — в левом нижнем углу; размер на десктопе тоже 17 px. */
 .category-card-label{
   left: 12px;
   bottom: 9px;
@@ -1691,11 +1548,6 @@ main{
   .brand{ font-size: 13px; padding: 4px 6px; }
 }
 
-
-/* ============================================================
-   HRYVNIA HUB — согласованная верхняя панель (2026-10-27)
-   Изменения ограничены логотипом и элементами шапки.
-   ============================================================ */
 .header .nav{ gap: 10px; }
 .header .brand{
   min-height: 44px;
@@ -1805,21 +1657,13 @@ main{
   .header #openAdd{ padding-inline: 5px; font-size: 10px; }
 }
 
-
-/* ============================================================
-   МОБИЛЬНЫЕ ТОЧЕЧНЫЕ ПРАВКИ: логотип, переключатель, стрелки
-   Только мобильная версия; desktop не затрагивается.
-   ============================================================ */
 @media (max-width: 720px) {
-  /* Увеличиваем высоту букв без изменения ширины текста в потоке
-     и без изменения размеров белого блока логотипа. */
+  
   .brand .brand-text{
     transform: scale(1, 1.25);
     transform-origin: left center;
   }
 
-  /* Одинаковая ширина переключателя для всех языков.
-     Отдельные колонки фиксируют место флага, города и часов. */
   .header-actions .lang-btn{
     flex: 0 0 126px;
     width: 126px;
@@ -1883,14 +1727,11 @@ main{
     font-variant-numeric: tabular-nums;
   }
 
-  /* Убираем стрелку у переключателя языка только на мобильных.
-     Иначе псевдоэлемент попадает на новую строку CSS Grid. */
   .header .lang-trigger::after{
     content: none;
     display: none;
   }
 
-  /* Неброская лаймовая стрелка в правом нижнем углу карточек. */
   .category-card::after{
     content: "›";
     position: absolute;
@@ -1907,8 +1748,6 @@ main{
   }
 }
 
-
-/* Hryvnia Hub — message timestamps, conversation listing thumbnails, muted-lime favorites. */
 .message-day-divider{ align-self: center; margin: 8px 0 4px; padding: 4px 10px; border-radius: 999px; background: #edf3e6; color: #53624e; font-size: 11px; font-weight: 700; line-height: 1.3; }
 .bubble-time{ display: block; margin-top: 4px; text-align: right; color: currentColor; opacity: .62; font-size: 10px; line-height: 1.2; font-variant-numeric: tabular-nums; }
 .conversation-card{ grid-template-columns: 56px minmax(0, 1fr) auto; }
@@ -1918,15 +1757,13 @@ main{
   .conversation-card{ grid-template-columns: 48px minmax(0, 1fr) auto; gap: 9px; }
   .conv-thumb, .conversation-card .conv-icon{ width: 48px; height: 48px; min-width: 48px; flex-basis: 48px; }
 }
-/* Muted lime rather than red/grey: clearer outline, same Hryvnia Hub accent. */
+
 .fav-btn{ color: #a8c928; border-color: rgba(168, 201, 40, .55); -webkit-text-stroke: .45px currentColor; font-weight: 700; }
 .fav-btn.active{ color: #a8c928; border-color: rgba(168, 201, 40, .65); background: #f7fbe9; }
 .listing-card-horizontal .fav-btn{ color: #a8c928; border: 1px solid rgba(168, 201, 40, .58); font-size: 27px; -webkit-text-stroke: .55px currentColor; }
 .listing-card-horizontal .fav-btn.active{ color: #a8c928; background: #f7fbe9; border-color: rgba(168, 201, 40, .7); }
 @media (max-width: 720px) { .listing-card-horizontal .fav-btn{ font-size: 22px; } }
 
-
-/* Messaging modal: compact conversation list, usable thread and composer on mobile. */
 .messages-card{
   display: flex;
   flex-direction: column;
@@ -2015,8 +1852,6 @@ main{
   #messagesModal .send-message-form input{ min-width: 0; }
 }
 
-
-/* FINAL FIX: keep flag, city and clock on one centered horizontal line. */
 @media (max-width: 720px) {
   .header .header-actions .lang-btn{
     flex: 0 0 138px;
@@ -2078,23 +1913,10 @@ main{
   }
 }
 
-
-/* Vehicle search geography filters */
 .vehicle-search-city-field{ position: relative; display: grid; gap: 6px; min-width: 0; color: #f7f9f5; font-size: 14px; font-weight: 650; }
 .vehicle-search-city-field input{ width: 100%; min-width: 0; min-height: 44px; padding: 9px 10px; border: 1px solid rgba(168, 201, 40,.38); border-radius: 10px; background: rgba(255,255,255,.97); color: #20352b; font: inherit; font-weight: 400; }
 .vehicle-search-city-suggestions{ top: calc(100% + 4px); max-height: 220px; overflow-y: auto; z-index: 10020; }
 
-
-/* Компактніша валютна стрічка: прибираємо зайві проміжки та робимо напрямок курсу помітним. */
-
-
-
-
-
-
-
-
-/* Branded AI category prompt */
 .hh-ai-prompt-backdrop{ position: fixed; inset: 0; z-index: 12000; display: grid; place-items: center; padding: 20px; background: rgba(3, 17, 12, .72); backdrop-filter: blur(7px); }
 .hh-ai-prompt{ width: min(100%, 360px); padding: 24px; border: 1px solid rgba(212,255,0,.42); border-radius: 22px; background: linear-gradient(145deg, #173c2d, #10271e); color: #f7f9f5; box-shadow: 0 22px 70px rgba(0,0,0,.42); text-align: center; }
 .hh-ai-prompt-badge{ display: inline-grid; place-items: center; width: 48px; height: 48px; margin: 0 auto 12px; border-radius: 15px; background: #d4ff00; color: #173c2d; font-weight: 900; font-size: 20px; }
@@ -2102,18 +1924,6 @@ main{
 .hh-ai-prompt p{ margin: 0 0 18px; color: rgba(247,249,245,.78); line-height: 1.45; }
 .hh-ai-prompt button{ width: 100%; min-height: 46px; border: 0; border-radius: 12px; background: #d4ff00; color: #14271e; font: inherit; font-weight: 800; cursor: pointer; }
 
-
-/* Market ticker: tighter mobile spacing and readable movement indicators. */
-
-
-
-
-
-
-
-
-
-/* AI prompt is an anchored branded popover, not a page-bottom alert. */
 .hh-ai-prompt-backdrop{ position: fixed; inset: 0; z-index: 12000; display: flex; align-items: flex-start; justify-content: center; padding: 16px; background: rgba(3,17,12,.24); backdrop-filter: blur(2px); }
 .hh-ai-prompt{ position: relative; margin-top: min(28vh, 220px); width: min(100%, 360px); padding: 22px 20px 18px; border: 1px solid rgba(212,255,0,.55); border-radius: 20px; background: linear-gradient(145deg,#173c2d,#10271e); color: #f7f9f5; box-shadow: 0 18px 55px rgba(0,0,0,.35); text-align: center; }
 .hh-ai-prompt-close{ position: absolute; top: 8px; right: 10px; width: 32px; height: 32px; border: 1px solid rgba(255,255,255,.18); border-radius: 50%; background: rgba(255,255,255,.08); color: #fff; font-size: 23px; line-height: 1; }
@@ -2123,8 +1933,6 @@ main{
 .hh-ai-prompt .hh-ai-prompt-ok{ width: 100%; min-height: 44px; border: 0; border-radius: 12px; background: #d4ff00; color: #14271e; font: inherit; font-weight: 800; }
 @media (max-width: 700px) { .hh-ai-prompt-backdrop{ align-items: center; } .hh-ai-prompt{ margin-top: 0; } }
 
-
-/* Hryvnia Hub — fix vehicle specification icons in listing cards */
 .listing-card-horizontal .vehicle-card-specs{
   display: flex;
   flex-wrap: wrap;
@@ -2170,7 +1978,6 @@ main{
   overflow: hidden;
 }
 
-/* Independent vehicle-search tabs */
 .vehicle-search-tabs{
   display: flex;
   align-items: center;
@@ -2224,54 +2031,6 @@ main{
 .vehicle-search-tab-add{ width: 36px; padding: 0; font-size: 22px; line-height: 1; color: var(--accent, #d4ff00); }
 .vehicle-search-tab:disabled, .vehicle-search-tab-close:disabled, .vehicle-search-tab-add:disabled{ opacity: .5; cursor: wait; }
 
-
-/* ============================================================
-   HRYVNIA HUB — TICKER V1: RATE + MOVEMENT + OFFICIAL SOURCE
-   ============================================================ */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* FINAL APPROVED DESIGN — compact, single-row Hryvnia Hub currency ticker */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* ============================================================
-   HRYVNIA HUB — COMPACT HORIZONTAL MARKET TICKER
-   One row, four columns; no descriptive subtitle line.
-   ============================================================ */
 .market-ticker {
   width: 100%;
   margin: 6px 0 0;
@@ -2295,7 +2054,7 @@ main{
   gap: 9px;
   min-width: 0;
   padding: 0 12px;
-  border-left: 3px solid #174c3a; /* фирменный тёмно-зелёный разделитель */
+  border-left: 3px solid #174c3a; 
 }
 .market-ticker .ticker-item:first-child { border-left: 0; padding-left: 2px; }
 .market-ticker .ticker-icon {
@@ -2361,7 +2120,7 @@ main{
 .market-ticker .ticker-change-badge.up { background: #e7f5e9; color: #16843b; }
 .market-ticker .ticker-change-badge.down { background: #fde9e9; color: #c92d2d; }
 .market-ticker .ticker-change-badge.flat { background: #eef1ee; color: #68736c; }
-/* BTC and gold show direction only; fiat currencies retain numeric change. */
+
 .market-ticker .ticker-item[data-ticker-item="btc"] .ticker-change,
 .market-ticker .ticker-item[data-ticker-item="xau"] .ticker-change { display: none; }
 .market-ticker .ticker-item[data-ticker-item="btc"] .ticker-change-badge,
@@ -2424,14 +2183,10 @@ main{
   .market-ticker .ticker-item[data-ticker-item="pln"] .ticker-source::before { flex-basis: 7px; width: 7px; height: 7px; margin-right: 1px; }
 }
 
-/* Hryvnia Hub — final micro-adjustments (2026-10-28)
-   Category arrows are ~20% larger; listing condition text is darker and lighter in weight. */
 .category-card::after{
   font-size: 30px;
 }
 
-
-/* Hryvnia Hub watermark is anchored to the actual image, not the empty media area. */
 .listing-photo-wrap{
   position: relative;
   display: block;
@@ -2496,46 +2251,268 @@ main{
   .detail-photo-watermark{ right: 7px; bottom: 7px; padding: 3.6px 5.4px; font-size: 8.1px; gap: 4.5px; border-radius: 8px; }
 }
 
-/* Hryvnia Hub — unify header logo frame with the photo watermark style. */
 .header .brand{
-  background: #ffffff !important;
+  background: #fff !important;
   border: 1px solid #17452f !important;
   border-radius: 14px !important;
   box-shadow: none !important;
 }
-
-/* Hryvnia Hub — third micro-adjustment to category and banner typography. */
-.category-card-label{ font-size: 13px; }
-.category-card-long-word{ font-size: 12px; }
-.category-card[data-category="Готовый бизнес"] .category-card-long-word{ font-size: 12px; }
-.banner-title .banner-title-accent{ font-size: calc(1em + 3px); }
-/* Match “ніж просто оголошення” to the lower supporting banner text. */
-.banner-title > span[data-i18n="than just listings"]{ font-size: clamp(12px, calc(1.2vw), 15px); }
-
-@media (max-width: 720px){
-  .category-card-label{ font-size: 14px; }
-  .category-card-long-word{ font-size: 12px; }
-  .category-card[data-category="Готовый бизнес"] .category-card-long-word{ font-size: 12px; }
-  .banner-title > span[data-i18n="than just listings"]{ font-size: 14px; }
-}
-
-
-/* Hryvnia Hub — align the supporting banner text with “ніж просто оголошення”. */
-.hero-text{ font-size: clamp(12px, calc(1.2vw), 15px); }
-@media (max-width: 720px){
-  .hero-text{ font-size: 14px; }
-}
-
-/* Hryvnia Hub — move category labels and icons 6px left and down. */
 .category-card-label{
   left: 6px !important;
   bottom: 3px !important;
   max-width: calc(100% - 12px) !important;
+  font-size: 13px;
 }
+.category-card-long-word,
+.category-card[data-category="Готовый бизнес"] .category-card-long-word{ font-size: 12px; }
+.banner-title .banner-title-accent{ font-size: calc(1em + 3px); }
+.banner-title > span[data-i18n="than just listings"]{ font-size: clamp(12px, calc(1.2vw), 15px); }
+.hero-text{ font-size: clamp(12px, calc(1.2vw), 15px); }
 @media (max-width: 720px){
   .category-card-label{
     left: 2px !important;
     bottom: 1px !important;
     max-width: calc(100% - 4px) !important;
+    font-size: 14px;
+  }
+  .category-card-long-word,
+  .category-card[data-category="Готовый бизнес"] .category-card-long-word{ font-size: 12px; }
+  .banner-title > span[data-i18n="than just listings"]{ font-size: 14px; }
+  .hero-text{ font-size: 14px; }
+}
+
+.real-estate-tabs{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:6px;
+  padding:5px;
+  margin:0 0 12px;
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(168,201,40,.35);
+  border-radius:10px;
+}
+.real-estate-tab{
+  min-width:0;
+  min-height:40px;
+  padding:8px 5px;
+  border:1px solid transparent;
+  border-radius:6px;
+  background:transparent;
+  color:#f7f9f5;
+  font:inherit;
+  font-size:14px;
+  font-weight:750;
+  cursor:pointer;
+  transition:background .15s ease,color .15s ease,border-color .15s ease;
+}
+.real-estate-tab:hover{background:rgba(168,201,40,.10);}
+.real-estate-tab.active{
+  background:var(--accent);
+  color:#173b2d;
+  border-color:#c1d967;
+  box-shadow:0 2px 7px rgba(0,0,0,.12);
+}
+.real-estate-options{display:flex;flex-direction:column;gap:0;}
+.category-menu-option.real-estate-option{
+  min-height:49px;
+  padding:11px 7px;
+  gap:10px;
+}
+.real-estate-option .category-menu-icon{
+  flex-basis:30px;
+  width:30px;
+  height:30px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid rgba(168,201,40,.38);
+  border-radius:6px;
+  background:rgba(168,201,40,.08);
+  font-size:19px;
+}
+.real-estate-option .category-menu-option-label{
+  font-size:15px;
+  font-weight:650;
+}
+.real-estate-option-arrow{color:var(--accent);font-size:23px;line-height:1;}
+@media(max-width:480px){
+  .category-menu{width:min(94vw,430px);padding:16px;max-height:84dvh;}
+  .category-menu h2{font-size:20px;margin-bottom:14px;}
+  .real-estate-tabs{gap:4px;padding:4px;margin-bottom:9px;}
+  .real-estate-tab{min-height:38px;font-size:13px;}
+  .category-menu-option.real-estate-option{min-height:46px;padding:10px 5px;gap:8px;}
+  .real-estate-option .category-menu-option-label{font-size:14px;}
+}
+
+.property-listing-fields{
+  min-width:0;
+  margin:8px 0 14px;
+  padding:14px;
+  border:1px solid var(--accent-border);
+  border-radius:14px;
+}
+.property-listing-fields[hidden]{display:none!important}
+.property-listing-fields legend{padding:0 6px;font-size:14px;font-weight:800;color:#174C3A}
+.property-listing-context,.property-listing-grid,.listing-price-row{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.property-listing-fields label,.listing-price-row label{
+  display:block;
+  min-width:0;
+  margin:0;
+  font-size:13px;
+  font-weight:700;
+}
+.property-listing-fields input,.property-listing-fields select,.listing-price-row input,.listing-price-row select{
+  display:block;
+  margin-top:6px;
+  min-width:0;
+}
+.property-listing-grid{margin-top:10px}
+.listing-price-row{grid-template-columns:minmax(0,1fr) 110px;margin:0 0 12px}
+#listingCurrencyField[hidden]{display:none!important}
+@media(max-width:560px){
+  .property-listing-context,.property-listing-grid{grid-template-columns:minmax(0,1fr)}
+  .listing-price-row{grid-template-columns:minmax(0,1fr) 100px}
+  .property-listing-fields{padding:11px}
+}
+
+.property-detail-specs{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px 12px;
+  margin:10px 0;
+}
+.property-detail-specs .vehicle-spec-item{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  font-size:13px;
+  font-weight:650;
+  color:var(--text);
+}
+
+.category-menu:has(.property-search-shell){
+  width:min(94vw,680px);
+  max-height:min(90dvh,900px);
+  padding:24px;
+  border-radius:28px;
+  background:rgba(4,39,27,.97);
+  border:1px solid rgba(168,201,40,.2);
+}
+.category-menu:has(.property-search-shell) h2{font-size:clamp(22px,3vw,30px);margin:0 44px 20px 0;}
+.property-search-shell{display:flex;flex-direction:column;gap:16px;min-width:0;}
+.property-search-section{min-width:0;padding:12px 14px 14px;border:1px solid rgba(168,201,40,.25);border-radius:22px;background:rgba(12,58,39,.3);}
+.property-section-heading{display:flex;align-items:center;gap:14px;width:100%;min-height:42px;padding:0 2px 10px;border:0;background:transparent;color:#f7f9f5;text-align:left;font:inherit;font-size:clamp(16px,2.4vw,21px);font-weight:800;cursor:pointer;}
+.property-section-icon{display:inline-flex;align-items:center;justify-content:center;flex:0 0 34px;color:var(--accent);font-size:29px;line-height:1;}
+.property-section-chevron{margin-left:auto;color:var(--accent);font-size:25px;line-height:1;transition:transform .15s ease;}
+.property-section-heading[aria-expanded="false"] .property-section-chevron,.property-more-toggle[aria-expanded="true"] .property-section-chevron{transform:rotate(180deg);}
+.property-location-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+.property-search-field{position:relative;display:flex;align-items:center;gap:12px;min-width:0;min-height:58px;padding:0 13px;border:1px solid rgba(219,240,228,.28);border-radius:17px;background:rgba(0,28,20,.35);color:#f7f9f5;box-sizing:border-box;}
+.property-search-field:focus-within{border-color:rgba(212,255,0,.8);box-shadow:0 0 0 2px rgba(212,255,0,.08);}
+.property-field-icon{flex:0 0 27px;text-align:center;color:var(--accent);font-size:25px;line-height:1;}
+.property-search-field input,.property-search-field select{appearance:none;display:block;width:100%;min-width:0;margin:0;padding:10px 0;border:0;outline:0;background:transparent;color:#f7f9f5;font:inherit;font-size:clamp(14px,2vw,17px);}
+.property-search-field input::placeholder{color:rgba(247,249,245,.88);opacity:1;}
+.property-search-field select option{background:#123b2c;color:#f7f9f5;}
+.property-field-chevron{flex:0 0 auto;color:#f7f9f5;font-size:23px;line-height:1;pointer-events:none;}
+.property-address-field{gap:10px;}
+.property-map-point{flex:0 0 28px;width:28px;height:32px;border:0;background:transparent;color:#f7f9f5;font-size:29px;line-height:1;cursor:pointer;}
+.property-city-field{z-index:4;}
+.property-city-suggestions{position:absolute;top:calc(100% + 5px);left:0;right:0;z-index:20;max-height:220px;overflow:auto;padding:5px;border:1px solid rgba(168,201,40,.35);border-radius:12px;background:#10382a;box-shadow:0 12px 30px rgba(0,0,0,.3);}
+.property-city-suggestions[hidden],.property-more-fields[hidden]{display:none!important;}
+.property-city-suggestion{display:flex;flex-direction:column;gap:2px;width:100%;padding:9px 10px;border:0;border-radius:8px;background:transparent;color:#f7f9f5;text-align:left;cursor:pointer;}
+.property-city-suggestion:hover{background:rgba(212,255,0,.12);}
+.property-category-field{min-height:64px;}
+.property-category-field .property-field-icon{font-size:30px;}
+.property-deal-section .real-estate-tabs{margin:0;padding:3px;gap:0;border-radius:14px;background:rgba(0,25,18,.28);}
+.property-deal-section .real-estate-tab{min-height:52px;border-radius:9px;font-size:clamp(14px,2vw,18px);}
+.property-deal-section .real-estate-tab+.real-estate-tab{border-left:1px solid rgba(247,249,245,.17);}
+.property-search-apply{display:flex;align-items:center;justify-content:center;gap:14px;width:100%;min-height:68px;padding:14px 18px;border:0;border-radius:22px;background:var(--accent);color:#112f23;font:inherit;font-size:clamp(18px,2.6vw,23px);font-weight:850;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.12);}
+.property-search-apply:hover{filter:brightness(1.04);}
+.property-search-apply span{font-size:30px;line-height:1;}
+.property-more-section{padding:2px 2px 0;border-top:1px solid rgba(247,249,245,.18);}
+.property-more-toggle{display:flex;align-items:center;gap:12px;width:100%;min-height:54px;padding:5px 0;border:0;background:transparent;color:#f7f9f5;text-align:left;font:inherit;font-size:clamp(16px,2.3vw,20px);font-weight:800;cursor:pointer;}
+.property-more-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:8px 0 4px;}
+.property-more-fields label{display:flex;flex-direction:column;gap:6px;min-width:0;color:#f7f9f5;font-size:14px;font-weight:700;}
+.property-more-fields input{width:100%;min-width:0;box-sizing:border-box;padding:12px;border:1px solid rgba(219,240,228,.28);border-radius:12px;background:rgba(0,28,20,.35);color:#fff;font:inherit;}
+@media(max-width:560px){
+  .category-menu:has(.property-search-shell){width:calc(100vw - 24px);max-height:calc(100dvh - 36px);padding:18px 14px;border-radius:25px;}
+  .category-menu:has(.property-search-shell) h2{margin-bottom:15px;font-size:22px;}
+  .property-search-shell{gap:12px;}
+  .property-search-section{padding:10px 10px 12px;border-radius:18px;}
+  .property-section-heading{gap:10px;min-height:38px;padding-bottom:8px;font-size:17px;}
+  .property-section-icon{flex-basis:30px;font-size:25px;}
+  .property-location-grid{gap:9px;}
+  .property-search-field{min-height:52px;padding:0 9px;gap:8px;border-radius:14px;}
+  .property-field-icon{flex-basis:22px;font-size:21px;}
+  .property-search-field input,.property-search-field select{font-size:13px;}
+  .property-map-point{flex-basis:23px;width:23px;font-size:24px;}
+  .property-deal-section .real-estate-tab{min-height:46px;font-size:14px;}
+  .property-search-apply{min-height:58px;border-radius:18px;font-size:19px;}
+  .property-more-toggle{min-height:48px;font-size:17px;}
+}
+@media(max-width:380px){
+  .property-location-grid{grid-template-columns:minmax(0,1fr);}
+  .property-search-field{min-height:48px;}
+}
+
+.category-menu,
+.category-menu:has(.property-search-shell){
+  color: #f7f9f5;
+  background: #173b2b;
+  border: 1px solid rgba(168, 201, 40, .55);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .38);
+}
+.category-menu h2,
+.category-menu:has(.property-search-shell) h2{ color: #fff; }
+.category-menu-close{
+  border-color: rgba(168, 201, 40, .55);
+  color: #fff;
+}
+.category-menu-option,
+.category-menu-option.real-estate-option{
+  color: #fff;
+  border-bottom-color: rgba(168, 201, 40, .28);
+  background: transparent;
+}
+.category-menu-option:hover,
+.category-menu-option:focus-visible,
+.category-menu-option.real-estate-option:hover{
+  color: #fff;
+  background: rgba(168, 201, 40, .10);
+}
+.category-menu-icon,
+.real-estate-option .category-menu-icon,
+.real-estate-option-arrow{ color: #A8C928; }
+.real-estate-tabs{
+  background: rgba(255, 255, 255, .06);
+  border-color: rgba(168, 201, 40, .35);
+}
+.real-estate-tab{ color: #fff; }
+.real-estate-tab.active{
+  background: #A8C928;
+  border-color: #A8C928;
+  color: #173b2b;
+  box-shadow: none;
+}
+.property-search-section{
+  border-color: rgba(168, 201, 40, .28);
+  background: rgba(255, 255, 255, .035);
+}
+.property-search-field{
+  border-color: rgba(255, 255, 255, .28);
+  background: rgba(0, 0, 0, .12);
+}
+.property-search-field select option{ background: #173b2b; color: #fff; }
+.property-city-suggestions{
+  background: #173b2b;
+  border-color: rgba(168, 201, 40, .45);
+}
+.property-city-suggestion{ color: #fff; }
+@media (max-width: 480px){
+  .category-menu:has(.property-search-shell){
+    border-radius: 22px;
   }
 }

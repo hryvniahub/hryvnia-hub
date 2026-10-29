@@ -3996,6 +3996,7 @@ function openPropertyListingForm(propertyType = "", operation = "") {
     propertyOperationSelect.value = ["Продажа", "Аренда"].includes(operation) ? operation : "";
   }
   syncVehicleListingFields();
+  // Keep the property form independent from the vehicle form visibility state.
   if (listingAdvancedCommonFields) listingAdvancedCommonFields.hidden = false;
   if (propertyListingFields) {
     propertyListingFields.hidden = false;

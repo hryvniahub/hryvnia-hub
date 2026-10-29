@@ -992,6 +992,8 @@ async function initAuth() {
     if (error) throw error;
     currentUser = data?.session?.user || null;
     updateAccountButton();
+    const propertyMarketAuthPrompt = document.querySelector("#propertyMarketPanel .vehicle-market-auth");
+    if (propertyMarketAuthPrompt) propertyMarketAuthPrompt.hidden = Boolean(currentUser);
     if (currentUser && authUserEmail) authUserEmail.textContent = currentUser.email || "";
     if (currentUser) {
       await syncFavoritesOnLogin();
@@ -1004,6 +1006,8 @@ async function initAuth() {
   db.auth.onAuthStateChange(async (event, session) => {
     currentUser = session?.user || null;
     updateAccountButton();
+    const propertyMarketAuthPrompt = document.querySelector("#propertyMarketPanel .vehicle-market-auth");
+    if (propertyMarketAuthPrompt) propertyMarketAuthPrompt.hidden = Boolean(currentUser);
     if (currentUser) {
       setTimeout(updateUnreadMessageIndicators, 0);
       subscribeToGlobalMessages();
@@ -3890,6 +3894,9 @@ function setPropertyAdvancedFields(expanded) {
   if (propertyAdvancedFields) propertyAdvancedFields.hidden = !expanded;
   const propertyMarketPanel = document.getElementById("propertyMarketPanel");
   if (propertyMarketPanel) propertyMarketPanel.hidden = !expanded;
+  // Keep the price estimate visible, but do not prompt an authenticated user to sign in/register.
+  const propertyMarketAuthPrompt = propertyMarketPanel?.querySelector(".vehicle-market-auth");
+  if (propertyMarketAuthPrompt) propertyMarketAuthPrompt.hidden = Boolean(currentUser);
   propertyListingMore?.setAttribute("aria-expanded", String(expanded));
   if (propertyListingMore) {
     const label = propertyListingMore.querySelector("[data-i18n]");
@@ -3901,15 +3908,15 @@ function setPropertyAdvancedFields(expanded) {
 
 function syncPropertyListingFields() {
   if (!propertyListingFields) return;
-  const type = propertyTypeSelect?.value || "";
   propertyListingFields.hidden = listingCategorySelect?.value !== "Недвижимость";
   propertyListingFields.disabled = listingCategorySelect?.value !== "Недвижимость";
+  // Keep the full set of property parameters available for every property type.
+  // The “Більше” button controls visibility of the whole advanced section;
+  // choosing a type must not silently remove fields from that section.
   propertyListingFields.querySelectorAll("[data-property-for]").forEach(field => {
-    const allowedTypes = (field.dataset.propertyFor || "").split(",").map(value => value.trim());
-    const visible = !type || allowedTypes.includes(type);
-    field.hidden = !visible;
+    field.hidden = false;
     field.querySelectorAll("input,select").forEach(control => {
-      control.disabled = propertyListingFields.disabled || !visible;
+      control.disabled = propertyListingFields.disabled;
     });
   });
   const isProperty = listingCategorySelect?.value === "Недвижимость";

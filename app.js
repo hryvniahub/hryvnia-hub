@@ -3996,6 +3996,13 @@ function openPropertyListingForm(propertyType = "", operation = "") {
     propertyOperationSelect.value = ["Продажа", "Аренда"].includes(operation) ? operation : "";
   }
   syncVehicleListingFields();
+  // The real-estate creation form must always show shared fields
+  // (price/currency, description, photos and publish button).
+  if (listingAdvancedCommonFields) listingAdvancedCommonFields.hidden = false;
+  if (propertyListingFields) {
+    propertyListingFields.hidden = false;
+    propertyListingFields.disabled = false;
+  }
   closeCategoryMenu();
   closeAddCategoryMenu();
   addModal?.classList.remove("hidden");

@@ -1214,6 +1214,19 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
 #addModal .vehicle-market-auth p{ margin: 0 0 12px; font-size: 13px; line-height: 1.45; }
 #addModal .vehicle-market-auth-actions{ display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
 #addModal .vehicle-advanced-fields, #addModal .listing-advanced-common{ display: contents; }
+/* Property creation form: let the property fieldset use the full add-form width. */
+#addModal #addForm #propertyListingFields{
+  grid-column: 1 / -1;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+#addModal #addForm #propertyListingFields .property-listing-context,
+#addModal #addForm #propertyListingFields .property-listing-grid{
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
 @media (max-width: 480px) {
   #addModal .vehicle-market-panel{ padding: 12px; }
   #addModal .listing-progress{ gap: 4px; }

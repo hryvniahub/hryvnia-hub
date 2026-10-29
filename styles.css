@@ -2417,6 +2417,8 @@ main{
   text-overflow:ellipsis;
 }
 .property-listing-grid{margin-top:10px}
+/* Keep a visible gap between the operation/type selects and the More/Less toggle. */
+#addModal #addForm #propertyListingFields > .property-listing-more{margin-top:10px}
 .listing-price-row{grid-template-columns:minmax(0,1fr) 110px;margin:0 0 12px}
 #listingCurrencyField[hidden]{display:none!important}
 @media(max-width:560px){

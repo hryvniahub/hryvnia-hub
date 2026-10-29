@@ -6,7 +6,7 @@
   <meta name="google" content="notranslate">
   <title>Hryvnia Hub — объявления Украины</title>
   <meta name="description" content="Hryvnia Hub — хаб объявлений: автомобили, недвижимость и бизнес.">
-  <link rel="stylesheet" href="styles.css?v=20261029-property-two-column-v5">
+  <link rel="stylesheet" href="styles.css?v=20261029-property-expand-location-v7">
 </head>
 <body>
   <header class="header">
@@ -419,7 +419,7 @@
             <label><span data-i18n="Тип объекта">Тип объекта</span><select id="propertyType" name="property_type" required><option value="" data-i18n="Выберите тип объекта">Выберите тип объекта</option><option value="Квартиры" data-i18n="Квартира">Квартира</option><option value="Дома" data-i18n="Дом">Дом</option><option value="Комнаты" data-i18n="Комната">Комната</option><option value="Коммерческая недвижимость" data-i18n="Коммерческая недвижимость">Коммерческая недвижимость</option><option value="Гаражи и парковочные места" data-i18n="Гараж / паркоместо">Гараж / паркоместо</option><option value="Земельные участки" data-i18n="Земельный участок">Земельный участок</option></select></label>
           </div>
           <button type="button" class="btn btn-primary full property-listing-more" id="propertyListingMore" aria-expanded="false" aria-controls="propertyAdvancedFields"><span data-i18n="Більше">Больше</span><span aria-hidden="true" class="property-listing-more-icon">⌄</span></button>
-          <section id="propertyMarketPanel" class="vehicle-market-panel property-market-panel" aria-live="polite">
+          <section id="propertyMarketPanel" class="vehicle-market-panel property-market-panel" hidden aria-live="polite">
             <h3 data-i18n="Орієнтовна ринкова ціна">Ориентировочная рыночная цена</h3>
             <p class="property-market-title" data-i18n="Вкажіть параметри об’єкта для оцінки ціни">Укажите параметры объекта для оценки цены</p>
             <div class="market-price-scale" role="img" aria-label="Шкала рыночной цены"><span></span><i></i></div>
@@ -489,6 +489,6 @@
   </div></div>
   <div class="modal hidden" id="favoritesModal" role="dialog" aria-modal="true" aria-labelledby="favoritesTitle"><div class="modal-card"><button class="modal-close" id="closeFavorites" type="button" aria-label="Закрыть">×</button><h2 id="favoritesTitle" data-i18n="Избранное">Избранное</h2><div id="favoritesList" class="favorites-list"></div></div></div>
   <div class="modal hidden" id="messagesModal" role="dialog" aria-modal="true" aria-labelledby="messagesTitle"><div class="modal-card messages-card"><button class="modal-close" id="closeMessages" type="button" aria-label="Закрыть">×</button><h2 id="messagesTitle" data-i18n="Сообщения">Сообщения</h2><div id="messagesContent"><p class="muted" id="messagesGuestHint">Войдите, чтобы видеть сообщения.</p><div id="conversationsList" class="conversations-list hidden"></div><div id="messagesThread" class="messages-thread hidden"><button class="link-btn" id="backToConvs" type="button">← К списку</button><div id="threadMessages" class="thread-messages"></div><form id="sendMessageForm" class="send-message-form"><input type="text" name="body" placeholder="Ваше сообщение..." required maxlength="2000" autocomplete="off"><button class="btn btn-primary" type="submit">Отправить</button></form></div></div></div></div>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="app.js?v=20261029-compact-property-menus-v4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="app.js?v=20261029-property-expand-location-v7"></script>
 </body>
 </html>

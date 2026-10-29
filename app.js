@@ -4085,11 +4085,6 @@ document.getElementById("addCategoryOptions")?.addEventListener("click", event =
   const option = event.target.closest("[data-add-category]");
   if (!option) return;
   const category = option.dataset.addCategory;
-  if (category === "Недвижимость") {
-    closeAddCategoryMenu();
-    openCategoryMenu("Недвижимость");
-    return;
-  }
   const categorySelect = addForm?.querySelector('select[name="category"]');
   if (!categorySelect || ![...categorySelect.options].some(item => item.value === category)) return;
   categorySelect.value = category;

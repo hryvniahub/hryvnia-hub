@@ -3548,10 +3548,10 @@ function openCategoryMenu(parentCategory = "") {
       <div class="property-search-shell">
         <section class="property-search-section" aria-labelledby="propertyLocationTitle">
           <button type="button" class="property-section-heading" aria-expanded="true" data-property-section="location">
-            <span id="propertyLocationTitle">${escapeHtml(t("Локація"))}</span><span class="property-section-chevron" aria-hidden="true">⌃</span>
+            <span id="propertyLocationTitle">${escapeHtml(t("Локація"))}</span>
           </button>
           <div class="property-location-grid" id="propertyLocationFields">
-            <label class="property-search-field property-city-field"><input id="propertySearchCity" type="text" autocomplete="off" placeholder="${escapeHtml(t("Город"))}" aria-label="${escapeHtml(t("Город"))}" aria-expanded="false" aria-controls="propertySearchCitySuggestions"><span class="property-field-chevron" aria-hidden="true">⌄</span><div id="propertySearchCitySuggestions" class="property-city-suggestions" role="listbox" hidden></div></label>
+            <label class="property-search-field property-city-field"><input id="propertySearchCity" type="text" autocomplete="off" placeholder="${escapeHtml(t("Город"))}" aria-label="${escapeHtml(t("Город"))}" aria-expanded="false" aria-controls="propertySearchCitySuggestions"><div id="propertySearchCitySuggestions" class="property-city-suggestions" role="listbox" hidden></div></label>
             <label class="property-search-field"><select id="propertySearchRegion" aria-label="${escapeHtml(t("Область"))}"><option value="">${escapeHtml(t("Область"))}</option></select><span class="property-field-chevron" aria-hidden="true">⌄</span></label>
             <label class="property-search-field property-address-field"><input id="propertySearchAddress" type="text" placeholder="${escapeHtml(t("Адреса або точка на карті"))}" aria-label="${escapeHtml(t("Адреса або точка на карті"))}"><button type="button" id="propertyUseMapPoint" class="property-map-point" aria-label="${escapeHtml(t("Вказати точку на карті"))}" title="${escapeHtml(t("Вказати точку на карті"))}">⊙</button></label>
             <label class="property-search-field"><select id="propertySearchRadius" aria-label="${escapeHtml(t("Радіус, км"))}"><option value="">${escapeHtml(t("Радіус, км"))}</option><option value="5">5 км</option><option value="10">10 км</option><option value="20">20 км</option><option value="30">30 км</option><option value="50">50 км</option><option value="100">100 км</option></select><span class="property-field-chevron" aria-hidden="true">⌄</span></label>
@@ -3559,7 +3559,7 @@ function openCategoryMenu(parentCategory = "") {
         </section>
         <section class="property-search-section" aria-labelledby="propertyCategoryTitle">
           <button type="button" class="property-section-heading" aria-expanded="true" data-property-section="category">
-            <span id="propertyCategoryTitle">${escapeHtml(t("Категорія нерухомості"))}</span><span class="property-section-chevron" aria-hidden="true">⌃</span>
+            <span id="propertyCategoryTitle">${escapeHtml(t("Категорія нерухомості"))}</span>
           </button>
           <div class="property-search-field property-category-field">
             
@@ -3571,7 +3571,7 @@ function openCategoryMenu(parentCategory = "") {
         </section>
         <section class="property-search-section property-deal-section" aria-labelledby="propertyDealTitle">
           <button type="button" class="property-section-heading" aria-expanded="true" data-property-section="deal">
-            <span id="propertyDealTitle">${escapeHtml(t("Тип угоди"))}</span><span class="property-section-chevron" aria-hidden="true">⌃</span>
+            <span id="propertyDealTitle">${escapeHtml(t("Тип угоди"))}</span>
           </button>
           <div class="real-estate-tabs" role="tablist" aria-label="${escapeHtml(t("Тип угоди"))}">
             ${["Все", "Продажа", "Аренда"].map((label, index) => { const active = (categoryMenu.dataset.realEstateDeal || "Все") === label; return `<button type="button" class="real-estate-tab${active ? " active" : ""}" role="tab" aria-selected="${active ? "true" : "false"}" data-real-estate-deal="${escapeHtml(label)}">${escapeHtml(t(label))}</button>`; }).join("")}

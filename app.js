@@ -1005,6 +1005,39 @@ const PHOTO_BUCKET = "listing-photos";
 const MAX_PHOTOS = 10;
 const MAX_PHOTO_BYTES = 10 * 1024 * 1024;
 const PHOTO_TYPES = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" };
+// Ensure the create-listing form exposes description, photo upload, and a submit/save button.
+(() => {
+  const form = document.getElementById("addForm");
+  if (!form) return;
+
+  if (!form.querySelector('textarea[name="description"]')) {
+    const description = document.createElement("label");
+    description.innerHTML = `<span>${escapeHtml(t("Описание"))}</span><textarea name="description" rows="5" maxlength="10000" placeholder="${escapeHtml(t("Коротко опишите предложение"))}"></textarea>`;
+    const submit = form.querySelector('button[type="submit"]');
+    form.insertBefore(description, submit || null);
+  }
+
+  if (!form.querySelector("#photoFields")) {
+    const photos = document.createElement("fieldset");
+    photos.id = "photoFields";
+    photos.innerHTML = `<legend id="photoLabel"></legend>
+      <p id="photoHint"></p>
+      <input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp" multiple hidden>
+      <button id="photoPickerButton" type="button" class="btn"></button>
+      <div id="photoPreview" class="photo-preview"></div>
+      <p id="photoMessage" class="form-message" role="status"></p>`;
+    const submit = form.querySelector('button[type="submit"]');
+    form.insertBefore(photos, submit || null);
+  }
+
+  if (!form.querySelector('button[type="submit"]')) {
+    const save = document.createElement("button");
+    save.type = "submit";
+    save.className = "btn btn-primary";
+    save.textContent = lang === "uk" ? "Зберегти" : lang === "pl" ? "Zapisz" : lang === "en" ? "Save" : "Сохранить";
+    form.append(save);
+  }
+})();
 const photoFields = document.getElementById("photoFields");
 const photoInput = document.getElementById("photoInput");
 const photoPreview = document.getElementById("photoPreview");
@@ -3505,13 +3538,6 @@ function preparePropertySearchMenu() {
   });
   regionSelect?.addEventListener("focus", initCities, {once:true});
   regionSelect?.addEventListener("change", () => { activeRegionCode = regionSelect.value; selectedCatalogCityId = ""; cityInput.value = ""; if (citySuggestions) citySuggestions.hidden = true; });
-  document.getElementById("propertyMoreToggle")?.addEventListener("click", () => {
-    const toggle = document.getElementById("propertyMoreToggle");
-    const fields = document.getElementById("propertyMoreFields");
-    const open = toggle?.getAttribute("aria-expanded") !== "true";
-    toggle?.setAttribute("aria-expanded", String(open));
-    if (fields) fields.hidden = !open;
-  });
   categoryMenuOptions?.querySelectorAll("[data-property-section]").forEach(button => button.addEventListener("click", () => {
     const section = button.dataset.propertySection;
     const content = section === "location" ? document.getElementById("propertyLocationFields") : section === "category" ? typeTrigger?.closest(".property-search-section")?.querySelector(".property-category-field") : button.closest(".property-search-section")?.querySelector(".real-estate-tabs");
@@ -3599,8 +3625,7 @@ function openCategoryMenu(parentCategory = "") {
         </section>
         <button type="button" id="propertySearchApply" class="property-search-apply">${escapeHtml(t("Розширений пошук"))}<span aria-hidden="true">→</span></button>
         <section class="property-more-section">
-          <button type="button" class="property-more-toggle" id="propertyMoreToggle" aria-expanded="false" aria-controls="propertyMoreFields"><span>${escapeHtml(t("Більше фільтрів"))}</span><span class="property-section-chevron" aria-hidden="true">⌄</span></button>
-          <div id="propertyMoreFields" class="property-more-fields" hidden>
+          <div id="propertyMoreFields" class="property-more-fields">
             <label>${escapeHtml(t("Ціна від"))}<input id="propertyPriceFrom" type="number" min="0" inputmode="numeric" placeholder="0"></label>
             <label>${escapeHtml(t("Ціна до"))}<input id="propertyPriceTo" type="number" min="0" inputmode="numeric" placeholder="${escapeHtml(t("Будь-яка ціна"))}"></label>
             <label>${escapeHtml(t("Площа від, м²"))}<input id="propertyAreaFrom" type="number" min="0" inputmode="decimal" placeholder="0"></label>
@@ -3971,6 +3996,13 @@ function openPropertyListingForm(propertyType = "", operation = "") {
     propertyOperationSelect.value = ["Продажа", "Аренда"].includes(operation) ? operation : "";
   }
   syncVehicleListingFields();
+  // Keep the property form independent from the vehicle form visibility state.
+  if (listingAdvancedCommonFields) listingAdvancedCommonFields.hidden = false;
+  if (propertyListingFields) {
+    propertyListingFields.hidden = false;
+    propertyListingFields.disabled = false;
+  }
+  if (vehicleListingFields) vehicleListingFields.hidden = true;
   closeCategoryMenu();
   closeAddCategoryMenu();
   addModal?.classList.remove("hidden");
@@ -4095,7 +4127,7 @@ document.getElementById("addCategoryOptions")?.addEventListener("click", event =
   const category = option.dataset.addCategory;
   if (category === "Недвижимость") {
     closeAddCategoryMenu();
-    openCategoryMenu("Недвижимость");
+    openPropertyListingForm("", "");
     return;
   }
   const categorySelect = addForm?.querySelector('select[name="category"]');

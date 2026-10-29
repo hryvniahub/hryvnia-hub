@@ -939,6 +939,29 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
 #addModal #addForm > label:nth-of-type(2), #addModal #addForm > label:has(textarea), #addModal #addForm > .photo-fields, #addModal #addForm > button[type="submit"], #addModal #addForm > #formMessage{
   grid-column: 1 / -1;
 }
+/* Common fields are wrapped in .listing-advanced-common (display: contents),
+   so span rules must target their descendants rather than direct form children. */
+#addModal #addForm .listing-advanced-common > label:has(textarea),
+#addModal #addForm .listing-advanced-common > .photo-fields,
+#addModal #addForm .listing-advanced-common > button[type="submit"],
+#addModal #addForm .listing-advanced-common > #formMessage,
+#addModal #addForm .listing-advanced-common > .listing-price-row{
+  grid-column: 1 / -1;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+#addModal #addForm .listing-advanced-common > label:has(textarea) textarea{
+  width: 100%;
+  min-height: 110px;
+  box-sizing: border-box;
+}
+#addModal #addForm .listing-advanced-common > .photo-fields{
+  display: block;
+}
+#addModal #addForm .listing-advanced-common > button[type="submit"]{
+  justify-self: stretch;
+}
 #addModal #addForm input:not([type="checkbox"]), #addModal #addForm select, #addModal #addForm textarea{
   width: 100%;
   min-width: 0;
@@ -1214,6 +1237,19 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
 #addModal .vehicle-market-auth p{ margin: 0 0 12px; font-size: 13px; line-height: 1.45; }
 #addModal .vehicle-market-auth-actions{ display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
 #addModal .vehicle-advanced-fields, #addModal .listing-advanced-common{ display: contents; }
+/* Property creation form: let the property fieldset use the full add-form width. */
+#addModal #addForm #propertyListingFields{
+  grid-column: 1 / -1;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+#addModal #addForm #propertyListingFields .property-listing-context,
+#addModal #addForm #propertyListingFields .property-listing-grid{
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
 @media (max-width: 480px) {
   #addModal .vehicle-market-panel{ padding: 12px; }
   #addModal .listing-progress{ gap: 4px; }
@@ -2519,3 +2555,38 @@ main{
 .property-more-fields label{min-width:0;}
 .category-menu-options{overscroll-behavior:contain;-webkit-overflow-scrolling:touch;}
 @media(max-width:640px){.edit-property-grid{grid-template-columns:minmax(0,1fr);}.listing-edit-dialog{max-height:90dvh;overflow-y:auto;overscroll-behavior:contain;}}
+
+
+/* Mobile fix: let the entire real-estate search menu scroll as one surface.
+   Avoid nested scrolling in the expanded "More filters" section. */
+@media (max-width: 720px) {
+  .category-menu:has(.property-search-shell) {
+    top: 12px;
+    bottom: calc(82px + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100vw - 24px);
+    max-height: none;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    padding-bottom: 20px;
+  }
+
+  .category-menu:has(.property-search-shell) .category-menu-options {
+    flex: 0 0 auto;
+    min-height: auto;
+    overflow: visible;
+    touch-action: auto;
+  }
+
+  .property-more-fields {
+    max-height: none;
+    overflow: visible;
+    overscroll-behavior: auto;
+    padding-bottom: 20px;
+  }
+}

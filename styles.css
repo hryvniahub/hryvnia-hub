@@ -2519,3 +2519,38 @@ main{
 .property-more-fields label{min-width:0;}
 .category-menu-options{overscroll-behavior:contain;-webkit-overflow-scrolling:touch;}
 @media(max-width:640px){.edit-property-grid{grid-template-columns:minmax(0,1fr);}.listing-edit-dialog{max-height:90dvh;overflow-y:auto;overscroll-behavior:contain;}}
+
+
+/* Mobile fix: let the entire real-estate search menu scroll as one surface.
+   Avoid nested scrolling in the expanded "More filters" section. */
+@media (max-width: 720px) {
+  .category-menu:has(.property-search-shell) {
+    top: 12px;
+    bottom: calc(82px + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100vw - 24px);
+    max-height: none;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    padding-bottom: 20px;
+  }
+
+  .category-menu:has(.property-search-shell) .category-menu-options {
+    flex: 0 0 auto;
+    min-height: auto;
+    overflow: visible;
+    touch-action: auto;
+  }
+
+  .property-more-fields {
+    max-height: none;
+    overflow: visible;
+    overscroll-behavior: auto;
+    padding-bottom: 20px;
+  }
+}

@@ -1303,11 +1303,7 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
 }
 .listing-card-horizontal .listing-card-heading .fav-btn{
   
-  top: 0;
-  right: -34px;
   z-index: 3;
-
-  border-radius: 50%;
 
 }
 
@@ -1317,27 +1313,17 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
 
 .urgent-deals{ padding-top: 8px; }
 @media (min-width: 721px) {
-  .listing-card-horizontal .listing-card-heading .fav-btn{
-    right: -40px;  
-  }
-  .listing-card-horizontal{ background: linear-gradient(to right, #fff calc(100% - 32px), var(--dark) calc(100% - 32px)); }
   .listing-card-horizontal h3{ font-size: clamp(20px, 2.1vw, 29px); }
   .listing-card-horizontal .listing-card-specs{ font-size: clamp(15px, 1.45vw, 20px); }
   .listing-card-horizontal .city{ font-size: 16px; }
 }
 
 @media (max-width: 720px) {
-  .listing-card-horizontal{ background: linear-gradient(to right, #fff calc(100% - 24px), var(--dark) calc(100% - 24px)); }
-  .listing-card-horizontal .listing-card-heading .fav-btn{
-    right: -30px;   
-  }
   .listing-card-horizontal h3{ font-size: clamp(14px, 3.9vw, 17px); }
   .listing-card-horizontal .listing-card-specs{ font-size: 14px; color: #424b45; line-height: 1.25; }
 }
 
 @media (max-width: 380px) {
-  .listing-card-horizontal{ background: linear-gradient(to right, #fff calc(100% - 22px), var(--dark) calc(100% - 22px)); }
-  .listing-card-horizontal .listing-card-heading .fav-btn{ right: -28px;    }
   .listing-card-horizontal .listing-card-specs{ font-size: 14px; }
 }
 

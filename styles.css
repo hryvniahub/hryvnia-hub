@@ -939,6 +939,29 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
 #addModal #addForm > label:nth-of-type(2), #addModal #addForm > label:has(textarea), #addModal #addForm > .photo-fields, #addModal #addForm > button[type="submit"], #addModal #addForm > #formMessage{
   grid-column: 1 / -1;
 }
+/* Common fields are wrapped in .listing-advanced-common (display: contents),
+   so span rules must target their descendants rather than direct form children. */
+#addModal #addForm .listing-advanced-common > label:has(textarea),
+#addModal #addForm .listing-advanced-common > .photo-fields,
+#addModal #addForm .listing-advanced-common > button[type="submit"],
+#addModal #addForm .listing-advanced-common > #formMessage,
+#addModal #addForm .listing-advanced-common > .listing-price-row{
+  grid-column: 1 / -1;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+#addModal #addForm .listing-advanced-common > label:has(textarea) textarea{
+  width: 100%;
+  min-height: 110px;
+  box-sizing: border-box;
+}
+#addModal #addForm .listing-advanced-common > .photo-fields{
+  display: block;
+}
+#addModal #addForm .listing-advanced-common > button[type="submit"]{
+  justify-self: stretch;
+}
 #addModal #addForm input:not([type="checkbox"]), #addModal #addForm select, #addModal #addForm textarea{
   width: 100%;
   min-width: 0;

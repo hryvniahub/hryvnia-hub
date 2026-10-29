@@ -277,8 +277,10 @@ const translations = {
   "Згорнути розширений пошук": { ru: "Меньше", uk: "Менше", en: "Less", pl: "Mniej" },
   "Скинути": { ru: "Сбросить", uk: "Скинути", en: "Reset", pl: "Wyczyść" },
   "Знайти автомобілі": { ru: "Найти автомобили", uk: "Знайти автомобілі", en: "Find cars", pl: "Znajdź samochody" },
+  "Знайти нерухомість": { ru: "Найти недвижимость", uk: "Знайти нерухомість", en: "Find properties", pl: "Znajdź nieruchomości" },
   "Застосувати": { ru: "Применить", uk: "Застосувати", en: "Apply", pl: "Zastosuj" },
   "Оберіть параметри автомобіля": { ru:"Выберите параметры автомобиля", uk:"Оберіть параметри автомобіля", en:"Choose vehicle filters", pl:"Wybierz parametry pojazdu" },
+  "Оберіть параметри нерухомості": { ru:"Выберите параметры недвижимости", uk:"Оберіть параметри нерухомості", en:"Choose property filters", pl:"Wybierz filtry nieruchomości" },
   "Будь-яка ціна": {ru:"Любая",uk:"Будь-яка ціна",en:"Any price",pl:"Dowolna cena"},
   "Всі марки": {ru:"Все марки",uk:"Всі марки",en:"All makes",pl:"Wszystkie marki"},
   "Всі моделі": {ru:"Все модели",uk:"Всі моделі",en:"All models",pl:"Wszystkie modele"},
@@ -3468,13 +3470,18 @@ const categorySelectTrigger = document.getElementById("categorySelectTrigger");
 const categorySelectLabel = document.getElementById("categorySelectLabel");
 const vehicleSearchMenu = document.getElementById("vehicleSearchMenu");
 const vehicleSearchBackdrop = document.getElementById("vehicleSearchBackdrop");
+const propertySearchMenu = document.getElementById("propertySearchMenu");
+const propertySearchBackdrop = document.getElementById("propertySearchBackdrop");
+const propertySearchContent = document.getElementById("propertySearchContent");
 let selectedSearchCategory = "";
 let vehicleModelsCache = [];
 let vehicleModelsPromise = null;
 function closeCategoryMenu() {
   categoryMenu?.classList.add("hidden"); categoryMenuBackdrop?.classList.add("hidden");
+  propertySearchMenu?.classList.add("hidden"); propertySearchBackdrop?.classList.add("hidden");
   categorySelectTrigger?.setAttribute("aria-expanded", "false");
 }
+function closePropertySearch() { propertySearchMenu?.classList.add("hidden"); propertySearchBackdrop?.classList.add("hidden"); }
 function closeVehicleSearch() { vehicleSearchMenu?.classList.add("hidden"); vehicleSearchBackdrop?.classList.add("hidden"); }
 // City suggestions are derived directly from citySearchIndex.
 let propertySearchClientFilters = null;
@@ -3611,7 +3618,7 @@ function preparePropertySearchMenu() {
     const numFilter = id => { const v = document.getElementById(id)?.value.trim() || ""; return v === "" ? null : Number(v); };
     propertySearchClientFilters = {
       type: typeTrigger?.dataset.value || "",
-      deal: categoryMenu?.dataset.realEstateDeal || "Все",
+      deal: propertySearchMenu?.dataset.realEstateDeal || "Все",
       priceFrom: fromNumbers[0], priceTo: fromNumbers[1], areaFrom: fromNumbers[2], areaTo: fromNumbers[3],
       address: document.getElementById("propertySearchAddress")?.value.trim() || "",
       radius: document.getElementById("propertySearchRadius")?.value || "",
@@ -3628,9 +3635,44 @@ function preparePropertySearchMenu() {
       landFrom: numFilter("propertyFilterLandFrom"), landTo: numFilter("propertyFilterLandTo")
     };
     if (searchInput) searchInput.value = "";
-    closeCategoryMenu();
+    closePropertySearch();
     loadListings();
   });
+  const moreFields = document.getElementById("propertyMoreFields");
+  const advancedToggle = document.getElementById("propertySearchToggleAdvanced");
+  advancedToggle?.addEventListener("click", () => {
+    const opening = Boolean(moreFields?.hidden);
+    if (moreFields) moreFields.hidden = !opening;
+    advancedToggle.setAttribute("aria-expanded", String(opening));
+    advancedToggle.textContent = t(opening ? "Згорнути розширений пошук" : "Розширений пошук");
+  });
+  document.getElementById("propertySearchReset")?.addEventListener("click", () => {
+    ["propertySearchCity", "propertySearchAddress", "propertySearchRadius", "propertySearchRegion", "propertyPriceFrom", "propertyPriceTo", "propertyAreaFrom", "propertyAreaTo", "propertyFilterRooms", "propertyFilterBuilding", "propertyFilterFloorFrom", "propertyFilterFloorTo", "propertyFilterFloorsFrom", "propertyFilterFloorsTo", "propertyFilterKitchenFrom", "propertyFilterKitchenTo", "propertyFilterCondition", "propertyFilterFurniture", "propertyFilterBalcony", "propertyFilterLoggia", "propertyFilterMetroFrom", "propertyFilterMetroTo", "propertyFilterLandFrom", "propertyFilterLandTo"].forEach(id => { const field = document.getElementById(id); if (field) field.value = ""; });
+    selectedCatalogCityId = ""; activeRegionCode = ""; propertySearchClientFilters = null;
+    if (citySuggestions) citySuggestions.hidden = true;
+    cityInput?.setAttribute("aria-expanded", "false");
+    if (typeTrigger) { typeTrigger.dataset.value = ""; const label = typeTrigger.querySelector(".property-type-label"); if (label) label.textContent = t("Оберіть категорію"); }
+    typeOptions?.querySelectorAll("[data-property-type]").forEach(option => { const selected = !option.dataset.propertyType; option.classList.toggle("is-selected", selected); option.setAttribute("aria-selected", String(selected)); });
+    if (propertySearchMenu) propertySearchMenu.dataset.realEstateDeal = "Все";
+    propertySearchContent?.querySelectorAll("[data-real-estate-deal]").forEach(tab => { const active = tab.dataset.realEstateDeal === "Все"; tab.classList.toggle("active", active); tab.setAttribute("aria-selected", String(active)); });
+    if (moreFields) moreFields.hidden = true;
+    if (advancedToggle) { advancedToggle.setAttribute("aria-expanded", "false"); advancedToggle.textContent = t("Розширений пошук"); }
+    renderRegions();
+    if (regionSelect) regionSelect.value = "";
+  });
+  if (propertySearchContent && propertySearchContent.dataset.dealTabsBound !== "1") {
+    propertySearchContent.dataset.dealTabsBound = "1";
+    propertySearchContent.addEventListener("click", event => {
+      const dealTab = event.target.closest("[data-real-estate-deal]");
+      if (!dealTab) return;
+      propertySearchMenu.dataset.realEstateDeal = dealTab.dataset.realEstateDeal || "Все";
+      propertySearchContent.querySelectorAll("[data-real-estate-deal]").forEach(tab => {
+        const active = tab === dealTab;
+        tab.classList.toggle("active", active);
+        tab.setAttribute("aria-selected", String(active));
+      });
+    });
+  }
   initCities();
 }
 
@@ -3642,10 +3684,11 @@ function openCategoryMenu(parentCategory = "") {
   ];
 
   if (parentCategory === "Недвижимость") {
-    categoryMenuTitle.textContent = t("Недвижимость");
+    document.getElementById("propertySearchTitle").textContent = t("Недвижимость");
+    document.getElementById("propertySearchIntro").textContent = t("Оберіть параметри нерухомості");
     const propertyTypes = categorySubcategories[parentCategory] || [];
-    categoryMenu.dataset.realEstateDeal = "Все";
-    categoryMenuOptions.innerHTML = `
+    propertySearchMenu.dataset.realEstateDeal = "Все";
+    propertySearchContent.innerHTML = `
       <div class="property-search-shell">
         <section class="property-search-section" aria-label="${escapeHtml(t("Локація"))}">
           <div class="property-location-grid" id="propertyLocationFields">
@@ -3666,12 +3709,11 @@ function openCategoryMenu(parentCategory = "") {
         </section>
         <section class="property-search-section property-deal-section" aria-label="${escapeHtml(t("Тип угоди"))}">
           <div class="real-estate-tabs" role="tablist" aria-label="${escapeHtml(t("Тип угоди"))}">
-            ${["Все", "Продажа", "Аренда"].map((label, index) => { const active = (categoryMenu.dataset.realEstateDeal || "Все") === label; return `<button type="button" class="real-estate-tab${active ? " active" : ""}" role="tab" aria-selected="${active ? "true" : "false"}" data-real-estate-deal="${escapeHtml(label)}">${escapeHtml(t(label))}</button>`; }).join("")}
+            ${["Все", "Продажа", "Аренда"].map((label, index) => { const active = (propertySearchMenu.dataset.realEstateDeal || "Все") === label; return `<button type="button" class="real-estate-tab${active ? " active" : ""}" role="tab" aria-selected="${active ? "true" : "false"}" data-real-estate-deal="${escapeHtml(label)}">${escapeHtml(t(label))}</button>`; }).join("")}
           </div>
         </section>
-        <button type="button" id="propertySearchApply" class="property-search-apply">${escapeHtml(t("Розширений пошук"))}<span aria-hidden="true">→</span></button>
         <section class="property-more-section">
-          <div id="propertyMoreFields" class="property-more-fields">
+          <div id="propertyMoreFields" class="property-more-fields" hidden>
             <label>${escapeHtml(t("Ціна від"))}<input id="propertyPriceFrom" type="number" min="0" inputmode="numeric" placeholder="0"></label>
             <label>${escapeHtml(t("Ціна до"))}<input id="propertyPriceTo" type="number" min="0" inputmode="numeric" placeholder="${escapeHtml(t("Будь-яка ціна"))}"></label>
             <label>${escapeHtml(t("Площа від, м²"))}<input id="propertyAreaFrom" type="number" min="0" inputmode="decimal" placeholder="0"></label>
@@ -3694,8 +3736,17 @@ function openCategoryMenu(parentCategory = "") {
             <label>${escapeHtml(t("Площа ділянки, соток до"))}<input id="propertyFilterLandTo" type="number" min="0" step="0.1"></label>
           </div>
         </section>
+        <div class="property-search-actions">
+          <button type="button" id="propertySearchReset" class="vehicle-reset-btn">${escapeHtml(t("Скинути"))}</button>
+          <button type="button" id="propertySearchToggleAdvanced" class="vehicle-search-toggle" aria-expanded="false" aria-controls="propertyMoreFields">${escapeHtml(t("Розширений пошук"))}</button>
+          <button type="button" id="propertySearchApply" class="btn btn-primary">${escapeHtml(t("Знайти нерухомість"))}</button>
+        </div>
       </div>`;
+    closeCategoryMenu();
     preparePropertySearchMenu();
+    propertySearchMenu.classList.remove("hidden");
+    propertySearchBackdrop?.classList.remove("hidden");
+    return;
   } else if (parentCategory) {
     delete categoryMenu.dataset.realEstateDeal;
     categoryMenuTitle.textContent = t(parentCategory === "Готовый бизнес" ? "Бизнес и предпринимательство" : parentCategory);
@@ -4155,6 +4206,8 @@ document.querySelectorAll(".category").forEach(button => {
 });
 document.getElementById("categoryMenuClose")?.addEventListener("click", closeCategoryMenu);
 categoryMenuBackdrop?.addEventListener("click", closeCategoryMenu);
+document.getElementById("propertySearchClose")?.addEventListener("click", closePropertySearch);
+propertySearchBackdrop?.addEventListener("click", closePropertySearch);
 document.getElementById("vehicleSearchClose")?.addEventListener("click", closeVehicleSearch);
 vehicleSearchBackdrop?.addEventListener("click", closeVehicleSearch);
 document.getElementById("vehicleSearchToggleAdvanced")?.addEventListener("click", () => {

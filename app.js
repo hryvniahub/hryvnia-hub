@@ -3574,7 +3574,7 @@ function ensurePropertySearchTabsHost() {
     host.id = "propertySearchTabs";
     host.className = "vehicle-search-tabs property-search-tabs";
     host.setAttribute("aria-label", t("Збережені пошуки"));
-    document.getElementById("propertySearchIntro")?.after(host);
+    document.getElementById("propertySearchTitle")?.after(host);
   }
   return host;
 }
@@ -3926,7 +3926,6 @@ function openCategoryMenu(parentCategory = "") {
     if (document.getElementById("propertySearchCity")) capturePropertySearchTab();
     ensurePropertySearchTabs();
     document.getElementById("propertySearchTitle").textContent = t("Недвижимость");
-    document.getElementById("propertySearchIntro").textContent = t("Оберіть параметри нерухомості");
     const propertyTypes = categorySubcategories[parentCategory] || [];
     propertySearchMenu.dataset.realEstateDeal = ensurePropertySearchTabs().deal || "Все";
     propertySearchContent.innerHTML = `

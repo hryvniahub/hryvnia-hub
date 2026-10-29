@@ -3900,7 +3900,10 @@ function setPropertyAdvancedFields(expanded) {
   propertyListingMore?.setAttribute("aria-expanded", String(expanded));
   if (propertyListingMore) {
     const label = propertyListingMore.querySelector("[data-i18n]");
-    if (label) label.textContent = t(expanded ? "Скрыть" : "Більше");
+    if (label) {
+      label.dataset.i18n = expanded ? "Згорнути розширений пошук" : "Більше";
+      label.textContent = t(label.dataset.i18n);
+    }
     const icon = propertyListingMore.querySelector(".property-listing-more-icon");
     if (icon) icon.textContent = expanded ? "⌃" : "⌄";
   }

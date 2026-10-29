@@ -287,8 +287,8 @@ const translations = {
   "Модель": { ru: "Модель", uk: "Модель", en: "Model", pl: "Model" },
   "Рік від": { ru: "Год от", uk: "Рік від", en: "Year from", pl: "Rok od" },
   "Рік до": { ru: "Год до", uk: "Рік до", en: "Year to", pl: "Rok do" },
-  "Ціна від": { ru: "Цена от", uk: "Ціна від", en: "Price from", pl: "Cena od" },
-  "Ціна до": { ru: "Цена до", uk: "Ціна до", en: "Price to", pl: "Cena do" },
+
+
   "Пробіг від, км": { ru: "Пробег от, км", uk: "Пробіг від, км", en: "Mileage from, km", pl: "Przebieg od, km" },
   "Пробіг до, км": { ru: "Пробег до, км", uk: "Пробіг до, км", en: "Mileage to, km", pl: "Przebieg do, km" },
   "Об’єм двигуна від, л": { ru: "Объём двигателя от, л", uk: "Об’єм двигуна від, л", en: "Engine size from, L", pl: "Pojemność silnika od, l" },
@@ -1977,13 +1977,6 @@ async function loadMarketQuotes() {
   tickerSetText("icon", "usd", icons.usd);
   tickerSetText("icon", "pln", icons.pln);
 
-  const goldUnitLabel = lang === "pl"
-    ? "za uncję trojańską"
-    : lang === "en"
-      ? "per troy ounce"
-      : lang === "ru"
-        ? "за тройскую унцию"
-        : "за тройську унцію";
 
   try {
     const [usdResult, plnResult, btcResult, xauResult] = await Promise.allSettled([
@@ -2143,25 +2136,34 @@ function renderCitySuggestionButton(entry, className) {
     ${regionLine}
   </button>`;
 }
+function renderCitySuggestionList({ input, container, className, regionCode = "", limit = 12, emptyPrompt = false, showAllWhenEmpty = false }) {
+  if (!input || !container) return;
+  const term = String(input.value || "").trim();
+  const variants = getQueryVariants(term);
+  const base = regionCode
+    ? citySearchIndex.filter(entry => String(entry.city.region_katottg_code) === String(regionCode))
+    : citySearchIndex;
+  const ranked = term || showAllWhenEmpty
+    ? base.map(entry => ({ entry, rank: term ? rankCityEntry(entry, variants) : 0 }))
+      .filter(item => item.rank >= 0)
+      .sort((a, b) => a.rank - b.rank || cityName(a.entry.city).localeCompare(cityName(b.entry.city)))
+      .slice(0, limit)
+      .map(item => item.entry)
+    : [];
+  container.innerHTML = ranked.length
+    ? ranked.map(entry => renderCitySuggestionButton(entry, className)).join("")
+    : `<div class="city-suggestion-empty" role="status">${escapeHtml(cityTranslation(term || !emptyPrompt ? "Город не найден" : "Введите название города"))}</div>`;
+  container.hidden = false;
+  input.setAttribute("aria-expanded", "true");
+  return ranked;
+}
 function closeCatalogCitySuggestions() {
   if (!catalogCitySuggestions) return;
   catalogCitySuggestions.hidden = true;
   catalogCitySearchInput?.setAttribute("aria-expanded", "false");
 }
 function renderCatalogCitySuggestions() {
-  if (!catalogCitySuggestions || !catalogCitySearchInput) return;
-  const term = catalogCitySearchInput.value;
-  const queryVariants = getQueryVariants(term);
-  const base = activeRegionCode ? citySearchIndex.filter(e => String(e.city.region_katottg_code) === activeRegionCode) : citySearchIndex;
-  const ranked = term ? base.map(entry => ({ entry, rank: rankCityEntry(entry, queryVariants) }))
-    .filter(item => item.rank >= 0)
-    .sort((a, b) => a.rank - b.rank || cityName(a.entry.city).localeCompare(cityName(b.entry.city)))
-    .slice(0, 12).map(item => item.entry) : [];
-  catalogCitySuggestions.innerHTML = ranked.length
-    ? ranked.map(entry => renderCitySuggestionButton(entry, "catalog-city-suggestion")).join("")
-    : `<div class="city-suggestion-empty" role="status">${escapeHtml(term ? cityTranslation("Город не найден") : cityTranslation("Введите название города"))}</div>`;
-  catalogCitySuggestions.hidden = false;
-  catalogCitySearchInput.setAttribute("aria-expanded", "true");
+  renderCitySuggestionList({ input: catalogCitySearchInput, container: catalogCitySuggestions, className: "catalog-city-suggestion", regionCode: activeRegionCode, emptyPrompt: true });
 }
 function selectCatalogCity(city) {
   selectedCatalogCityId = String(city.id);
@@ -2186,19 +2188,7 @@ function closeVehicleSearchCitySuggestions() {
   vehicleSearchCityInput?.setAttribute("aria-expanded", "false");
 }
 function renderVehicleSearchCitySuggestions() {
-  if (!vehicleSearchCitySuggestions || !vehicleSearchCityInput) return;
-  const term = vehicleSearchCityInput.value;
-  const queryVariants = getQueryVariants(term);
-  const base = activeRegionCode ? citySearchIndex.filter(entry => String(entry.city.region_katottg_code) === String(activeRegionCode)) : citySearchIndex;
-  const ranked = term ? base.map(entry => ({ entry, rank: rankCityEntry(entry, queryVariants) }))
-    .filter(item => item.rank >= 0)
-    .sort((a, b) => a.rank - b.rank || cityName(a.entry.city).localeCompare(cityName(b.entry.city)))
-    .slice(0, 12).map(item => item.entry) : [];
-  vehicleSearchCitySuggestions.innerHTML = ranked.length
-    ? ranked.map(entry => renderCitySuggestionButton(entry, "catalog-city-suggestion")).join("")
-    : `<div class="city-suggestion-empty" role="status">${escapeHtml(cityTranslation(term ? "Город не найден" : "Введите название города"))}</div>`;
-  vehicleSearchCitySuggestions.hidden = false;
-  vehicleSearchCityInput.setAttribute("aria-expanded", "true");
+  renderCitySuggestionList({ input: vehicleSearchCityInput, container: vehicleSearchCitySuggestions, className: "catalog-city-suggestion", regionCode: activeRegionCode, emptyPrompt: true });
 }
 function selectVehicleSearchCity(city) {
   selectedCatalogCityId = String(city.id);
@@ -2263,19 +2253,7 @@ function closeCitySuggestions() {
   citySearchInput?.setAttribute("aria-expanded", "false");
 }
 function renderCitySuggestions() {
-  if (!citySuggestions || !citySearchInput) return;
-  const term = citySearchInput.value;
-  const queryVariants = getQueryVariants(term);
-  const base = citySearchIndex.filter(entry => !formRegionCode || String(entry.city.region_katottg_code) === formRegionCode);
-  const ranked = base.map(entry => ({ entry, rank: rankCityEntry(entry, queryVariants) }))
-    .filter(item => item.rank >= 0)
-    .sort((a, b) => a.rank - b.rank || cityName(a.entry.city).localeCompare(cityName(b.entry.city)))
-    .slice(0, 12).map(item => item.entry);
-  citySuggestions.innerHTML = ranked.length
-    ? ranked.map(entry => renderCitySuggestionButton(entry, "city-suggestion")).join("")
-    : `<div class="city-suggestion-empty" role="status">${escapeHtml(cityTranslation("Город не найден"))}</div>`;
-  citySuggestions.hidden = false;
-  citySearchInput.setAttribute("aria-expanded", "true");
+  renderCitySuggestionList({ input: citySearchInput, container: citySuggestions, className: "city-suggestion", regionCode: formRegionCode, showAllWhenEmpty: true });
 }
 function selectCity(city) {
   citySelect.value = String(city.id);
@@ -2863,16 +2841,7 @@ async function editListing(item, labels) {
     editCityInput.setAttribute("aria-expanded", "false");
   };
   const renderEditCitySuggestions = () => {
-    const variants = getQueryVariants(editCityInput.value);
-    const ranked = citySearchIndex.map(entry => ({ entry, rank: rankCityEntry(entry, variants) }))
-      .filter(row => row.rank >= 0)
-      .sort((a, b) => a.rank - b.rank || cityName(a.entry.city).localeCompare(cityName(b.entry.city)))
-      .slice(0, 12).map(row => row.entry);
-    editCitySuggestions.innerHTML = ranked.length
-      ? ranked.map(entry => renderCitySuggestionButton(entry, "edit-city-suggestion")).join("")
-      : `<div class="city-suggestion-empty" role="status">${escapeHtml(cityTranslation("Город не найден"))}</div>`;
-    editCitySuggestions.hidden = false;
-    editCityInput.setAttribute("aria-expanded", "true");
+    renderCitySuggestionList({ input: editCityInput, container: editCitySuggestions, className: "edit-city-suggestion", showAllWhenEmpty: true });
   };
   const chooseEditCity = city => {
     editCityId.value = String(city.id);
@@ -3387,7 +3356,7 @@ function closeCategoryMenu() {
   categorySelectTrigger?.setAttribute("aria-expanded", "false");
 }
 function closeVehicleSearch() { vehicleSearchMenu?.classList.add("hidden"); vehicleSearchBackdrop?.classList.add("hidden"); }
-let propertySearchCitySuggestionIndex = [];
+// City suggestions are derived directly from citySearchIndex.
 let propertySearchClientFilters = null;
 function preparePropertySearchMenu() {
   const cityInput = document.getElementById("propertySearchCity");
@@ -3402,16 +3371,14 @@ function preparePropertySearchMenu() {
     regionSelect.innerHTML = `<option value="">${escapeHtml(t("Область"))}</option>` + codes.map(code => `<option value="${escapeHtml(code)}">${escapeHtml(regionNames[code] || code)}</option>`).join("");
     regionSelect.value = activeRegionCode || "";
   };
-  const renderSuggestions = () => {
-    if (!citySuggestions) return;
-    const term = cityInput.value.trim();
-    const variants = getQueryVariants(term);
-    const base = regionSelect?.value ? citySearchIndex.filter(entry => String(entry.city.region_katottg_code) === regionSelect.value) : citySearchIndex;
-    const ranked = term ? base.map(entry => ({entry, rank: rankCityEntry(entry, variants)})).filter(item => item.rank >= 0).sort((a,b) => a.rank-b.rank || cityName(a.entry.city).localeCompare(cityName(b.entry.city))).slice(0,10).map(item => item.entry) : [];
-    citySuggestions.innerHTML = ranked.length ? ranked.map(entry => renderCitySuggestionButton(entry, "property-city-suggestion")).join("") : `<div class="city-suggestion-empty" role="status">${escapeHtml(cityTranslation(term ? "Город не найден" : "Введите название города"))}</div>`;
-    citySuggestions.hidden = false;
-    cityInput.setAttribute("aria-expanded", "true");
-  };
+  const renderSuggestions = () => renderCitySuggestionList({
+    input: cityInput,
+    container: citySuggestions,
+    className: "property-city-suggestion",
+    regionCode: regionSelect?.value || "",
+    limit: 10,
+    emptyPrompt: true
+  });
   const initCities = async () => {
     if (!availableCities.length) { try { await loadCities(); } catch (error) { console.error("Не удалось загрузить города для поиска недвижимости:", error); } }
     renderRegions();
@@ -4006,7 +3973,7 @@ document.getElementById("addCategoryOptions")?.addEventListener("click", event =
   const category = option.dataset.addCategory;
   if (category === "Недвижимость") {
     closeAddCategoryMenu();
-    openCategoryMenu("Недвижимость");
+    openPropertyListingForm();
     return;
   }
   const categorySelect = addForm?.querySelector('select[name="category"]');
@@ -4260,6 +4227,35 @@ function translateVehicleSearchUI() {
   if (toggle) toggle.textContent = t(document.getElementById("vehicleSearchAdvanced")?.classList.contains("hidden") ? "Розширений пошук" : "Згорнути розширений пошук");
   setVehicleSearchAdvanced(Boolean(document.getElementById("vehicleSearchAdvanced") && !document.getElementById("vehicleSearchAdvanced").classList.contains("hidden")));
 }
+
+// Keep the final word of the business-category label smaller in every language.
+function fitBusinessCategoryLabel() {
+  const selector = '.category-card[data-category="Готовый бизнес"] .category-card-label > span[data-i18n]';
+  const target = document.querySelector(selector);
+  if (!target) return;
+
+  const text = target.textContent.trim().replace(/\s+/g, " ");
+  const splitAt = text.lastIndexOf(" ");
+  if (splitAt < 1 || splitAt === text.length - 1) return;
+
+  const prefix = text.slice(0, splitAt);
+  const finalWord = text.slice(splitAt + 1);
+  const current = target.querySelector(".category-card-long-word");
+
+  if (
+    current &&
+    target.childNodes.length === 2 &&
+    target.childNodes[1] === current &&
+    current.textContent === finalWord &&
+    target.childNodes[0].textContent === prefix + " "
+  ) return;
+
+  const smallWord = document.createElement("span");
+  smallWord.className = "category-card-long-word";
+  smallWord.textContent = finalWord;
+  target.replaceChildren(document.createTextNode(prefix + " "), smallWord);
+}
+
 function translatePage(selectedLanguage) {
   lang = selectedLanguage;
   if (typeof loadMarketQuotes === "function") loadMarketQuotes();
@@ -4268,6 +4264,7 @@ function translatePage(selectedLanguage) {
   updateLangButton();
   updateAuthTranslations();
   document.querySelectorAll("[data-i18n]").forEach(el => translateTextElement(el, el.dataset.i18n));
+  fitBusinessCategoryLabel();
   document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
     const item = translations[el.dataset.i18nPlaceholder];
     if (item && item[lang]) el.placeholder = item[lang];
@@ -4388,15 +4385,8 @@ function translatePage(selectedLanguage) {
   renderListings(visibleListings);
 }
 
-const languageSwitcher = document.getElementById("languageSwitcher");
-if (languageSwitcher) {
-  languageSwitcher.addEventListener("change", function () { translatePage(this.value); });
-  const savedLanguage = localStorage.getItem("hryvniaHubLanguage");
-  languageSwitcher.value = savedLanguage || "uk";
-  translatePage(savedLanguage || "uk");
-} else {
-  translatePage(lang);
-}
+const savedLanguage = localStorage.getItem("hryvniaHubLanguage");
+translatePage(savedLanguage || "uk");
 
 const langTrigger = document.getElementById("langTrigger");
 const langDropdown = document.getElementById("langDropdown");
@@ -4419,7 +4409,6 @@ if (langTrigger && langDropdown) {
     const btn = event.target.closest("[data-lang-value]");
     if (!btn) return;
     const value = btn.dataset.langValue;
-    if (languageSwitcher) languageSwitcher.value = value;
     translatePage(value);
     closeLangDropdown();
   });

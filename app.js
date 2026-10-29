@@ -287,8 +287,8 @@ const translations = {
   "Модель": { ru: "Модель", uk: "Модель", en: "Model", pl: "Model" },
   "Рік від": { ru: "Год от", uk: "Рік від", en: "Year from", pl: "Rok od" },
   "Рік до": { ru: "Год до", uk: "Рік до", en: "Year to", pl: "Rok do" },
-  "Ціна від": { ru: "Цена от", uk: "Ціна від", en: "Price from", pl: "Cena od" },
-  "Ціна до": { ru: "Цена до", uk: "Ціна до", en: "Price to", pl: "Cena do" },
+
+
   "Пробіг від, км": { ru: "Пробег от, км", uk: "Пробіг від, км", en: "Mileage from, km", pl: "Przebieg od, km" },
   "Пробіг до, км": { ru: "Пробег до, км", uk: "Пробіг до, км", en: "Mileage to, km", pl: "Przebieg do, km" },
   "Об’єм двигуна від, л": { ru: "Объём двигателя от, л", uk: "Об’єм двигуна від, л", en: "Engine size from, L", pl: "Pojemność silnika od, l" },
@@ -1977,13 +1977,6 @@ async function loadMarketQuotes() {
   tickerSetText("icon", "usd", icons.usd);
   tickerSetText("icon", "pln", icons.pln);
 
-  const goldUnitLabel = lang === "pl"
-    ? "za uncję trojańską"
-    : lang === "en"
-      ? "per troy ounce"
-      : lang === "ru"
-        ? "за тройскую унцию"
-        : "за тройську унцію";
 
   try {
     const [usdResult, plnResult, btcResult, xauResult] = await Promise.allSettled([
@@ -3387,7 +3380,7 @@ function closeCategoryMenu() {
   categorySelectTrigger?.setAttribute("aria-expanded", "false");
 }
 function closeVehicleSearch() { vehicleSearchMenu?.classList.add("hidden"); vehicleSearchBackdrop?.classList.add("hidden"); }
-let propertySearchCitySuggestionIndex = [];
+// City suggestions are derived directly from citySearchIndex.
 let propertySearchClientFilters = null;
 function preparePropertySearchMenu() {
   const cityInput = document.getElementById("propertySearchCity");
@@ -4260,6 +4253,35 @@ function translateVehicleSearchUI() {
   if (toggle) toggle.textContent = t(document.getElementById("vehicleSearchAdvanced")?.classList.contains("hidden") ? "Розширений пошук" : "Згорнути розширений пошук");
   setVehicleSearchAdvanced(Boolean(document.getElementById("vehicleSearchAdvanced") && !document.getElementById("vehicleSearchAdvanced").classList.contains("hidden")));
 }
+
+// Keep the final word of the business-category label smaller in every language.
+function fitBusinessCategoryLabel() {
+  const selector = '.category-card[data-category="Готовый бизнес"] .category-card-label > span[data-i18n]';
+  const target = document.querySelector(selector);
+  if (!target) return;
+
+  const text = target.textContent.trim().replace(/\s+/g, " ");
+  const splitAt = text.lastIndexOf(" ");
+  if (splitAt < 1 || splitAt === text.length - 1) return;
+
+  const prefix = text.slice(0, splitAt);
+  const finalWord = text.slice(splitAt + 1);
+  const current = target.querySelector(".category-card-long-word");
+
+  if (
+    current &&
+    target.childNodes.length === 2 &&
+    target.childNodes[1] === current &&
+    current.textContent === finalWord &&
+    target.childNodes[0].textContent === prefix + " "
+  ) return;
+
+  const smallWord = document.createElement("span");
+  smallWord.className = "category-card-long-word";
+  smallWord.textContent = finalWord;
+  target.replaceChildren(document.createTextNode(prefix + " "), smallWord);
+}
+
 function translatePage(selectedLanguage) {
   lang = selectedLanguage;
   if (typeof loadMarketQuotes === "function") loadMarketQuotes();
@@ -4268,6 +4290,7 @@ function translatePage(selectedLanguage) {
   updateLangButton();
   updateAuthTranslations();
   document.querySelectorAll("[data-i18n]").forEach(el => translateTextElement(el, el.dataset.i18n));
+  fitBusinessCategoryLabel();
   document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
     const item = translations[el.dataset.i18nPlaceholder];
     if (item && item[lang]) el.placeholder = item[lang];
@@ -4388,15 +4411,8 @@ function translatePage(selectedLanguage) {
   renderListings(visibleListings);
 }
 
-const languageSwitcher = document.getElementById("languageSwitcher");
-if (languageSwitcher) {
-  languageSwitcher.addEventListener("change", function () { translatePage(this.value); });
-  const savedLanguage = localStorage.getItem("hryvniaHubLanguage");
-  languageSwitcher.value = savedLanguage || "uk";
-  translatePage(savedLanguage || "uk");
-} else {
-  translatePage(lang);
-}
+const savedLanguage = localStorage.getItem("hryvniaHubLanguage");
+translatePage(savedLanguage || "uk");
 
 const langTrigger = document.getElementById("langTrigger");
 const langDropdown = document.getElementById("langDropdown");
@@ -4419,7 +4435,6 @@ if (langTrigger && langDropdown) {
     const btn = event.target.closest("[data-lang-value]");
     if (!btn) return;
     const value = btn.dataset.langValue;
-    if (languageSwitcher) languageSwitcher.value = value;
     translatePage(value);
     closeLangDropdown();
   });

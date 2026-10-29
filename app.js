@@ -2765,7 +2765,7 @@ async function editListing(item, labels) {
       <div class="edit-city-suggestions" id="editCitySuggestions" role="listbox" hidden></div>
     </label>
     <label>${escapeHtml(L.price)}<input name="price" type="number" min="0" step="0.01" required value="${escapeHtml(String(item.price ?? ""))}"></label>
-    ${String(item.category || "") === "Недвижимость" ? (() => { const d=item.property_details||{}; const val=(k)=>escapeHtml(String(d[k]??"")); const select=(name,label,opts,key)=>`<label>${escapeHtml(t(label))}<select name="${name}"><option value="">${escapeHtml(t("Не указано"))}</option>${opts.map(v=>`<option value="${escapeHtml(v)}" ${String(d[key]??"")===v?"selected":""}>${escapeHtml(t(v))}</option>`).join("")}</select></label>`; const num=(name,label,key)=>`<label>${escapeHtml(t(label))}<input name="${name}" type="number" min="0" step="0.1" value="${val(key)}"></label>`; return `<fieldset class="edit-property-fields"><legend>${escapeHtml(t("Характеристики недвижимости"))}</legend><div class="edit-property-grid">${select("property_rooms","Кількість кімнат",["1","2","3","4","5+"],"rooms")}<label>${escapeHtml(t("Етаж"))}<input name="property_floor" type="number" min="0" step="1" value="${val("floor")}"></label><label>${escapeHtml(t("Етажність будівлі"))}<input name="property_floors_total" type="number" min="1" step="1" value="${val("floors_total")}"></label>${num("property_kitchen_area_m2","Площа кухні, м²","kitchen_area_m2")}${select("property_building_type","Тип будівлі",["Кирпичный","Панельный","Монолитный","Монолитно-кирпичный","Деревянный","Другое"],"building_type")}${select("property_condition","Стан",["Новостройка","Новый ремонт","Жилое состояние","Нужен ремонт","Под ремонт"],"condition")}${select("property_furniture","Меблі",["Есть","Нет","Частично"],"furniture")}${select("property_balcony","Балкон",["Есть","Нет"],"balcony")}${select("property_loggia","Лоджія",["Есть","Нет"],"loggia")}<label>${escapeHtml(t("До метро, м"))}<input name="property_metro_distance_m" type="number" min="0" step="1" value="${val("metro_distance_m")}"></label>${num("property_land_area_sotkas","Площа ділянки, соток","land_area_sotkas")}</div></fieldset>`; })() : ""}
+    ${String(item.category || "") === "Недвижимость" ? (() => { const d=item.property_details||{}; const val=(k)=>escapeHtml(String(d[k]??"")); const select=(name,label,opts,key)=>`<label>${escapeHtml(t(label))}<select name="${name}"><option value="">${escapeHtml(t("Не указано"))}</option>${opts.map(v=>`<option value="${escapeHtml(v)}" ${String(d[key]??"")===v?"selected":""}>${escapeHtml(t(v))}</option>`).join("")}</select></label>`; const num=(name,label,key)=>`<label>${escapeHtml(t(label))}<input name="${name}" type="number" min="0" step="0.1" value="${val(key)}"></label>`; return `<fieldset class="edit-property-fields" aria-label="${escapeHtml(t("Характеристики недвижимости"))}"><div class="edit-property-grid">${select("property_rooms","Кількість кімнат",["1","2","3","4","5+"],"rooms")}<label>${escapeHtml(t("Етаж"))}<input name="property_floor" type="number" min="0" step="1" value="${val("floor")}"></label><label>${escapeHtml(t("Етажність будівлі"))}<input name="property_floors_total" type="number" min="1" step="1" value="${val("floors_total")}"></label>${num("property_kitchen_area_m2","Площа кухні, м²","kitchen_area_m2")}${select("property_building_type","Тип будівлі",["Кирпичный","Панельный","Монолитный","Монолитно-кирпичный","Деревянный","Другое"],"building_type")}${select("property_condition","Стан",["Новостройка","Новый ремонт","Жилое состояние","Нужен ремонт","Под ремонт"],"condition")}${select("property_furniture","Меблі",["Есть","Нет","Частично"],"furniture")}${select("property_balcony","Балкон",["Есть","Нет"],"balcony")}${select("property_loggia","Лоджія",["Есть","Нет"],"loggia")}<label>${escapeHtml(t("До метро, м"))}<input name="property_metro_distance_m" type="number" min="0" step="1" value="${val("metro_distance_m")}"></label>${num("property_land_area_sotkas","Площа ділянки, соток","land_area_sotkas")}</div></fieldset>`; })() : ""}
     <label>${escapeHtml(L.description)}<textarea name="description" rows="5" maxlength="10000">${escapeHtml(item.description || "")}</textarea></label>
     <fieldset class="edit-photo-fields">
       <legend>${escapeHtml(L.photos)}</legend>
@@ -3527,12 +3527,6 @@ function preparePropertySearchMenu() {
   document.getElementById("propertySearchApply")?.addEventListener("click", () => {
     const priceFrom = document.getElementById("propertyPriceFrom")?.value.trim() || "";
     const priceTo = document.getElementById("propertyPriceTo")?.value.trim() || "";
-    const priceCurrency = document.getElementById("propertyPriceCurrency")?.value || "UAH";
-    const usdRate = Number(listingRates?.usdUah);
-    if (priceCurrency === "USD" && ( !Number.isFinite(usdRate) || usdRate <= 0) && (priceFrom !== "" || priceTo !== "")) {
-      showAiCategoryPrompt(t("Немає актуального курсу USD/UAH. Спробуйте пізніше або оберіть UAH."), t("Недвижимость"));
-      return;
-    }
     const areaFrom = document.getElementById("propertyAreaFrom")?.value.trim() || "";
     const areaTo = document.getElementById("propertyAreaTo")?.value.trim() || "";
     const fromNumbers = [priceFrom, priceTo, areaFrom, areaTo].map(value => value === "" ? null : Number(value));
@@ -3546,10 +3540,7 @@ function preparePropertySearchMenu() {
     propertySearchClientFilters = {
       type: typeTrigger?.dataset.value || "",
       deal: categoryMenu?.dataset.realEstateDeal || "Все",
-      priceCurrency,
-      priceFrom: fromNumbers[0] === null ? null : (priceCurrency === "USD" ? fromNumbers[0] * usdRate : fromNumbers[0]),
-      priceTo: fromNumbers[1] === null ? null : (priceCurrency === "USD" ? fromNumbers[1] * usdRate : fromNumbers[1]),
-      areaFrom: fromNumbers[2], areaTo: fromNumbers[3],
+      priceFrom: fromNumbers[0], priceTo: fromNumbers[1], areaFrom: fromNumbers[2], areaTo: fromNumbers[3],
       address: document.getElementById("propertySearchAddress")?.value.trim() || "",
       radius: document.getElementById("propertySearchRadius")?.value || "",
       rooms: document.getElementById("propertyFilterRooms")?.value || "",
@@ -3584,10 +3575,7 @@ function openCategoryMenu(parentCategory = "") {
     categoryMenu.dataset.realEstateDeal = "Все";
     categoryMenuOptions.innerHTML = `
       <div class="property-search-shell">
-        <section class="property-search-section" aria-labelledby="propertyLocationTitle">
-          <button type="button" class="property-section-heading" aria-expanded="true" data-property-section="location">
-            <span id="propertyLocationTitle">${escapeHtml(t("Локація"))}</span>
-          </button>
+        <section class="property-search-section" aria-label="${escapeHtml(t("Локація"))}">
           <div class="property-location-grid" id="propertyLocationFields">
             <label class="property-search-field property-city-field"><input id="propertySearchCity" type="text" autocomplete="off" placeholder="${escapeHtml(t("Город"))}" aria-label="${escapeHtml(t("Город"))}" aria-expanded="false" aria-controls="propertySearchCitySuggestions"><div id="propertySearchCitySuggestions" class="property-city-suggestions" role="listbox" hidden></div></label>
             <label class="property-search-field"><select id="propertySearchRegion" aria-label="${escapeHtml(t("Область"))}"><option value="">${escapeHtml(t("Область"))}</option></select><span class="property-field-chevron" aria-hidden="true">⌄</span></label>
@@ -3595,10 +3583,7 @@ function openCategoryMenu(parentCategory = "") {
             <label class="property-search-field"><select id="propertySearchRadius" aria-label="${escapeHtml(t("Радіус, км"))}"><option value="">${escapeHtml(t("Радіус, км"))}</option><option value="5">5 км</option><option value="10">10 км</option><option value="20">20 км</option><option value="30">30 км</option><option value="50">50 км</option><option value="100">100 км</option></select><span class="property-field-chevron" aria-hidden="true">⌄</span></label>
           </div>
         </section>
-        <section class="property-search-section" aria-labelledby="propertyCategoryTitle">
-          <button type="button" class="property-section-heading" aria-expanded="true" data-property-section="category">
-            <span id="propertyCategoryTitle">${escapeHtml(t("Категорія нерухомості"))}</span>
-          </button>
+        <section class="property-search-section" aria-label="${escapeHtml(t("Категорія нерухомості"))}">
           <div class="property-search-field property-category-field">
             
             <button type="button" id="propertyTypeTrigger" class="property-type-trigger" data-value="" aria-haspopup="listbox" aria-expanded="false" aria-controls="propertyTypeOptions" aria-label="${escapeHtml(t("Категорія нерухомості"))}"><span class="property-type-label">${escapeHtml(t("Оберіть категорію"))}</span><span class="property-field-chevron" aria-hidden="true">⌄</span></button>
@@ -3607,32 +3592,28 @@ function openCategoryMenu(parentCategory = "") {
             </div>
           </div>
         </section>
-        <section class="property-search-section property-deal-section" aria-labelledby="propertyDealTitle">
-          <button type="button" class="property-section-heading" aria-expanded="true" data-property-section="deal">
-            <span id="propertyDealTitle">${escapeHtml(t("Тип угоди"))}</span>
-          </button>
+        <section class="property-search-section property-deal-section" aria-label="${escapeHtml(t("Тип угоди"))}">
           <div class="real-estate-tabs" role="tablist" aria-label="${escapeHtml(t("Тип угоди"))}">
             ${["Все", "Продажа", "Аренда"].map((label, index) => { const active = (categoryMenu.dataset.realEstateDeal || "Все") === label; return `<button type="button" class="real-estate-tab${active ? " active" : ""}" role="tab" aria-selected="${active ? "true" : "false"}" data-real-estate-deal="${escapeHtml(label)}">${escapeHtml(t(label))}</button>`; }).join("")}
           </div>
         </section>
         <button type="button" id="propertySearchApply" class="property-search-apply">${escapeHtml(t("Розширений пошук"))}<span aria-hidden="true">→</span></button>
         <section class="property-more-section">
-          <button type="button" class="property-more-toggle" id="propertyMoreToggle" aria-label="${escapeHtml(t("Розгорнути або згорнути додаткові фільтри"))}" title="${escapeHtml(t("Розгорнути або згорнути додаткові фільтри"))}" aria-expanded="false" aria-controls="propertyMoreFields"><span class="property-more-toggle-label" aria-hidden="true"></span><span class="property-section-chevron" aria-hidden="true">⌄</span></button>
+          <button type="button" class="property-more-toggle" id="propertyMoreToggle" aria-expanded="false" aria-controls="propertyMoreFields"><span>${escapeHtml(t("Більше фільтрів"))}</span><span class="property-section-chevron" aria-hidden="true">⌄</span></button>
           <div id="propertyMoreFields" class="property-more-fields" hidden>
-            <label class="property-currency-field">${escapeHtml(t("Валюта"))}<select id="propertyPriceCurrency" aria-label="${escapeHtml(t("Валюта"))}"><option value="UAH">₴ UAH</option><option value="USD">$ USD</option></select></label>
             <label>${escapeHtml(t("Ціна від"))}<input id="propertyPriceFrom" type="number" min="0" inputmode="numeric" placeholder="0"></label>
             <label>${escapeHtml(t("Ціна до"))}<input id="propertyPriceTo" type="number" min="0" inputmode="numeric" placeholder="${escapeHtml(t("Будь-яка ціна"))}"></label>
             <label>${escapeHtml(t("Площа від, м²"))}<input id="propertyAreaFrom" type="number" min="0" inputmode="decimal" placeholder="0"></label>
             <label>${escapeHtml(t("Площа до, м²"))}<input id="propertyAreaTo" type="number" min="0" inputmode="decimal" placeholder="${escapeHtml(t("Будь-яка"))}"></label>
             <label>${escapeHtml(t("Кількість кімнат"))}<select id="propertyFilterRooms"><option value="">${escapeHtml(t("Будь-яка кількість"))}</option>${["1","2","3","4","5+"].map(v=>`<option value="${v}">${v}</option>`).join("")}</select></label>
             <label>${escapeHtml(t("Тип будівлі"))}<select id="propertyFilterBuilding"><option value="">${escapeHtml(t("Будь-який"))}</option>${["Кирпичный","Панельный","Монолитный","Монолитно-кирпичный","Деревянный","Другое"].map(v=>`<option value="${v}">${escapeHtml(t(v))}</option>`).join("")}</select></label>
-            <label>${escapeHtml(t("Стан"))}<select id="propertyFilterCondition"><option value="">${escapeHtml(t("Будь-який"))}</option>${["Новостройка","Новый ремонт","Жилое состояние","Нужен ремонт","Под ремонт"].map(v=>`<option value="${v}">${escapeHtml(t(v))}</option>`).join("")}</select></label>
             <label>${escapeHtml(t("Етаж від"))}<input id="propertyFilterFloorFrom" type="number" min="0" step="1"></label>
             <label>${escapeHtml(t("Етаж до"))}<input id="propertyFilterFloorTo" type="number" min="0" step="1"></label>
             <label>${escapeHtml(t("Етажність будівлі від"))}<input id="propertyFilterFloorsFrom" type="number" min="1" step="1"></label>
             <label>${escapeHtml(t("Етажність будівлі до"))}<input id="propertyFilterFloorsTo" type="number" min="1" step="1"></label>
             <label>${escapeHtml(t("Площа кухні, м² від"))}<input id="propertyFilterKitchenFrom" type="number" min="0" step="0.1"></label>
             <label>${escapeHtml(t("Площа кухні, м² до"))}<input id="propertyFilterKitchenTo" type="number" min="0" step="0.1"></label>
+            <label>${escapeHtml(t("Стан"))}<select id="propertyFilterCondition"><option value="">${escapeHtml(t("Будь-який"))}</option>${["Новостройка","Новый ремонт","Жилое состояние","Нужен ремонт","Под ремонт"].map(v=>`<option value="${v}">${escapeHtml(t(v))}</option>`).join("")}</select></label>
             <label>${escapeHtml(t("Меблі"))}<select id="propertyFilterFurniture"><option value="">${escapeHtml(t("Будь-який"))}</option>${["Есть","Нет","Частично"].map(v=>`<option value="${v}">${escapeHtml(t(v))}</option>`).join("")}</select></label>
             <label>${escapeHtml(t("Балкон"))}<select id="propertyFilterBalcony"><option value="">${escapeHtml(t("Будь-який"))}</option><option value="Есть">${escapeHtml(t("Есть"))}</option><option value="Нет">${escapeHtml(t("Нет"))}</option></select></label>
             <label>${escapeHtml(t("Лоджія"))}<select id="propertyFilterLoggia"><option value="">${escapeHtml(t("Будь-який"))}</option><option value="Есть">${escapeHtml(t("Есть"))}</option><option value="Нет">${escapeHtml(t("Нет"))}</option></select></label>

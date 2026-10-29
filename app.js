@@ -3868,18 +3868,36 @@ let vehicleMarketRequestId = 0;
 function setVehicleAdvancedFields(expanded) {
   if (vehicleAdvancedFields) vehicleAdvancedFields.hidden = !expanded;
   if (listingAdvancedCommonFields) listingAdvancedCommonFields.hidden = !expanded && listingCategorySelect?.value === "Автомобили";
-  const steps = vehicleListingFields?.querySelectorAll(".listing-progress-step") || [];
+  const steps = addModal?.querySelectorAll(".listing-progress-step") || [];
   steps.forEach((step, index) => {
     step.classList.toggle("is-active", expanded ? index === 1 : index === 0);
     step.classList.toggle("is-complete", expanded && index === 0);
   });
-  const lines = vehicleListingFields?.querySelectorAll(".listing-progress > i") || [];
+  const lines = addModal?.querySelectorAll(".listing-progress > i") || [];
   lines.forEach((line, index) => line.classList.toggle("is-complete", expanded && index === 0));
 }
 const propertyListingFields = document.getElementById("propertyListingFields");
 const propertyTypeSelect = document.getElementById("propertyType");
 const propertyOperationSelect = document.getElementById("propertyOperation");
 const listingCurrencyField = document.getElementById("listingCurrencyField");
+const propertyListingMore = document.getElementById("propertyListingMore");
+const propertyAdvancedFields = document.getElementById("propertyAdvancedFields");
+const propertyAddressField = document.getElementById("propertyAddressField");
+const propertyRadiusField = document.getElementById("propertyRadiusField");
+
+function setPropertyAdvancedFields(expanded) {
+  // The More control reveals both the extra property fields and the market/auth panel.
+  if (propertyAdvancedFields) propertyAdvancedFields.hidden = !expanded;
+  const propertyMarketPanel = document.getElementById("propertyMarketPanel");
+  if (propertyMarketPanel) propertyMarketPanel.hidden = !expanded;
+  propertyListingMore?.setAttribute("aria-expanded", String(expanded));
+  if (propertyListingMore) {
+    const label = propertyListingMore.querySelector("[data-i18n]");
+    if (label) label.textContent = t(expanded ? "Скрыть" : "Більше");
+    const icon = propertyListingMore.querySelector(".property-listing-more-icon");
+    if (icon) icon.textContent = expanded ? "⌃" : "⌄";
+  }
+}
 
 function syncPropertyListingFields() {
   if (!propertyListingFields) return;
@@ -3894,7 +3912,11 @@ function syncPropertyListingFields() {
       control.disabled = propertyListingFields.disabled || !visible;
     });
   });
-  if (listingCurrencyField) listingCurrencyField.hidden = listingCategorySelect?.value !== "Недвижимость";
+  const isProperty = listingCategorySelect?.value === "Недвижимость";
+  if (listingCurrencyField) listingCurrencyField.hidden = !isProperty;
+  if (propertyAddressField) propertyAddressField.hidden = !isProperty;
+  if (propertyRadiusField) propertyRadiusField.hidden = !isProperty;
+  if (!isProperty) setPropertyAdvancedFields(false);
 }
 
 function syncVehicleListingFields() {
@@ -3920,6 +3942,16 @@ function syncVehicleListingFields() {
   if (isVehicle) loadVehicleListingMakes();
 }
 propertyTypeSelect?.addEventListener("change", syncPropertyListingFields);
+propertyListingMore?.addEventListener("click", () => setPropertyAdvancedFields(Boolean(propertyAdvancedFields?.hidden)));
+for (const action of ["Login", "Register"]) {
+  document.getElementById(`propertyMarket${action}`)?.addEventListener("click", () => {
+    const authView = action === "Login" ? "login" : "register";
+    openAuthModal();
+    // Select the requested auth form directly; do not rely on a synthetic tab click.
+    showAuthView(authView);
+    document.querySelector(`[data-auth-tab="${authView}"]`)?.setAttribute("aria-selected", "true");
+  });
+}
 async function loadVehicleListingMakes() {
   if (!vehicleListingMake || !db || vehicleListingMake.dataset.loaded === "1" || vehicleListingMake.dataset.loading === "1") return;
   vehicleListingMake.dataset.loading = "1";
@@ -4044,6 +4076,7 @@ function openPropertyListingForm(propertyType = "", operation = "") {
     propertyListingFields.hidden = false;
     propertyListingFields.disabled = false;
   }
+  setPropertyAdvancedFields(false);
   if (vehicleListingFields) vehicleListingFields.hidden = true;
   closeCategoryMenu();
   closeAddCategoryMenu();
@@ -4229,6 +4262,8 @@ if (addForm) {
         property_details: {
           operation: propertyOperation,
           type: propertyType,
+          address: String(form.get("property_address") || "").trim() || null,
+          radius_km: optionalNumber("property_radius_km"),
           area_m2: optionalNumber("property_area"),
           rooms: String(form.get("property_rooms") || "") || null,
           floor: optionalNumber("property_floor"),

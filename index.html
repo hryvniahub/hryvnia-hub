@@ -364,6 +364,14 @@
     </div>
   </section>
 
+  <div class="property-search-backdrop hidden" id="propertySearchBackdrop"></div>
+  <section class="property-search-menu hidden" id="propertySearchMenu" role="dialog" aria-modal="true" aria-labelledby="propertySearchTitle">
+    <button class="category-menu-close" id="propertySearchClose" type="button" aria-label="Close">×</button>
+    <h2 id="propertySearchTitle">Нерухомість</h2>
+    <p class="vehicle-search-intro" id="propertySearchIntro">Оберіть параметри нерухомості</p>
+    <div id="propertySearchContent"></div>
+  </section>
+
   <div class="modal hidden" id="addModal">
     <div class="modal-card">
       <button class="modal-close" id="closeAdd" type="button">×</button>
@@ -445,6 +453,23 @@
             <label class="property-field" data-property-for="Квартиры,Дома,Комнаты,Коммерческая недвижимость"><span data-i18n="До школы, м">До школы, м</span><input name="property_school_distance" type="number" min="0" step="1" placeholder="350"></label>
             <label class="property-field" data-property-for="Квартиры,Дома,Комнаты,Коммерческая недвижимость,Гаражи и парковочные места,Земельные участки"><span data-i18n="До остановки, м">До остановки, м</span><input name="property_stop_distance" type="number" min="0" step="1" placeholder="150"></label>
           </div>
+          <details class="property-amenities">
+            <summary data-i18n="Удобства">Удобства</summary>
+            <div class="property-amenity-grid">
+              <label><input type="checkbox" name="property_amenity_refrigerator"><span data-i18n="Холодильник">Холодильник</span></label>
+              <label><input type="checkbox" name="property_amenity_washing_machine"><span data-i18n="Стиральная машина">Стиральная машина</span></label>
+              <label><input type="checkbox" name="property_amenity_stove"><span data-i18n="Плита">Плита</span></label>
+              <label><input type="checkbox" name="property_amenity_dishwasher"><span data-i18n="Посудомоечная машина">Посудомоечная машина</span></label>
+              <label><input type="checkbox" name="property_amenity_air_conditioning"><span data-i18n="Кондиционер">Кондиционер</span></label>
+              <label><input type="checkbox" name="property_amenity_internet"><span data-i18n="Интернет">Интернет</span></label>
+              <label><input type="checkbox" name="property_amenity_parking"><span data-i18n="Парковка">Парковка</span></label>
+            </div>
+            <fieldset class="property-bathroom-field">
+              <legend data-i18n="Санузел">Санузел</legend>
+              <label><input type="radio" name="property_bathroom_type" value="separate"><span data-i18n="Раздельный">Раздельный</span></label>
+              <label><input type="radio" name="property_bathroom_type" value="combined"><span data-i18n="Совмещённый">Совмещённый</span></label>
+            </fieldset>
+          </details>
           </section>
         </fieldset>
         <div class="listing-price-row">

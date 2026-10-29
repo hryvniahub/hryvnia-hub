@@ -2909,3 +2909,50 @@ main{
   .property-search-amenities .property-amenity-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 8px;}
   .property-search-amenities .property-amenity-grid label{font-size:12px;gap:6px;}
 }
+
+
+/* Property search amenities: keep checkbox and text on one left-aligned row. */
+.property-search-menu .property-more-fields .property-search-amenities .property-amenity-grid{
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  align-items:start !important;
+  justify-items:stretch !important;
+  gap:7px 12px !important;
+  width:100% !important;
+}
+.property-search-menu .property-more-fields .property-search-amenities .property-amenity-grid label{
+  display:flex !important;
+  flex-direction:row !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  gap:8px !important;
+  width:auto !important;
+  min-width:0 !important;
+  margin:0 !important;
+  padding:3px 0 !important;
+  text-align:left !important;
+  font-size:13px !important;
+  line-height:1.3 !important;
+}
+.property-search-menu .property-more-fields .property-search-amenities .property-amenity-grid label span{
+  display:inline !important;
+  flex:1 1 auto !important;
+  min-width:0 !important;
+  text-align:left !important;
+  overflow-wrap:anywhere !important;
+}
+.property-search-menu .property-more-fields .property-search-amenities .property-amenity-grid input[type="checkbox"]{
+  display:block !important;
+  flex:0 0 16px !important;
+  width:16px !important;
+  min-width:16px !important;
+  height:16px !important;
+  margin:0 !important;
+  padding:0 !important;
+  accent-color:#A8C928 !important;
+}
+.property-search-menu #propertySearchTabs{margin-top:8px;margin-bottom:12px;}
+@media(max-width:420px){
+  .property-search-menu .property-more-fields .property-search-amenities .property-amenity-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:7px 8px !important;}
+  .property-search-menu .property-more-fields .property-search-amenities .property-amenity-grid label{font-size:12px !important;gap:6px !important;}
+}

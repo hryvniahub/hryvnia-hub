@@ -3505,13 +3505,6 @@ function preparePropertySearchMenu() {
   });
   regionSelect?.addEventListener("focus", initCities, {once:true});
   regionSelect?.addEventListener("change", () => { activeRegionCode = regionSelect.value; selectedCatalogCityId = ""; cityInput.value = ""; if (citySuggestions) citySuggestions.hidden = true; });
-  document.getElementById("propertyMoreToggle")?.addEventListener("click", () => {
-    const toggle = document.getElementById("propertyMoreToggle");
-    const fields = document.getElementById("propertyMoreFields");
-    const open = toggle?.getAttribute("aria-expanded") !== "true";
-    toggle?.setAttribute("aria-expanded", String(open));
-    if (fields) fields.hidden = !open;
-  });
   categoryMenuOptions?.querySelectorAll("[data-property-section]").forEach(button => button.addEventListener("click", () => {
     const section = button.dataset.propertySection;
     const content = section === "location" ? document.getElementById("propertyLocationFields") : section === "category" ? typeTrigger?.closest(".property-search-section")?.querySelector(".property-category-field") : button.closest(".property-search-section")?.querySelector(".real-estate-tabs");
@@ -3599,8 +3592,7 @@ function openCategoryMenu(parentCategory = "") {
         </section>
         <button type="button" id="propertySearchApply" class="property-search-apply">${escapeHtml(t("Розширений пошук"))}<span aria-hidden="true">→</span></button>
         <section class="property-more-section">
-          <button type="button" class="property-more-toggle" id="propertyMoreToggle" aria-expanded="false" aria-controls="propertyMoreFields"><span>${escapeHtml(t("Більше фільтрів"))}</span><span class="property-section-chevron" aria-hidden="true">⌄</span></button>
-          <div id="propertyMoreFields" class="property-more-fields" hidden>
+          <div id="propertyMoreFields" class="property-more-fields">
             <label>${escapeHtml(t("Ціна від"))}<input id="propertyPriceFrom" type="number" min="0" inputmode="numeric" placeholder="0"></label>
             <label>${escapeHtml(t("Ціна до"))}<input id="propertyPriceTo" type="number" min="0" inputmode="numeric" placeholder="${escapeHtml(t("Будь-яка ціна"))}"></label>
             <label>${escapeHtml(t("Площа від, м²"))}<input id="propertyAreaFrom" type="number" min="0" inputmode="decimal" placeholder="0"></label>

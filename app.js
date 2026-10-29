@@ -1005,6 +1005,39 @@ const PHOTO_BUCKET = "listing-photos";
 const MAX_PHOTOS = 10;
 const MAX_PHOTO_BYTES = 10 * 1024 * 1024;
 const PHOTO_TYPES = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" };
+// Ensure the create-listing form exposes description, photo upload, and a submit/save button.
+(() => {
+  const form = document.getElementById("addForm");
+  if (!form) return;
+
+  if (!form.querySelector('textarea[name="description"]')) {
+    const description = document.createElement("label");
+    description.innerHTML = `<span>${escapeHtml(t("Описание"))}</span><textarea name="description" rows="5" maxlength="10000" placeholder="${escapeHtml(t("Коротко опишите предложение"))}"></textarea>`;
+    const submit = form.querySelector('button[type="submit"]');
+    form.insertBefore(description, submit || null);
+  }
+
+  if (!form.querySelector("#photoFields")) {
+    const photos = document.createElement("fieldset");
+    photos.id = "photoFields";
+    photos.innerHTML = `<legend id="photoLabel"></legend>
+      <p id="photoHint"></p>
+      <input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp" multiple hidden>
+      <button id="photoPickerButton" type="button" class="btn"></button>
+      <div id="photoPreview" class="photo-preview"></div>
+      <p id="photoMessage" class="form-message" role="status"></p>`;
+    const submit = form.querySelector('button[type="submit"]');
+    form.insertBefore(photos, submit || null);
+  }
+
+  if (!form.querySelector('button[type="submit"]')) {
+    const save = document.createElement("button");
+    save.type = "submit";
+    save.className = "btn btn-primary";
+    save.textContent = lang === "uk" ? "Зберегти" : lang === "pl" ? "Zapisz" : lang === "en" ? "Save" : "Сохранить";
+    form.append(save);
+  }
+})();
 const photoFields = document.getElementById("photoFields");
 const photoInput = document.getElementById("photoInput");
 const photoPreview = document.getElementById("photoPreview");

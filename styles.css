@@ -18,6 +18,8 @@
   --shadow-sm: 0 1px 3px rgba(20, 22, 26, 0.06);
   --shadow: 0 6px 18px rgba(20, 22, 26, 0.08);
   --shadow-lg: 0 18px 42px rgba(20, 22, 26, 0.12);
+  --dark: #174C3A;
+  --accent-hover: #B5D63A;
 }
 
 *{ box-sizing: border-box; }
@@ -1335,11 +1337,6 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
   }
 }
 
-.listing-card-horizontal .listing-card-heading .fav-btn.active{
-  color: #16833b;
-  background: #f0f8f1;
-}
-
 .listing-card-horizontal .listing-card-heading .fav-btn, .listing-card-horizontal .listing-card-heading .fav-btn.active{
   color: #A8C928;
   background: #fff;
@@ -1366,10 +1363,6 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
   .listing-card-horizontal .old-price{ font-size: 11px; }
 }
 
-:root{
-  --dark: #174C3A;
-  --accent-hover: #B5D63A;
-}
 
 html, body{
   background-color: #174C3A;
@@ -1902,13 +1895,6 @@ main{
 .vehicle-search-city-field{ position: relative; display: grid; gap: 6px; min-width: 0; color: #f7f9f5; font-size: 14px; font-weight: 650; }
 .vehicle-search-city-field input{ width: 100%; min-width: 0; min-height: 44px; padding: 9px 10px; border: 1px solid rgba(168, 201, 40,.38); border-radius: 10px; background: rgba(255,255,255,.97); color: #20352b; font: inherit; font-weight: 400; }
 .vehicle-search-city-suggestions{ top: calc(100% + 4px); max-height: 220px; overflow-y: auto; z-index: 10020; }
-
-.hh-ai-prompt-backdrop{ position: fixed; inset: 0; z-index: 12000; display: grid; place-items: center; padding: 20px; background: rgba(3, 17, 12, .72); backdrop-filter: blur(7px); }
-.hh-ai-prompt{ width: min(100%, 360px); padding: 24px; border: 1px solid rgba(212,255,0,.42); border-radius: 22px; background: linear-gradient(145deg, #173c2d, #10271e); color: #f7f9f5; box-shadow: 0 22px 70px rgba(0,0,0,.42); text-align: center; }
-.hh-ai-prompt-badge{ display: inline-grid; place-items: center; width: 48px; height: 48px; margin: 0 auto 12px; border-radius: 15px; background: #d4ff00; color: #173c2d; font-weight: 900; font-size: 20px; }
-.hh-ai-prompt h3{ margin: 0 0 8px; font-size: 21px; }
-.hh-ai-prompt p{ margin: 0 0 18px; color: rgba(247,249,245,.78); line-height: 1.45; }
-.hh-ai-prompt button{ width: 100%; min-height: 46px; border: 0; border-radius: 12px; background: #d4ff00; color: #14271e; font: inherit; font-weight: 800; cursor: pointer; }
 
 .hh-ai-prompt-backdrop{ position: fixed; inset: 0; z-index: 12000; display: flex; align-items: flex-start; justify-content: center; padding: 16px; background: rgba(3,17,12,.24); backdrop-filter: blur(2px); }
 .hh-ai-prompt{ position: relative; margin-top: min(28vh, 220px); width: min(100%, 360px); padding: 22px 20px 18px; border: 1px solid rgba(212,255,0,.55); border-radius: 20px; background: linear-gradient(145deg,#173c2d,#10271e); color: #f7f9f5; box-shadow: 0 18px 55px rgba(0,0,0,.35); text-align: center; }

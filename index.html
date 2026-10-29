@@ -6,7 +6,7 @@
   <meta name="google" content="notranslate">
   <title>Hryvnia Hub — объявления Украины</title>
   <meta name="description" content="Hryvnia Hub — хаб объявлений: автомобили, недвижимость и бизнес.">
-  <link rel="stylesheet" href="styles.css?v=20261029-menu-unified-v1">
+  <link rel="stylesheet" href="styles.css?v=20261029-cleanup-v1">
 </head>
 <body>
   <header class="header">
@@ -28,9 +28,6 @@
             <button type="button" class="lang-option" data-lang-value="pl" role="menuitem"><span class="flag" aria-hidden="true">🇵🇱</span> Polski</button>
             <button type="button" class="lang-option" data-lang-value="ru" role="menuitem"><span class="flag-ru" aria-hidden="true"></span> Русский</button>
           </div>
-          <select id="languageSwitcher" class="sr-only" tabindex="-1" aria-hidden="true">
-            <option value="ru">Русский</option><option value="uk">Українська</option><option value="en">English</option><option value="pl">Polski</option>
-          </select>
         </div>
         <button class="header-action account-btn" id="accountBtn" type="button" aria-label="Аккаунт">
           <span class="account-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="7.5" r="4"/><path d="M4.5 21v-2.2a7.5 7.5 0 0 1 15 0V21z"/></svg></span>
@@ -407,7 +404,6 @@
           <label>Привод<select name="vehicle_drive"><option value="">Выберите привод</option><option value="Передній">Передний</option><option value="Задній">Задний</option><option value="Повний">Полный</option><option value="Повний підключаємий">Полный подключаемый</option></select></label>
           <label>Пробег, км<input name="vehicle_mileage_km" type="number" min="0" placeholder="125000"></label>
           <label>Тип авто<select name="vehicle_condition"><option value="">Выберите тип</option><option value="new">Новое</option><option value="used">С пробегом</option></select></label>
-          <label style="grid-column:1 / -1;">Техническое состояние<div id="vehicleListingConditions" role="group" aria-label="Техническое состояние"></div></label>
           <label>Количество дверей<select name="vehicle_doors"><option value="">Выберите количество</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></label>
           <label>Цвет<select name="vehicle_color"><option value="">Выберите цвет</option><option value="white">Белый</option><option value="black">Чёрный</option><option value="gray">Серый</option><option value="silver">Серебристый</option><option value="red">Красный</option><option value="blue">Синий</option><option value="green">Зелёный</option><option value="brown">Коричневый</option><option value="yellow">Жёлтый</option><option value="other">Другой</option></select></label>
           <label>Тип продавца<select name="seller_type"><option value="private">Частное лицо</option><option value="business">Компания / бизнес</option></select></label>
@@ -480,30 +476,6 @@
   </div></div>
   <div class="modal hidden" id="favoritesModal" role="dialog" aria-modal="true" aria-labelledby="favoritesTitle"><div class="modal-card"><button class="modal-close" id="closeFavorites" type="button" aria-label="Закрыть">×</button><h2 id="favoritesTitle" data-i18n="Избранное">Избранное</h2><div id="favoritesList" class="favorites-list"></div></div></div>
   <div class="modal hidden" id="messagesModal" role="dialog" aria-modal="true" aria-labelledby="messagesTitle"><div class="modal-card messages-card"><button class="modal-close" id="closeMessages" type="button" aria-label="Закрыть">×</button><h2 id="messagesTitle" data-i18n="Сообщения">Сообщения</h2><div id="messagesContent"><p class="muted" id="messagesGuestHint">Войдите, чтобы видеть сообщения.</p><div id="conversationsList" class="conversations-list hidden"></div><div id="messagesThread" class="messages-thread hidden"><button class="link-btn" id="backToConvs" type="button">← К списку</button><div id="threadMessages" class="thread-messages"></div><form id="sendMessageForm" class="send-message-form"><input type="text" name="body" placeholder="Ваше сообщение..." required maxlength="2000" autocomplete="off"><button class="btn btn-primary" type="submit">Отправить</button></form></div></div></div></div>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="app.js?v=20261029-real-estate-menu-v3"></script>
-  <script>
-    // Keep only the final word of the business-category label smaller in every language.
-    (() => {
-      const selector = '.category-card[data-category="Готовый бизнес"] .category-card-label > span[data-i18n]';
-      const fitFinalWord = (target) => {
-        if (!target) return;
-        const text = target.textContent.trim().replace(/\s+/g, ' ');
-        const splitAt = text.lastIndexOf(' ');
-        if (splitAt < 1 || splitAt === text.length - 1) return;
-        const prefix = text.slice(0, splitAt);
-        const finalWord = text.slice(splitAt + 1);
-        const current = target.querySelector('.category-card-long-word');
-        if (current && target.childNodes.length === 2 && target.childNodes[1] === current && current.textContent === finalWord && target.childNodes[0].textContent === prefix + ' ') return;
-        const smallWord = document.createElement('span');
-        smallWord.className = 'category-card-long-word';
-        smallWord.textContent = finalWord;
-        target.replaceChildren(document.createTextNode(prefix + ' '), smallWord);
-      };
-      const target = document.querySelector(selector);
-      const apply = () => fitFinalWord(document.querySelector(selector));
-      apply();
-      if (target) new MutationObserver(() => apply()).observe(target, { childList: true, characterData: true, subtree: true });
-    })();
-  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="app.js?v=20261029-cleanup-v2"></script>
 </body>
 </html>

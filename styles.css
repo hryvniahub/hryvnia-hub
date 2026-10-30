@@ -3159,3 +3159,43 @@ main{
 .property-search-menu .property-deal-section .real-estate-tab:first-child{order:0;}
 .property-search-menu .property-deal-section .real-estate-tab:nth-child(2){order:1;}
 .property-search-menu .property-deal-section .real-estate-tab:nth-child(3){order:2;}
+
+
+/* Mobile property search: keep the full filter panel above the fixed bottom navigation. */
+@media(max-width:720px){
+  .property-search-menu{
+    top:max(10px,env(safe-area-inset-top,0px)) !important;
+    bottom:calc(104px + env(safe-area-inset-bottom,0px)) !important;
+    height:auto !important;
+    max-height:none !important;
+    min-height:0 !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    overscroll-behavior-y:contain;
+    -webkit-overflow-scrolling:touch;
+    touch-action:pan-y;
+    padding-bottom:22px;
+  }
+  .property-search-menu .property-search-shell{min-height:min-content;}
+  .property-search-menu .property-more-fields{overflow:visible;max-height:none;padding-bottom:16px;}
+  .property-search-menu .property-search-actions{position:static;margin:12px 0 4px;}
+}
+
+/* Compact, clear actions: reset + lime-accented More/Less, equal halves. */
+.property-search-menu .property-search-actions{
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:10px;
+  width:100%;
+}
+.property-search-menu .property-search-actions button{
+  width:100%;min-width:0;min-height:52px;padding:11px 12px;
+  border-radius:12px;font-size:15px;font-weight:800;
+}
+.property-search-menu .property-search-actions #propertySearchReset{
+  border:1px solid rgba(168,201,40,.42);background:rgba(255,255,255,.07);color:#f7f9f5;
+}
+.property-search-menu .property-search-actions #propertySearchToggleAdvanced{
+  border:1px solid rgba(168,201,40,.62);background:rgba(168,201,40,.22);color:#d9ec83;
+}
+.property-search-menu .property-search-actions #propertySearchApply{display:none !important;}

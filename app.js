@@ -4124,7 +4124,7 @@ function openCategoryMenu(parentCategory = "") {
         </section>
         <section class="property-search-section property-deal-section" aria-label="${escapeHtml(t("Тип угоди"))}">
           <div class="real-estate-tabs" role="tablist" aria-label="${escapeHtml(t("Тип угоди"))}">
-            ${["Все", "Продажа", "Аренда"].map((label, index) => { const active = (propertySearchMenu.dataset.realEstateDeal || "Все") === label; return `<button type="button" class="real-estate-tab${active ? " active" : ""}" role="tab" aria-selected="${active ? "true" : "false"}" data-real-estate-deal="${escapeHtml(label)}">${escapeHtml(t(label))}</button>`; }).join("")}
+            ${["Все", "Продажа", "Аренда"].map(label => { const active = (propertySearchMenu.dataset.realEstateDeal || "Все") === label; return `<button type="button" class="real-estate-tab${active ? " active" : ""}" role="tab" aria-selected="${active ? "true" : "false"}" data-real-estate-deal="${escapeHtml(label)}">${escapeHtml(t(label))}</button>`; }).join("")}
           </div>
         </section>
         <section class="property-more-section">
@@ -4165,7 +4165,6 @@ function openCategoryMenu(parentCategory = "") {
         <div class="property-search-actions">
           <button type="button" id="propertySearchReset" class="vehicle-reset-btn">${escapeHtml(t("Скинути"))}</button>
           <button type="button" id="propertySearchToggleAdvanced" class="vehicle-search-toggle" aria-expanded="false" aria-controls="propertyMoreFields">${escapeHtml(t("Розширений пошук"))}</button>
-          <button type="button" id="propertySearchApply" class="btn btn-primary">${escapeHtml(t("Найти"))}</button>
         </div>
       </div>`;
     closeCategoryMenu();

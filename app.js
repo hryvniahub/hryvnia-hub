@@ -3719,7 +3719,9 @@ function ensurePropertySearchTabs() {
     propertySearchTabs = [tab];
     activePropertySearchTabId = tab.id;
   }
-  return propertySearchTabs.find(tab => tab.id === activePropertySearchTabId) || propertySearchTabs[0];
+  const activeTab = propertySearchTabs.find(tab => tab.id === activePropertySearchTabId) || propertySearchTabs[0];
+  if (!['Все', 'Продажа', 'Аренда'].includes(activeTab.deal)) activeTab.deal = 'Все';
+  return activeTab;
 }
 function ensurePropertySearchTabsHost() {
   let host = document.getElementById("propertySearchTabs");
@@ -4082,7 +4084,8 @@ function openCategoryMenu(parentCategory = "") {
     ensurePropertySearchTabs();
     document.getElementById("propertySearchTitle").textContent = t("Недвижимость");
     const propertyTypes = categorySubcategories[parentCategory] || [];
-    propertySearchMenu.dataset.realEstateDeal = ensurePropertySearchTabs().deal || "Все";
+    const activePropertyTab = ensurePropertySearchTabs();
+    propertySearchMenu.dataset.realEstateDeal = activePropertyTab.deal;
     propertySearchContent.innerHTML = `
       <div class="property-search-shell">
         <section class="property-search-section" aria-label="${escapeHtml(t("Локація"))}">
@@ -4355,6 +4358,14 @@ function refreshPropertyListingSelect(select) {
   if (!select) return;
   const control = select.parentElement?.querySelector(`.hh-property-select[data-for="${select.id}"]`);
   if (!control) return;
+  if (control.classList.contains("hh-property-operation-tabs")) {
+    control.querySelectorAll("[data-property-operation-value]").forEach(button => {
+      const active = button.dataset.propertyOperationValue === select.value;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", String(active));
+    });
+    return;
+  }
   const trigger = control.querySelector(".hh-property-select-trigger");
   const label = control.querySelector(".hh-property-select-label");
   const selected = select.options[select.selectedIndex];
@@ -4377,26 +4388,46 @@ function initializePropertyListingSelects() {
     select.required = false;
     select.classList.add("hh-native-select-source");
     const wrapper = document.createElement("div");
-    wrapper.className = "hh-property-select";
+    wrapper.className = select === propertyOperationSelect ? "hh-property-select hh-property-operation-tabs" : "hh-property-select hh-property-type-wide";
     wrapper.dataset.for = select.id;
-    wrapper.innerHTML = `<button type="button" class="hh-property-select-trigger" aria-haspopup="listbox" aria-required="true" aria-expanded="false"><span class="hh-property-select-label"></span><span class="hh-property-select-chevron" aria-hidden="true">⌄</span></button><div class="hh-property-select-options" role="listbox" hidden></div>`;
-    const options = wrapper.querySelector(".hh-property-select-options");
-    [...select.options].forEach(option => {
-      const item = document.createElement("button");
-      item.type = "button";
-      item.className = "hh-property-select-option";
-      item.setAttribute("role", "option");
-      item.dataset.propertySelectValue = option.value;
-      item.setAttribute("aria-selected", String(option.selected));
-      item.textContent = option.textContent.trim();
-      const radio = document.createElement("span");
-      radio.className = "hh-property-select-radio";
-      radio.setAttribute("aria-hidden", "true");
-      item.append(radio);
-      options.append(item);
-    });
+    let options = null;
+    if (select === propertyOperationSelect) {
+      wrapper.setAttribute("role", "group");
+      wrapper.setAttribute("aria-label", "Операція");
+      [...select.options].filter(option => option.value).forEach(option => {
+        const item = document.createElement("button");
+        item.type = "button";
+        item.className = "hh-property-operation-button";
+        item.dataset.propertyOperationValue = option.value;
+        item.textContent = option.textContent.trim();
+        item.setAttribute("aria-pressed", String(option.value === select.value));
+        item.addEventListener("click", () => {
+          select.value = option.value;
+          select.dispatchEvent(new Event("change", { bubbles: true }));
+          refreshPropertyListingSelect(select);
+        });
+        wrapper.append(item);
+      });
+    } else {
+      wrapper.innerHTML = `<button type="button" class="hh-property-select-trigger" aria-haspopup="listbox" aria-required="true" aria-expanded="false"><span class="hh-property-select-label"></span><span class="hh-property-select-chevron" aria-hidden="true">⌄</span></button><div class="hh-property-select-options" role="listbox" hidden></div>`;
+      options = wrapper.querySelector(".hh-property-select-options");
+      [...select.options].forEach(option => {
+        const item = document.createElement("button");
+        item.type = "button";
+        item.className = "hh-property-select-option";
+        item.setAttribute("role", "option");
+        item.dataset.propertySelectValue = option.value;
+        item.setAttribute("aria-selected", String(option.selected));
+        item.textContent = option.textContent.trim();
+        const radio = document.createElement("span");
+        radio.className = "hh-property-select-radio";
+        radio.setAttribute("aria-hidden", "true");
+        item.append(radio);
+        options.append(item);
+      });
+    }
     select.insertAdjacentElement("afterend", wrapper);
-    wrapper.querySelector(".hh-property-select-trigger")?.addEventListener("click", () => {
+    if (select !== propertyOperationSelect) wrapper.querySelector(".hh-property-select-trigger")?.addEventListener("click", () => {
       const opening = options.hidden;
       document.querySelectorAll(".hh-property-select-options").forEach(menu => { menu.hidden = true; menu.previousElementSibling?.setAttribute("aria-expanded", "false"); });
       options.hidden = !opening;
@@ -4409,7 +4440,7 @@ function initializePropertyListingSelects() {
         options.style.width = `${Math.round(rect.width)}px`;
       }
     });
-    options.addEventListener("click", event => {
+    options?.addEventListener("click", event => {
       const item = event.target.closest("[data-property-select-value]");
       if (!item) return;
       select.value = item.dataset.propertySelectValue;
@@ -4420,6 +4451,10 @@ function initializePropertyListingSelects() {
     });
     refreshPropertyListingSelect(select);
   });
+  const propertyContext = document.querySelector("#propertyListingFields .property-listing-context");
+  const typeLabel = propertyTypeSelect?.closest("label");
+  const operationLabel = propertyOperationSelect?.closest("label");
+  if (propertyContext && typeLabel && operationLabel) propertyContext.insertBefore(typeLabel, operationLabel);
 }
 initializePropertyListingSelects();
 addForm?.addEventListener("reset", () => setTimeout(() => {

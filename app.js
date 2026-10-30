@@ -4346,6 +4346,17 @@ const vehicleListingMakeSpinner = document.getElementById("vehicleListingMakeSpi
 const vehicleListingMakeStatus = document.getElementById("vehicleListingMakeStatus");
 const listingTitleField = document.getElementById("listingTitleField");
 const vehicleListingMore = document.getElementById("vehicleListingMore");
+
+// Keep the listing-creation currency set to UAH, USD and PLN.
+// The search filters have their own currency selector and are not changed here.
+function syncVehicleListingFormOptions() {
+  const currencySelect = document.getElementById("listingPriceCurrency");
+  currencySelect?.querySelector('option[value="EUR"]')?.remove();
+
+  if (vehicleListingMore) {
+    vehicleListingMore.textContent = t("Розширений пошук");
+  }
+}
 const vehicleMarketPanel = document.getElementById("vehicleMarketPanel");
 const vehicleMarketPrice = document.getElementById("vehicleMarketPrice");
 const vehicleMarketNote = document.getElementById("vehicleMarketNote");
@@ -5265,6 +5276,7 @@ function translatePage(selectedLanguage) {
 
 const savedLanguage = localStorage.getItem("hryvniaHubLanguage");
 translatePage(savedLanguage || "uk");
+syncVehicleListingFormOptions();
 
 const langTrigger = document.getElementById("langTrigger");
 const langDropdown = document.getElementById("langDropdown");
@@ -5288,6 +5300,7 @@ if (langTrigger && langDropdown) {
     if (!btn) return;
     const value = btn.dataset.langValue;
     translatePage(value);
+    syncVehicleListingFormOptions();
     closeLangDropdown();
   });
   document.addEventListener("click", event => {

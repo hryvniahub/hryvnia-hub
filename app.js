@@ -40,6 +40,26 @@ function updateClock() {
 }
 
 const translations = {
+  "Количество комнат": {ru:"Количество комнат",uk:"Кількість кімнат",en:"Number of rooms",pl:"Liczba pokoi"},
+  "Общая площадь, м²": {ru:"Общая площадь, м²",uk:"Загальна площа, м²",en:"Total area, m²",pl:"Powierzchnia całkowita, m²"},
+  "Этаж": {ru:"Этаж",uk:"Поверх",en:"Floor",pl:"Piętro"},
+  "Этажность здания": {ru:"Этажность здания",uk:"Кількість поверхів у будинку",en:"Building floors",pl:"Liczba pięter w budynku"},
+  "Площадь участка, м²": {ru:"Площадь участка, м²",uk:"Площа ділянки, м²",en:"Plot area, m²",pl:"Powierzchnia działki, m²"},
+  "Отдельный вход (чаще для коммерческой недвижимости)": {ru:"Отдельный вход (чаще для коммерческой недвижимости)",uk:"Окремий вхід (частіше для комерційної нерухомості)",en:"Separate entrance (more common for commercial property)",pl:"Oddzielne wejście (częściej w nieruchomościach komercyjnych)"},
+  "Парковочные места": {ru:"Парковочные места",uk:"Паркувальні місця",en:"Parking spaces",pl:"Miejsca parkingowe"},
+  "1 место": {ru:"1 место",uk:"1 місце",en:"1 space",pl:"1 miejsce"},
+  "2 и более": {ru:"2 и более",uk:"2 і більше",en:"2 or more",pl:"2 lub więcej"},
+  "Тип гаража": {ru:"Тип гаража",uk:"Тип гаража",en:"Garage type",pl:"Typ garażu"},
+  "Капитальный": {ru:"Капитальный",uk:"Капітальний",en:"Permanent",pl:"Murowany"},
+  "Металлический": {ru:"Металлический",uk:"Металевий",en:"Metal",pl:"Metalowy"},
+  "Подземный": {ru:"Подземный",uk:"Підземний",en:"Underground",pl:"Podziemny"},
+  "Гаражный бокс": {ru:"Гаражный бокс",uk:"Гаражний бокс",en:"Garage unit",pl:"Boks garażowy"},
+  "Дополнительно": {ru:"Дополнительно",uk:"Додатково",en:"Additional features",pl:"Dodatkowo"},
+  "Смотровая яма": {ru:"Смотровая яма",uk:"Оглядова яма",en:"Inspection pit",pl:"Kanał rewizyjny"},
+  "Погреб": {ru:"Погреб",uk:"Погріб",en:"Cellar",pl:"Piwnica"},
+  "Яма и погреб": {ru:"Яма и погреб",uk:"Яма та погріб",en:"Pit and cellar",pl:"Kanał i piwnica"},
+  "Электричество": {ru:"Электричество",uk:"Електрика",en:"Electricity",pl:"Prąd"},
+
   // Stable slug keys for vehicle select options; values saved to Supabase stay unchanged.
   "Редактирование объявления": { ru: "Редактирование объявления", uk: "Редагування оголошення", en: "Edit listing", pl: "Edytuj ogłoszenie" },
   "roadworthy": { ru: "На ходу, технически исправен", uk: "На ходу, технічно справний", en: "Roadworthy, mechanically sound", pl: "Sprawny technicznie, jeżdżący" },
@@ -4567,18 +4587,21 @@ function syncPropertyListingFields() {
   if (!propertyListingFields) return;
   propertyListingFields.hidden = listingCategorySelect?.value !== "Недвижимость";
   propertyListingFields.disabled = listingCategorySelect?.value !== "Недвижимость";
-  // Keep the full set of property parameters available for every property type.
-  // The “Більше” button controls visibility of the whole advanced section;
-  // choosing a type must not silently remove fields from that section.
+  const selectedType = propertyTypeSelect?.value || "";
   propertyListingFields.querySelectorAll("[data-property-for]").forEach(field => {
-    field.hidden = false;
-    field.querySelectorAll("input,select").forEach(control => {
-      control.disabled = propertyListingFields.disabled;
+    const allowed = (field.dataset.propertyFor || "").split(",").map(value => value.trim());
+    const applicable = allowed.includes(selectedType);
+    field.hidden = !applicable;
+    field.querySelectorAll("input,select,textarea").forEach(control => {
+      control.disabled = propertyListingFields.disabled || !applicable;
+      if (!applicable) control.value = "";
     });
   });
   const isProperty = listingCategorySelect?.value === "Недвижимость";
   const isVehicle = listingCategorySelect?.value === "Автомобили";
   if (listingCurrencyField) listingCurrencyField.hidden = !(isProperty || isVehicle);
+  const eurOption = document.querySelector('#listingPriceCurrency option[value="EUR"]');
+  if (eurOption) eurOption.hidden = isProperty;
   const propertyDistrictField = document.getElementById("propertyDistrictField");
   if (propertyDistrictField) propertyDistrictField.hidden = !isProperty;
   if (propertyAddressField) propertyAddressField.hidden = !isProperty;
@@ -4595,6 +4618,12 @@ function syncVehicleListingFields() {
   const listingLocationHome = document.getElementById("listingLocationHome");
   const listingPriceRow = document.getElementById("listingPriceRow");
   const listingPriceHome = document.getElementById("listingPriceHome");
+  const propertyListingPriceHome = document.getElementById("propertyListingPriceHome");
+  if (isProperty && propertyListingFields && listingPriceRow && propertyListingPriceHome?.parentElement) {
+    propertyListingPriceHome.after(listingPriceRow);
+  } else if (!isVehicle && listingPriceRow && listingPriceHome?.parentElement && listingPriceRow.parentElement !== listingPriceHome.parentElement) {
+    listingPriceHome.after(listingPriceRow);
+  }
   if (isVehicle && vehicleListingFields) {
     const firstVehicleLabel = vehicleListingFields.querySelector("label");
     if (listingLocationFields && firstVehicleLabel && listingLocationFields.parentElement !== vehicleListingFields) {
@@ -4609,7 +4638,7 @@ function syncVehicleListingFields() {
     if (listingLocationFields && listingLocationHome?.parentElement && listingLocationFields.parentElement !== listingLocationHome.parentElement) {
       listingLocationHome.after(listingLocationFields);
     }
-    if (listingPriceRow && listingPriceHome?.parentElement && listingPriceRow.parentElement !== listingPriceHome.parentElement) {
+    if (!isProperty && listingPriceRow && listingPriceHome?.parentElement && listingPriceRow.parentElement !== listingPriceHome.parentElement) {
       listingPriceHome.after(listingPriceRow);
     }
   }
@@ -4968,7 +4997,13 @@ if (addForm) {
           kitchen_area_m2: optionalNumber("property_kitchen_area"),
           building_type: String(form.get("property_building_type") || "") || null,
           condition: String(form.get("property_condition") || "") || null,
-          land_area_sotkas: optionalNumber("property_land_area"),
+          land_area_m2: optionalNumber("property_land_area_m2"),
+          separate_entry: String(form.get("property_separate_entry") || "") || null,
+          parking_spaces: String(form.get("property_parking_spaces") || "") || null,
+          garage_type: String(form.get("property_garage_type") || "") || null,
+          garage_features: String(form.get("property_garage_features") || "") || null,
+          garage_electricity: String(form.get("property_garage_electricity") || "") || null,
+          land_area_sotkas: null,
           furniture: String(form.get("property_furniture") || "") || null,
           balcony: String(form.get("property_balcony") || "") || null,
           loggia: String(form.get("property_loggia") || "") || null,

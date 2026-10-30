@@ -41,6 +41,7 @@ function updateClock() {
 
 const translations = {
   // Stable slug keys for vehicle select options; values saved to Supabase stay unchanged.
+  "Редактирование объявления": { ru: "Редактирование объявления", uk: "Редагування оголошення", en: "Edit listing", pl: "Edytuj ogłoszenie" },
   "roadworthy": { ru: "На ходу, технически исправен", uk: "На ходу, технічно справний", en: "Roadworthy, mechanically sound", pl: "Sprawny technicznie, jeżdżący" },
   "needs_repair": { ru: "Требует ремонта", uk: "Потребує ремонту", en: "Needs repair", pl: "Wymaga naprawy" },
   "not_running": { ru: "Не на ходу", uk: "Не на ходу", en: "Not running", pl: "Nie jeździ" },
@@ -274,7 +275,6 @@ const translations = {
   "Площа від, м²": { ru: "Площадь от, м²", uk: "Площа від, м²", en: "Area from, m²", pl: "Powierzchnia od, m²" },
   "Загальна площа, м²": { ru: "Общая площадь, м²", uk: "Загальна площа, м²", en: "Total area, m²", pl: "Powierzchnia całkowita, m²" },
   "Площа кухні, м²": { ru: "Площадь кухни, м²", uk: "Площа кухні, м²", en: "Kitchen area, m²", pl: "Powierzchnia kuchni, m²" },
-  "До метро, м": { ru: "До метро, м", uk: "До метро, м", en: "Distance to metro, m", pl: "Odległość do metra, m" },
   "До школи, м": { ru: "До школы, м", uk: "До школи, м", en: "Distance to school, m", pl: "Odległość do szkoły, m" },
   "До зупинки, м": { ru: "До остановки, м", uk: "До зупинки, м", en: "Distance to stop, m", pl: "Odległość do przystanku, m" },
   "Площа до, м²": { ru: "Площадь до, м²", uk: "Площа до, м²", en: "Area to, m²", pl: "Powierzchnia do, m²" },
@@ -469,12 +469,6 @@ const translations = {
   "Комфорт и управление": { ru:"Комфорт и управление", uk:"Комфорт і керування", en:"Comfort and controls", pl:"Komfort i sterowanie" },
   "Музыка и мультимедиа": { ru:"Музыка и мультимедиа", uk:"Музика та мультимедіа", en:"Audio and multimedia", pl:"Audio i multimedia" },
   "Документы и принадлежности": { ru:"Документы и принадлежности", uk:"Документи та приладдя", en:"Documents and accessories", pl:"Dokumenty i wyposażenie" },
-  "Гидроусилитель руля": { ru:"ГУР", uk:"ГПК", en:"Power steering", pl:"Wspomaganie kierownicy" },
-  "Электростеклоподъёмники": { ru:"Электростеклоподъёмники", uk:"Електросклопідіймачі", en:"Power windows", pl:"Elektryczne szyby" },
-  "Подогрев сидений": { ru:"Подогрев сидений", uk:"Підігрів сидінь", en:"Heated seats", pl:"Podgrzewane fotele" },
-  "Подогрев заднего стекла": { ru:"Подогрев заднего стекла", uk:"Обігрів заднього скла", en:"Heated rear window", pl:"Podgrzewana tylna szyba" },
-  "Подогрев лобового стекла": { ru:"Подогрев лобового стекла", uk:"Обігрів лобового скла", en:"Heated windshield", pl:"Podgrzewana przednia szyba" },
-  "Подогрев зеркал": { ru:"Подогрев зеркал", uk:"Підігрів дзеркал", en:"Heated mirrors", pl:"Podgrzewane lusterka" },
   "Магнитола 1 DIN": { ru:"Магнитола 1 DIN", uk:"Магнітола 1 DIN", en:"1-DIN head unit", pl:"Radio 1 DIN" },
   "Магнитола 2 DIN": { ru:"Магнитола 2 DIN", uk:"Магнітола 2 DIN", en:"2-DIN head unit", pl:"Radio 2 DIN" },
   "Запасное колесо (запаска)": { ru:"Запасное колесо (запаска)", uk:"Запасне колесо", en:"Spare wheel", pl:"Koło zapasowe" },
@@ -1067,8 +1061,7 @@ async function initAuth() {
       return;
     }
     if (event === "SIGNED_IN") {
-      // Do not replace the login form with the account menu after sign-in.
-      // The menu remains available when the user explicitly taps the account button.
+      if (authModal && !authModal.classList.contains("hidden")) renderAuthModal();
       if (vehicleMarketPanel && !vehicleMarketPanel.hidden && listingCategorySelect?.value === "Автомобили") {
         if (vehicleMarketAuthPrompt) vehicleMarketAuthPrompt.hidden = true;
         closeAuthModal();
@@ -2812,8 +2805,7 @@ async function ensureCitiesLoaded() {
 
 // ==== РАСШИРЕННОЕ РЕДАКТИРОВАНИЕ (включая авто-поля) ====
 async function editListing(item, labels) {
-  // Opening the editor must never wait for city/region catalogs.
-  // City data is loaded lazily only when the user focuses the city field.
+  await ensureCitiesLoaded();
   if (!db || !currentUser) { alert(labels.denied); return; }
   if (String(currentUser.id) !== String(item.user_id || "")) { alert(labels.denied); return; }
 
@@ -2829,7 +2821,9 @@ async function editListing(item, labels) {
   const selectedCityId = String(item.city_id || item.cities?.id || "");
   const selectedCity = availableCities.find(city => String(city.id) === selectedCityId);
   const initialCityName = selectedCity ? cityName(selectedCity) : String(item.cities?.[`name_${lang}`] || item.cities?.name_uk || item.cities?.name_ru || "");
-  const categoryValue = escapeHtml(String(item.category || "Автомобили"));
+  const categoryOptions = ["Автомобили","Недвижимость","Готовый бизнес","Инвестиции"]
+    .map(cat => `<option value="${cat}" ${item.category === cat ? "selected" : ""}>${escapeHtml(translations[cat]?.[lang] || cat)}</option>`)
+    .join("");
   const photos = listingPhotos(item);
 
   const opt = (value, current, key) => {
@@ -2849,18 +2843,9 @@ async function editListing(item, labels) {
   const vehicleTypes = [["new","new"],["used","used"]];
   const operational = [["roadworthy","roadworthy"],["needs_repair","needs_repair"],["not_running","not_running"],["after_accident","after_accident"]];
 
-  const editCityField = `
-    <label class="edit-city-field">${escapeHtml(L.city)}
-      <input name="city_search" type="text" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="editCitySuggestions" placeholder="${escapeHtml(cityTranslation("Введите название города"))}" value="${escapeHtml(initialCityName)}" required>
-      <input name="city_id" type="hidden" value="${escapeHtml(selectedCityId)}">
-      <div class="edit-city-suggestions" id="editCitySuggestions" role="listbox" hidden></div>
-    </label>`;
-  const editPriceField = `<label>${escapeHtml(L.price)}<input name="price" type="number" min="0" step="0.01" required value="${escapeHtml(String(item.price ?? ""))}"></label>`;
-
   const vehicleBlock = isVehicle ? `
     <fieldset class="vehicle-listing-fields">
       <legend>${escapeHtml(t("Характеристики автомобиля"))}</legend>
-      ${editCityField}
       <label>${escapeHtml(t("Марка автомобиля"))}
         <select name="vehicle_make_slug" id="editVehicleMake" required>
           <option value="">${escapeHtml(t("Выберите марку"))}</option>
@@ -2872,14 +2857,13 @@ async function editListing(item, labels) {
         </select>
       </label>
       <label>${escapeHtml(t("Год выпуска"))}<input name="vehicle_year" type="number" min="1900" max="2100" value="${escapeHtml(String(item.vehicle_year ?? ""))}"></label>
-      ${editPriceField}
-      <label>${escapeHtml(t("Пробег, км"))}<input name="vehicle_mileage_km" type="number" min="0" value="${escapeHtml(String(item.vehicle_mileage_km ?? ""))}"></label>
+      <label>${escapeHtml(t("Тип кузова"))}<select name="vehicle_body_type"><option value="">${escapeHtml(t("Выберите тип кузова"))}</option>${bodyTypes.map(v => opt(v, item.vehicle_body_type, v)).join("")}</select></label>
+      <label>${escapeHtml(t("Топливо"))}<select name="vehicle_fuel_type"><option value="">${escapeHtml(t("Выберите топливо"))}</option>${fuels.map(v => opt(v, item.vehicle_fuel_type, v)).join("")}</select></label>
       <label>${escapeHtml(t("Объём двигателя, л"))}<input name="vehicle_engine_liters" type="number" min="0" max="20" step="0.1" value="${escapeHtml(String(item.vehicle_engine_liters ?? ""))}"></label>
       <label>${escapeHtml(t("Мощность, л.с."))}<input name="vehicle_power_hp" type="number" min="1" max="3000" value="${escapeHtml(String(item.vehicle_power_hp ?? ""))}"></label>
-      <label>${escapeHtml(t("Топливо"))}<select name="vehicle_fuel_type"><option value="">${escapeHtml(t("Выберите топливо"))}</option>${fuels.map(v => opt(v, item.vehicle_fuel_type, v)).join("")}</select></label>
       <label>${escapeHtml(t("Коробка передач"))}<select name="vehicle_transmission"><option value="">${escapeHtml(t("Выберите коробку"))}</option>${transmissions.map(v => opt(v, item.vehicle_transmission, v)).join("")}</select></label>
-      <label>${escapeHtml(t("Тип кузова"))}<select name="vehicle_body_type"><option value="">${escapeHtml(t("Выберите тип кузова"))}</option>${bodyTypes.map(v => opt(v, item.vehicle_body_type, v)).join("")}</select></label>
       <label>${escapeHtml(t("Привод"))}<select name="vehicle_drive"><option value="">${escapeHtml(t("Выберите привод"))}</option>${drives.map(v => opt(v, item.vehicle_drive, v)).join("")}</select></label>
+      <label>${escapeHtml(t("Пробег, км"))}<input name="vehicle_mileage_km" type="number" min="0" value="${escapeHtml(String(item.vehicle_mileage_km ?? ""))}"></label>
       <label>${escapeHtml(t("Тип авто"))}<select name="vehicle_condition"><option value="">${escapeHtml(t("Выберите тип"))}</option>${vehicleTypes.map(([v,k]) => opt(v, item.vehicle_condition, k)).join("")}</select></label>
       <label>${escapeHtml(t("Техническое состояние"))}<select name="vehicle_operational_condition"><option value="">${escapeHtml(t("Выберите состояние"))}</option>${operational.map(([v,k]) => opt(v, item.vehicle_operational_condition, k)).join("")}</select></label>
       <label>${escapeHtml(t("Количество дверей"))}<select name="vehicle_doors"><option value="">${escapeHtml(t("Выберите количество"))}</option>${[2,3,4,5].map(n => optPlain(n, item.vehicle_doors, String(n))).join("")}</select></label>
@@ -2890,12 +2874,16 @@ async function editListing(item, labels) {
 
   const dialog = document.createElement("dialog");
   dialog.className = "modal-card listing-edit-dialog";
-  dialog.innerHTML = `<form class="listing-edit-form"><header class="listing-edit-header"><p class="eyebrow">${escapeHtml(t("Редактирование объявления"))}</p></header>
-    <input type="hidden" name="category" value="${categoryValue}">
+  dialog.innerHTML = `<form class="listing-edit-form"><header class="listing-edit-header"><p class="eyebrow">${escapeHtml(t("Редактирование объявления"))}</p><h2>${escapeHtml(labels.edit)}</h2></header>
+    <label>${escapeHtml(L.category)}<select name="category" required>${categoryOptions}</select></label>
     ${isVehicle ? "" : `<label>${escapeHtml(L.title)}<input name="title" required maxlength="180" value="${escapeHtml(item.title || "")}"></label>`}
     ${vehicleBlock}
-    ${isVehicle ? "" : editCityField}
-    ${isVehicle ? "" : editPriceField}
+    <label class="edit-city-field">${escapeHtml(L.city)}
+      <input name="city_search" type="text" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="editCitySuggestions" placeholder="${escapeHtml(cityTranslation("Введите название города"))}" value="${escapeHtml(initialCityName)}" required>
+      <input name="city_id" type="hidden" value="${escapeHtml(selectedCityId)}">
+      <div class="edit-city-suggestions" id="editCitySuggestions" role="listbox" hidden></div>
+    </label>
+    <label>${escapeHtml(L.price)}<input name="price" type="number" min="0" step="0.01" required value="${escapeHtml(String(item.price ?? ""))}"></label>
     ${String(item.category || "") === "Недвижимость" ? (() => { const d=item.property_details||{}; const val=(k)=>escapeHtml(String(d[k]??"")); const select=(name,label,opts,key)=>`<label>${escapeHtml(t(label))}<select name="${name}"><option value="">${escapeHtml(t("Не указано"))}</option>${opts.map(v=>`<option value="${escapeHtml(v)}" ${String(d[key]??"")===v?"selected":""}>${escapeHtml(t(v))}</option>`).join("")}</select></label>`; const num=(name,label,key)=>`<label>${escapeHtml(t(label))}<input name="${name}" type="number" min="0" step="0.1" value="${val(key)}"></label>`; return `<fieldset class="edit-property-fields" aria-label="${escapeHtml(t("Характеристики недвижимости"))}"><div class="edit-property-grid"><label>${escapeHtml(t("Район"))}<input name="property_district" type="text" value="${val("district")}"></label>${select("property_rooms","Кількість кімнат",["1","2","3","4","5+"],"rooms")}<label>${escapeHtml(t("Етаж"))}<input name="property_floor" type="number" min="0" step="1" value="${val("floor")}"></label><label>${escapeHtml(t("Етажність будівлі"))}<input name="property_floors_total" type="number" min="1" step="1" value="${val("floors_total")}"></label>${num("property_area_m2","Загальна площа, м²","area_m2")}${num("property_kitchen_area_m2","Площа кухні, м²","kitchen_area_m2")}${select("property_building_type","Тип будівлі",["Кирпичный","Панельный","Монолитный","Монолитно-кирпичный","Деревянный","Другое"],"building_type")}${select("property_condition","Стан",["Новостройка","Новый ремонт","Жилое состояние","Нужен ремонт","Под ремонт"],"condition")}${select("property_furniture","Меблі",["Есть","Нет","Частично"],"furniture")}${select("property_balcony","Балкон",["Есть","Нет"],"balcony")}${select("property_loggia","Лоджія",["Есть","Нет"],"loggia")}<label>${escapeHtml(t("До метро, м"))}<input name="property_metro_distance_m" type="number" min="0" step="1" value="${val("metro_distance_m")}"></label><label>${escapeHtml(t("До школи, м"))}<input name="property_school_distance_m" type="number" min="0" step="1" value="${val("school_distance_m")}"></label><label>${escapeHtml(t("До зупинки, м"))}<input name="property_stop_distance_m" type="number" min="0" step="1" value="${val("stop_distance_m")}"></label>${num("property_land_area_sotkas","Площа ділянки, соток","land_area_sotkas")}<section class="property-amenities property-amenities-fixed"><h3>${escapeHtml(t("Удобства"))}</h3><div class="property-amenity-grid">${[["refrigerator","Холодильник"],["washing_machine","Стиральная машина"],["stove","Плита"],["dishwasher","Посудомоечная машина"],["air_conditioning","Кондиционер"],["internet","Интернет"],["parking","Парковка"]].map(([key,label])=>`<label><input type="checkbox" name="property_amenity_${key}" ${d.amenities?.[key] ? "checked" : ""}><span>${escapeHtml(t(label))}</span></label>`).join("")}</div><fieldset class="property-bathroom-field"><legend>${escapeHtml(t("Санузел"))}</legend>${[["separate","Раздельный"],["combined","Совмещённый"]].map(([value,label])=>`<label><input type="radio" name="property_bathroom_type" value="${value}" ${d.bathroom_type===value?"checked":""}><span>${escapeHtml(t(label))}</span></label>`).join("")}</fieldset></section></div></fieldset>`; })() : ""}
     <label>${escapeHtml(L.description)}<textarea name="description" rows="5" maxlength="10000">${escapeHtml(item.description || "")}</textarea></label>
     <fieldset class="edit-photo-fields">
@@ -2987,32 +2975,6 @@ async function editListing(item, labels) {
     editCitySuggestions.hidden = true;
     editCityInput.setAttribute("aria-expanded", "false");
   };
-  let editCityLoadStarted = false;
-  let editCityLoadFailed = false;
-  const showEditCityLoading = () => {
-    editCitySuggestions.innerHTML = `<div class="city-suggestion-empty" role="status"><span aria-hidden="true" style="display:inline-block;margin-right:7px;font-size:16px">⟳</span>${escapeHtml(cityTranslation("Загрузка городов…"))}</div>`;
-    editCitySuggestions.hidden = false;
-    editCityInput.setAttribute("aria-expanded", "true");
-  };
-  const loadEditCitiesOnDemand = async () => {
-    if (availableCities.length) return true;
-    if (editCityLoadStarted) {
-      if (citiesLoadPromise) {
-        try { await citiesLoadPromise; } catch (error) { console.error("Не удалось загрузить города для редактора:", error); }
-      }
-      return availableCities.length > 0;
-    }
-    editCityLoadStarted = true;
-    showEditCityLoading();
-    try {
-      await loadCities();
-      editCityLoadFailed = !availableCities.length;
-    } catch (error) {
-      editCityLoadFailed = true;
-      console.error("Не удалось загрузить города для редактора:", error);
-    }
-    return availableCities.length > 0;
-  };
   const renderEditCitySuggestions = () => {
     const variants = getQueryVariants(editCityInput.value);
     const ranked = citySearchIndex.map(entry => ({ entry, rank: rankCityEntry(entry, variants) }))
@@ -3034,19 +2996,7 @@ async function editListing(item, labels) {
     editCityId.value = ""; // Never silently save the previous city after the user edits the text.
     renderEditCitySuggestions();
   });
-  editCityInput.addEventListener("focus", async () => {
-    if (!availableCities.length) {
-      const loaded = await loadEditCitiesOnDemand();
-      if (!loaded) {
-        editCitySuggestions.innerHTML = `<div class="city-suggestion-empty" role="status">${escapeHtml(cityTranslation("Не удалось загрузить города. Попробуйте ещё раз."))}</div>`;
-        editCitySuggestions.hidden = false;
-        editCityInput.setAttribute("aria-expanded", "true");
-        editCityLoadStarted = false;
-        return;
-      }
-    }
-    renderEditCitySuggestions();
-  });
+  editCityInput.addEventListener("focus", renderEditCitySuggestions);
   editCityInput.addEventListener("keydown", event => {
     if (event.key === "Escape") closeEditCitySuggestions();
     if (event.key === "ArrowDown" && !editCitySuggestions.hidden) {
@@ -3112,16 +3062,14 @@ async function editListing(item, labels) {
     let urls = editPhotos.map(photo => photo.uploadedUrl).filter(Boolean).slice(0, MAX_PHOTOS);
 
     const cityIdValue = String(form.elements.city_id.value || "");
-    const originalCityId = String(item.city_id || item.cities?.id || "");
-    const cityWasChanged = cityIdValue !== originalCityId;
-    if (!cityIdValue || (cityWasChanged && !availableCities.some(city => String(city.id) === cityIdValue))) {
+    if (!cityIdValue || !availableCities.some(city => String(city.id) === cityIdValue)) {
       message.textContent = t("Выберите город из предложенных вариантов");
       form.elements.city_search.focus();
       return;
     }
     const payload = {
       category: form.elements.category.value,
-      ...(cityWasChanged ? { city_id: Number(cityIdValue) } : {}),
+      city_id: Number(cityIdValue),
       price,
       previous_price: Number(item.price) !== price ? Number(item.price) : (item.previous_price ?? null),
       description: form.elements.description.value.trim(),
@@ -4211,7 +4159,6 @@ function openCategoryMenu(parentCategory = "") {
         <div class="property-search-actions">
           <button type="button" id="propertySearchReset" class="vehicle-reset-btn">${escapeHtml(t("Скинути"))}</button>
           <button type="button" id="propertySearchToggleAdvanced" class="vehicle-search-toggle" aria-expanded="false" aria-controls="propertyMoreFields">${escapeHtml(t("Розширений пошук"))}</button>
-          <button type="button" id="propertySearchApply" class="btn btn-primary property-search-apply">Знайти</button>
         </div>
       </div>`;
     closeCategoryMenu();
@@ -4387,17 +4334,6 @@ const vehicleListingMakeSpinner = document.getElementById("vehicleListingMakeSpi
 const vehicleListingMakeStatus = document.getElementById("vehicleListingMakeStatus");
 const listingTitleField = document.getElementById("listingTitleField");
 const vehicleListingMore = document.getElementById("vehicleListingMore");
-
-// Keep the listing-creation currency set to UAH, USD and PLN.
-// The search filters have their own currency selector and are not changed here.
-function syncVehicleListingFormOptions() {
-  const currencySelect = document.getElementById("listingPriceCurrency");
-  currencySelect?.querySelector('option[value="EUR"]')?.remove();
-
-  if (vehicleListingMore) {
-    vehicleListingMore.textContent = t("Розширений пошук");
-  }
-}
 const vehicleMarketPanel = document.getElementById("vehicleMarketPanel");
 const vehicleMarketPrice = document.getElementById("vehicleMarketPrice");
 const vehicleMarketNote = document.getElementById("vehicleMarketNote");
@@ -4576,8 +4512,7 @@ function syncPropertyListingFields() {
     });
   });
   const isProperty = listingCategorySelect?.value === "Недвижимость";
-  const isVehicle = listingCategorySelect?.value === "Автомобили";
-  if (listingCurrencyField) listingCurrencyField.hidden = !(isProperty || isVehicle);
+  if (listingCurrencyField) listingCurrencyField.hidden = !isProperty;
   const propertyDistrictField = document.getElementById("propertyDistrictField");
   if (propertyDistrictField) propertyDistrictField.hidden = !isProperty;
   if (propertyAddressField) propertyAddressField.hidden = !isProperty;
@@ -4590,28 +4525,6 @@ function syncVehicleListingFields() {
   const isVehicle = category === "Автомобили";
   const isProperty = category === "Недвижимость";
   const hidesManualTitle = isVehicle || isProperty;
-  const listingLocationFields = document.getElementById("listingLocationFields");
-  const listingLocationHome = document.getElementById("listingLocationHome");
-  const listingPriceRow = document.getElementById("listingPriceRow");
-  const listingPriceHome = document.getElementById("listingPriceHome");
-  if (isVehicle && vehicleListingFields) {
-    const firstVehicleLabel = vehicleListingFields.querySelector("label");
-    if (listingLocationFields && firstVehicleLabel && listingLocationFields.parentElement !== vehicleListingFields) {
-      vehicleListingFields.insertBefore(listingLocationFields, firstVehicleLabel);
-    }
-    const transmissionInput = vehicleListingFields.querySelector('[name="vehicle_transmission"]');
-    const transmissionLabel = transmissionInput?.closest("label");
-    if (listingPriceRow && transmissionLabel && listingPriceRow.parentElement !== vehicleListingFields) {
-      transmissionLabel.after(listingPriceRow);
-    }
-  } else {
-    if (listingLocationFields && listingLocationHome?.parentElement && listingLocationFields.parentElement !== listingLocationHome.parentElement) {
-      listingLocationHome.after(listingLocationFields);
-    }
-    if (listingPriceRow && listingPriceHome?.parentElement && listingPriceRow.parentElement !== listingPriceHome.parentElement) {
-      listingPriceHome.after(listingPriceRow);
-    }
-  }
   if (vehicleListingFields) vehicleListingFields.hidden = !isVehicle;
   if (vehicleListingMore) vehicleListingMore.hidden = !isVehicle;
   if (vehicleMarketPanel) vehicleMarketPanel.hidden = true;
@@ -5317,7 +5230,6 @@ function translatePage(selectedLanguage) {
 
 const savedLanguage = localStorage.getItem("hryvniaHubLanguage");
 translatePage(savedLanguage || "uk");
-syncVehicleListingFormOptions();
 
 const langTrigger = document.getElementById("langTrigger");
 const langDropdown = document.getElementById("langDropdown");
@@ -5341,7 +5253,6 @@ if (langTrigger && langDropdown) {
     if (!btn) return;
     const value = btn.dataset.langValue;
     translatePage(value);
-    syncVehicleListingFormOptions();
     closeLangDropdown();
   });
   document.addEventListener("click", event => {

@@ -2812,7 +2812,8 @@ async function ensureCitiesLoaded() {
 
 // ==== РАСШИРЕННОЕ РЕДАКТИРОВАНИЕ (включая авто-поля) ====
 async function editListing(item, labels) {
-  await ensureCitiesLoaded();
+  // Opening the editor must never wait for city/region catalogs.
+  // City data is loaded lazily only when the user focuses the city field.
   if (!db || !currentUser) { alert(labels.denied); return; }
   if (String(currentUser.id) !== String(item.user_id || "")) { alert(labels.denied); return; }
 
@@ -2986,6 +2987,32 @@ async function editListing(item, labels) {
     editCitySuggestions.hidden = true;
     editCityInput.setAttribute("aria-expanded", "false");
   };
+  let editCityLoadStarted = false;
+  let editCityLoadFailed = false;
+  const showEditCityLoading = () => {
+    editCitySuggestions.innerHTML = `<div class="city-suggestion-empty" role="status"><span aria-hidden="true" style="display:inline-block;margin-right:7px;font-size:16px">⟳</span>${escapeHtml(cityTranslation("Загрузка городов…"))}</div>`;
+    editCitySuggestions.hidden = false;
+    editCityInput.setAttribute("aria-expanded", "true");
+  };
+  const loadEditCitiesOnDemand = async () => {
+    if (availableCities.length) return true;
+    if (editCityLoadStarted) {
+      if (citiesLoadPromise) {
+        try { await citiesLoadPromise; } catch (error) { console.error("Не удалось загрузить города для редактора:", error); }
+      }
+      return availableCities.length > 0;
+    }
+    editCityLoadStarted = true;
+    showEditCityLoading();
+    try {
+      await loadCities();
+      editCityLoadFailed = !availableCities.length;
+    } catch (error) {
+      editCityLoadFailed = true;
+      console.error("Не удалось загрузить города для редактора:", error);
+    }
+    return availableCities.length > 0;
+  };
   const renderEditCitySuggestions = () => {
     const variants = getQueryVariants(editCityInput.value);
     const ranked = citySearchIndex.map(entry => ({ entry, rank: rankCityEntry(entry, variants) }))
@@ -3007,7 +3034,19 @@ async function editListing(item, labels) {
     editCityId.value = ""; // Never silently save the previous city after the user edits the text.
     renderEditCitySuggestions();
   });
-  editCityInput.addEventListener("focus", renderEditCitySuggestions);
+  editCityInput.addEventListener("focus", async () => {
+    if (!availableCities.length) {
+      const loaded = await loadEditCitiesOnDemand();
+      if (!loaded) {
+        editCitySuggestions.innerHTML = `<div class="city-suggestion-empty" role="status">${escapeHtml(cityTranslation("Не удалось загрузить города. Попробуйте ещё раз."))}</div>`;
+        editCitySuggestions.hidden = false;
+        editCityInput.setAttribute("aria-expanded", "true");
+        editCityLoadStarted = false;
+        return;
+      }
+    }
+    renderEditCitySuggestions();
+  });
   editCityInput.addEventListener("keydown", event => {
     if (event.key === "Escape") closeEditCitySuggestions();
     if (event.key === "ArrowDown" && !editCitySuggestions.hidden) {
@@ -3073,14 +3112,16 @@ async function editListing(item, labels) {
     let urls = editPhotos.map(photo => photo.uploadedUrl).filter(Boolean).slice(0, MAX_PHOTOS);
 
     const cityIdValue = String(form.elements.city_id.value || "");
-    if (!cityIdValue || !availableCities.some(city => String(city.id) === cityIdValue)) {
+    const originalCityId = String(item.city_id || item.cities?.id || "");
+    const cityWasChanged = cityIdValue !== originalCityId;
+    if (!cityIdValue || (cityWasChanged && !availableCities.some(city => String(city.id) === cityIdValue))) {
       message.textContent = t("Выберите город из предложенных вариантов");
       form.elements.city_search.focus();
       return;
     }
     const payload = {
       category: form.elements.category.value,
-      city_id: Number(cityIdValue),
+      ...(cityWasChanged ? { city_id: Number(cityIdValue) } : {}),
       price,
       previous_price: Number(item.price) !== price ? Number(item.price) : (item.previous_price ?? null),
       description: form.elements.description.value.trim(),

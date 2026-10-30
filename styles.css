@@ -3210,3 +3210,32 @@ main{
   box-sizing:border-box;
   margin:0;
 }
+
+
+/* Vehicle search: primary filters are visible before the More button. */
+.vehicle-search-main-grid .vehicle-price-range {
+  grid-column: 1 / -1;
+}
+.vehicle-search-main-grid > label,
+.vehicle-search-main-grid > .vehicle-search-city-field {
+  min-width: 0;
+}
+@media (max-width: 420px) {
+  .vehicle-search-main-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+  .vehicle-search-main-grid .vehicle-price-range {
+    grid-template-columns: minmax(0, 1fr) 76px minmax(0, 1fr);
+    gap: 5px;
+  }
+  .vehicle-search-main-grid .vehicle-price-range label {
+    font-size: 11px;
+  }
+  .vehicle-search-main-grid .vehicle-price-range input,
+  .vehicle-search-main-grid .vehicle-price-range select {
+    padding-left: 6px;
+    padding-right: 6px;
+    font-size: 12px;
+  }
+}

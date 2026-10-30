@@ -850,21 +850,26 @@ h2{ margin: 0; font-size: 22px; letter-spacing: -.02em; }
 @keyframes vehicle-make-spin { to { transform: rotate(360deg); } }
 
 .vehicle-search-toggle{
-  border: 1px solid rgba(168, 201, 40,.55);
-  background: transparent;
-  color: var(--accent);
+  border: 1px solid var(--accent-border);
+  background: var(--accent);
+  color: #17210a;
   font-weight: 700;
 }
 .vehicle-search-toggle:hover{
-  background: rgba(168, 201, 40,.12);
+  background: var(--accent-hover);
+}
+.vehicle-search-submit{
+  display: flex;
+  width: 100%;
+  min-height: 46px;
+  margin-top: 10px;
 }
 @media (max-width: 420px) {
   .vehicle-search-actions{
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
   }
-  .vehicle-search-actions .vehicle-search-toggle{
-    flex: 1 1 100%;
-    order: -1;
+  .vehicle-search-actions button{
+    flex: 1 1 0;
   }
 }
 

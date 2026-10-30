@@ -41,6 +41,7 @@ function updateClock() {
 
 const translations = {
   // Stable slug keys for vehicle select options; values saved to Supabase stay unchanged.
+  "Редактирование объявления": { ru: "Редактирование объявления", uk: "Редагування оголошення", en: "Edit listing", pl: "Edytuj ogłoszenie" },
   "roadworthy": { ru: "На ходу, технически исправен", uk: "На ходу, технічно справний", en: "Roadworthy, mechanically sound", pl: "Sprawny technicznie, jeżdżący" },
   "needs_repair": { ru: "Требует ремонта", uk: "Потребує ремонту", en: "Needs repair", pl: "Wymaga naprawy" },
   "not_running": { ru: "Не на ходу", uk: "Не на ходу", en: "Not running", pl: "Nie jeździ" },

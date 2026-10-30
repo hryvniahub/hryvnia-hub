@@ -5015,7 +5015,17 @@ if (addForm) {
         const value = String(form.get(name) || "").trim();
         return value === "" ? null : Number(value);
       };
+      // Store property amenities as dedicated listings columns.
+      // Keep the existing property_details JSON structure unchanged.
       Object.assign(payload, {
+        has_refrigerator: form.querySelector('[name="property_amenity_refrigerator"]')?.checked === true,
+        has_washing_machine: form.querySelector('[name="property_amenity_washing_machine"]')?.checked === true,
+        has_stove: form.querySelector('[name="property_amenity_stove"]')?.checked === true,
+        has_dishwasher: form.querySelector('[name="property_amenity_dishwasher"]')?.checked === true,
+        has_air_conditioner: form.querySelector('[name="property_amenity_air_conditioning"]')?.checked === true,
+        has_internet: form.querySelector('[name="property_amenity_internet"]')?.checked === true,
+        has_parking: form.querySelector('[name="property_amenity_parking"]')?.checked === true,
+        bathroom_type: String(form.querySelector('[name="property_bathroom_type"]:checked')?.value || '') || null,
         property_details: {
           operation: propertyOperation,
           type: propertyType,

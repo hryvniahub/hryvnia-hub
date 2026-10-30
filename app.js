@@ -2426,7 +2426,7 @@ function renderCitySuggestions() {
   if (!citySuggestions || !citySearchInput) return;
   const term = citySearchInput.value;
   const queryVariants = getQueryVariants(term);
-  const base = citySearchIndex.filter(entry => !formRegionCode || String(entry.city.region_katottg_code) === formRegionCode);
+  const base = getPropertyGeoFilteredCities();
   const ranked = base.map(entry => ({ entry, rank: rankCityEntry(entry, queryVariants) }))
     .filter(item => item.rank >= 0)
     .sort((a, b) => a.rank - b.rank || cityName(a.entry.city).localeCompare(cityName(b.entry.city)))
@@ -2443,8 +2443,14 @@ function selectCity(city) {
   const isCapital = String(city.official_code || "") === "UA80000000000093317" || Number(city.id) === 29707;
   formRegionCode = isCapital ? "" : String(city.region_katottg_code || "");
   if (cityRegionSelect) cityRegionSelect.value = isCapital ? "__capital__" : formRegionCode;
+
+  // A selected settlement resolves its oblast raion through the KATOTTG code hierarchy.
   updatePropertyOblastRaions(formRegionCode);
+  const matchingRaion = findOblastRaionForCity(city);
+  const raionSelect = document.getElementById("propertyOblastRaionSelect");
+  if (raionSelect) raionSelect.value = matchingRaion ? String(matchingRaion.katottg_code) : "";
   updatePropertyCityDistricts(city);
+
   closeCitySuggestions();
   if (formMessage) formMessage.textContent = "";
 }
@@ -2480,8 +2486,31 @@ let propertyGeoCatalogsPromise = null;
 const propertyGeoName = row => {
   if (!row) return "";
   const key = lang === "ru" ? "name_ru" : lang === "en" ? "name_en" : lang === "pl" ? "name_pl" : "name_uk";
-  return String(row[key] || row.name_uk || "").trim();
+  return String(row[key] || row.name_uk || row.name_ru || "").trim();
 };
+const normalizeKatottgCode = value => String(value || "").trim().toUpperCase();
+function findOblastRaionForCity(city) {
+  const cityCode = normalizeKatottgCode(city?.official_code);
+  const regionCode = normalizeKatottgCode(city?.region_katottg_code);
+  if (!cityCode) return null;
+  return propertyOblastRaions
+    .filter(row => normalizeKatottgCode(row.region_katottg_code) === regionCode)
+    .filter(row => {
+      const raionCode = normalizeKatottgCode(row.katottg_code);
+      return raionCode && cityCode.startsWith(raionCode);
+    })
+    .sort((a, b) => normalizeKatottgCode(b.katottg_code).length - normalizeKatottgCode(a.katottg_code).length)[0] || null;
+}
+function getPropertyGeoFilteredCities() {
+  const raionCode = normalizeKatottgCode(document.getElementById("propertyOblastRaionSelect")?.value);
+  const regionCode = normalizeKatottgCode(formRegionCode);
+  return citySearchIndex.filter(entry => {
+    const city = entry.city;
+    if (regionCode && normalizeKatottgCode(city.region_katottg_code) !== regionCode) return false;
+    if (raionCode && !normalizeKatottgCode(city.official_code).startsWith(raionCode)) return false;
+    return true;
+  });
+}
 async function loadPropertyGeoCatalogs() {
   if (!db) return;
   if (propertyGeoCatalogsPromise) return propertyGeoCatalogsPromise;
@@ -2500,19 +2529,25 @@ async function loadPropertyGeoCatalogs() {
 }
 function updatePropertyOblastRaions(regionCode, select = document.getElementById("propertyOblastRaionSelect")) {
   if (!select) return;
-  const current = select.value;
-  const rows = propertyOblastRaions.filter(row => String(row.region_katottg_code) === String(regionCode || ""));
-  select.innerHTML = `<option value="">${escapeHtml(t("Район области"))}</option>` + rows.map(row => `<option value="${escapeHtml(row.katottg_code)}">${escapeHtml(propertyGeoName(row))}</option>`).join("");
-  if (rows.some(row => String(row.katottg_code) === current)) select.value = current;
+  const current = normalizeKatottgCode(select.value);
+  const region = normalizeKatottgCode(regionCode);
+  const rows = propertyOblastRaions.filter(row => !region || normalizeKatottgCode(row.region_katottg_code) === region);
+  select.innerHTML = `<option value="">${escapeHtml(t("Район области"))}</option>` +
+    rows.map(row => `<option value="${escapeHtml(row.katottg_code)}">${escapeHtml(propertyGeoName(row))}</option>`).join("");
+  if (rows.some(row => normalizeKatottgCode(row.katottg_code) === current)) select.value = current;
   const field = document.getElementById("propertyOblastRaionField");
   if (field) field.hidden = rows.length === 0;
 }
 function updatePropertyCityDistricts(city, select = document.getElementById("propertyCityDistrictSelect")) {
   if (!select) return;
   const current = select.value;
-  const rows = propertyCityDistricts.filter(row => city && (String(row.city_id || "") === String(city.id) || (!row.city_id && String(row.city_katottg_code || "") === String(city.official_code || ""))));
-  select.innerHTML = `<option value="">${escapeHtml(t("Район города"))}</option>` + rows.map(row => `<option value="${escapeHtml(row.katottg_code)}" data-name="${escapeHtml(propertyGeoName(row))}">${escapeHtml(propertyGeoName(row))}</option>`).join("");
-  if (rows.some(row => String(row.katottg_code) === current)) select.value = current;
+  const rows = propertyCityDistricts.filter(row => city && (
+    String(row.city_id || "") === String(city.id) ||
+    (!row.city_id && normalizeKatottgCode(row.city_katottg_code) === normalizeKatottgCode(city.official_code))
+  ));
+  select.innerHTML = `<option value="">${escapeHtml(t("Район города"))}</option>` +
+    rows.map(row => `<option value="${escapeHtml(row.katottg_code)}">${escapeHtml(propertyGeoName(row))}</option>`).join("");
+  if (rows.some(row => String(row.katottg_code) === String(current))) select.value = current;
   const field = document.getElementById("propertyDistrictField");
   if (field) field.hidden = rows.length === 0;
 }
@@ -2527,7 +2562,7 @@ async function loadCities() {
   let from = 0;
   let cityError = null;
   while (true) {
-    const { data, error } = await db.from("cities").select("id, name_ru, name_uk, name_en, name_pl, region_katottg_code").order("id").range(from, from + pageSize - 1);
+    const { data, error } = await db.from("cities").select("id, name_ru, name_uk, name_en, name_pl, official_code, settlement_category_code, region_katottg_code").order("id").range(from, from + pageSize - 1);
     if (error) { cityError = error; break; }
     allCities.push(...(data || []));
     if (!data || data.length < pageSize) break;
@@ -2572,13 +2607,56 @@ if (catalogRegionSelect) {
   });
 }
 if (cityRegionSelect) {
-  cityRegionSelect.addEventListener("focus", () => { if (!availableCities.length) loadCities().catch(error => console.error("Не удалось загрузить города:", error)); }, { once: true });
-  cityRegionSelect.addEventListener("change", () => {
-    formRegionCode = cityRegionSelect.value === "__capital__" ? "" : cityRegionSelect.value;
-    if (citySelect) citySelect.value = "";
-    if (citySearchInput) citySearchInput.value = "";
+  cityRegionSelect.addEventListener("focus", async () => {
+    if (!availableCities.length) await loadCities().catch(error => console.error("Не удалось загрузить города:", error));
+    await loadPropertyGeoCatalogs().catch(error => console.error("Не удалось загрузить географические справочники:", error));
     updatePropertyOblastRaions(formRegionCode);
-    updatePropertyCityDistricts(null);
+  }, { once: true });
+  cityRegionSelect.addEventListener("change", async () => {
+    formRegionCode = cityRegionSelect.value === "__capital__" ? "" : cityRegionSelect.value;
+    const selectedCity = availableCities.find(city => String(city.id) === String(citySelect?.value || ""));
+    const cityMatchesRegion = selectedCity && (!formRegionCode || normalizeKatottgCode(selectedCity.region_katottg_code) === normalizeKatottgCode(formRegionCode));
+    if (!cityMatchesRegion) {
+      if (citySelect) citySelect.value = "";
+      if (citySearchInput) citySearchInput.value = "";
+      updatePropertyCityDistricts(null);
+    }
+    await loadPropertyGeoCatalogs().catch(error => console.error("Не удалось загрузить географические справочники:", error));
+    updatePropertyOblastRaions(formRegionCode);
+    const selectedRaion = propertyOblastRaions.find(row => normalizeKatottgCode(row.katottg_code) === normalizeKatottgCode(propertyOblastRaionSelect?.value));
+    if (selectedRaion && normalizeKatottgCode(selectedRaion.region_katottg_code) !== normalizeKatottgCode(formRegionCode)) {
+      if (propertyOblastRaionSelect) propertyOblastRaionSelect.value = "";
+    }
+    if (cityMatchesRegion && selectedCity) {
+      const raion = findOblastRaionForCity(selectedCity);
+      if (propertyOblastRaionSelect) propertyOblastRaionSelect.value = raion ? String(raion.katottg_code) : "";
+    }
+    renderCitySuggestions();
+  });
+}
+const propertyOblastRaionSelect = document.getElementById("propertyOblastRaionSelect");
+if (propertyOblastRaionSelect) {
+  propertyOblastRaionSelect.addEventListener("focus", async () => {
+    await loadPropertyGeoCatalogs().catch(error => console.error("Не удалось загрузить географические справочники:", error));
+    updatePropertyOblastRaions(formRegionCode);
+  }, { once: true });
+  propertyOblastRaionSelect.addEventListener("change", () => {
+    const selectedRaion = propertyOblastRaions.find(row =>
+      normalizeKatottgCode(row.katottg_code) === normalizeKatottgCode(propertyOblastRaionSelect.value)
+    );
+    if (selectedRaion) {
+      formRegionCode = String(selectedRaion.region_katottg_code || "");
+      if (cityRegionSelect) cityRegionSelect.value = formRegionCode;
+    }
+    const selectedCity = availableCities.find(city => String(city.id) === String(citySelect?.value || ""));
+    const cityMatchesRaion = selectedCity && (!selectedRaion ||
+      (normalizeKatottgCode(selectedCity.region_katottg_code) === normalizeKatottgCode(selectedRaion.region_katottg_code) &&
+       normalizeKatottgCode(selectedCity.official_code).startsWith(normalizeKatottgCode(selectedRaion.katottg_code))));
+    if (!cityMatchesRaion) {
+      if (citySelect) citySelect.value = "";
+      if (citySearchInput) citySearchInput.value = "";
+      updatePropertyCityDistricts(null);
+    }
     renderCitySuggestions();
   });
 }
@@ -2622,6 +2700,7 @@ if (citySearchInput) {
       citySuggestions && (citySuggestions.hidden = false);
       try { await loadCities(); } catch (error) { console.error("Не удалось загрузить города:", error); }
     }
+    try { await loadPropertyGeoCatalogs(); updatePropertyOblastRaions(formRegionCode); } catch (error) { console.error("Не удалось загрузить географические справочники:", error); }
     renderCitySuggestions();
   });
   citySearchInput.addEventListener("keydown", event => {

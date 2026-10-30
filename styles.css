@@ -3239,3 +3239,59 @@ main{
     font-size: 12px;
   }
 }
+
+/* Property listing creation: primary parameters and price stay above More. */
+#addModal #addForm #propertyListingFields .property-primary-grid{margin-top:10px;}
+#addModal #addForm #propertyListingFields #listingPriceRow{margin:10px 0 0;}
+#addModal #addForm #propertyListingFields .property-listing-more{margin-top:10px;}
+#addModal #addForm #propertyAdvancedFields .property-listing-grid{align-items:start;}
+@media(max-width:560px){
+  #addModal #addForm #propertyListingFields .property-primary-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+  #addModal #addForm #propertyListingFields #listingPriceRow{grid-template-columns:minmax(0,1fr) 100px;}
+}
+
+/* Unified real-estate create/edit form: identical layout inside the editor. */
+.listing-edit-form .property-listing-fields,
+.listing-edit-form .listing-price-row,
+.listing-edit-form .property-location-field,
+.listing-edit-form .property-listing-more,
+.listing-edit-form .property-market-panel,
+.listing-edit-form .property-advanced-fields,
+.listing-edit-form .property-amenities,
+.listing-edit-form .edit-photo-fields { grid-column: 1 / -1; }
+.listing-edit-form .property-listing-context,
+.listing-edit-form .property-listing-grid,
+.listing-edit-form .listing-price-row { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.listing-edit-form .property-listing-fields label,
+.listing-edit-form .property-location-field { min-width:0; }
+.listing-edit-form .property-listing-fields input,
+.listing-edit-form .property-listing-fields select,
+.listing-edit-form .property-location-field input,
+.listing-edit-form .listing-price-row input,
+.listing-edit-form .listing-price-row select { width:100%; box-sizing:border-box; }
+.listing-edit-form .property-listing-fields .property-listing-more { width:100%; }
+.listing-edit-form .property-advanced-fields[hidden] { display:none!important; }
+@media(max-width:640px){
+  .listing-edit-form .property-listing-context,
+  .listing-edit-form .property-listing-grid,
+  .listing-edit-form .listing-price-row { grid-template-columns:minmax(0,1fr); }
+  .listing-edit-form .property-listing-fields { padding:11px; }
+}
+
+
+/* The editor reuses the create-form custom property selectors.
+   Hide their native source controls here too, not only inside #addModal. */
+.listing-edit-dialog .property-listing-fields select.hh-native-select-source {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}

@@ -285,7 +285,6 @@ const translations = {
   "Знайти нерухомість": { ru: "Найти недвижимость", uk: "Знайти нерухомість", en: "Find properties", pl: "Znajdź nieruchomości" },
   "Застосувати": { ru: "Применить", uk: "Застосувати", en: "Apply", pl: "Zastosuj" },
   "Оберіть параметри автомобіля": { ru:"Выберите параметры автомобиля", uk:"Оберіть параметри автомобіля", en:"Choose vehicle filters", pl:"Wybierz parametry pojazdu" },
-  "Оберіть параметри нерухомості": { ru:"Выберите параметры недвижимости", uk:"Оберіть параметри нерухомості", en:"Choose property filters", pl:"Wybierz filtry nieruchomości" },
   "Будь-яка ціна": {ru:"Любая",uk:"Будь-яка ціна",en:"Any price",pl:"Dowolna cena"},
   "Всі марки": {ru:"Все марки",uk:"Всі марки",en:"All makes",pl:"Wszystkie marki"},
   "Всі моделі": {ru:"Все модели",uk:"Всі моделі",en:"All models",pl:"Wszystkie modele"},

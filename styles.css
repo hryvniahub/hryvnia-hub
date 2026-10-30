@@ -3142,3 +3142,20 @@ main{
 .property-search-menu .property-deal-section .real-estate-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;}
 .property-search-menu .property-deal-section .real-estate-tab{min-width:0;min-height:54px;font-weight:800;}
 .property-search-menu .property-deal-section .real-estate-tab.active{background:#A8C928!important;color:#173b2b!important;border-color:#A8C928!important;}
+
+
+/* Real-estate search actions: no separate Find button; More gets the space. */
+.property-search-actions{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2.2fr);gap:10px;align-items:stretch;}
+.property-search-actions #propertySearchReset{min-width:0;}
+.property-search-actions #propertySearchToggleAdvanced{width:100%;min-height:54px;padding:12px 18px;font-size:17px;font-weight:850;}
+.property-search-actions #propertySearchApply{display:none!important;}
+@media(max-width:480px){
+  .property-search-actions{grid-template-columns:minmax(0,.85fr) minmax(0,2.15fr);gap:8px;}
+  .property-search-actions #propertySearchToggleAdvanced{min-height:54px;padding:12px 10px;font-size:16px;}
+}
+/* Exactly three equal deal choices; keep All in the first fixed position. */
+.property-search-menu .property-deal-section .real-estate-tabs{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;direction:ltr;width:100%;}
+.property-search-menu .property-deal-section .real-estate-tab{display:flex;align-items:center;justify-content:center;width:100%;min-width:0;flex:initial;transform:none;}
+.property-search-menu .property-deal-section .real-estate-tab:first-child{order:0;}
+.property-search-menu .property-deal-section .real-estate-tab:nth-child(2){order:1;}
+.property-search-menu .property-deal-section .real-estate-tab:nth-child(3){order:2;}

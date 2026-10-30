@@ -2925,6 +2925,16 @@ async function editListing(item, labels) {
     clone.removeAttribute('id'); clone.removeAttribute('disabled'); clone.hidden = false;
     clone.querySelectorAll('[id]').forEach(node => node.removeAttribute('id'));
     clone.querySelectorAll('[data-i18n]').forEach(node => { const key=node.getAttribute('data-i18n'); node.textContent=t(key); });
+    // The create form enhances these two selects with DOM controls whose event
+    // listeners are not copied by cloneNode(). Remove those visual wrappers and
+    // restore the real selects so the editor remains fully interactive.
+    clone.querySelectorAll('.hh-property-select').forEach(wrapper => wrapper.remove());
+    clone.querySelectorAll('select[name="property_operation"], select[name="property_type"]').forEach(select => {
+      select.classList.remove('hh-native-select-source');
+      select.removeAttribute('data-hh-custom-select');
+      select.required = false; // validated explicitly before saving
+      select.disabled = false;
+    });
     clone.querySelectorAll('[data-property-for]').forEach(node => {
       const allowed = (node.dataset.propertyFor || '').split(',');
       if (allowed.length && !allowed.includes(String(propertyDetails.type || ''))) node.hidden = true;
@@ -2956,9 +2966,16 @@ async function editListing(item, labels) {
     const more = clone.querySelector('.property-listing-more');
     const advanced = clone.querySelector('.property-advanced-fields');
     if (more && advanced) { more.addEventListener('click', () => { advanced.hidden = !advanced.hidden; more.setAttribute('aria-expanded', String(!advanced.hidden)); }); advanced.hidden = false; }
+    const typeSelect = clone.querySelector('select[name="property_type"]');
+    typeSelect?.addEventListener('change', () => {
+      clone.querySelectorAll('[data-property-for]').forEach(field => {
+        const allowed = (field.dataset.propertyFor || '').split(',').map(value => value.trim());
+        field.hidden = allowed.length > 0 && !allowed.includes(typeSelect.value);
+      });
+    });
     return clone.outerHTML;
   })();
-  const editPropertyPriceField = `<div class="listing-price-row"><label>${escapeHtml(L.price)}<input name="price" type="number" min="0" step="0.01" required value="${escapeHtml(String(item.price ?? ""))}"></label><label>${escapeHtml(t("Валюта"))}<select name="price_currency">${[['UAH','₴ UAH'],['USD','$ USD'],['EUR','€ EUR'],['PLN','zł PLN']].map(([v,l])=>`<option value="${v}" ${String(item.currency||'UAH')===v?'selected':''}>${l}</option>`).join('')}</select></label></div>`;
+  const editPropertyPriceField = `<div class="listing-price-row"><label>${escapeHtml(t("Цена"))}<input name="price" type="number" min="0" step="0.01" required value="${escapeHtml(String(item.price ?? ""))}"></label><label>${escapeHtml(t("Валюта"))}<select name="price_currency">${[['UAH','₴ UAH'],['USD','$ USD'],['EUR','€ EUR'],['PLN','zł PLN']].map(([v,l])=>`<option value="${v}" ${String(item.currency||'UAH')===v?'selected':''}>${l}</option>`).join('')}</select></label></div>`;
 
 
   const vehicleBlock = isVehicle ? `
@@ -3002,7 +3019,7 @@ async function editListing(item, labels) {
     ${String(item.category || "") === "Недвижимость" ? propertyLocationBlock : ""}
     ${isVehicle ? "" : (String(item.category || "") === "Недвижимость" ? editPropertyPriceField : editPriceField)}
     ${String(item.category || "") === "Недвижимость" ? propertyEditorBlock : ""}
-    <label>${escapeHtml(L.description)}}<textarea name="description" rows="5" maxlength="10000">${escapeHtml(item.description || "")}</textarea></label>
+    <label>${escapeHtml(L.description)}<textarea name="description" rows="5" maxlength="10000">${escapeHtml(item.description || "")}</textarea></label>
     <fieldset class="edit-photo-fields">
       <legend>${escapeHtml(L.photos)}</legend>
       <p class="edit-photo-hint">${escapeHtml(photoText("hint"))}</p>

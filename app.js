@@ -4322,6 +4322,91 @@ const propertyAdvancedFields = document.getElementById("propertyAdvancedFields")
 const propertyAddressField = document.getElementById("propertyAddressField");
 const propertyRadiusField = document.getElementById("propertyRadiusField");
 
+// Replace the two native Android property selectors with site-owned controls.
+// The original selects remain in the form so FormData and existing validation keep working.
+function refreshPropertyListingSelect(select) {
+  if (!select) return;
+  const control = select.parentElement?.querySelector(`.hh-property-select[data-for="${select.id}"]`);
+  if (!control) return;
+  const trigger = control.querySelector(".hh-property-select-trigger");
+  const label = control.querySelector(".hh-property-select-label");
+  const selected = select.options[select.selectedIndex];
+  if (label) label.textContent = selected?.textContent?.trim() || "";
+  control.querySelectorAll("[data-property-select-value]").forEach(option => {
+    const active = option.dataset.propertySelectValue === select.value;
+    const sourceOption = [...select.options].find(item => item.value === option.dataset.propertySelectValue);
+    if (sourceOption && option.firstChild) option.firstChild.textContent = sourceOption.textContent.trim();
+    option.classList.toggle("is-selected", active);
+    option.setAttribute("aria-selected", String(active));
+  });
+  trigger?.setAttribute("aria-expanded", "false");
+}
+function initializePropertyListingSelects() {
+  [propertyOperationSelect, propertyTypeSelect].forEach(select => {
+    if (!select || select.dataset.hhCustomSelect === "1") return;
+    select.dataset.hhCustomSelect = "1";
+    // Validation is performed in the existing submit handler; a visually hidden
+    // native required control must not trigger the browser's inaccessible popup.
+    select.required = false;
+    select.classList.add("hh-native-select-source");
+    const wrapper = document.createElement("div");
+    wrapper.className = "hh-property-select";
+    wrapper.dataset.for = select.id;
+    wrapper.innerHTML = `<button type="button" class="hh-property-select-trigger" aria-haspopup="listbox" aria-required="true" aria-expanded="false"><span class="hh-property-select-label"></span><span class="hh-property-select-chevron" aria-hidden="true">⌄</span></button><div class="hh-property-select-options" role="listbox" hidden></div>`;
+    const options = wrapper.querySelector(".hh-property-select-options");
+    [...select.options].forEach(option => {
+      const item = document.createElement("button");
+      item.type = "button";
+      item.className = "hh-property-select-option";
+      item.setAttribute("role", "option");
+      item.dataset.propertySelectValue = option.value;
+      item.setAttribute("aria-selected", String(option.selected));
+      item.textContent = option.textContent.trim();
+      const radio = document.createElement("span");
+      radio.className = "hh-property-select-radio";
+      radio.setAttribute("aria-hidden", "true");
+      item.append(radio);
+      options.append(item);
+    });
+    select.insertAdjacentElement("afterend", wrapper);
+    wrapper.querySelector(".hh-property-select-trigger")?.addEventListener("click", () => {
+      const opening = options.hidden;
+      document.querySelectorAll(".hh-property-select-options").forEach(menu => { menu.hidden = true; menu.previousElementSibling?.setAttribute("aria-expanded", "false"); });
+      options.hidden = !opening;
+      const activeTrigger = wrapper.querySelector(".hh-property-select-trigger");
+      activeTrigger?.setAttribute("aria-expanded", String(opening));
+      if (opening && activeTrigger) {
+        const rect = activeTrigger.getBoundingClientRect();
+        options.style.left = `${Math.round(rect.left)}px`;
+        options.style.top = `${Math.round(rect.bottom + 6)}px`;
+        options.style.width = `${Math.round(rect.width)}px`;
+      }
+    });
+    options.addEventListener("click", event => {
+      const item = event.target.closest("[data-property-select-value]");
+      if (!item) return;
+      select.value = item.dataset.propertySelectValue;
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+      options.hidden = true;
+      wrapper.querySelector(".hh-property-select-trigger")?.setAttribute("aria-expanded", "false");
+      refreshPropertyListingSelect(select);
+    });
+    refreshPropertyListingSelect(select);
+  });
+}
+initializePropertyListingSelects();
+addForm?.addEventListener("reset", () => setTimeout(() => {
+  refreshPropertyListingSelect(propertyOperationSelect);
+  refreshPropertyListingSelect(propertyTypeSelect);
+}, 0));
+document.addEventListener("click", event => {
+  if (event.target.closest(".hh-property-select")) return;
+  document.querySelectorAll(".hh-property-select-options").forEach(menu => {
+    menu.hidden = true;
+    menu.previousElementSibling?.setAttribute("aria-expanded", "false");
+  });
+});
+
 function setPropertyAdvancedFields(expanded) {
   // The More control reveals both the extra property fields and the market/auth panel.
   if (propertyAdvancedFields) propertyAdvancedFields.hidden = !expanded;
@@ -4512,6 +4597,8 @@ function openPropertyListingForm(propertyType = "", operation = "") {
   if (propertyOperationSelect) {
     propertyOperationSelect.value = ["Продажа", "Аренда"].includes(operation) ? operation : "";
   }
+  refreshPropertyListingSelect(propertyTypeSelect);
+  refreshPropertyListingSelect(propertyOperationSelect);
   syncVehicleListingFields();
   // Keep the property form independent from the vehicle form visibility state.
   if (listingAdvancedCommonFields) listingAdvancedCommonFields.hidden = false;

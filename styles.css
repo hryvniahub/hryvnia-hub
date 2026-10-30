@@ -3052,3 +3052,93 @@ main{
   .property-search-menu .property-city-field,.property-search-menu .property-region-field,.property-search-menu .property-district-field,.property-search-menu .property-address-field{grid-column:auto;}
   .property-search-menu .property-radius-field{grid-column:1/-1;}
 }
+
+/* Real-estate listing form: wide category selector and clear operation buttons. */
+#addModal #addForm #propertyListingFields .property-listing-context{
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:12px;
+}
+#addModal #addForm #propertyListingFields .property-listing-context > label{
+  display:block;
+  width:100%;
+  min-width:0;
+}
+#addModal #addForm #propertyListingFields .hh-property-select-type-wide{
+  width:100%;
+}
+#addModal #addForm #propertyListingFields .hh-property-type-wide .hh-property-select-trigger{
+  min-height:62px;
+  padding:14px 18px;
+  border:1px solid #dce9b0;
+  border-radius:16px;
+  background:#f7f8f5;
+  color:#20352b;
+  font-size:18px;
+  font-weight:650;
+}
+#addModal #addForm #propertyListingFields .hh-property-type-wide .hh-property-select-chevron{
+  color:#20352b;
+}
+#addModal #addForm #propertyListingFields .hh-property-type-wide .hh-property-select-options{
+  background:#f7f8f5;
+  border-color:#b5ce56;
+}
+#addModal #addForm #propertyListingFields .hh-property-type-wide .hh-property-select-option{
+  min-height:54px;
+  color:#20352b;
+  border-bottom-color:rgba(32,53,43,.12);
+}
+#addModal #addForm #propertyListingFields .hh-property-type-wide .hh-property-select-option:hover,
+#addModal #addForm #propertyListingFields .hh-property-type-wide .hh-property-select-option.is-selected{
+  background:#eaf2ce;
+  color:#173b2b;
+}
+#addModal #addForm #propertyListingFields .hh-property-type-wide .hh-property-select-radio{
+  border-color:#879c3e;
+}
+#addModal #addForm #propertyListingFields .hh-property-type-wide .hh-property-select-option.is-selected .hh-property-select-radio{
+  border-color:#A8C928;
+}
+#addModal #addForm #propertyListingFields .hh-property-operation-tabs{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:0;
+  width:100%;
+  margin-top:8px;
+  padding:4px;
+  border:1px solid rgba(168,201,40,.45);
+  border-radius:15px;
+  background:rgba(0,25,18,.3);
+}
+#addModal #addForm #propertyListingFields .hh-property-operation-button{
+  min-width:0;
+  min-height:54px;
+  padding:10px 8px;
+  border:0;
+  border-radius:11px;
+  background:transparent;
+  color:#f7f9f5;
+  font:inherit;
+  font-size:16px;
+  font-weight:800;
+  cursor:pointer;
+}
+#addModal #addForm #propertyListingFields .hh-property-operation-button + .hh-property-operation-button{
+  border-left:1px solid rgba(247,249,245,.2);
+}
+#addModal #addForm #propertyListingFields .hh-property-operation-button.active{
+  background:#A8C928;
+  color:#173b2b;
+  box-shadow:0 2px 8px rgba(0,0,0,.14);
+}
+@media(max-width:560px){
+  #addModal #addForm #propertyListingFields .property-listing-context{grid-template-columns:minmax(0,1fr);gap:10px;}
+  #addModal #addForm #propertyListingFields .hh-property-type-wide .hh-property-select-trigger{min-height:58px;font-size:17px;}
+  #addModal #addForm #propertyListingFields .hh-property-operation-button{min-height:52px;font-size:15px;}
+}
+
+/* The search filter always starts with All selected; the three choices remain equal-width. */
+.property-search-menu .property-deal-section .real-estate-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;}
+.property-search-menu .property-deal-section .real-estate-tab{min-width:0;min-height:54px;font-weight:800;}
+.property-search-menu .property-deal-section .real-estate-tab.active{background:#A8C928!important;color:#173b2b!important;border-color:#A8C928!important;}

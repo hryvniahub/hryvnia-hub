@@ -4542,10 +4542,10 @@ function syncVehicleListingFields() {
     if (listingLocationFields && firstVehicleLabel && listingLocationFields.parentElement !== vehicleListingFields) {
       vehicleListingFields.insertBefore(listingLocationFields, firstVehicleLabel);
     }
-    const yearInput = vehicleListingFields.querySelector('[name="vehicle_year"]');
-    const yearLabel = yearInput?.closest("label");
-    if (listingPriceRow && yearLabel && listingPriceRow.parentElement !== vehicleListingFields) {
-      yearLabel.after(listingPriceRow);
+    const transmissionInput = vehicleListingFields.querySelector('[name="vehicle_transmission"]');
+    const transmissionLabel = transmissionInput?.closest("label");
+    if (listingPriceRow && transmissionLabel && listingPriceRow.parentElement !== vehicleListingFields) {
+      transmissionLabel.after(listingPriceRow);
     }
   } else {
     if (listingLocationFields && listingLocationHome?.parentElement && listingLocationFields.parentElement !== listingLocationHome.parentElement) {

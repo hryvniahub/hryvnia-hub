@@ -3239,3 +3239,13 @@ main{
     font-size: 12px;
   }
 }
+
+/* Property listing creation: primary parameters and price stay above More. */
+#addModal #addForm #propertyListingFields .property-primary-grid{margin-top:10px;}
+#addModal #addForm #propertyListingFields #listingPriceRow{margin:10px 0 0;}
+#addModal #addForm #propertyListingFields .property-listing-more{margin-top:10px;}
+#addModal #addForm #propertyAdvancedFields .property-listing-grid{align-items:start;}
+@media(max-width:560px){
+  #addModal #addForm #propertyListingFields .property-primary-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+  #addModal #addForm #propertyListingFields #listingPriceRow{grid-template-columns:minmax(0,1fr) 100px;}
+}

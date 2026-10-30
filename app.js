@@ -3720,7 +3720,16 @@ function ensurePropertySearchTabs() {
     activePropertySearchTabId = tab.id;
   }
   const activeTab = propertySearchTabs.find(tab => tab.id === activePropertySearchTabId) || propertySearchTabs[0];
-  if (!['Все', 'Продажа', 'Аренда'].includes(activeTab.deal)) activeTab.deal = 'Все';
+
+  // Keep the active ID in sync with the tab returned above. If an old or
+  // stale ID survives a reset/close operation, the UI otherwise renders
+  // every saved-search tab as inactive.
+  activePropertySearchTabId = activeTab.id;
+
+  // Normalize every saved search, not only the active one.
+  propertySearchTabs.forEach(tab => {
+    if (!['Все', 'Продажа', 'Аренда'].includes(tab.deal)) tab.deal = 'Все';
+  });
   return activeTab;
 }
 function ensurePropertySearchTabsHost() {
@@ -3886,6 +3895,8 @@ function preparePropertySearchMenu() {
     const option = event.target.closest("[data-property-type]");
     if (!option || !typeTrigger) return;
     typeTrigger.dataset.value = option.dataset.propertyType || "";
+    const activePropertyTab = ensurePropertySearchTabs();
+    activePropertyTab.type = typeTrigger.dataset.value;
     const selectedLabel = typeTrigger.querySelector(".property-type-label");
     if (selectedLabel) selectedLabel.textContent = option.textContent.trim();
     typeOptions.querySelectorAll("[data-property-type]").forEach(item => {
@@ -4050,18 +4061,23 @@ function preparePropertySearchMenu() {
     if (typeTrigger) { typeTrigger.dataset.value = ""; const label = typeTrigger.querySelector(".property-type-label"); if (label) label.textContent = t("Оберіть категорію"); }
     typeOptions?.querySelectorAll("[data-property-type]").forEach(option => { const selected = !option.dataset.propertyType; option.classList.toggle("is-selected", selected); option.setAttribute("aria-selected", String(selected)); });
     if (propertySearchMenu) propertySearchMenu.dataset.realEstateDeal = "Все";
+    ensurePropertySearchTabs().deal = "Все";
     propertySearchContent?.querySelectorAll("[data-real-estate-deal]").forEach(tab => { const active = tab.dataset.realEstateDeal === "Все"; tab.classList.toggle("active", active); tab.setAttribute("aria-selected", String(active)); });
     if (moreFields) moreFields.hidden = true;
     if (advancedToggle) { advancedToggle.setAttribute("aria-expanded", "false"); advancedToggle.textContent = t("Розширений пошук"); }
     renderRegions();
     if (regionSelect) regionSelect.value = "";
+    capturePropertySearchTab();
+    renderPropertySearchTabs();
   });
   if (propertySearchContent && propertySearchContent.dataset.dealTabsBound !== "1") {
     propertySearchContent.dataset.dealTabsBound = "1";
     propertySearchContent.addEventListener("click", event => {
       const dealTab = event.target.closest("[data-real-estate-deal]");
       if (!dealTab) return;
-      propertySearchMenu.dataset.realEstateDeal = dealTab.dataset.realEstateDeal || "Все";
+      const selectedDeal = dealTab.dataset.realEstateDeal || "Все";
+      propertySearchMenu.dataset.realEstateDeal = selectedDeal;
+      ensurePropertySearchTabs().deal = selectedDeal;
       propertySearchContent.querySelectorAll("[data-real-estate-deal]").forEach(tab => {
         const active = tab === dealTab;
         tab.classList.toggle("active", active);

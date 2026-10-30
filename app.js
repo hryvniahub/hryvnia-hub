@@ -50,6 +50,7 @@ const translations = {
   "Категорії": { ru: "Категории", uk: "Категорії", en: "Categories", pl: "Kategorie" },
   "Автомобили": { ru: "Автомобили", uk: "Автомобілі", en: "Cars", pl: "Samochody" },
   "Недвижимость": { ru: "Недвижимость", uk: "Нерухомість", en: "Real estate", pl: "Nieruchomości" },
+  "Район": { ru: "Район", uk: "Район", en: "District", pl: "Dzielnica" },
   "Продажа": { ru: "Продажа", uk: "Продаж", en: "For sale", pl: "Sprzedaż" },
   "Аренда": { ru: "Аренда", uk: "Оренда", en: "For rent", pl: "Wynajem" },
   "Квартиры": { ru: "Квартиры", uk: "Квартири", en: "Apartments", pl: "Mieszkania" },
@@ -285,7 +286,6 @@ const translations = {
   "Знайти нерухомість": { ru: "Найти недвижимость", uk: "Знайти нерухомість", en: "Find properties", pl: "Znajdź nieruchomości" },
   "Застосувати": { ru: "Применить", uk: "Застосувати", en: "Apply", pl: "Zastosuj" },
   "Оберіть параметри автомобіля": { ru:"Выберите параметры автомобиля", uk:"Оберіть параметри автомобіля", en:"Choose vehicle filters", pl:"Wybierz parametry pojazdu" },
-  "Оберіть параметри нерухомості": { ru:"Выберите параметры недвижимости", uk:"Оберіть параметри нерухомості", en:"Choose property filters", pl:"Wybierz filtry nieruchomości" },
   "Будь-яка ціна": {ru:"Любая",uk:"Будь-яка ціна",en:"Any price",pl:"Dowolna cena"},
   "Всі марки": {ru:"Все марки",uk:"Всі марки",en:"All makes",pl:"Wszystkie marki"},
   "Всі моделі": {ru:"Все модели",uk:"Всі моделі",en:"All models",pl:"Wszystkie modele"},
@@ -2726,7 +2726,7 @@ function openListing(item, galleryOnly = false) {
   }[lang] || { edit: "Edit", del: "Delete", confirm: "Delete this listing?", failed: "Failed.", denied: "Not your listing." };
   dialog.innerHTML = `
     <button type="button" class="modal-close" aria-label="${labels[0]}" data-close>×</button>
-    <h2 id="listingDialogTitle" style="padding-right:24px">${escapeHtml(item.title)}</h2>
+    <h2 id="listingDialogTitle" style="padding-right:24px">${escapeHtml(String(item.category || "") === "Недвижимость" ? propertyCardTitle(item) : item.title)}</h2>
     ${photos.length ? `<section aria-label="${labels[3]}">
       <div class="detail-photo-wrap">
         <img data-gallery-image alt="${escapeHtml(item.title)}" style="display:block;width:100%;height:auto;max-height:55dvh;object-fit:contain;border-radius:10px">
@@ -2890,7 +2890,7 @@ async function editListing(item, labels) {
       <div class="edit-city-suggestions" id="editCitySuggestions" role="listbox" hidden></div>
     </label>
     <label>${escapeHtml(L.price)}<input name="price" type="number" min="0" step="0.01" required value="${escapeHtml(String(item.price ?? ""))}"></label>
-    ${String(item.category || "") === "Недвижимость" ? (() => { const d=item.property_details||{}; const val=(k)=>escapeHtml(String(d[k]??"")); const select=(name,label,opts,key)=>`<label>${escapeHtml(t(label))}<select name="${name}"><option value="">${escapeHtml(t("Не указано"))}</option>${opts.map(v=>`<option value="${escapeHtml(v)}" ${String(d[key]??"")===v?"selected":""}>${escapeHtml(t(v))}</option>`).join("")}</select></label>`; const num=(name,label,key)=>`<label>${escapeHtml(t(label))}<input name="${name}" type="number" min="0" step="0.1" value="${val(key)}"></label>`; return `<fieldset class="edit-property-fields" aria-label="${escapeHtml(t("Характеристики недвижимости"))}"><div class="edit-property-grid">${select("property_rooms","Кількість кімнат",["1","2","3","4","5+"],"rooms")}<label>${escapeHtml(t("Етаж"))}<input name="property_floor" type="number" min="0" step="1" value="${val("floor")}"></label><label>${escapeHtml(t("Етажність будівлі"))}<input name="property_floors_total" type="number" min="1" step="1" value="${val("floors_total")}"></label>${num("property_area_m2","Загальна площа, м²","area_m2")}${num("property_kitchen_area_m2","Площа кухні, м²","kitchen_area_m2")}${select("property_building_type","Тип будівлі",["Кирпичный","Панельный","Монолитный","Монолитно-кирпичный","Деревянный","Другое"],"building_type")}${select("property_condition","Стан",["Новостройка","Новый ремонт","Жилое состояние","Нужен ремонт","Под ремонт"],"condition")}${select("property_furniture","Меблі",["Есть","Нет","Частично"],"furniture")}${select("property_balcony","Балкон",["Есть","Нет"],"balcony")}${select("property_loggia","Лоджія",["Есть","Нет"],"loggia")}<label>${escapeHtml(t("До метро, м"))}<input name="property_metro_distance_m" type="number" min="0" step="1" value="${val("metro_distance_m")}"></label><label>${escapeHtml(t("До школи, м"))}<input name="property_school_distance_m" type="number" min="0" step="1" value="${val("school_distance_m")}"></label><label>${escapeHtml(t("До зупинки, м"))}<input name="property_stop_distance_m" type="number" min="0" step="1" value="${val("stop_distance_m")}"></label>${num("property_land_area_sotkas","Площа ділянки, соток","land_area_sotkas")}<section class="property-amenities property-amenities-fixed"><h3>${escapeHtml(t("Удобства"))}</h3><div class="property-amenity-grid">${[["refrigerator","Холодильник"],["washing_machine","Стиральная машина"],["stove","Плита"],["dishwasher","Посудомоечная машина"],["air_conditioning","Кондиционер"],["internet","Интернет"],["parking","Парковка"]].map(([key,label])=>`<label><input type="checkbox" name="property_amenity_${key}" ${d.amenities?.[key] ? "checked" : ""}><span>${escapeHtml(t(label))}</span></label>`).join("")}</div><fieldset class="property-bathroom-field"><legend>${escapeHtml(t("Санузел"))}</legend>${[["separate","Раздельный"],["combined","Совмещённый"]].map(([value,label])=>`<label><input type="radio" name="property_bathroom_type" value="${value}" ${d.bathroom_type===value?"checked":""}><span>${escapeHtml(t(label))}</span></label>`).join("")}</fieldset></section></div></fieldset>`; })() : ""}
+    ${String(item.category || "") === "Недвижимость" ? (() => { const d=item.property_details||{}; const val=(k)=>escapeHtml(String(d[k]??"")); const select=(name,label,opts,key)=>`<label>${escapeHtml(t(label))}<select name="${name}"><option value="">${escapeHtml(t("Не указано"))}</option>${opts.map(v=>`<option value="${escapeHtml(v)}" ${String(d[key]??"")===v?"selected":""}>${escapeHtml(t(v))}</option>`).join("")}</select></label>`; const num=(name,label,key)=>`<label>${escapeHtml(t(label))}<input name="${name}" type="number" min="0" step="0.1" value="${val(key)}"></label>`; return `<fieldset class="edit-property-fields" aria-label="${escapeHtml(t("Характеристики недвижимости"))}"><div class="edit-property-grid"><label>${escapeHtml(t("Район"))}<input name="property_district" type="text" value="${val("district")}"></label>${select("property_rooms","Кількість кімнат",["1","2","3","4","5+"],"rooms")}<label>${escapeHtml(t("Етаж"))}<input name="property_floor" type="number" min="0" step="1" value="${val("floor")}"></label><label>${escapeHtml(t("Етажність будівлі"))}<input name="property_floors_total" type="number" min="1" step="1" value="${val("floors_total")}"></label>${num("property_area_m2","Загальна площа, м²","area_m2")}${num("property_kitchen_area_m2","Площа кухні, м²","kitchen_area_m2")}${select("property_building_type","Тип будівлі",["Кирпичный","Панельный","Монолитный","Монолитно-кирпичный","Деревянный","Другое"],"building_type")}${select("property_condition","Стан",["Новостройка","Новый ремонт","Жилое состояние","Нужен ремонт","Под ремонт"],"condition")}${select("property_furniture","Меблі",["Есть","Нет","Частично"],"furniture")}${select("property_balcony","Балкон",["Есть","Нет"],"balcony")}${select("property_loggia","Лоджія",["Есть","Нет"],"loggia")}<label>${escapeHtml(t("До метро, м"))}<input name="property_metro_distance_m" type="number" min="0" step="1" value="${val("metro_distance_m")}"></label><label>${escapeHtml(t("До школи, м"))}<input name="property_school_distance_m" type="number" min="0" step="1" value="${val("school_distance_m")}"></label><label>${escapeHtml(t("До зупинки, м"))}<input name="property_stop_distance_m" type="number" min="0" step="1" value="${val("stop_distance_m")}"></label>${num("property_land_area_sotkas","Площа ділянки, соток","land_area_sotkas")}<section class="property-amenities property-amenities-fixed"><h3>${escapeHtml(t("Удобства"))}</h3><div class="property-amenity-grid">${[["refrigerator","Холодильник"],["washing_machine","Стиральная машина"],["stove","Плита"],["dishwasher","Посудомоечная машина"],["air_conditioning","Кондиционер"],["internet","Интернет"],["parking","Парковка"]].map(([key,label])=>`<label><input type="checkbox" name="property_amenity_${key}" ${d.amenities?.[key] ? "checked" : ""}><span>${escapeHtml(t(label))}</span></label>`).join("")}</div><fieldset class="property-bathroom-field"><legend>${escapeHtml(t("Санузел"))}</legend>${[["separate","Раздельный"],["combined","Совмещённый"]].map(([value,label])=>`<label><input type="radio" name="property_bathroom_type" value="${value}" ${d.bathroom_type===value?"checked":""}><span>${escapeHtml(t(label))}</span></label>`).join("")}</fieldset></section></div></fieldset>`; })() : ""}
     <label>${escapeHtml(L.description)}<textarea name="description" rows="5" maxlength="10000">${escapeHtml(item.description || "")}</textarea></label>
     <fieldset class="edit-photo-fields">
       <legend>${escapeHtml(L.photos)}</legend>
@@ -3088,7 +3088,7 @@ async function editListing(item, labels) {
     if (String(item.category || "") === "Недвижимость" && form.querySelector(".edit-property-fields")) {
       const n = name => { const v=String(form.elements[name]?.value || "").trim(); return v === "" ? null : Number(v); };
       const v = name => String(form.elements[name]?.value || "") || null;
-      payload.property_details = { ...(item.property_details || {}), rooms:v("property_rooms"), floor:n("property_floor"), floors_total:n("property_floors_total"), area_m2:n("property_area_m2"), kitchen_area_m2:n("property_kitchen_area_m2"), building_type:v("property_building_type"), condition:v("property_condition"), furniture:v("property_furniture"), balcony:v("property_balcony"), loggia:v("property_loggia"), metro_distance_m:n("property_metro_distance_m"), school_distance_m:n("property_school_distance_m"), stop_distance_m:n("property_stop_distance_m"), land_area_sotkas:n("property_land_area_sotkas"), amenities:Object.fromEntries(["refrigerator","washing_machine","stove","dishwasher","air_conditioning","internet","parking"].map(key=>[key,Boolean(form.elements[`property_amenity_${key}`]?.checked)])), bathroom_type:v("property_bathroom_type") };
+      payload.property_details = { ...(item.property_details || {}), district:v("property_district"), rooms:v("property_rooms"), floor:n("property_floor"), floors_total:n("property_floors_total"), area_m2:n("property_area_m2"), kitchen_area_m2:n("property_kitchen_area_m2"), building_type:v("property_building_type"), condition:v("property_condition"), furniture:v("property_furniture"), balcony:v("property_balcony"), loggia:v("property_loggia"), metro_distance_m:n("property_metro_distance_m"), school_distance_m:n("property_school_distance_m"), stop_distance_m:n("property_stop_distance_m"), land_area_sotkas:n("property_land_area_sotkas"), amenities:Object.fromEntries(["refrigerator","washing_machine","stove","dishwasher","air_conditioning","internet","parking"].map(key=>[key,Boolean(form.elements[`property_amenity_${key}`]?.checked)])), bathroom_type:v("property_bathroom_type") };
     }
     if (isVehicle) {
       const makeSlug = form.elements.vehicle_make_slug.value;
@@ -3212,6 +3212,28 @@ function vehicleCardSpecs(item) {
   return specs.length ? [specs] : [];
 }
 
+function propertyCardTitle(item) {
+  const details = item?.property_details || {};
+  const rawType = String(details.type || item?.property_type || "");
+  const typeMap = [
+    [/квартир|apartment/i, "Квартира"],
+    [/дом|house/i, "Дом"],
+    [/комнат|room/i, "Комната"],
+    [/коммерч|commercial/i, "Коммерческая недвижимость"],
+    [/гараж|парков|garage|parking/i, "Гараж / паркоместо"]
+  ];
+  const typeKey = typeMap.find(([pattern]) => pattern.test(rawType))?.[1];
+  const typeLabel = typeKey ? t(typeKey) : (item?.title || t("Недвижимость"));
+  const operation = String(details.operation || item?.property_operation || "");
+  const operationLabel = operation ? t(operation) : "";
+  const rooms = String(details.rooms ?? "").trim();
+  const roomLabel = rooms ? ({
+    ru: `${rooms}-комнатная`, uk: `${rooms}-кімнатна`,
+    en: `${rooms}-bedroom`, pl: `${rooms}-pokojowe`
+  }[lang] || `${rooms}-bedroom`) : "";
+  return [typeLabel, operationLabel, roomLabel].filter(Boolean).join(" · ");
+}
+
 function propertyCardSpecs(item) {
   if (String(item.category || "") !== "Недвижимость" || !item.property_details) return [];
   const d = item.property_details;
@@ -3302,13 +3324,11 @@ function propertyCardSpecs(item) {
 
   // The first two rows are the category's core information.
   if (isHouse) {
-    first.push(L.house);
     if (number(area)) first.push(`${area} м²`);
     if (number(floorsTotal)) second.push(L.floors(floorsTotal));
     if (number(land)) second.push(L.land(land));
     if (!number(land) && d.has_land === false) second.push(language === "uk" ? "Без ділянки" : language === "en" ? "No land plot" : language === "pl" ? "Bez działki" : "Без участка");
   } else {
-    if (nonEmpty(rooms)) first.push(L.room(rooms));
     if (number(area)) first.push(`${area} м²`);
     if (number(floor)) second.push(L.floor(floor, floorsTotal));
   }
@@ -3383,20 +3403,22 @@ function renderListings(items) {
     const hasCover = cover !== "";
     const isOwner = Boolean(currentUser?.id && item.user_id && String(currentUser.id) === String(item.user_id));
     const myListingLabel = ({ uk: "Моє оголошення", ru: "Моё объявление", en: "My listing", pl: "Moje ogłoszenie" })[lang] || "My listing";
+    const isPropertyListing = String(item.category || "") === "Недвижимость";
     const specs = [...vehicleCardSpecs(item), ...propertyCardSpecs(item)];
+    const cardTitle = isPropertyListing ? propertyCardTitle(item) : (item.title || "");
     const city = item.cities?.[`name_${lang}`] || item.cities?.name_ru || item.city || "";
     const marketScale = ["Автомобили", "Недвижимость"].includes(String(item.category || "")) && Number(item.price) > 0
       ? `<div class="listing-market" aria-label="${escapeHtml(({ru:"Индикатор цены",uk:"Індикатор ціни",en:"Price indicator",pl:"Wskaźnik ceny"})[lang] || "Price indicator")}"><span class="listing-market-bar" aria-hidden="true"></span></div>`
       : "";
     return `
-    <article class="card listing-card-horizontal${hasCover ? " has-cover" : " no-cover"}" data-listing-index="${index}" tabindex="0" role="button" aria-label="${escapeHtml(item.title)}" style="cursor:pointer">
+    <article class="card listing-card-horizontal${hasCover ? " has-cover" : " no-cover"}${isPropertyListing ? " is-property-listing" : ""}" data-listing-index="${index}" tabindex="0" role="button" aria-label="${escapeHtml(cardTitle)}" style="cursor:pointer">
       <div class="listing-card-media">
         ${cover}
         ${item.is_hot ? `<span class="hot-listing-badge" aria-label="${escapeHtml(({ru:"Горячее",uk:"Гаряче",en:"Hot",pl:"Gorące"})[lang] || "Hot")}">${escapeHtml(({ru:"Горячее",uk:"Гаряче",en:"Hot",pl:"Gorące"})[lang] || "Hot")}</span>` : ""}
       </div>
       <div class="listing-card-content">
         <div class="listing-card-heading">
-          <h3>${escapeHtml(item.title || "")}</h3>
+          <h3>${escapeHtml(cardTitle)}</h3>
           <button class="fav-btn ${fav ? "active" : ""}" data-fav-id="${escapeHtml(String(item.id))}" type="button" aria-pressed="${fav ? "true" : "false"}" aria-label="${fav ? "Убрать из избранного" : "В избранное"}"><span aria-hidden="true">${fav ? "♥" : "♡"}</span></button>
         </div>
         ${String(item.category || "") === "Недвижимость"
@@ -3407,8 +3429,8 @@ function renderListings(items) {
         ${marketScale}
         <div class="listing-card-meta">
           ${city ? `<span class="city">⌖ ${escapeHtml(city)}</span>` : ""}
-          ${item.is_urgent ? `<span class="urgent-listing-badge">⏱ ${escapeHtml(({ru:"Срочно",uk:"Терміново",en:"Urgent",pl:"Pilne"})[lang] || "Urgent")}</span>` : ""}
-          ${isOwner ? `<span class="owner-listing-badge">✓ ${escapeHtml(myListingLabel)}</span>` : ""}
+          ${!isPropertyListing && item.is_urgent ? `<span class="urgent-listing-badge">⏱ ${escapeHtml(({ru:"Срочно",uk:"Терміново",en:"Urgent",pl:"Pilne"})[lang] || "Urgent")}</span>` : ""}
+          ${!isPropertyListing && isOwner ? `<span class="owner-listing-badge">✓ ${escapeHtml(myListingLabel)}</span>` : ""}
         </div>
       </div>
     </article>`;
@@ -3533,6 +3555,8 @@ async function loadListings() {
       rows = rows.filter(item =>
         (!f.type || String(item.property_details?.type || item.property_type || "") === f.type) &&
         (f.deal === "Все" || String(item.property_details?.operation || item.property_operation || "") === f.deal) &&
+        (!f.district || String(item.property_details?.district || item.district || "").toLocaleLowerCase().includes(String(f.district).toLocaleLowerCase())) &&
+        (!f.address || String(item.property_details?.address || item.property_address || "").toLocaleLowerCase().includes(String(f.address).toLocaleLowerCase())) &&
         within(item.price, f.priceFrom, f.priceTo) &&
         within(item.property_details?.area_m2 ?? item.property_area_sqm ?? item.property_area ?? item.property_total_area, f.areaFrom, f.areaTo) &&
         (!f.rooms || String(item.property_details?.rooms ?? "") === f.rooms || (f.rooms === "5+" && Number(item.property_details?.rooms) >= 5)) &&
@@ -3616,7 +3640,7 @@ async function loadListings() {
 
 // === Справочник марок/моделей ===
 const categorySubcategories = {
-  "Недвижимость": ["Квартиры", "Дома", "Комнаты", "Коммерческая недвижимость", "Гаражи и парковочные места", "Земельные участки"],
+  "Недвижимость": ["Квартиры", "Дома", "Комнаты", "Коммерческая недвижимость", "Гаражи и парковочные места"],
   "Готовый бизнес": ["Куплю готовый бизнес", "Продам готовый бизнес", "Ищу бизнес-партнёра", "Услуги"],
   "Инвестиции": ["Ищу инвестора", "Стану инвестором", "Стартапы"]
 };
@@ -3672,7 +3696,7 @@ function closeVehicleSearch() { vehicleSearchMenu?.classList.add("hidden"); vehi
 // City suggestions are derived directly from citySearchIndex.
 let propertySearchClientFilters = null;
 const PROPERTY_SEARCH_FILTER_IDS = [
-  "propertySearchCity", "propertySearchRegion", "propertySearchAddress", "propertySearchRadius",
+  "propertySearchCity", "propertySearchRegion", "propertySearchDistrict", "propertySearchAddress", "propertySearchRadius",
   "propertyPriceFrom", "propertyPriceTo", "propertyAreaFrom", "propertyAreaTo", "propertyFilterRooms",
   "propertyFilterBuilding", "propertyFilterFloorFrom", "propertyFilterFloorTo", "propertyFilterFloorsFrom",
   "propertyFilterFloorsTo", "propertyFilterKitchenFrom", "propertyFilterKitchenTo", "propertyFilterCondition",
@@ -3695,7 +3719,18 @@ function ensurePropertySearchTabs() {
     propertySearchTabs = [tab];
     activePropertySearchTabId = tab.id;
   }
-  return propertySearchTabs.find(tab => tab.id === activePropertySearchTabId) || propertySearchTabs[0];
+  const activeTab = propertySearchTabs.find(tab => tab.id === activePropertySearchTabId) || propertySearchTabs[0];
+
+  // Keep the active ID in sync with the tab returned above. If an old or
+  // stale ID survives a reset/close operation, the UI otherwise renders
+  // every saved-search tab as inactive.
+  activePropertySearchTabId = activeTab.id;
+
+  // Normalize every saved search, not only the active one.
+  propertySearchTabs.forEach(tab => {
+    if (!['Все', 'Продажа', 'Аренда'].includes(tab.deal)) tab.deal = 'Все';
+  });
+  return activeTab;
 }
 function ensurePropertySearchTabsHost() {
   let host = document.getElementById("propertySearchTabs");
@@ -3778,7 +3813,7 @@ function restorePropertySearchTab(tab) {
   if (moreFields) moreFields.hidden = !tab.advanced;
   if (advancedToggle) {
     advancedToggle.setAttribute("aria-expanded", String(Boolean(tab.advanced)));
-    advancedToggle.textContent = t(tab.advanced ? "Згорнути розширений пошук" : "Розширений пошук");
+    advancedToggle.textContent = t(tab.advanced ? "Менше" : "Більше");
   }
   propertySearchClientFilters = tab.clientFilters ? { ...tab.clientFilters } : null;
   if (Array.isArray(tab.listings)) renderListings(tab.listings);
@@ -3860,6 +3895,8 @@ function preparePropertySearchMenu() {
     const option = event.target.closest("[data-property-type]");
     if (!option || !typeTrigger) return;
     typeTrigger.dataset.value = option.dataset.propertyType || "";
+    const activePropertyTab = ensurePropertySearchTabs();
+    activePropertyTab.type = typeTrigger.dataset.value;
     const selectedLabel = typeTrigger.querySelector(".property-type-label");
     if (selectedLabel) selectedLabel.textContent = option.textContent.trim();
     typeOptions.querySelectorAll("[data-property-type]").forEach(item => {
@@ -3972,6 +4009,7 @@ function preparePropertySearchMenu() {
       type: typeTrigger?.dataset.value || "",
       deal: propertySearchMenu?.dataset.realEstateDeal || "Все",
       priceFrom: fromNumbers[0], priceTo: fromNumbers[1], areaFrom: fromNumbers[2], areaTo: fromNumbers[3],
+      district: document.getElementById("propertySearchDistrict")?.value.trim() || "",
       address: document.getElementById("propertySearchAddress")?.value.trim() || "",
       radius: document.getElementById("propertySearchRadius")?.value || "",
       rooms: document.getElementById("propertyFilterRooms")?.value || "",
@@ -4013,28 +4051,33 @@ function preparePropertySearchMenu() {
     const opening = Boolean(moreFields?.hidden);
     if (moreFields) moreFields.hidden = !opening;
     advancedToggle.setAttribute("aria-expanded", String(opening));
-    advancedToggle.textContent = t(opening ? "Згорнути розширений пошук" : "Розширений пошук");
+    advancedToggle.textContent = t(opening ? "Менше" : "Більше");
   });
   document.getElementById("propertySearchReset")?.addEventListener("click", () => {
-    ["propertySearchCity", "propertySearchAddress", "propertySearchRadius", "propertySearchRegion", "propertyPriceFrom", "propertyPriceTo", "propertyAreaFrom", "propertyAreaTo", "propertyFilterRooms", "propertyFilterBuilding", "propertyFilterFloorFrom", "propertyFilterFloorTo", "propertyFilterFloorsFrom", "propertyFilterFloorsTo", "propertyFilterKitchenFrom", "propertyFilterKitchenTo", "propertyFilterCondition", "propertyFilterFurniture", "propertyFilterBalcony", "propertyFilterLoggia", "propertyFilterMetroFrom", "propertyFilterMetroTo", "propertyFilterLandFrom", "propertyFilterLandTo", "propertyFilterAmenityRefrigerator", "propertyFilterAmenityWashingMachine", "propertyFilterAmenityStove", "propertyFilterAmenityDishwasher", "propertyFilterAmenityAirConditioning", "propertyFilterAmenityInternet", "propertyFilterAmenityParking", "propertyFilterBathroom"].forEach(id => { const field = document.getElementById(id); if (field) { if (field.type === "checkbox") field.checked = false; else field.value = ""; } });
+    ["propertySearchCity", "propertySearchRegion", "propertySearchDistrict", "propertySearchAddress", "propertySearchRadius", "propertyPriceFrom", "propertyPriceTo", "propertyAreaFrom", "propertyAreaTo", "propertyFilterRooms", "propertyFilterBuilding", "propertyFilterFloorFrom", "propertyFilterFloorTo", "propertyFilterFloorsFrom", "propertyFilterFloorsTo", "propertyFilterKitchenFrom", "propertyFilterKitchenTo", "propertyFilterCondition", "propertyFilterFurniture", "propertyFilterBalcony", "propertyFilterLoggia", "propertyFilterMetroFrom", "propertyFilterMetroTo", "propertyFilterLandFrom", "propertyFilterLandTo", "propertyFilterAmenityRefrigerator", "propertyFilterAmenityWashingMachine", "propertyFilterAmenityStove", "propertyFilterAmenityDishwasher", "propertyFilterAmenityAirConditioning", "propertyFilterAmenityInternet", "propertyFilterAmenityParking", "propertyFilterBathroom"].forEach(id => { const field = document.getElementById(id); if (field) { if (field.type === "checkbox") field.checked = false; else field.value = ""; } });
     selectedCatalogCityId = ""; activeRegionCode = ""; propertySearchClientFilters = null;
     if (citySuggestions) citySuggestions.hidden = true;
     cityInput?.setAttribute("aria-expanded", "false");
     if (typeTrigger) { typeTrigger.dataset.value = ""; const label = typeTrigger.querySelector(".property-type-label"); if (label) label.textContent = t("Оберіть категорію"); }
     typeOptions?.querySelectorAll("[data-property-type]").forEach(option => { const selected = !option.dataset.propertyType; option.classList.toggle("is-selected", selected); option.setAttribute("aria-selected", String(selected)); });
     if (propertySearchMenu) propertySearchMenu.dataset.realEstateDeal = "Все";
+    ensurePropertySearchTabs().deal = "Все";
     propertySearchContent?.querySelectorAll("[data-real-estate-deal]").forEach(tab => { const active = tab.dataset.realEstateDeal === "Все"; tab.classList.toggle("active", active); tab.setAttribute("aria-selected", String(active)); });
     if (moreFields) moreFields.hidden = true;
-    if (advancedToggle) { advancedToggle.setAttribute("aria-expanded", "false"); advancedToggle.textContent = t("Розширений пошук"); }
+    if (advancedToggle) { advancedToggle.setAttribute("aria-expanded", "false"); advancedToggle.textContent = t("Більше"); }
     renderRegions();
     if (regionSelect) regionSelect.value = "";
+    capturePropertySearchTab();
+    renderPropertySearchTabs();
   });
   if (propertySearchContent && propertySearchContent.dataset.dealTabsBound !== "1") {
     propertySearchContent.dataset.dealTabsBound = "1";
     propertySearchContent.addEventListener("click", event => {
       const dealTab = event.target.closest("[data-real-estate-deal]");
       if (!dealTab) return;
-      propertySearchMenu.dataset.realEstateDeal = dealTab.dataset.realEstateDeal || "Все";
+      const selectedDeal = dealTab.dataset.realEstateDeal || "Все";
+      propertySearchMenu.dataset.realEstateDeal = selectedDeal;
+      ensurePropertySearchTabs().deal = selectedDeal;
       propertySearchContent.querySelectorAll("[data-real-estate-deal]").forEach(tab => {
         const active = tab === dealTab;
         tab.classList.toggle("active", active);
@@ -4057,15 +4100,17 @@ function openCategoryMenu(parentCategory = "") {
     ensurePropertySearchTabs();
     document.getElementById("propertySearchTitle").textContent = t("Недвижимость");
     const propertyTypes = categorySubcategories[parentCategory] || [];
-    propertySearchMenu.dataset.realEstateDeal = ensurePropertySearchTabs().deal || "Все";
+    const activePropertyTab = ensurePropertySearchTabs();
+    propertySearchMenu.dataset.realEstateDeal = activePropertyTab.deal;
     propertySearchContent.innerHTML = `
       <div class="property-search-shell">
         <section class="property-search-section" aria-label="${escapeHtml(t("Локація"))}">
           <div class="property-location-grid" id="propertyLocationFields">
             <label class="property-search-field property-city-field"><input id="propertySearchCity" type="text" autocomplete="off" placeholder="${escapeHtml(t("Город"))}" aria-label="${escapeHtml(t("Город"))}" aria-expanded="false" aria-controls="propertySearchCitySuggestions"><div id="propertySearchCitySuggestions" class="property-city-suggestions" role="listbox" hidden></div></label>
-            <label class="property-search-field"><select id="propertySearchRegion" aria-label="${escapeHtml(t("Область"))}"><option value="">${escapeHtml(t("Область"))}</option></select><span class="property-field-chevron" aria-hidden="true">⌄</span></label>
+            <label class="property-search-field property-region-field"><select id="propertySearchRegion" aria-label="${escapeHtml(t("Область"))}"><option value="">${escapeHtml(t("Область"))}</option></select><span class="property-field-chevron" aria-hidden="true">⌄</span></label>
+            <label class="property-search-field property-district-field"><input id="propertySearchDistrict" type="text" autocomplete="off" placeholder="${escapeHtml(t("Район"))}" aria-label="${escapeHtml(t("Район"))}"></label>
             <label class="property-search-field property-address-field"><input id="propertySearchAddress" type="text" placeholder="${escapeHtml(t("Адреса або точка на карті"))}" aria-label="${escapeHtml(t("Адреса або точка на карті"))}"><button type="button" id="propertyUseMapPoint" class="property-map-point" aria-label="${escapeHtml(t("Вказати точку на карті"))}" title="${escapeHtml(t("Вказати точку на карті"))}">⊙</button></label>
-            <label class="property-search-field"><select id="propertySearchRadius" aria-label="${escapeHtml(t("Радіус, км"))}"><option value="">${escapeHtml(t("Радіус, км"))}</option><option value="5">5 км</option><option value="10">10 км</option><option value="20">20 км</option><option value="30">30 км</option><option value="50">50 км</option><option value="100">100 км</option></select><span class="property-field-chevron" aria-hidden="true">⌄</span></label>
+            <label class="property-search-field property-radius-field"><select id="propertySearchRadius" aria-label="${escapeHtml(t("Радіус, км"))}"><option value="">${escapeHtml(t("Радіус, км"))}</option><option value="5">5 км</option><option value="10">10 км</option><option value="20">20 км</option><option value="30">30 км</option><option value="50">50 км</option><option value="100">100 км</option></select><span class="property-field-chevron" aria-hidden="true">⌄</span></label>
           </div>
         </section>
         <section class="property-search-section" aria-label="${escapeHtml(t("Категорія нерухомості"))}">
@@ -4079,7 +4124,7 @@ function openCategoryMenu(parentCategory = "") {
         </section>
         <section class="property-search-section property-deal-section" aria-label="${escapeHtml(t("Тип угоди"))}">
           <div class="real-estate-tabs" role="tablist" aria-label="${escapeHtml(t("Тип угоди"))}">
-            ${["Все", "Продажа", "Аренда"].map((label, index) => { const active = (propertySearchMenu.dataset.realEstateDeal || "Все") === label; return `<button type="button" class="real-estate-tab${active ? " active" : ""}" role="tab" aria-selected="${active ? "true" : "false"}" data-real-estate-deal="${escapeHtml(label)}">${escapeHtml(t(label))}</button>`; }).join("")}
+            ${["Все", "Продажа", "Аренда"].map(label => { const active = (propertySearchMenu.dataset.realEstateDeal || "Все") === label; return `<button type="button" class="real-estate-tab${active ? " active" : ""}" role="tab" aria-selected="${active ? "true" : "false"}" data-real-estate-deal="${escapeHtml(label)}">${escapeHtml(t(label))}</button>`; }).join("")}
           </div>
         </section>
         <section class="property-more-section">
@@ -4120,7 +4165,7 @@ function openCategoryMenu(parentCategory = "") {
         <div class="property-search-actions">
           <button type="button" id="propertySearchReset" class="vehicle-reset-btn">${escapeHtml(t("Скинути"))}</button>
           <button type="button" id="propertySearchToggleAdvanced" class="vehicle-search-toggle" aria-expanded="false" aria-controls="propertyMoreFields">${escapeHtml(t("Розширений пошук"))}</button>
-          <button type="button" id="propertySearchApply" class="btn btn-primary">${escapeHtml(t("Найти"))}</button>
+          <button type="button" id="propertySearchApply" class="btn btn-primary property-search-apply">Знайти</button>
         </div>
       </div>`;
     closeCategoryMenu();
@@ -4323,6 +4368,123 @@ const propertyAdvancedFields = document.getElementById("propertyAdvancedFields")
 const propertyAddressField = document.getElementById("propertyAddressField");
 const propertyRadiusField = document.getElementById("propertyRadiusField");
 
+// Replace the two native Android property selectors with site-owned controls.
+// The original selects remain in the form so FormData and existing validation keep working.
+function refreshPropertyListingSelect(select) {
+  if (!select) return;
+  const control = select.parentElement?.querySelector(`.hh-property-select[data-for="${select.id}"]`);
+  if (!control) return;
+  if (control.classList.contains("hh-property-operation-tabs")) {
+    control.querySelectorAll("[data-property-operation-value]").forEach(button => {
+      const active = button.dataset.propertyOperationValue === select.value;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", String(active));
+    });
+    return;
+  }
+  const trigger = control.querySelector(".hh-property-select-trigger");
+  const label = control.querySelector(".hh-property-select-label");
+  const selected = select.options[select.selectedIndex];
+  if (label) label.textContent = selected?.textContent?.trim() || "";
+  control.querySelectorAll("[data-property-select-value]").forEach(option => {
+    const active = option.dataset.propertySelectValue === select.value;
+    const sourceOption = [...select.options].find(item => item.value === option.dataset.propertySelectValue);
+    if (sourceOption && option.firstChild) option.firstChild.textContent = sourceOption.textContent.trim();
+    option.classList.toggle("is-selected", active);
+    option.setAttribute("aria-selected", String(active));
+  });
+  trigger?.setAttribute("aria-expanded", "false");
+}
+function initializePropertyListingSelects() {
+  [propertyOperationSelect, propertyTypeSelect].forEach(select => {
+    if (!select || select.dataset.hhCustomSelect === "1") return;
+    select.dataset.hhCustomSelect = "1";
+    // Validation is performed in the existing submit handler; a visually hidden
+    // native required control must not trigger the browser's inaccessible popup.
+    select.required = false;
+    select.classList.add("hh-native-select-source");
+    const wrapper = document.createElement("div");
+    wrapper.className = select === propertyOperationSelect ? "hh-property-select hh-property-operation-tabs" : "hh-property-select hh-property-type-wide";
+    wrapper.dataset.for = select.id;
+    let options = null;
+    if (select === propertyOperationSelect) {
+      wrapper.setAttribute("role", "group");
+      wrapper.setAttribute("aria-label", "Операція");
+      [...select.options].filter(option => option.value).forEach(option => {
+        const item = document.createElement("button");
+        item.type = "button";
+        item.className = "hh-property-operation-button";
+        item.dataset.propertyOperationValue = option.value;
+        item.textContent = option.textContent.trim();
+        item.setAttribute("aria-pressed", String(option.value === select.value));
+        item.addEventListener("click", () => {
+          select.value = option.value;
+          select.dispatchEvent(new Event("change", { bubbles: true }));
+          refreshPropertyListingSelect(select);
+        });
+        wrapper.append(item);
+      });
+    } else {
+      wrapper.innerHTML = `<button type="button" class="hh-property-select-trigger" aria-haspopup="listbox" aria-required="true" aria-expanded="false"><span class="hh-property-select-label"></span><span class="hh-property-select-chevron" aria-hidden="true">⌄</span></button><div class="hh-property-select-options" role="listbox" hidden></div>`;
+      options = wrapper.querySelector(".hh-property-select-options");
+      [...select.options].forEach(option => {
+        const item = document.createElement("button");
+        item.type = "button";
+        item.className = "hh-property-select-option";
+        item.setAttribute("role", "option");
+        item.dataset.propertySelectValue = option.value;
+        item.setAttribute("aria-selected", String(option.selected));
+        item.textContent = option.textContent.trim();
+        const radio = document.createElement("span");
+        radio.className = "hh-property-select-radio";
+        radio.setAttribute("aria-hidden", "true");
+        item.append(radio);
+        options.append(item);
+      });
+    }
+    select.insertAdjacentElement("afterend", wrapper);
+    if (select !== propertyOperationSelect) wrapper.querySelector(".hh-property-select-trigger")?.addEventListener("click", () => {
+      const opening = options.hidden;
+      document.querySelectorAll(".hh-property-select-options").forEach(menu => { menu.hidden = true; menu.previousElementSibling?.setAttribute("aria-expanded", "false"); });
+      options.hidden = !opening;
+      const activeTrigger = wrapper.querySelector(".hh-property-select-trigger");
+      activeTrigger?.setAttribute("aria-expanded", String(opening));
+      if (opening && activeTrigger) {
+        const rect = activeTrigger.getBoundingClientRect();
+        options.style.left = `${Math.round(rect.left)}px`;
+        options.style.top = `${Math.round(rect.bottom + 6)}px`;
+        options.style.width = `${Math.round(rect.width)}px`;
+      }
+    });
+    options?.addEventListener("click", event => {
+      const item = event.target.closest("[data-property-select-value]");
+      if (!item) return;
+      select.value = item.dataset.propertySelectValue;
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+      options.hidden = true;
+      wrapper.querySelector(".hh-property-select-trigger")?.setAttribute("aria-expanded", "false");
+      refreshPropertyListingSelect(select);
+    });
+    refreshPropertyListingSelect(select);
+  });
+  const propertyContext = document.querySelector("#propertyListingFields .property-listing-context");
+  const typeLabel = propertyTypeSelect?.closest("label");
+  const operationLabel = propertyOperationSelect?.closest("label");
+  if (propertyContext && typeLabel && operationLabel) propertyContext.insertBefore(typeLabel, operationLabel);
+}
+initializePropertyListingSelects();
+addForm?.addEventListener("reset", () => setTimeout(() => {
+  refreshPropertyListingSelect(propertyOperationSelect);
+  refreshPropertyListingSelect(propertyTypeSelect);
+}, 0));
+document.addEventListener("click", event => {
+  if (event.target.closest(".hh-property-select")) return;
+  document.querySelectorAll(".hh-property-select-options").forEach(menu => {
+    menu.hidden = true;
+    menu.previousElementSibling?.setAttribute("aria-expanded", "false");
+  });
+});
+
 function setPropertyAdvancedFields(expanded) {
   // The More control reveals both the extra property fields and the market/auth panel.
   if (propertyAdvancedFields) propertyAdvancedFields.hidden = !expanded;
@@ -4358,6 +4520,8 @@ function syncPropertyListingFields() {
   });
   const isProperty = listingCategorySelect?.value === "Недвижимость";
   if (listingCurrencyField) listingCurrencyField.hidden = !isProperty;
+  const propertyDistrictField = document.getElementById("propertyDistrictField");
+  if (propertyDistrictField) propertyDistrictField.hidden = !isProperty;
   if (propertyAddressField) propertyAddressField.hidden = !isProperty;
   if (propertyRadiusField) propertyRadiusField.hidden = !isProperty;
   if (!isProperty) setPropertyAdvancedFields(false);
@@ -4511,8 +4675,12 @@ function openPropertyListingForm(propertyType = "", operation = "") {
   categorySelect.value = "Недвижимость";
   if (propertyTypeSelect) propertyTypeSelect.value = propertyType || "";
   if (propertyOperationSelect) {
-    propertyOperationSelect.value = ["Продажа", "Аренда"].includes(operation) ? operation : "";
+    // Listing creation must always have one of its two valid operations selected.
+    // "Все" belongs only to search and must never clear the creation-form choice.
+    propertyOperationSelect.value = ["Продажа", "Аренда"].includes(operation) ? operation : "Продажа";
   }
+  refreshPropertyListingSelect(propertyTypeSelect);
+  refreshPropertyListingSelect(propertyOperationSelect);
   syncVehicleListingFields();
   // Keep the property form independent from the vehicle form visibility state.
   if (listingAdvancedCommonFields) listingAdvancedCommonFields.hidden = false;
@@ -4709,6 +4877,7 @@ if (addForm) {
         property_details: {
           operation: propertyOperation,
           type: propertyType,
+          district: String(form.get("property_district") || "").trim() || null,
           address: String(form.get("property_address") || "").trim() || null,
           radius_km: optionalNumber("property_radius_km"),
           area_m2: optionalNumber("property_area"),

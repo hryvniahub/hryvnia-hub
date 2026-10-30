@@ -6,7 +6,7 @@
   <meta name="google" content="notranslate">
   <title>Hryvnia Hub — объявления Украины</title>
   <meta name="description" content="Hryvnia Hub — хаб объявлений: автомобили, недвижимость и бизнес.">
-  <link rel="stylesheet" href="styles.css?v=20261029-property-expand-location-v8">
+  <link rel="stylesheet" href="styles.css?v=20261030-property-card-v10">
 </head>
 <body>
   <header class="header">
@@ -374,7 +374,6 @@
   <section class="property-search-menu hidden" id="propertySearchMenu" role="dialog" aria-modal="true" aria-labelledby="propertySearchTitle">
     <button class="category-menu-close" id="propertySearchClose" type="button" aria-label="Close">×</button>
     <h2 id="propertySearchTitle">Нерухомість</h2>
-    <p class="vehicle-search-intro" id="propertySearchIntro">Оберіть параметри нерухомості</p>
     <div id="propertySearchContent"></div>
   </section>
 
@@ -430,13 +429,14 @@
         </fieldset>
         <div id="listingAdvancedCommonFields" class="listing-advanced-common" hidden>
         <label class="property-location-field">Город<div class="city-search"><input id="citySearchInput" type="search" required autocomplete="off" placeholder="Введите название города" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="citySuggestions"><div id="citySuggestions" class="city-suggestions" role="listbox" hidden></div><input type="hidden" name="city_id" id="citySelect"></div></label><label class="property-location-field">Область / регион<select id="cityRegionSelect" aria-label="Область"><option value="">Все области</option></select></label>
+        <label id="propertyDistrictField" class="property-location-field" hidden><span data-i18n="Район">Район</span><input name="property_district" type="text" autocomplete="address-level3" placeholder="Район"></label>
         <label id="propertyAddressField" class="property-location-field" hidden><span data-i18n="Адреса">Адреса</span><input name="property_address" type="text" autocomplete="street-address" placeholder="Вулиця, будинок"></label>
         <label id="propertyRadiusField" class="property-location-field" hidden><span data-i18n="Радіус, км">Радіус, км</span><select name="property_radius_km"><option value="5">5</option><option value="10">10</option><option value="20">20</option><option value="50">50</option></select></label>
         <fieldset id="propertyListingFields" class="property-listing-fields" hidden disabled>
           <legend data-i18n="Недвижимость">Недвижимость</legend>
           <div class="property-listing-context">
             <label><span data-i18n="Операция">Операция</span><select id="propertyOperation" name="property_operation" required><option value="" data-i18n="Выберите операцию">Выберите операцию</option><option value="Продажа" data-i18n="Продажа">Продажа</option><option value="Аренда" data-i18n="Аренда">Аренда</option></select></label>
-            <label><span data-i18n="Тип объекта">Тип объекта</span><select id="propertyType" name="property_type" required><option value="" data-i18n="Выберите тип объекта">Выберите тип объекта</option><option value="Квартиры" data-i18n="Квартира">Квартира</option><option value="Дома" data-i18n="Дом">Дом</option><option value="Комнаты" data-i18n="Комната">Комната</option><option value="Коммерческая недвижимость" data-i18n="Коммерческая недвижимость">Коммерческая недвижимость</option><option value="Гаражи и парковочные места" data-i18n="Гараж / паркоместо">Гараж / паркоместо</option><option value="Земельные участки" data-i18n="Земельный участок">Земельный участок</option></select></label>
+            <label><span data-i18n="Тип объекта">Тип объекта</span><select id="propertyType" name="property_type" required><option value="" data-i18n="Выберите тип объекта">Выберите тип объекта</option><option value="Квартиры" data-i18n="Квартира">Квартира</option><option value="Дома" data-i18n="Дом">Дом</option><option value="Комнаты" data-i18n="Комната">Комната</option><option value="Коммерческая недвижимость" data-i18n="Коммерческая недвижимость">Коммерческая недвижимость</option><option value="Гаражи и парковочные места" data-i18n="Гараж / паркоместо">Гараж / паркоместо</option></select></label>
           </div>
           <button type="button" class="btn btn-primary full property-listing-more" id="propertyListingMore" aria-expanded="false" aria-controls="propertyAdvancedFields"><span data-i18n="Більше">Больше</span><span aria-hidden="true" class="property-listing-more-icon">⌄</span></button>
           <section id="propertyMarketPanel" class="vehicle-market-panel property-market-panel" hidden aria-live="polite">
@@ -461,9 +461,9 @@
             <label class="property-field" data-property-for="Квартиры,Дома,Комнаты"><span data-i18n="Балкон">Балкон</span><select name="property_balcony"><option value="" data-i18n="Не указано">Не указано</option><option value="Есть" data-i18n="Есть">Есть</option><option value="Нет" data-i18n="Нет">Нет</option></select></label>
             <label class="property-field" data-property-for="Квартиры,Дома,Комнаты"><span data-i18n="Лоджия">Лоджия</span><select name="property_loggia"><option value="" data-i18n="Не указано">Не указано</option><option value="Есть" data-i18n="Есть">Есть</option><option value="Нет" data-i18n="Нет">Нет</option></select></label>
             <label class="property-field" data-property-for="Квартиры,Дома,Комнаты,Коммерческая недвижимость"><span data-i18n="До метро, м">До метро, м</span><input name="property_metro_distance" type="number" min="0" step="1" placeholder="600"></label>
-            <label class="property-field" data-property-for="Дома,Земельные участки"><span data-i18n="Площадь участка, соток">Площа ділянки, соток</span><input name="property_land_area" type="number" min="0" step="0.1" placeholder="6"></label>
+            <label class="property-field" data-property-for="Дома"><span data-i18n="Площадь участка, соток">Площа ділянки, соток</span><input name="property_land_area" type="number" min="0" step="0.1" placeholder="6"></label>
             <label class="property-field" data-property-for="Квартиры,Дома,Комнаты,Коммерческая недвижимость"><span data-i18n="До школы, м">До школы, м</span><input name="property_school_distance" type="number" min="0" step="1" placeholder="350"></label>
-            <label class="property-field" data-property-for="Квартиры,Дома,Комнаты,Коммерческая недвижимость,Гаражи и парковочные места,Земельные участки"><span data-i18n="До остановки, м">До остановки, м</span><input name="property_stop_distance" type="number" min="0" step="1" placeholder="150"></label>
+            <label class="property-field" data-property-for="Квартиры,Дома,Комнаты,Коммерческая недвижимость,Гаражи и парковочные места"><span data-i18n="До остановки, м">До остановки, м</span><input name="property_stop_distance" type="number" min="0" step="1" placeholder="150"></label>
           </div>
           <section class="property-amenities property-amenities-fixed" aria-label="Удобства">
             <h3 data-i18n="Удобства">Удобства</h3>
@@ -526,6 +526,6 @@
   </div></div>
   <div class="modal hidden" id="favoritesModal" role="dialog" aria-modal="true" aria-labelledby="favoritesTitle"><div class="modal-card"><button class="modal-close" id="closeFavorites" type="button" aria-label="Закрыть">×</button><h2 id="favoritesTitle" data-i18n="Избранное">Избранное</h2><div id="favoritesList" class="favorites-list"></div></div></div>
   <div class="modal hidden" id="messagesModal" role="dialog" aria-modal="true" aria-labelledby="messagesTitle"><div class="modal-card messages-card"><button class="modal-close" id="closeMessages" type="button" aria-label="Закрыть">×</button><h2 id="messagesTitle" data-i18n="Сообщения">Сообщения</h2><div id="messagesContent"><p class="muted" id="messagesGuestHint">Войдите, чтобы видеть сообщения.</p><div id="conversationsList" class="conversations-list hidden"></div><div id="messagesThread" class="messages-thread hidden"><button class="link-btn" id="backToConvs" type="button">← К списку</button><div id="threadMessages" class="thread-messages"></div><form id="sendMessageForm" class="send-message-form"><input type="text" name="body" placeholder="Ваше сообщение..." required maxlength="2000" autocomplete="off"><button class="btn btn-primary" type="submit">Отправить</button></form></div></div></div></div>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="app.js?v=20261029-property-expand-location-v7"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="app.js?v=20261030-property-card-v10"></script>
 </body>
 </html>

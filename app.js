@@ -5071,7 +5071,7 @@ function translateVehicleSearchUI() {
   const reset = document.getElementById("vehicleSearchReset");
   const apply = document.getElementById("vehicleSearchApply");
   if (reset) reset.textContent = t("Скинути");
-  if (apply) apply.textContent = t("Найти");
+  if (apply) apply.textContent = t("Застосувати");
   const toggle = document.getElementById("vehicleSearchToggleAdvanced");
   if (toggle) toggle.textContent = t(document.getElementById("vehicleSearchAdvanced")?.classList.contains("hidden") ? "Розширений пошук" : "Згорнути розширений пошук");
   setVehicleSearchAdvanced(Boolean(document.getElementById("vehicleSearchAdvanced") && !document.getElementById("vehicleSearchAdvanced").classList.contains("hidden")));

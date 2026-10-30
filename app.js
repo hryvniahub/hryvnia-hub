@@ -4165,6 +4165,7 @@ function openCategoryMenu(parentCategory = "") {
         <div class="property-search-actions">
           <button type="button" id="propertySearchReset" class="vehicle-reset-btn">${escapeHtml(t("Скинути"))}</button>
           <button type="button" id="propertySearchToggleAdvanced" class="vehicle-search-toggle" aria-expanded="false" aria-controls="propertyMoreFields">${escapeHtml(t("Розширений пошук"))}</button>
+          <button type="button" id="propertySearchApply" class="btn btn-primary property-search-apply">Знайти</button>
         </div>
       </div>`;
     closeCategoryMenu();

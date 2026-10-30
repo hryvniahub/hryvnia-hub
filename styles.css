@@ -2416,6 +2416,22 @@ main{
   font-size:15px;
   text-overflow:ellipsis;
 }
+/* Property operation/type controls: Hryvnia Hub dark-green + muted-lime palette. */
+#addModal #addForm #propertyListingFields .property-listing-context select{
+  color-scheme:dark;
+  color:#f7f9f5;
+  background-color:#173b2b;
+  border:1px solid rgba(168,201,40,.58);
+  accent-color:#A8C928;
+}
+#addModal #addForm #propertyListingFields .property-listing-context select option{
+  background:#173b2b;
+  color:#f7f9f5;
+}
+#addModal #addForm #propertyListingFields .property-listing-context select:focus{
+  border-color:#A8C928;
+  box-shadow:0 0 0 3px rgba(168,201,40,.18);
+}
 .property-listing-grid{margin-top:10px}
 /* Keep a visible gap between the operation/type selects and the More/Less toggle. */
 #addModal #addForm #propertyListingFields > .property-listing-more{margin-top:10px}
@@ -2696,7 +2712,7 @@ main{
 .property-search-menu h2{margin:0 40px 5px 0;color:#fff;font-size:24px;}
 .property-search-menu .vehicle-search-intro{margin:0 0 18px;color:rgba(247,249,245,.75);}
 .property-search-menu .property-search-shell{gap:12px;}
-.property-search-menu .property-search-section{border-color:rgba(168,201,40,.3);background:rgba(255,255,255,.035);}
+.property-search-menu .property-search-section{border:0;border-radius:0;background:transparent;padding-left:0;padding-right:0;}
 .property-search-menu .property-search-field{border-color:rgba(168,201,40,.38);background:rgba(255,255,255,.97);color:#20352b;}
 .property-search-menu .property-search-field input,.property-search-menu .property-search-field select{color:#20352b;font-size:15px;}
 .property-search-menu .property-search-field input::placeholder{color:#7b817e;}
@@ -2956,3 +2972,4 @@ main{
   .property-search-menu .property-more-fields .property-search-amenities .property-amenity-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:7px 8px !important;}
   .property-search-menu .property-more-fields .property-search-amenities .property-amenity-grid label{font-size:12px !important;gap:6px !important;}
 }
+

@@ -4421,7 +4421,10 @@ function preparePropertySearchMenu() {
       });
     });
   }
-  initCities();
+  // Return the async loader so the menu can run it again after saved filters
+  // have been restored. Otherwise region/city values are restored after the
+  // first render and their dependent district selects remain empty.
+  return initCities;
 }
 
 function openCategoryMenu(parentCategory = "") {
@@ -4506,9 +4509,12 @@ function openCategoryMenu(parentCategory = "") {
         </div>
       </div>`;
     closeCategoryMenu();
-    preparePropertySearchMenu();
+    const initializePropertySearchGeo = preparePropertySearchMenu();
     renderPropertySearchTabs();
     restorePropertySearchTab(ensurePropertySearchTabs());
+    // Restore may select an existing region/city; populate dependent district
+    // lists only after those selections are back in the controls.
+    initializePropertySearchGeo?.();
     propertySearchMenu.classList.remove("hidden");
     propertySearchBackdrop?.classList.remove("hidden");
     return;

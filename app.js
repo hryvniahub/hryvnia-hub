@@ -4457,6 +4457,26 @@ const propertyListingMore = document.getElementById("propertyListingMore");
 const propertyAdvancedFields = document.getElementById("propertyAdvancedFields");
 const propertyAddressField = document.getElementById("propertyAddressField");
 const propertyRadiusField = document.getElementById("propertyRadiusField");
+const propertyRadiusSlider = document.getElementById("propertyRadiusSlider");
+const propertyRadiusValue = document.getElementById("propertyRadiusValue");
+
+function updatePropertyRadiusDisplay() {
+  if (!propertyRadiusSlider) return;
+  const value = Number(propertyRadiusSlider.value) || 0;
+  const unit = lang === "en" || lang === "pl" ? "km" : "км";
+  if (propertyRadiusValue) propertyRadiusValue.textContent = `${value} ${unit}`;
+  propertyRadiusSlider.setAttribute("aria-label", t("Радіус, км"));
+  propertyRadiusSlider.setAttribute("aria-valuetext", `${value} ${unit}`);
+  const max = Number(propertyRadiusSlider.max) || 50;
+  const progress = max > 0 ? (value / max) * 100 : 0;
+  propertyRadiusSlider.style.setProperty("--radius-progress", `${progress}%`);
+}
+
+if (propertyRadiusSlider) {
+  propertyRadiusSlider.addEventListener("input", updatePropertyRadiusDisplay);
+  propertyRadiusSlider.addEventListener("change", updatePropertyRadiusDisplay);
+  updatePropertyRadiusDisplay();
+}
 
 // Replace the two native Android property selectors with site-owned controls.
 // The original selects remain in the form so FormData and existing validation keep working.
@@ -5251,6 +5271,7 @@ function translatePage(selectedLanguage) {
     const item = translations[el.dataset.i18nAria];
     if (item && item[lang]) el.setAttribute("aria-label", item[lang]);
   });
+  updatePropertyRadiusDisplay();
   updatePhotoFields();
   prepareVehicleSearchUI();
   translateVehicleSearchUI();

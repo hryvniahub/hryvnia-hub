@@ -498,6 +498,19 @@
               <label><input type="radio" name="property_bathroom_type" value="combined"><span data-i18n="Совмещённый">Совмещённый</span></label>
             </fieldset>
           </section>
+          <section class="property-amenities property-amenities-fixed property-accessibility" aria-label="Инклюзивность и доступность">
+            <h3 data-i18n="Инклюзивность и доступность">Инклюзивность и доступность</h3>
+            <div class="property-amenity-grid">
+              <label><input type="checkbox" name="property_accessibility_ramp"><span data-i18n="Пандус">Пандус</span></label>
+              <label><input type="checkbox" name="property_accessibility_elevator"><span data-i18n="Лифт">Лифт</span></label>
+              <label><input type="checkbox" name="property_accessibility_step_free_entrance"><span data-i18n="Вход без ступенек">Вход без ступенек</span></label>
+              <label><input type="checkbox" name="property_accessibility_handrails"><span data-i18n="Поручни на лестнице">Поручни на лестнице</span></label>
+            </div>
+            <div class="property-listing-grid property-accessibility-measurements">
+              <label><span data-i18n="Ширина дверей лифта, см">Ширина дверей лифта, см</span><input type="number" name="property_accessibility_elevator_door_width_cm" min="0" step="1" placeholder="90"></label>
+              <label><span data-i18n="Размер кабины лифта, см (Ш × Г)">Размер кабины лифта, см (Ш × Г)</span><input type="text" name="property_accessibility_elevator_cabin_size_cm" maxlength="30" placeholder="110 × 140"></label>
+            </div>
+          </section>
           </section>
         </fieldset>
         <span id="listingPriceHome" hidden></span><div class="listing-price-row" id="listingPriceRow">

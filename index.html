@@ -432,7 +432,14 @@
         <span id="listingLocationHome" hidden></span><div id="listingLocationFields" class="listing-location-fields"><label class="property-location-field">Город<div class="city-search"><input id="citySearchInput" type="search" required autocomplete="off" placeholder="Введите название города" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="citySuggestions"><div id="citySuggestions" class="city-suggestions" role="listbox" hidden></div><input type="hidden" name="city_id" id="citySelect"></div></label><label class="property-location-field">Область / регион<select id="cityRegionSelect" aria-label="Область"><option value="">Все области</option></select></label></div>
         <label id="propertyDistrictField" class="property-location-field" hidden><span data-i18n="Район">Район</span><input name="property_district" type="text" autocomplete="address-level3" placeholder="Район"></label>
         <label id="propertyAddressField" class="property-location-field" hidden><span data-i18n="Адреса">Адреса</span><input name="property_address" type="text" autocomplete="street-address" placeholder="Вулиця, будинок"></label>
-        <label id="propertyRadiusField" class="property-location-field" hidden><span data-i18n="Радіус, км">Радіус, км</span><select name="property_radius_km"><option value="5">5</option><option value="10">10</option><option value="20">20</option><option value="50">50</option></select></label>
+        <label id="propertyRadiusField" class="property-location-field property-radius-field" hidden>
+          <span data-i18n="Радіус, км">Радіус, км</span>
+          <div class="property-radius-control">
+            <output class="property-radius-value" id="propertyRadiusValue" for="propertyRadiusSlider">0 км</output>
+            <input id="propertyRadiusSlider" class="property-radius-slider" type="range" name="property_radius_km" min="0" max="50" step="1" value="0" aria-label="Радіус, км">
+            <div class="property-radius-ticks" aria-hidden="true"><span>0</span><span>10</span><span>20</span><span>30</span><span>40</span><span>50</span></div>
+          </div>
+        </label>
         <fieldset id="propertyListingFields" class="property-listing-fields" hidden disabled>
           <legend data-i18n="Недвижимость">Недвижимость</legend>
           <div class="property-listing-context">

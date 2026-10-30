@@ -3025,3 +3025,25 @@ main{
   .property-search-menu .property-more-fields .property-search-amenities .property-amenity-grid label{font-size:12px !important;gap:6px !important;}
 }
 
+
+
+/* Approved real-estate search layout: full-width object selector, deal tabs and free radius slider. */
+.property-control-caption{margin:0 0 8px 2px;color:#f7f9f5;font-size:clamp(15px,2vw,18px);font-weight:800;}
+.property-deal-section .real-estate-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;}
+.property-deal-section .real-estate-tab{flex:1 1 0;min-width:0;}
+.property-type-section .property-category-field{width:100%;min-height:68px;padding:0 18px;border:1px solid rgba(168,201,40,.58);border-radius:18px;background:rgba(0,28,20,.35);}
+.property-type-section .property-type-trigger{width:100%;font-size:clamp(17px,2.2vw,20px);font-weight:750;}
+.property-type-section .property-type-label{white-space:nowrap;}
+.property-radius-control{margin-top:14px;padding:4px 2px 0;}
+.property-radius-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;color:#f7f9f5;font-size:clamp(15px,2vw,18px);font-weight:800;}
+.property-radius-heading output{min-width:66px;padding:7px 10px;border:1px solid rgba(168,201,40,.42);border-radius:10px;color:#f7f9f5;text-align:center;font-size:16px;font-weight:800;}
+.property-radius-slider{display:block;width:100%;height:28px;margin:0;appearance:none;background:transparent;cursor:pointer;touch-action:pan-y;}
+.property-radius-slider::-webkit-slider-runnable-track{height:8px;border-radius:99px;background:linear-gradient(90deg,#A8C928 0%,#A8C928 var(--radius-progress,12.25%),rgba(255,255,255,.28) var(--radius-progress,12.25%),rgba(255,255,255,.28) 100%);}
+.property-radius-slider::-moz-range-track{height:8px;border-radius:99px;background:rgba(255,255,255,.28);}
+.property-radius-slider::-moz-range-progress{height:8px;border-radius:99px;background:#A8C928;}
+.property-radius-slider::-webkit-slider-thumb{width:25px;height:25px;margin-top:-8.5px;appearance:none;border:3px solid #fff;border-radius:50%;background:#A8C928;box-shadow:0 0 0 3px rgba(168,201,40,.22);}
+.property-radius-slider::-moz-range-thumb{width:19px;height:19px;border:3px solid #fff;border-radius:50%;background:#A8C928;box-shadow:0 0 0 3px rgba(168,201,40,.22);}
+.property-radius-ticks{display:flex;justify-content:space-between;padding:0 5px;color:rgba(247,249,245,.82);font-size:12px;}
+.property-radius-ticks span{position:relative;padding-top:8px;}
+.property-radius-ticks span:before{position:absolute;top:0;left:50%;width:1px;height:5px;background:rgba(247,249,245,.48);content:"";}
+@media(max-width:560px){.property-type-section .property-category-field{min-height:62px;padding:0 14px;border-radius:15px}.property-radius-control{margin-top:11px}.property-radius-heading{font-size:14px}.property-radius-heading output{font-size:14px;min-width:58px}.property-radius-ticks{font-size:11px}}

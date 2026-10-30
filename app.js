@@ -3813,7 +3813,7 @@ function restorePropertySearchTab(tab) {
   if (moreFields) moreFields.hidden = !tab.advanced;
   if (advancedToggle) {
     advancedToggle.setAttribute("aria-expanded", String(Boolean(tab.advanced)));
-    advancedToggle.textContent = t(tab.advanced ? "Згорнути розширений пошук" : "Розширений пошук");
+    advancedToggle.textContent = t(tab.advanced ? "Менше" : "Більше");
   }
   propertySearchClientFilters = tab.clientFilters ? { ...tab.clientFilters } : null;
   if (Array.isArray(tab.listings)) renderListings(tab.listings);
@@ -4051,7 +4051,7 @@ function preparePropertySearchMenu() {
     const opening = Boolean(moreFields?.hidden);
     if (moreFields) moreFields.hidden = !opening;
     advancedToggle.setAttribute("aria-expanded", String(opening));
-    advancedToggle.textContent = t(opening ? "Згорнути розширений пошук" : "Розширений пошук");
+    advancedToggle.textContent = t(opening ? "Менше" : "Більше");
   });
   document.getElementById("propertySearchReset")?.addEventListener("click", () => {
     ["propertySearchCity", "propertySearchRegion", "propertySearchDistrict", "propertySearchAddress", "propertySearchRadius", "propertyPriceFrom", "propertyPriceTo", "propertyAreaFrom", "propertyAreaTo", "propertyFilterRooms", "propertyFilterBuilding", "propertyFilterFloorFrom", "propertyFilterFloorTo", "propertyFilterFloorsFrom", "propertyFilterFloorsTo", "propertyFilterKitchenFrom", "propertyFilterKitchenTo", "propertyFilterCondition", "propertyFilterFurniture", "propertyFilterBalcony", "propertyFilterLoggia", "propertyFilterMetroFrom", "propertyFilterMetroTo", "propertyFilterLandFrom", "propertyFilterLandTo", "propertyFilterAmenityRefrigerator", "propertyFilterAmenityWashingMachine", "propertyFilterAmenityStove", "propertyFilterAmenityDishwasher", "propertyFilterAmenityAirConditioning", "propertyFilterAmenityInternet", "propertyFilterAmenityParking", "propertyFilterBathroom"].forEach(id => { const field = document.getElementById(id); if (field) { if (field.type === "checkbox") field.checked = false; else field.value = ""; } });
@@ -4064,7 +4064,7 @@ function preparePropertySearchMenu() {
     ensurePropertySearchTabs().deal = "Все";
     propertySearchContent?.querySelectorAll("[data-real-estate-deal]").forEach(tab => { const active = tab.dataset.realEstateDeal === "Все"; tab.classList.toggle("active", active); tab.setAttribute("aria-selected", String(active)); });
     if (moreFields) moreFields.hidden = true;
-    if (advancedToggle) { advancedToggle.setAttribute("aria-expanded", "false"); advancedToggle.textContent = t("Розширений пошук"); }
+    if (advancedToggle) { advancedToggle.setAttribute("aria-expanded", "false"); advancedToggle.textContent = t("Більше"); }
     renderRegions();
     if (regionSelect) regionSelect.value = "";
     capturePropertySearchTab();
@@ -4674,7 +4674,9 @@ function openPropertyListingForm(propertyType = "", operation = "") {
   categorySelect.value = "Недвижимость";
   if (propertyTypeSelect) propertyTypeSelect.value = propertyType || "";
   if (propertyOperationSelect) {
-    propertyOperationSelect.value = ["Продажа", "Аренда"].includes(operation) ? operation : "";
+    // Listing creation must always have one of its two valid operations selected.
+    // "Все" belongs only to search and must never clear the creation-form choice.
+    propertyOperationSelect.value = ["Продажа", "Аренда"].includes(operation) ? operation : "Продажа";
   }
   refreshPropertyListingSelect(propertyTypeSelect);
   refreshPropertyListingSelect(propertyOperationSelect);

@@ -2838,6 +2838,93 @@ function openListing(item, galleryOnly = false) {
     if (previousFocus?.isConnected) previousFocus.focus();
   }, { once: true });
   document.body.append(dialog);
+
+  // Rebind the cloned property selectors without falling back to Android's
+  // native select popup. This preserves the same single custom menu as creation.
+  const editorPropertyFields = dialog.querySelector('.property-listing-fields');
+  if (editorPropertyFields) {
+    const bindEditorPropertySelect = (name) => {
+      const select = editorPropertyFields.querySelector(`select[name="${name}"]`);
+      const wrapper = select?.parentElement?.querySelector('.hh-property-select');
+      if (!select || !wrapper) return;
+      select.required = false;
+      select.disabled = false;
+      select.classList.add('hh-native-select-source');
+      select.dataset.hhCustomSelect = '1';
+      if (name === 'property_operation') {
+        wrapper.querySelectorAll('[data-property-operation-value]').forEach(button => {
+          button.addEventListener('click', () => {
+            select.value = button.dataset.propertyOperationValue;
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+            refreshEditorPropertySelect(select, wrapper);
+          });
+        });
+      } else {
+        const trigger = wrapper.querySelector('.hh-property-select-trigger');
+        const options = wrapper.querySelector('.hh-property-select-options');
+        trigger?.addEventListener('click', () => {
+          const opening = options.hidden;
+          dialog.querySelectorAll('.hh-property-select-options').forEach(menu => {
+            menu.hidden = true;
+            menu.previousElementSibling?.setAttribute('aria-expanded', 'false');
+          });
+          options.hidden = !opening;
+          trigger.setAttribute('aria-expanded', String(opening));
+          if (opening) {
+            const rect = trigger.getBoundingClientRect();
+            options.style.left = `${Math.round(rect.left)}px`;
+            options.style.top = `${Math.round(rect.bottom + 6)}px`;
+            options.style.width = `${Math.round(rect.width)}px`;
+          }
+        });
+        options?.addEventListener('click', event => {
+          const option = event.target.closest('[data-property-select-value]');
+          if (!option) return;
+          select.value = option.dataset.propertySelectValue;
+          select.dispatchEvent(new Event('change', { bubbles: true }));
+          options.hidden = true;
+          trigger?.setAttribute('aria-expanded', 'false');
+          refreshEditorPropertySelect(select, wrapper);
+        });
+      }
+      select.addEventListener('change', () => refreshEditorPropertySelect(select, wrapper));
+      refreshEditorPropertySelect(select, wrapper);
+    };
+    const refreshEditorPropertySelect = (select, wrapper) => {
+      const selected = select.options[select.selectedIndex];
+      const label = wrapper.querySelector('.hh-property-select-label');
+      if (label) label.textContent = selected?.textContent?.trim() || '';
+      wrapper.querySelectorAll('[data-property-select-value]').forEach(option => {
+        const active = option.dataset.propertySelectValue === select.value;
+        option.classList.toggle('is-selected', active);
+        option.setAttribute('aria-selected', String(active));
+      });
+      wrapper.querySelectorAll('[data-property-operation-value]').forEach(button => {
+        const active = button.dataset.propertyOperationValue === select.value;
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-pressed', String(active));
+      });
+    };
+    bindEditorPropertySelect('property_type');
+    bindEditorPropertySelect('property_operation');
+
+    const typeSelect = editorPropertyFields.querySelector('select[name="property_type"]');
+    const updateTypeFields = () => editorPropertyFields.querySelectorAll('[data-property-for]').forEach(field => {
+      const allowed = (field.dataset.propertyFor || '').split(',').map(value => value.trim());
+      field.hidden = allowed.length > 0 && !allowed.includes(typeSelect.value);
+    });
+    typeSelect?.addEventListener('change', updateTypeFields);
+    updateTypeFields();
+
+    const more = editorPropertyFields.querySelector('.property-listing-more');
+    const advanced = editorPropertyFields.querySelector('.property-advanced-fields');
+    more?.addEventListener('click', () => {
+      if (!advanced) return;
+      advanced.hidden = !advanced.hidden;
+      more.setAttribute('aria-expanded', String(!advanced.hidden));
+    });
+  }
+
   showPhoto(0);
   dialog.showModal();
   dialog.addEventListener('click', event => {
@@ -2925,16 +3012,8 @@ async function editListing(item, labels) {
     clone.removeAttribute('id'); clone.removeAttribute('disabled'); clone.hidden = false;
     clone.querySelectorAll('[id]').forEach(node => node.removeAttribute('id'));
     clone.querySelectorAll('[data-i18n]').forEach(node => { const key=node.getAttribute('data-i18n'); node.textContent=t(key); });
-    // The create form enhances these two selects with DOM controls whose event
-    // listeners are not copied by cloneNode(). Remove those visual wrappers and
-    // restore the real selects so the editor remains fully interactive.
-    clone.querySelectorAll('.hh-property-select').forEach(wrapper => wrapper.remove());
-    clone.querySelectorAll('select[name="property_operation"], select[name="property_type"]').forEach(select => {
-      select.classList.remove('hh-native-select-source');
-      select.removeAttribute('data-hh-custom-select');
-      select.required = false; // validated explicitly before saving
-      select.disabled = false;
-    });
+    // Keep the exact custom selectors from the create form. Their DOM markup is
+    // cloned here; their event handlers are rebound after the editor enters the DOM.
     clone.querySelectorAll('[data-property-for]').forEach(node => {
       const allowed = (node.dataset.propertyFor || '').split(',');
       if (allowed.length && !allowed.includes(String(propertyDetails.type || ''))) node.hidden = true;
@@ -2963,16 +3042,8 @@ async function editListing(item, labels) {
       else if (name === 'property_bathroom_type') control.checked = control.value === propertyDetails.bathroom_type;
       else if (Object.prototype.hasOwnProperty.call(values,name)) control.value = values[name] ?? '';
     });
-    const more = clone.querySelector('.property-listing-more');
     const advanced = clone.querySelector('.property-advanced-fields');
-    if (more && advanced) { more.addEventListener('click', () => { advanced.hidden = !advanced.hidden; more.setAttribute('aria-expanded', String(!advanced.hidden)); }); advanced.hidden = false; }
-    const typeSelect = clone.querySelector('select[name="property_type"]');
-    typeSelect?.addEventListener('change', () => {
-      clone.querySelectorAll('[data-property-for]').forEach(field => {
-        const allowed = (field.dataset.propertyFor || '').split(',').map(value => value.trim());
-        field.hidden = allowed.length > 0 && !allowed.includes(typeSelect.value);
-      });
-    });
+    if (advanced) advanced.hidden = false;
     return clone.outerHTML;
   })();
   const editPropertyPriceField = `<div class="listing-price-row"><label>${escapeHtml(t("Цена"))}<input name="price" type="number" min="0" step="0.01" required value="${escapeHtml(String(item.price ?? ""))}"></label><label>${escapeHtml(t("Валюта"))}<select name="price_currency">${[['UAH','₴ UAH'],['USD','$ USD'],['EUR','€ EUR'],['PLN','zł PLN']].map(([v,l])=>`<option value="${v}" ${String(item.currency||'UAH')===v?'selected':''}>${l}</option>`).join('')}</select></label></div>`;

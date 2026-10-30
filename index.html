@@ -429,8 +429,12 @@
           </div>
         </fieldset>
         <div id="listingAdvancedCommonFields" class="listing-advanced-common" hidden>
-        <span id="listingLocationHome" hidden></span><div id="listingLocationFields" class="listing-location-fields"><label class="property-location-field">Город<div class="city-search"><input id="citySearchInput" type="search" required autocomplete="off" placeholder="Введите название города" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="citySuggestions"><div id="citySuggestions" class="city-suggestions" role="listbox" hidden></div><input type="hidden" name="city_id" id="citySelect"></div></label><label class="property-location-field">Область / регион<select id="cityRegionSelect" aria-label="Область"><option value="">Все области</option></select></label></div>
-        <label id="propertyDistrictField" class="property-location-field" hidden><span data-i18n="Район">Район</span><input name="property_district" type="text" autocomplete="address-level3" placeholder="Район"></label>
+        <span id="listingLocationHome" hidden></span><div id="listingLocationFields" class="listing-location-fields">
+          <label class="property-location-field"><span data-i18n="Область">Область</span><select id="cityRegionSelect" aria-label="Область"><option value="">Все области</option></select></label>
+          <label id="propertyOblastRaionField" class="property-location-field" hidden><span data-i18n="Район области">Район области</span><select id="propertyOblastRaionSelect" name="property_oblast_raion"><option value="">Оберіть район області</option></select></label>
+          <label class="property-location-field"><span data-i18n="Город">Город</span><div class="city-search"><input id="citySearchInput" type="search" required autocomplete="off" placeholder="Введите название города" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="citySuggestions"><div id="citySuggestions" class="city-suggestions" role="listbox" hidden></div><input type="hidden" name="city_id" id="citySelect"></div></label>
+        </div>
+        <label id="propertyDistrictField" class="property-location-field" hidden><span data-i18n="Район города">Район города</span><select name="property_district" id="propertyCityDistrictSelect"><option value="">Оберіть район міста</option></select></label>
         <label id="propertyAddressField" class="property-location-field" hidden><span data-i18n="Адреса">Адреса</span><input name="property_address" type="text" autocomplete="street-address" placeholder="Вулиця, будинок"></label>
         <label id="propertyRadiusField" class="property-location-field property-radius-field" hidden>
           <span data-i18n="Радіус, км">Радіус, км</span>

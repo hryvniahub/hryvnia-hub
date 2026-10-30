@@ -1067,7 +1067,8 @@ async function initAuth() {
       return;
     }
     if (event === "SIGNED_IN") {
-      if (authModal && !authModal.classList.contains("hidden")) renderAuthModal();
+      // Do not replace the login form with the account menu after sign-in.
+      // The menu remains available when the user explicitly taps the account button.
       if (vehicleMarketPanel && !vehicleMarketPanel.hidden && listingCategorySelect?.value === "Автомобили") {
         if (vehicleMarketAuthPrompt) vehicleMarketAuthPrompt.hidden = true;
         closeAuthModal();
@@ -2779,11 +2780,8 @@ function openListing(item, galleryOnly = false) {
     const id = evt.currentTarget.dataset.ownerEdit;
     const target = visibleListings.find(l => String(l.id) === id);
     if (!target) return;
-    // editListing opens its dialog synchronously before its first await.
-    // Start it first so there is no blank-screen gap between the two dialogs.
-    const editPromise = editListing(target, ownerLabels);
     dialog.close();
-    await editPromise;
+    await editListing(target, ownerLabels);
   });
   dialog.querySelector("[data-owner-delete]")?.addEventListener("click", async (evt) => {
     const id = evt.currentTarget.dataset.ownerDelete;
@@ -2814,16 +2812,9 @@ async function ensureCitiesLoaded() {
 
 // ==== РАСШИРЕННОЕ РЕДАКТИРОВАНИЕ (включая авто-поля) ====
 async function editListing(item, labels) {
+  await ensureCitiesLoaded();
   if (!db || !currentUser) { alert(labels.denied); return; }
   if (String(currentUser.id) !== String(item.user_id || "")) { alert(labels.denied); return; }
-
-  // Load the city catalog in the background; do not delay the editor opening.
-  const citiesReady = availableCities.length
-    ? Promise.resolve(availableCities)
-    : ensureCitiesLoaded().catch(error => {
-        console.error("Не удалось загрузить города для редактирования", error);
-        return [];
-      });
 
   const L = {
     ru: { title:"Название", category:"Категория", city:"Город", price:"Цена (грн)", description:"Описание", photos:"Фотографии", hot:"Горячее объявление", urgent:"Срочная продажа", save:"Сохранить изменения", cancel:"Отмена", published:"Опубликовано" },
@@ -3045,14 +3036,6 @@ async function editListing(item, labels) {
     if (!event.target.closest(".edit-city-field")) closeEditCitySuggestions();
   });
 
-  // If the user focused/typed in the city field while cities were loading,
-  // refresh suggestions as soon as the catalog becomes available.
-  citiesReady.then(() => {
-    if (document.activeElement === editCityInput && editCityInput.value.trim()) {
-      renderEditCitySuggestions();
-    }
-  });
-
   if (isVehicle) {
     const makeSelect = dialog.querySelector("#editVehicleMake");
     const modelSelect = dialog.querySelector("#editVehicleModel");
@@ -3089,7 +3072,6 @@ async function editListing(item, labels) {
     if (editPhotosBusy) return;
     let urls = editPhotos.map(photo => photo.uploadedUrl).filter(Boolean).slice(0, MAX_PHOTOS);
 
-    if (!availableCities.length) await citiesReady;
     const cityIdValue = String(form.elements.city_id.value || "");
     if (!cityIdValue || !availableCities.some(city => String(city.id) === cityIdValue)) {
       message.textContent = t("Выберите город из предложенных вариантов");

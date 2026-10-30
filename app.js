@@ -3531,7 +3531,8 @@ async function loadListings() {
       };
       rows = rows.filter(item =>
         (!f.type || String(item.property_details?.type || item.property_type || "") === f.type) &&
-        (f.deal === "Все" || String(item.property_details?.operation || item.property_operation || "") === f.deal) &&
+        (!f.district || String(item.property_details?.district || item.property_district || "").toLocaleLowerCase().includes(f.district.toLocaleLowerCase())) &&
+        (!f.deal || f.deal === "Все" || String(item.property_details?.operation || item.property_operation || "") === f.deal) &&
         within(item.price, f.priceFrom, f.priceTo) &&
         within(item.property_details?.area_m2 ?? item.property_area_sqm ?? item.property_area ?? item.property_total_area, f.areaFrom, f.areaTo) &&
         (!f.rooms || String(item.property_details?.rooms ?? "") === f.rooms || (f.rooms === "5+" && Number(item.property_details?.rooms) >= 5)) &&
@@ -3671,7 +3672,7 @@ function closeVehicleSearch() { vehicleSearchMenu?.classList.add("hidden"); vehi
 // City suggestions are derived directly from citySearchIndex.
 let propertySearchClientFilters = null;
 const PROPERTY_SEARCH_FILTER_IDS = [
-  "propertySearchCity", "propertySearchRegion", "propertySearchAddress", "propertySearchRadius",
+  "propertySearchCity", "propertySearchRegion", "propertySearchDistrict", "propertySearchAddress", "propertySearchRadius",
   "propertyPriceFrom", "propertyPriceTo", "propertyAreaFrom", "propertyAreaTo", "propertyFilterRooms",
   "propertyFilterBuilding", "propertyFilterFloorFrom", "propertyFilterFloorTo", "propertyFilterFloorsFrom",
   "propertyFilterFloorsTo", "propertyFilterKitchenFrom", "propertyFilterKitchenTo", "propertyFilterCondition",
@@ -3686,7 +3687,7 @@ let activePropertySearchTabId = "";
 let propertySearchTabSequence = 0;
 function newPropertySearchTab() {
   propertySearchTabSequence += 1;
-  return { id: `property-search-${Date.now()}-${propertySearchTabSequence}`, title: "", filters: {}, selectedCityId: "", regionCode: "", type: "", deal: "Все", advanced: false, listings: null, clientFilters: null, scrollY: 0 };
+  return { id: `property-search-${Date.now()}-${propertySearchTabSequence}`, title: "", filters: {}, selectedCityId: "", regionCode: "", type: "", deal: "Покупка", advanced: false, listings: null, clientFilters: null, scrollY: 0 };
 }
 function ensurePropertySearchTabs() {
   if (!propertySearchTabs.length) {
@@ -3717,7 +3718,7 @@ function capturePropertySearchTab() {
     tab.selectedCityId = selectedCatalogCityId || "";
     tab.regionCode = document.getElementById("propertySearchRegion")?.value || activeRegionCode || "";
     tab.type = document.getElementById("propertyTypeTrigger")?.dataset.value || "";
-    tab.deal = propertySearchMenu?.dataset.realEstateDeal || "Все";
+    tab.deal = propertySearchMenu?.dataset.realEstateDeal || "Покупка";
     tab.advanced = Boolean(document.getElementById("propertyMoreFields") && !document.getElementById("propertyMoreFields").hidden);
     tab.clientFilters = propertySearchClientFilters ? { ...propertySearchClientFilters } : null;
     tab.scrollY = window.scrollY;
@@ -3749,6 +3750,9 @@ function restorePropertySearchTab(tab) {
   });
   selectedCatalogCityId = tab.selectedCityId || "";
   activeRegionCode = tab.regionCode || "";
+  const radiusSlider = document.getElementById("propertySearchRadius");
+  const radiusValue = document.getElementById("propertySearchRadiusValue");
+  if (radiusSlider && radiusValue) { radiusValue.textContent = `${radiusSlider.value} ${t("км")}`; radiusSlider.style.setProperty("--radius-progress", `${((Number(radiusSlider.value) - Number(radiusSlider.min)) / (Number(radiusSlider.max) - Number(radiusSlider.min))) * 100}%`); }
   const region = document.getElementById("propertySearchRegion");
   if (region && tab.regionCode) region.value = tab.regionCode;
   const cityInput = document.getElementById("propertySearchCity");
@@ -3766,9 +3770,9 @@ function restorePropertySearchTab(tab) {
       item.setAttribute("aria-selected", String(selected));
     });
   }
-  if (propertySearchMenu) propertySearchMenu.dataset.realEstateDeal = tab.deal || "Все";
+  if (propertySearchMenu) propertySearchMenu.dataset.realEstateDeal = tab.deal || "Покупка";
   propertySearchContent?.querySelectorAll("[data-real-estate-deal]").forEach(item => {
-    const active = item.dataset.realEstateDeal === (tab.deal || "Все");
+    const active = item.dataset.realEstateDeal === (tab.deal || "Покупка");
     item.classList.toggle("active", active);
     item.setAttribute("aria-selected", String(active));
   });
@@ -3798,11 +3802,11 @@ function addPropertySearchTab() {
   const tab = newPropertySearchTab();
   propertySearchTabs.push(tab);
   activePropertySearchTabId = tab.id;
-  tab.filters = Object.fromEntries(PROPERTY_SEARCH_FILTER_IDS.map(id => [id, ""]));
+  tab.filters = Object.fromEntries(PROPERTY_SEARCH_FILTER_IDS.map(id => [id, id === "propertySearchRadius" ? "7" : ""]));
   tab.selectedCityId = "";
   tab.regionCode = "";
   tab.type = "";
-  tab.deal = "Все";
+  tab.deal = "Покупка";
   tab.advanced = false;
   tab.listings = null;
   tab.clientFilters = null;
@@ -3820,8 +3824,8 @@ function closePropertySearchTab(id) {
     const replacement = newPropertySearchTab();
     propertySearchTabs = [replacement];
     activePropertySearchTabId = replacement.id;
-    replacement.filters = Object.fromEntries(PROPERTY_SEARCH_FILTER_IDS.map(filterId => [filterId, ""]));
-    replacement.deal = "Все";
+    replacement.filters = Object.fromEntries(PROPERTY_SEARCH_FILTER_IDS.map(filterId => [filterId, filterId === "propertySearchRadius" ? "7" : ""]));
+    replacement.deal = "Покупка";
     restorePropertySearchTab(replacement);
     document.getElementById("propertySearchReset")?.click();
     capturePropertySearchTab();
@@ -3942,6 +3946,11 @@ function preparePropertySearchMenu() {
   });
   regionSelect?.addEventListener("focus", initCities, {once:true});
   regionSelect?.addEventListener("change", () => { activeRegionCode = regionSelect.value; selectedCatalogCityId = ""; cityInput.value = ""; if (citySuggestions) citySuggestions.hidden = true; });
+  const radiusSlider = document.getElementById("propertySearchRadius");
+  const radiusValue = document.getElementById("propertySearchRadiusValue");
+  const updateRadiusValue = () => { if (radiusSlider && radiusValue) { radiusValue.textContent = `${radiusSlider.value} ${t("км")}`; radiusSlider.style.setProperty("--radius-progress", `${((Number(radiusSlider.value) - Number(radiusSlider.min)) / (Number(radiusSlider.max) - Number(radiusSlider.min))) * 100}%`); } };
+  radiusSlider?.addEventListener("input", updateRadiusValue);
+  updateRadiusValue();
   categoryMenuOptions?.querySelectorAll("[data-property-section]").forEach(button => button.addEventListener("click", () => {
     const section = button.dataset.propertySection;
     const content = section === "location" ? document.getElementById("propertyLocationFields") : section === "category" ? typeTrigger?.closest(".property-search-section")?.querySelector(".property-category-field") : button.closest(".property-search-section")?.querySelector(".real-estate-tabs");
@@ -3969,9 +3978,10 @@ function preparePropertySearchMenu() {
     const numFilter = id => { const v = document.getElementById(id)?.value.trim() || ""; return v === "" ? null : Number(v); };
     propertySearchClientFilters = {
       type: typeTrigger?.dataset.value || "",
-      deal: propertySearchMenu?.dataset.realEstateDeal || "Все",
+      deal: propertySearchMenu?.dataset.realEstateDeal || "Покупка",
       priceFrom: fromNumbers[0], priceTo: fromNumbers[1], areaFrom: fromNumbers[2], areaTo: fromNumbers[3],
       address: document.getElementById("propertySearchAddress")?.value.trim() || "",
+      district: document.getElementById("propertySearchDistrict")?.value.trim() || "",
       radius: document.getElementById("propertySearchRadius")?.value || "",
       rooms: document.getElementById("propertyFilterRooms")?.value || "",
       floorFrom: numFilter("propertyFilterFloorFrom"), floorTo: numFilter("propertyFilterFloorTo"),
@@ -4015,14 +4025,18 @@ function preparePropertySearchMenu() {
     advancedToggle.textContent = t(opening ? "Згорнути розширений пошук" : "Розширений пошук");
   });
   document.getElementById("propertySearchReset")?.addEventListener("click", () => {
-    ["propertySearchCity", "propertySearchAddress", "propertySearchRadius", "propertySearchRegion", "propertyPriceFrom", "propertyPriceTo", "propertyAreaFrom", "propertyAreaTo", "propertyFilterRooms", "propertyFilterBuilding", "propertyFilterFloorFrom", "propertyFilterFloorTo", "propertyFilterFloorsFrom", "propertyFilterFloorsTo", "propertyFilterKitchenFrom", "propertyFilterKitchenTo", "propertyFilterCondition", "propertyFilterFurniture", "propertyFilterBalcony", "propertyFilterLoggia", "propertyFilterMetroFrom", "propertyFilterMetroTo", "propertyFilterLandFrom", "propertyFilterLandTo", "propertyFilterAmenityRefrigerator", "propertyFilterAmenityWashingMachine", "propertyFilterAmenityStove", "propertyFilterAmenityDishwasher", "propertyFilterAmenityAirConditioning", "propertyFilterAmenityInternet", "propertyFilterAmenityParking", "propertyFilterBathroom"].forEach(id => { const field = document.getElementById(id); if (field) { if (field.type === "checkbox") field.checked = false; else field.value = ""; } });
+    ["propertySearchCity", "propertySearchAddress", "propertySearchDistrict", "propertySearchRadius", "propertySearchRegion", "propertyPriceFrom", "propertyPriceTo", "propertyAreaFrom", "propertyAreaTo", "propertyFilterRooms", "propertyFilterBuilding", "propertyFilterFloorFrom", "propertyFilterFloorTo", "propertyFilterFloorsFrom", "propertyFilterFloorsTo", "propertyFilterKitchenFrom", "propertyFilterKitchenTo", "propertyFilterCondition", "propertyFilterFurniture", "propertyFilterBalcony", "propertyFilterLoggia", "propertyFilterMetroFrom", "propertyFilterMetroTo", "propertyFilterLandFrom", "propertyFilterLandTo", "propertyFilterAmenityRefrigerator", "propertyFilterAmenityWashingMachine", "propertyFilterAmenityStove", "propertyFilterAmenityDishwasher", "propertyFilterAmenityAirConditioning", "propertyFilterAmenityInternet", "propertyFilterAmenityParking", "propertyFilterBathroom"].forEach(id => { const field = document.getElementById(id); if (field) { if (field.type === "checkbox") field.checked = false; else field.value = ""; } });
     selectedCatalogCityId = ""; activeRegionCode = ""; propertySearchClientFilters = null;
+    const radiusSlider = document.getElementById("propertySearchRadius");
+    const radiusValue = document.getElementById("propertySearchRadiusValue");
+    if (radiusSlider) radiusSlider.value = "7";
+    if (radiusSlider && radiusValue) { radiusValue.textContent = `7 ${t("км")}`; radiusSlider.style.setProperty("--radius-progress", `${((7 - Number(radiusSlider.min)) / (Number(radiusSlider.max) - Number(radiusSlider.min))) * 100}%`); }
     if (citySuggestions) citySuggestions.hidden = true;
     cityInput?.setAttribute("aria-expanded", "false");
     if (typeTrigger) { typeTrigger.dataset.value = ""; const label = typeTrigger.querySelector(".property-type-label"); if (label) label.textContent = t("Оберіть категорію"); }
     typeOptions?.querySelectorAll("[data-property-type]").forEach(option => { const selected = !option.dataset.propertyType; option.classList.toggle("is-selected", selected); option.setAttribute("aria-selected", String(selected)); });
-    if (propertySearchMenu) propertySearchMenu.dataset.realEstateDeal = "Все";
-    propertySearchContent?.querySelectorAll("[data-real-estate-deal]").forEach(tab => { const active = tab.dataset.realEstateDeal === "Все"; tab.classList.toggle("active", active); tab.setAttribute("aria-selected", String(active)); });
+    if (propertySearchMenu) propertySearchMenu.dataset.realEstateDeal = "Покупка";
+    propertySearchContent?.querySelectorAll("[data-real-estate-deal]").forEach(tab => { const active = tab.dataset.realEstateDeal === "Покупка"; tab.classList.toggle("active", active); tab.setAttribute("aria-selected", String(active)); });
     if (moreFields) moreFields.hidden = true;
     if (advancedToggle) { advancedToggle.setAttribute("aria-expanded", "false"); advancedToggle.textContent = t("Розширений пошук"); }
     renderRegions();
@@ -4033,7 +4047,7 @@ function preparePropertySearchMenu() {
     propertySearchContent.addEventListener("click", event => {
       const dealTab = event.target.closest("[data-real-estate-deal]");
       if (!dealTab) return;
-      propertySearchMenu.dataset.realEstateDeal = dealTab.dataset.realEstateDeal || "Все";
+      propertySearchMenu.dataset.realEstateDeal = dealTab.dataset.realEstateDeal || "Покупка";
       propertySearchContent.querySelectorAll("[data-real-estate-deal]").forEach(tab => {
         const active = tab === dealTab;
         tab.classList.toggle("active", active);
@@ -4056,29 +4070,35 @@ function openCategoryMenu(parentCategory = "") {
     ensurePropertySearchTabs();
     document.getElementById("propertySearchTitle").textContent = t("Недвижимость");
     const propertyTypes = categorySubcategories[parentCategory] || [];
-    propertySearchMenu.dataset.realEstateDeal = ensurePropertySearchTabs().deal || "Все";
+    propertySearchMenu.dataset.realEstateDeal = ensurePropertySearchTabs().deal || "Покупка";
     propertySearchContent.innerHTML = `
       <div class="property-search-shell">
         <section class="property-search-section" aria-label="${escapeHtml(t("Локація"))}">
           <div class="property-location-grid" id="propertyLocationFields">
             <label class="property-search-field property-city-field"><input id="propertySearchCity" type="text" autocomplete="off" placeholder="${escapeHtml(t("Город"))}" aria-label="${escapeHtml(t("Город"))}" aria-expanded="false" aria-controls="propertySearchCitySuggestions"><div id="propertySearchCitySuggestions" class="property-city-suggestions" role="listbox" hidden></div></label>
             <label class="property-search-field"><select id="propertySearchRegion" aria-label="${escapeHtml(t("Область"))}"><option value="">${escapeHtml(t("Область"))}</option></select><span class="property-field-chevron" aria-hidden="true">⌄</span></label>
+            <label class="property-search-field property-district-field"><input id="propertySearchDistrict" type="text" autocomplete="off" placeholder="${escapeHtml(t("Район міста"))}" aria-label="${escapeHtml(t("Район міста"))}"></label>
             <label class="property-search-field property-address-field"><input id="propertySearchAddress" type="text" placeholder="${escapeHtml(t("Адреса або точка на карті"))}" aria-label="${escapeHtml(t("Адреса або точка на карті"))}"><button type="button" id="propertyUseMapPoint" class="property-map-point" aria-label="${escapeHtml(t("Вказати точку на карті"))}" title="${escapeHtml(t("Вказати точку на карті"))}">⊙</button></label>
-            <label class="property-search-field"><select id="propertySearchRadius" aria-label="${escapeHtml(t("Радіус, км"))}"><option value="">${escapeHtml(t("Радіус, км"))}</option><option value="5">5 км</option><option value="10">10 км</option><option value="20">20 км</option><option value="30">30 км</option><option value="50">50 км</option><option value="100">100 км</option></select><span class="property-field-chevron" aria-hidden="true">⌄</span></label>
+          </div>
+          <div class="property-radius-control">
+            <div class="property-radius-heading"><label for="propertySearchRadius">${escapeHtml(t("Радіус пошуку, км"))}</label><output id="propertySearchRadiusValue" for="propertySearchRadius">7 км</output></div>
+            <input id="propertySearchRadius" class="property-radius-slider" type="range" min="1" max="50" step="1" value="7" aria-label="${escapeHtml(t("Радіус пошуку, км"))}">
+            <div class="property-radius-ticks" aria-hidden="true"><span>1</span><span>5</span><span>10</span><span>20</span><span>30</span><span>50</span></div>
           </div>
         </section>
-        <section class="property-search-section" aria-label="${escapeHtml(t("Категорія нерухомості"))}">
+        <section class="property-search-section property-deal-section" aria-label="${escapeHtml(t("Операція"))}">
+          <div class="property-control-caption">${escapeHtml(t("Операція"))}</div>
+          <div class="real-estate-tabs" role="tablist" aria-label="${escapeHtml(t("Операція"))}">
+            ${["Покупка", "Продажа", "Аренда"].map(label => { const active = (propertySearchMenu.dataset.realEstateDeal || "Покупка") === label; return `<button type="button" class="real-estate-tab${active ? " active" : ""}" role="tab" aria-selected="${active ? "true" : "false"}" data-real-estate-deal="${escapeHtml(label)}">${escapeHtml(t(label))}</button>`; }).join("")}
+          </div>
+        </section>
+        <section class="property-search-section property-type-section" aria-label="${escapeHtml(t("Тип об’єкта"))}">
+          <div class="property-control-caption">${escapeHtml(t("Тип об’єкта"))}</div>
           <div class="property-search-field property-category-field">
-            
-            <button type="button" id="propertyTypeTrigger" class="property-type-trigger" data-value="" aria-haspopup="listbox" aria-expanded="false" aria-controls="propertyTypeOptions" aria-label="${escapeHtml(t("Категорія нерухомості"))}"><span class="property-type-label">${escapeHtml(t("Оберіть категорію"))}</span><span class="property-field-chevron" aria-hidden="true">⌄</span></button>
-            <div id="propertyTypeOptions" class="property-type-options" role="listbox" aria-label="${escapeHtml(t("Категорія нерухомості"))}" hidden>
-              ${[``, ...propertyTypes].map(label => { const value = label; const text = label ? t(label) : t("Оберіть категорію"); return `<button type="button" class="property-type-option${!label ? " is-selected" : ""}" role="option" aria-selected="${!label ? "true" : "false"}" data-property-type="${escapeHtml(value)}">${escapeHtml(text)}<span class="property-type-radio" aria-hidden="true"></span></button>`; }).join("")}
+            <button type="button" id="propertyTypeTrigger" class="property-type-trigger" data-value="" aria-haspopup="listbox" aria-expanded="false" aria-controls="propertyTypeOptions" aria-label="${escapeHtml(t("Тип об’єкта"))}"><span class="property-type-label">${escapeHtml(t("Оберіть категорію"))}</span><span class="property-field-chevron" aria-hidden="true">⌄</span></button>
+            <div id="propertyTypeOptions" class="property-type-options" role="listbox" aria-label="${escapeHtml(t("Тип об’єкта"))}" hidden>
+              ${["", ...propertyTypes].map(label => { const value = label; const text = label ? t(label) : t("Оберіть категорію"); return `<button type="button" class="property-type-option${!label ? " is-selected" : ""}" role="option" aria-selected="${!label ? "true" : "false"}" data-property-type="${escapeHtml(value)}">${escapeHtml(text)}<span class="property-type-radio" aria-hidden="true"></span></button>`; }).join("")}
             </div>
-          </div>
-        </section>
-        <section class="property-search-section property-deal-section" aria-label="${escapeHtml(t("Тип угоди"))}">
-          <div class="real-estate-tabs" role="tablist" aria-label="${escapeHtml(t("Тип угоди"))}">
-            ${["Все", "Продажа", "Аренда"].map((label, index) => { const active = (propertySearchMenu.dataset.realEstateDeal || "Все") === label; return `<button type="button" class="real-estate-tab${active ? " active" : ""}" role="tab" aria-selected="${active ? "true" : "false"}" data-real-estate-deal="${escapeHtml(label)}">${escapeHtml(t(label))}</button>`; }).join("")}
           </div>
         </section>
         <section class="property-more-section">

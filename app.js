@@ -4519,7 +4519,8 @@ function syncPropertyListingFields() {
     });
   });
   const isProperty = listingCategorySelect?.value === "Недвижимость";
-  if (listingCurrencyField) listingCurrencyField.hidden = !isProperty;
+  const isVehicle = listingCategorySelect?.value === "Автомобили";
+  if (listingCurrencyField) listingCurrencyField.hidden = !(isProperty || isVehicle);
   const propertyDistrictField = document.getElementById("propertyDistrictField");
   if (propertyDistrictField) propertyDistrictField.hidden = !isProperty;
   if (propertyAddressField) propertyAddressField.hidden = !isProperty;
@@ -4532,6 +4533,28 @@ function syncVehicleListingFields() {
   const isVehicle = category === "Автомобили";
   const isProperty = category === "Недвижимость";
   const hidesManualTitle = isVehicle || isProperty;
+  const listingLocationFields = document.getElementById("listingLocationFields");
+  const listingLocationHome = document.getElementById("listingLocationHome");
+  const listingPriceRow = document.getElementById("listingPriceRow");
+  const listingPriceHome = document.getElementById("listingPriceHome");
+  if (isVehicle && vehicleListingFields) {
+    const firstVehicleLabel = vehicleListingFields.querySelector("label");
+    if (listingLocationFields && firstVehicleLabel && listingLocationFields.parentElement !== vehicleListingFields) {
+      vehicleListingFields.insertBefore(listingLocationFields, firstVehicleLabel);
+    }
+    const yearInput = vehicleListingFields.querySelector('[name="vehicle_year"]');
+    const yearLabel = yearInput?.closest("label");
+    if (listingPriceRow && yearLabel && listingPriceRow.parentElement !== vehicleListingFields) {
+      yearLabel.after(listingPriceRow);
+    }
+  } else {
+    if (listingLocationFields && listingLocationHome?.parentElement && listingLocationFields.parentElement !== listingLocationHome.parentElement) {
+      listingLocationHome.after(listingLocationFields);
+    }
+    if (listingPriceRow && listingPriceHome?.parentElement && listingPriceRow.parentElement !== listingPriceHome.parentElement) {
+      listingPriceHome.after(listingPriceRow);
+    }
+  }
   if (vehicleListingFields) vehicleListingFields.hidden = !isVehicle;
   if (vehicleListingMore) vehicleListingMore.hidden = !isVehicle;
   if (vehicleMarketPanel) vehicleMarketPanel.hidden = true;

@@ -537,6 +537,13 @@ const translations = {
   "Санузел": { ru:"Санузел", uk:"Санвузол", en:"Bathroom", pl:"Łazienka" },
   "Раздельный": { ru:"Раздельный", uk:"Роздільний", en:"Separate", pl:"Oddzielna" },
   "Совмещённый": { ru:"Совмещённый", uk:"Суміщений", en:"Combined", pl:"Połączona" },
+  "Инклюзивность и доступность": { ru:"Инклюзивность и доступность", uk:"Інклюзивність та доступність", en:"Accessibility", pl:"Dostępność" },
+  "Пандус": { ru:"Пандус", uk:"Пандус", en:"Ramp", pl:"Podjazd" },
+  "Лифт": { ru:"Лифт", uk:"Ліфт", en:"Elevator", pl:"Winda" },
+  "Вход без ступенек": { ru:"Вход без ступенек", uk:"Вхід без сходинок", en:"Step-free entrance", pl:"Wejście bez stopni" },
+  "Поручни на лестнице": { ru:"Поручни на лестнице", uk:"Поручні на сходах", en:"Stair handrails", pl:"Poręcze na schodach" },
+  "Ширина дверей лифта, см": { ru:"Ширина дверей лифта, см", uk:"Ширина дверей ліфта, см", en:"Elevator door width, cm", pl:"Szerokość drzwi windy, cm" },
+  "Размер кабины лифта, см (Ш × Г)": { ru:"Размер кабины лифта, см (Ш × Г)", uk:"Розмір кабіни ліфта, см (Ш × Г)", en:"Elevator cabin size, cm (W × D)", pl:"Wymiary kabiny windy, cm (szer. × gł.)" },
   "Характеристики недвижимости": { ru: "Характеристики недвижимости", uk: "Характеристики нерухомості", en: "Property details", pl: "Szczegóły nieruchomości" },
 };
 const authMessages = {
@@ -5015,17 +5022,7 @@ if (addForm) {
         const value = String(form.get(name) || "").trim();
         return value === "" ? null : Number(value);
       };
-      // Store property amenities as dedicated listings columns.
-      // Keep the existing property_details JSON structure unchanged.
       Object.assign(payload, {
-        has_refrigerator: form.querySelector('[name="property_amenity_refrigerator"]')?.checked === true,
-        has_washing_machine: form.querySelector('[name="property_amenity_washing_machine"]')?.checked === true,
-        has_stove: form.querySelector('[name="property_amenity_stove"]')?.checked === true,
-        has_dishwasher: form.querySelector('[name="property_amenity_dishwasher"]')?.checked === true,
-        has_air_conditioner: form.querySelector('[name="property_amenity_air_conditioning"]')?.checked === true,
-        has_internet: form.querySelector('[name="property_amenity_internet"]')?.checked === true,
-        has_parking: form.querySelector('[name="property_amenity_parking"]')?.checked === true,
-        bathroom_type: String(form.querySelector('[name="property_bathroom_type"]:checked')?.value || '') || null,
         property_details: {
           operation: propertyOperation,
           type: propertyType,
@@ -5053,7 +5050,15 @@ if (addForm) {
           school_distance_m: optionalNumber("property_school_distance"),
           stop_distance_m: optionalNumber("property_stop_distance"),
           amenities: Object.fromEntries(["refrigerator","washing_machine","stove","dishwasher","air_conditioning","internet","parking"].map(key => [key, form.querySelector(`[name="property_amenity_${key}"]`)?.checked === true])),
-          bathroom_type: String(form.get("property_bathroom_type") || "") || null
+          bathroom_type: String(form.get("property_bathroom_type") || "") || null,
+          accessibility: {
+            ramp: form.querySelector('[name="property_accessibility_ramp"]')?.checked === true,
+            elevator: form.querySelector('[name="property_accessibility_elevator"]')?.checked === true,
+            step_free_entrance: form.querySelector('[name="property_accessibility_step_free_entrance"]')?.checked === true,
+            handrails: form.querySelector('[name="property_accessibility_handrails"]')?.checked === true,
+            elevator_door_width_cm: optionalNumber("property_accessibility_elevator_door_width_cm"),
+            elevator_cabin_size_cm: String(form.get("property_accessibility_elevator_cabin_size_cm") || "").trim() || null
+          }
         }
       });
       const typeLabel = translations[propertyType]?.[lang] || propertyType;

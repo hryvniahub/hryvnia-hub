@@ -3027,85 +3027,28 @@ main{
 
 
 
-/* Approved real-estate search layout: full-width object selector, deal tabs and free radius slider. */
-.property-control-caption{margin:0 0 8px 2px;color:#f7f9f5;font-size:clamp(15px,2vw,18px);font-weight:800;}
-.property-deal-section .real-estate-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;}
-.property-deal-section .real-estate-tab{flex:1 1 0;min-width:0;}
-.property-type-section .property-category-field{width:100%;min-height:68px;padding:0 18px;border:1px solid rgba(168,201,40,.58);border-radius:18px;background:rgba(0,28,20,.35);}
-.property-type-section .property-type-trigger{width:100%;font-size:clamp(17px,2.2vw,20px);font-weight:750;}
-.property-type-section .property-type-label{white-space:nowrap;}
-.property-radius-control{margin-top:14px;padding:4px 2px 0;}
-.property-radius-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;color:#f7f9f5;font-size:clamp(15px,2vw,18px);font-weight:800;}
-.property-radius-heading output{min-width:66px;padding:7px 10px;border:1px solid rgba(168,201,40,.42);border-radius:10px;color:#f7f9f5;text-align:center;font-size:16px;font-weight:800;}
-.property-radius-slider{display:block;width:100%;height:28px;margin:0;appearance:none;background:transparent;cursor:pointer;touch-action:pan-y;}
-.property-radius-slider::-webkit-slider-runnable-track{height:8px;border-radius:99px;background:linear-gradient(90deg,#A8C928 0%,#A8C928 var(--radius-progress,12.25%),rgba(255,255,255,.28) var(--radius-progress,12.25%),rgba(255,255,255,.28) 100%);}
-.property-radius-slider::-moz-range-track{height:8px;border-radius:99px;background:rgba(255,255,255,.28);}
-.property-radius-slider::-moz-range-progress{height:8px;border-radius:99px;background:#A8C928;}
-.property-radius-slider::-webkit-slider-thumb{width:25px;height:25px;margin-top:-8.5px;appearance:none;border:3px solid #fff;border-radius:50%;background:#A8C928;box-shadow:0 0 0 3px rgba(168,201,40,.22);}
-.property-radius-slider::-moz-range-thumb{width:19px;height:19px;border:3px solid #fff;border-radius:50%;background:#A8C928;box-shadow:0 0 0 3px rgba(168,201,40,.22);}
-.property-radius-ticks{display:flex;justify-content:space-between;padding:0 5px;color:rgba(247,249,245,.82);font-size:12px;}
-.property-radius-ticks span{position:relative;padding-top:8px;}
-.property-radius-ticks span:before{position:absolute;top:0;left:50%;width:1px;height:5px;background:rgba(247,249,245,.48);content:"";}
-@media(max-width:560px){.property-type-section .property-category-field{min-height:62px;padding:0 14px;border-radius:15px}.property-radius-control{margin-top:11px}.property-radius-heading{font-size:14px}.property-radius-heading output{font-size:14px;min-width:58px}.property-radius-ticks{font-size:11px}}
+/* Real-estate listing cards: keep the price scale at the bottom, with city directly below. */
+.listing-card-horizontal.is-property-listing .listing-card-content{justify-content:flex-start;}
+.listing-card-horizontal.is-property-listing .listing-market{margin-top:auto;}
+.listing-card-horizontal.is-property-listing .listing-card-meta{margin-top:0;padding-top:5px;}
+@media(max-width:720px){
+  .property-search-menu{
+    top:max(10px,env(safe-area-inset-top,0px));
+    bottom:max(10px,env(safe-area-inset-bottom,0px));
+    max-height:none;
+    min-height:0;
+    touch-action:pan-y;
+    -webkit-overflow-scrolling:touch;
+  }
+}
 
-/* Hryvnia Hub — real-estate search palette aligned with the vehicle search menu.
-   Visual-only overrides: preserve the existing layout, controls and behavior. */
-.property-search-menu .vehicle-search-tab-item{
-  border-color:rgba(168,201,40,.28);
-  background:rgba(255,255,255,.06);
-  box-shadow:none;
-}
-.property-search-menu .vehicle-search-tab,
-.property-search-menu .vehicle-search-tab-add{
-  border-color:rgba(168,201,40,.28);
-  background:rgba(255,255,255,.06);
-  color:rgba(247,249,245,.82);
-}
-.property-search-menu .vehicle-search-tab-item.is-active{
-  border-color:#A8C928;
-  background:rgba(168,201,40,.13);
-  box-shadow:none;
-}
-.property-search-menu .vehicle-search-tab.is-active{
-  background:transparent;
-  color:#A8C928;
-}
-.property-search-menu .vehicle-search-tab-close{
-  color:rgba(247,249,245,.68);
-}
-.property-search-menu .vehicle-search-tab-add{
-  flex-basis:36px;
-  width:36px;
-  color:#A8C928;
-  font-size:22px;
-}
-.property-search-menu .vehicle-search-tab-add:hover{
-  background:rgba(168,201,40,.10);
-}
-.property-search-menu .property-deal-section .real-estate-tabs{
-  background:rgba(255,255,255,.06);
-  border-color:rgba(168,201,40,.35);
-}
-.property-search-menu .property-deal-section .real-estate-tab{
-  background:transparent;
-  border-color:transparent;
-  color:#f7f9f5;
-  box-shadow:none;
-}
-.property-search-menu .property-deal-section .real-estate-tab.active{
-  background:rgba(168,201,40,.13);
-  border-color:rgba(168,201,40,.55);
-  color:#A8C928;
-  box-shadow:none;
-}
-.property-search-menu .property-field-chevron{
-  flex:0 0 auto;
-  color:#20352b;
-  font-size:16px;
-  font-weight:600;
-  line-height:1;
-}
-.property-search-menu .property-type-trigger .property-field-chevron{
-  color:#A8C928;
-  font-size:16px;
+
+/* Real-estate location block: two rows on desktop, touch-friendly two-column flow on mobile. */
+.property-search-menu .property-location-grid{grid-template-columns:repeat(6,minmax(0,1fr));}
+.property-search-menu .property-city-field,.property-search-menu .property-region-field{grid-column:span 3;}
+.property-search-menu .property-district-field,.property-search-menu .property-address-field,.property-search-menu .property-radius-field{grid-column:span 2;}
+@media(max-width:720px){
+  .property-search-menu .property-location-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .property-search-menu .property-city-field,.property-search-menu .property-region-field,.property-search-menu .property-district-field,.property-search-menu .property-address-field{grid-column:auto;}
+  .property-search-menu .property-radius-field{grid-column:1/-1;}
 }

@@ -1067,7 +1067,8 @@ async function initAuth() {
       return;
     }
     if (event === "SIGNED_IN") {
-      if (authModal && !authModal.classList.contains("hidden")) renderAuthModal();
+      // Do not replace the login form with the account menu after sign-in.
+      // The menu remains available when the user explicitly taps the account button.
       if (vehicleMarketPanel && !vehicleMarketPanel.hidden && listingCategorySelect?.value === "Автомобили") {
         if (vehicleMarketAuthPrompt) vehicleMarketAuthPrompt.hidden = true;
         closeAuthModal();
@@ -2827,9 +2828,7 @@ async function editListing(item, labels) {
   const selectedCityId = String(item.city_id || item.cities?.id || "");
   const selectedCity = availableCities.find(city => String(city.id) === selectedCityId);
   const initialCityName = selectedCity ? cityName(selectedCity) : String(item.cities?.[`name_${lang}`] || item.cities?.name_uk || item.cities?.name_ru || "");
-  const categoryOptions = ["Автомобили","Недвижимость","Готовый бизнес","Инвестиции"]
-    .map(cat => `<option value="${cat}" ${item.category === cat ? "selected" : ""}>${escapeHtml(translations[cat]?.[lang] || cat)}</option>`)
-    .join("");
+  const categoryValue = escapeHtml(String(item.category || "Автомобили"));
   const photos = listingPhotos(item);
 
   const opt = (value, current, key) => {
@@ -2849,9 +2848,18 @@ async function editListing(item, labels) {
   const vehicleTypes = [["new","new"],["used","used"]];
   const operational = [["roadworthy","roadworthy"],["needs_repair","needs_repair"],["not_running","not_running"],["after_accident","after_accident"]];
 
+  const editCityField = `
+    <label class="edit-city-field">${escapeHtml(L.city)}
+      <input name="city_search" type="text" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="editCitySuggestions" placeholder="${escapeHtml(cityTranslation("Введите название города"))}" value="${escapeHtml(initialCityName)}" required>
+      <input name="city_id" type="hidden" value="${escapeHtml(selectedCityId)}">
+      <div class="edit-city-suggestions" id="editCitySuggestions" role="listbox" hidden></div>
+    </label>`;
+  const editPriceField = `<label>${escapeHtml(L.price)}<input name="price" type="number" min="0" step="0.01" required value="${escapeHtml(String(item.price ?? ""))}"></label>`;
+
   const vehicleBlock = isVehicle ? `
     <fieldset class="vehicle-listing-fields">
       <legend>${escapeHtml(t("Характеристики автомобиля"))}</legend>
+      ${editCityField}
       <label>${escapeHtml(t("Марка автомобиля"))}
         <select name="vehicle_make_slug" id="editVehicleMake" required>
           <option value="">${escapeHtml(t("Выберите марку"))}</option>
@@ -2863,13 +2871,14 @@ async function editListing(item, labels) {
         </select>
       </label>
       <label>${escapeHtml(t("Год выпуска"))}<input name="vehicle_year" type="number" min="1900" max="2100" value="${escapeHtml(String(item.vehicle_year ?? ""))}"></label>
-      <label>${escapeHtml(t("Тип кузова"))}<select name="vehicle_body_type"><option value="">${escapeHtml(t("Выберите тип кузова"))}</option>${bodyTypes.map(v => opt(v, item.vehicle_body_type, v)).join("")}</select></label>
-      <label>${escapeHtml(t("Топливо"))}<select name="vehicle_fuel_type"><option value="">${escapeHtml(t("Выберите топливо"))}</option>${fuels.map(v => opt(v, item.vehicle_fuel_type, v)).join("")}</select></label>
+      ${editPriceField}
+      <label>${escapeHtml(t("Пробег, км"))}<input name="vehicle_mileage_km" type="number" min="0" value="${escapeHtml(String(item.vehicle_mileage_km ?? ""))}"></label>
       <label>${escapeHtml(t("Объём двигателя, л"))}<input name="vehicle_engine_liters" type="number" min="0" max="20" step="0.1" value="${escapeHtml(String(item.vehicle_engine_liters ?? ""))}"></label>
       <label>${escapeHtml(t("Мощность, л.с."))}<input name="vehicle_power_hp" type="number" min="1" max="3000" value="${escapeHtml(String(item.vehicle_power_hp ?? ""))}"></label>
+      <label>${escapeHtml(t("Топливо"))}<select name="vehicle_fuel_type"><option value="">${escapeHtml(t("Выберите топливо"))}</option>${fuels.map(v => opt(v, item.vehicle_fuel_type, v)).join("")}</select></label>
       <label>${escapeHtml(t("Коробка передач"))}<select name="vehicle_transmission"><option value="">${escapeHtml(t("Выберите коробку"))}</option>${transmissions.map(v => opt(v, item.vehicle_transmission, v)).join("")}</select></label>
+      <label>${escapeHtml(t("Тип кузова"))}<select name="vehicle_body_type"><option value="">${escapeHtml(t("Выберите тип кузова"))}</option>${bodyTypes.map(v => opt(v, item.vehicle_body_type, v)).join("")}</select></label>
       <label>${escapeHtml(t("Привод"))}<select name="vehicle_drive"><option value="">${escapeHtml(t("Выберите привод"))}</option>${drives.map(v => opt(v, item.vehicle_drive, v)).join("")}</select></label>
-      <label>${escapeHtml(t("Пробег, км"))}<input name="vehicle_mileage_km" type="number" min="0" value="${escapeHtml(String(item.vehicle_mileage_km ?? ""))}"></label>
       <label>${escapeHtml(t("Тип авто"))}<select name="vehicle_condition"><option value="">${escapeHtml(t("Выберите тип"))}</option>${vehicleTypes.map(([v,k]) => opt(v, item.vehicle_condition, k)).join("")}</select></label>
       <label>${escapeHtml(t("Техническое состояние"))}<select name="vehicle_operational_condition"><option value="">${escapeHtml(t("Выберите состояние"))}</option>${operational.map(([v,k]) => opt(v, item.vehicle_operational_condition, k)).join("")}</select></label>
       <label>${escapeHtml(t("Количество дверей"))}<select name="vehicle_doors"><option value="">${escapeHtml(t("Выберите количество"))}</option>${[2,3,4,5].map(n => optPlain(n, item.vehicle_doors, String(n))).join("")}</select></label>
@@ -2880,16 +2889,12 @@ async function editListing(item, labels) {
 
   const dialog = document.createElement("dialog");
   dialog.className = "modal-card listing-edit-dialog";
-  dialog.innerHTML = `<form class="listing-edit-form"><header class="listing-edit-header"><p class="eyebrow">${escapeHtml(t("Редактирование объявления"))}</p><h2>${escapeHtml(labels.edit)}</h2></header>
-    <label>${escapeHtml(L.category)}<select name="category" required>${categoryOptions}</select></label>
+  dialog.innerHTML = `<form class="listing-edit-form"><header class="listing-edit-header"><p class="eyebrow">${escapeHtml(t("Редактирование объявления"))}</p></header>
+    <input type="hidden" name="category" value="${categoryValue}">
     ${isVehicle ? "" : `<label>${escapeHtml(L.title)}<input name="title" required maxlength="180" value="${escapeHtml(item.title || "")}"></label>`}
     ${vehicleBlock}
-    <label class="edit-city-field">${escapeHtml(L.city)}
-      <input name="city_search" type="text" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="editCitySuggestions" placeholder="${escapeHtml(cityTranslation("Введите название города"))}" value="${escapeHtml(initialCityName)}" required>
-      <input name="city_id" type="hidden" value="${escapeHtml(selectedCityId)}">
-      <div class="edit-city-suggestions" id="editCitySuggestions" role="listbox" hidden></div>
-    </label>
-    <label>${escapeHtml(L.price)}<input name="price" type="number" min="0" step="0.01" required value="${escapeHtml(String(item.price ?? ""))}"></label>
+    ${isVehicle ? "" : editCityField}
+    ${isVehicle ? "" : editPriceField}
     ${String(item.category || "") === "Недвижимость" ? (() => { const d=item.property_details||{}; const val=(k)=>escapeHtml(String(d[k]??"")); const select=(name,label,opts,key)=>`<label>${escapeHtml(t(label))}<select name="${name}"><option value="">${escapeHtml(t("Не указано"))}</option>${opts.map(v=>`<option value="${escapeHtml(v)}" ${String(d[key]??"")===v?"selected":""}>${escapeHtml(t(v))}</option>`).join("")}</select></label>`; const num=(name,label,key)=>`<label>${escapeHtml(t(label))}<input name="${name}" type="number" min="0" step="0.1" value="${val(key)}"></label>`; return `<fieldset class="edit-property-fields" aria-label="${escapeHtml(t("Характеристики недвижимости"))}"><div class="edit-property-grid"><label>${escapeHtml(t("Район"))}<input name="property_district" type="text" value="${val("district")}"></label>${select("property_rooms","Кількість кімнат",["1","2","3","4","5+"],"rooms")}<label>${escapeHtml(t("Етаж"))}<input name="property_floor" type="number" min="0" step="1" value="${val("floor")}"></label><label>${escapeHtml(t("Етажність будівлі"))}<input name="property_floors_total" type="number" min="1" step="1" value="${val("floors_total")}"></label>${num("property_area_m2","Загальна площа, м²","area_m2")}${num("property_kitchen_area_m2","Площа кухні, м²","kitchen_area_m2")}${select("property_building_type","Тип будівлі",["Кирпичный","Панельный","Монолитный","Монолитно-кирпичный","Деревянный","Другое"],"building_type")}${select("property_condition","Стан",["Новостройка","Новый ремонт","Жилое состояние","Нужен ремонт","Под ремонт"],"condition")}${select("property_furniture","Меблі",["Есть","Нет","Частично"],"furniture")}${select("property_balcony","Балкон",["Есть","Нет"],"balcony")}${select("property_loggia","Лоджія",["Есть","Нет"],"loggia")}<label>${escapeHtml(t("До метро, м"))}<input name="property_metro_distance_m" type="number" min="0" step="1" value="${val("metro_distance_m")}"></label><label>${escapeHtml(t("До школи, м"))}<input name="property_school_distance_m" type="number" min="0" step="1" value="${val("school_distance_m")}"></label><label>${escapeHtml(t("До зупинки, м"))}<input name="property_stop_distance_m" type="number" min="0" step="1" value="${val("stop_distance_m")}"></label>${num("property_land_area_sotkas","Площа ділянки, соток","land_area_sotkas")}<section class="property-amenities property-amenities-fixed"><h3>${escapeHtml(t("Удобства"))}</h3><div class="property-amenity-grid">${[["refrigerator","Холодильник"],["washing_machine","Стиральная машина"],["stove","Плита"],["dishwasher","Посудомоечная машина"],["air_conditioning","Кондиционер"],["internet","Интернет"],["parking","Парковка"]].map(([key,label])=>`<label><input type="checkbox" name="property_amenity_${key}" ${d.amenities?.[key] ? "checked" : ""}><span>${escapeHtml(t(label))}</span></label>`).join("")}</div><fieldset class="property-bathroom-field"><legend>${escapeHtml(t("Санузел"))}</legend>${[["separate","Раздельный"],["combined","Совмещённый"]].map(([value,label])=>`<label><input type="radio" name="property_bathroom_type" value="${value}" ${d.bathroom_type===value?"checked":""}><span>${escapeHtml(t(label))}</span></label>`).join("")}</fieldset></section></div></fieldset>`; })() : ""}
     <label>${escapeHtml(L.description)}<textarea name="description" rows="5" maxlength="10000">${escapeHtml(item.description || "")}</textarea></label>
     <fieldset class="edit-photo-fields">
@@ -4341,6 +4346,17 @@ const vehicleListingMakeSpinner = document.getElementById("vehicleListingMakeSpi
 const vehicleListingMakeStatus = document.getElementById("vehicleListingMakeStatus");
 const listingTitleField = document.getElementById("listingTitleField");
 const vehicleListingMore = document.getElementById("vehicleListingMore");
+
+// Keep the listing-creation currency set to UAH, USD and PLN.
+// The search filters have their own currency selector and are not changed here.
+function syncVehicleListingFormOptions() {
+  const currencySelect = document.getElementById("listingPriceCurrency");
+  currencySelect?.querySelector('option[value="EUR"]')?.remove();
+
+  if (vehicleListingMore) {
+    vehicleListingMore.textContent = t("Розширений пошук");
+  }
+}
 const vehicleMarketPanel = document.getElementById("vehicleMarketPanel");
 const vehicleMarketPrice = document.getElementById("vehicleMarketPrice");
 const vehicleMarketNote = document.getElementById("vehicleMarketNote");
@@ -4519,7 +4535,8 @@ function syncPropertyListingFields() {
     });
   });
   const isProperty = listingCategorySelect?.value === "Недвижимость";
-  if (listingCurrencyField) listingCurrencyField.hidden = !isProperty;
+  const isVehicle = listingCategorySelect?.value === "Автомобили";
+  if (listingCurrencyField) listingCurrencyField.hidden = !(isProperty || isVehicle);
   const propertyDistrictField = document.getElementById("propertyDistrictField");
   if (propertyDistrictField) propertyDistrictField.hidden = !isProperty;
   if (propertyAddressField) propertyAddressField.hidden = !isProperty;
@@ -4532,6 +4549,28 @@ function syncVehicleListingFields() {
   const isVehicle = category === "Автомобили";
   const isProperty = category === "Недвижимость";
   const hidesManualTitle = isVehicle || isProperty;
+  const listingLocationFields = document.getElementById("listingLocationFields");
+  const listingLocationHome = document.getElementById("listingLocationHome");
+  const listingPriceRow = document.getElementById("listingPriceRow");
+  const listingPriceHome = document.getElementById("listingPriceHome");
+  if (isVehicle && vehicleListingFields) {
+    const firstVehicleLabel = vehicleListingFields.querySelector("label");
+    if (listingLocationFields && firstVehicleLabel && listingLocationFields.parentElement !== vehicleListingFields) {
+      vehicleListingFields.insertBefore(listingLocationFields, firstVehicleLabel);
+    }
+    const transmissionInput = vehicleListingFields.querySelector('[name="vehicle_transmission"]');
+    const transmissionLabel = transmissionInput?.closest("label");
+    if (listingPriceRow && transmissionLabel && listingPriceRow.parentElement !== vehicleListingFields) {
+      transmissionLabel.after(listingPriceRow);
+    }
+  } else {
+    if (listingLocationFields && listingLocationHome?.parentElement && listingLocationFields.parentElement !== listingLocationHome.parentElement) {
+      listingLocationHome.after(listingLocationFields);
+    }
+    if (listingPriceRow && listingPriceHome?.parentElement && listingPriceRow.parentElement !== listingPriceHome.parentElement) {
+      listingPriceHome.after(listingPriceRow);
+    }
+  }
   if (vehicleListingFields) vehicleListingFields.hidden = !isVehicle;
   if (vehicleListingMore) vehicleListingMore.hidden = !isVehicle;
   if (vehicleMarketPanel) vehicleMarketPanel.hidden = true;
@@ -5237,6 +5276,7 @@ function translatePage(selectedLanguage) {
 
 const savedLanguage = localStorage.getItem("hryvniaHubLanguage");
 translatePage(savedLanguage || "uk");
+syncVehicleListingFormOptions();
 
 const langTrigger = document.getElementById("langTrigger");
 const langDropdown = document.getElementById("langDropdown");
@@ -5260,6 +5300,7 @@ if (langTrigger && langDropdown) {
     if (!btn) return;
     const value = btn.dataset.langValue;
     translatePage(value);
+    syncVehicleListingFormOptions();
     closeLangDropdown();
   });
   document.addEventListener("click", event => {

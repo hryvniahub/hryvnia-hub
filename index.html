@@ -10,6 +10,24 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+<style>
+  #addModal #formMessage.error {
+    display:block;
+    margin:12px 0;
+    padding:12px 14px;
+    border:1px solid #d96b6b;
+    border-radius:10px;
+    background:#7a1f1f;
+    color:#fff;
+    font-weight:600;
+    scroll-margin:24px;
+  }
+  #addModal .has-error,
+  #addModal input.has-error {
+    outline:2px solid #d96b6b !important;
+    outline-offset:2px;
+  }
+</style>
 </head>
 <body>
   <header class="header">
@@ -531,7 +549,7 @@
         </div>
         <label>Описание<textarea name="description" rows="4" placeholder="Коротко опишите предложение"></textarea></label>
         <fieldset id="photoFields" class="photo-fields"><legend id="photoLabel">Фотографии</legend><button id="photoPickerButton" class="btn" type="button">Добавить фотографии</button><input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple hidden aria-labelledby="photoLabel" aria-describedby="photoHint photoMessage"><p id="photoHint" class="muted">До 10 фото: JPEG, PNG или WebP, до 10 МБ каждое. Первое фото — главное.</p><p id="photoMessage" class="form-message" role="status" aria-live="polite"></p><div id="photoPreview" class="photo-preview"></div></fieldset>
-        <button class="btn btn-primary full" type="submit">Опубликовать</button><p id="formMessage" class="form-message"></p></div></form></div></div>
+        <p id="formMessage" class="form-message" role="status" aria-live="polite"></p><button class="btn btn-primary full" type="submit">Опубликовать</button></div></form></div></div>
   <div class="modal map-modal hidden" id="marketplaceMapModal" role="dialog" aria-modal="true" aria-labelledby="marketplaceMapTitle">
     <div class="modal-card map-modal-card"><button class="modal-close" id="closeMarketplaceMap" type="button" aria-label="Закрыть">×</button>
       <h2 id="marketplaceMapTitle">Карта Hryvnia Hub</h2>

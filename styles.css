@@ -3301,8 +3301,17 @@ main{
 .property-search-menu .property-location-accordion{display:flex;flex-direction:column;gap:10px;min-width:0;}
 .property-search-menu .property-location-summary{
   display:flex;align-items:center;gap:12px;width:100%;min-height:54px;padding:10px 15px;
-  border:1px solid rgba(168,201,40,.55);border-radius:14px;background:rgba(0,28,20,.35);
-  color:#f7f9f5;text-align:left;font:inherit;font-size:15px;font-weight:700;cursor:pointer;
+  border:1px solid rgba(168,201,40,.7);border-radius:14px;background:#fff;
+  color:#20352b;text-align:left;font:inherit;font-size:15px;font-weight:700;cursor:pointer;
+  box-shadow:0 1px 2px rgba(0,0,0,.08);transition:border-color .16s ease,box-shadow .16s ease;
+}
+.property-search-menu .property-location-summary:hover,
+.property-search-menu .property-location-summary:focus-visible{
+  border-color:#A8C928;box-shadow:0 0 0 3px rgba(168,201,40,.18);outline:none;
+}
+.property-search-menu .property-location-summary:active{transform:translateY(1px);}
+.property-search-menu .property-location-summary #propertyLocationSummaryText.is-placeholder{
+  color:#78847d;font-weight:500;
 }
 .property-search-menu .property-location-summary #propertyLocationSummaryText{
   flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;

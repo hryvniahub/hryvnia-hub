@@ -3,6 +3,7 @@ const SUPABASE_URL = "https://bxwfnmndxbhrjvcpsffy.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_KTs3Xo5UIxZ0ArcZV-5oQA_V4wXZog9";
 const hasSupabaseConfig = !SUPABASE_URL.startsWith("YOUR_") && !SUPABASE_ANON_KEY.startsWith("YOUR_");
 const db = hasSupabaseConfig ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+window.db = db;
 
 let lang = localStorage.getItem("hryvniaHubLanguage") || "uk";
 
@@ -3472,7 +3473,9 @@ async function editListing(item, labels) {
       image_urls: urls,
       image_url: urls[0] || null,
       is_hot: form.elements.is_hot.checked,
-      is_urgent: Boolean(form.elements.is_urgent?.checked)
+      is_urgent: Boolean(form.elements.is_urgent?.checked),
+      latitude: item.latitude ?? null,
+      longitude: item.longitude ?? null
     };
 
     if (String(item.category || "") === "Недвижимость" && form.querySelector(".property-listing-fields")) {
@@ -3982,6 +3985,11 @@ async function loadListings() {
         within(item.property_details?.metro_distance_m, f.metroFrom, f.metroTo) &&
         within(item.property_details?.land_area_sotkas, f.landFrom, f.landTo)
       );
+      const point = window.hhSearchMapPoint;
+      const radiusKm = Number(f.radius || 0);
+      if (point && radiusKm > 0) {
+        rows = rows.filter(item => Number.isFinite(Number(item.latitude)) && Number.isFinite(Number(item.longitude)) && window.HHMap?.distanceKm(point.lat, point.lng, Number(item.latitude), Number(item.longitude)) <= radiusKm);
+      }
     }
     if (currentCategory === "Автомобили" && vehicleClientFilters) {
       const f = vehicleClientFilters;
@@ -4250,6 +4258,7 @@ function restorePropertySearchTab(tab) {
     advancedToggle.textContent = t(tab.advanced ? "Менше" : "Більше");
   }
   propertySearchClientFilters = tab.clientFilters ? { ...tab.clientFilters } : null;
+  if (propertySearchClientFilters?.mapPoint) window.hhSearchMapPoint = { ...propertySearchClientFilters.mapPoint };
   if (Array.isArray(tab.listings)) renderListings(tab.listings);
   else renderListings([]);
   renderPropertySearchTabs();
@@ -4567,9 +4576,7 @@ function preparePropertySearchMenu() {
     if (content) content.hidden = !expanded;
   }));
   document.getElementById("propertyUseMapPoint")?.addEventListener("click", () => {
-    const address = document.getElementById("propertySearchAddress");
-    address?.focus();
-    if (address && !address.value) address.placeholder = t("Введіть адресу або орієнтир");
+    window.HHMap?.openPicker("search");
   });
   document.getElementById("propertySearchApply")?.addEventListener("click", () => {
     const priceFrom = document.getElementById("propertyPriceFrom")?.value.trim() || "";
@@ -4595,6 +4602,7 @@ function preparePropertySearchMenu() {
       cityId: selectedCatalogCityId || "",
       address: document.getElementById("propertySearchAddress")?.value.trim() || "",
       radius: document.getElementById("propertySearchRadius")?.value || "",
+      mapPoint: window.hhSearchMapPoint || null,
       rooms: document.getElementById("propertyFilterRooms")?.value || "",
       floorFrom: numFilter("propertyFilterFloorFrom"), floorTo: numFilter("propertyFilterFloorTo"),
       floorsFrom: numFilter("propertyFilterFloorsFrom"), floorsTo: numFilter("propertyFilterFloorsTo"),
@@ -5545,7 +5553,9 @@ if (addForm) {
       description,
       is_hot: false,
       is_urgent: false,
-      user_id: currentUser?.id || null
+      user_id: currentUser?.id || null,
+      latitude: form.get("latitude") === "" ? null : Number(form.get("latitude")),
+      longitude: form.get("longitude") === "" ? null : Number(form.get("longitude"))
     };
     if (selectedCategory === "Недвижимость") {
       const propertyType = String(form.get("property_type") || "").trim();
@@ -6012,4 +6022,100 @@ initAuth();
   viewport?.addEventListener("scroll", updateVisibleViewport);
   window.addEventListener("resize", updateVisibleViewport);
   updateVisibleViewport();
+})();
+
+
+// Hryvnia Hub unified map: shared map picker + category markers + persisted viewport.
+(() => {
+  const modal = document.getElementById("marketplaceMapModal");
+  const canvas = document.getElementById("marketplaceMapCanvas");
+  if (!modal || !canvas) return;
+  const categoryColors = { "Автомобили": "#3478c7", "Недвижимость": "#2b9b69", "Готовый бизнес": "#d18a32", "Инвестиции": "#8b65bd" };
+  let map = null, markerLayer = null, selectedMarker = null, pickerMode = null, pendingPoint = null;
+  let pendingCallback = null;
+  const stateKey = "hh_marketplace_map_state_v1";
+  const esc = value => String(value ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+  const distanceKm = (lat1, lon1, lat2, lon2) => {
+    const rad = value => value * Math.PI / 180;
+    const dLat = rad(lat2-lat1), dLon = rad(lon2-lon1);
+    const a = Math.sin(dLat/2)**2 + Math.cos(rad(lat1))*Math.cos(rad(lat2))*Math.sin(dLon/2)**2;
+    return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  };
+  const selectedCategories = () => [...modal.querySelectorAll('[data-map-category]:checked')].map(el => el.dataset.mapCategory);
+  const ensureMap = () => {
+    if (map || !window.L) return;
+    let saved = null; try { saved = JSON.parse(localStorage.getItem(stateKey) || "null"); } catch (_) {}
+    map = L.map(canvas, { preferCanvas: true }).setView(saved?.center || [48.5, 31.2], saved?.zoom || 6);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors' }).addTo(map);
+    markerLayer = L.markerClusterGroup({ showCoverageOnHover: false, maxClusterRadius: 48 });
+    map.addLayer(markerLayer);
+    map.on("moveend", () => { try { localStorage.setItem(stateKey, JSON.stringify({ center: map.getCenter(), zoom: map.getZoom() })); } catch (_) {} });
+    map.on("click", event => {
+      if (pickerMode !== "listing" && pickerMode !== "search") return;
+      setPendingPoint(event.latlng.lat, event.latlng.lng);
+    });
+  };
+  const setPendingPoint = (lat, lng) => {
+    pendingPoint = { lat: Number(lat), lng: Number(lng) };
+    if (selectedMarker) selectedMarker.remove();
+    selectedMarker = L.marker([pendingPoint.lat, pendingPoint.lng]).addTo(map).bindPopup(`Точка: ${pendingPoint.lat.toFixed(6)}, ${pendingPoint.lng.toFixed(6)}`).openPopup();
+  };
+  const loadMarkers = async () => {
+    if (!window.db) return;
+    markerLayer.clearLayers();
+    const categories = selectedCategories();
+    if (!categories.length) return;
+    const { data, error } = await window.db.from("listings").select("id,category,title,price,currency,description,image_url,latitude,longitude").not("latitude", "is", null).not("longitude", "is", null).in("category", categories).limit(1500);
+    if (error) { console.error("Не удалось загрузить объявления на карту:", error); return; }
+    (data || []).forEach(item => {
+      const lat = Number(item.latitude), lng = Number(item.longitude);
+      if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) return;
+      const color = categoryColors[item.category] || "#477";
+      const icon = L.divIcon({ className: "hh-map-marker-wrap", html: `<span class="hh-map-marker" style="--marker-color:${color}"></span>`, iconSize: [22,22], iconAnchor: [11,11] });
+      const marker = L.marker([lat,lng], { icon });
+      const photo = item.image_url ? `<img class="hh-map-popup-photo" src="${esc(item.image_url)}" alt="">` : "";
+      marker.bindPopup(`<div class="hh-map-popup">${photo}<strong>${esc(item.title || item.category)}</strong><b>${Number(item.price || 0).toLocaleString("uk-UA")} ${esc(item.currency || "UAH")}</b><small>${esc(item.category)}</small><p>${esc(String(item.description || "").slice(0,130))}</p></div>`);
+      markerLayer.addLayer(marker);
+    });
+  };
+  const open = async (mode = "browse", callback = null) => {
+    pickerMode = mode === "listing" || mode === "search" ? mode : null;
+    pendingCallback = callback;
+    pendingPoint = null;
+    modal.classList.remove("hidden");
+    document.body.classList.add("modal-open");
+    const picker = Boolean(pickerMode);
+    document.getElementById("confirmMapPoint").hidden = !picker;
+    document.getElementById("mapUseCurrentLocation").hidden = !picker;
+    document.getElementById("marketplaceMapHint").textContent = picker ? "Нажмите на карту, чтобы поставить точку, затем подтвердите выбор." : "Выберите категории. Нажмите на маркер, чтобы увидеть объявление. Кластеры объединяют близкие объявления.";
+    ensureMap();
+    setTimeout(() => { map?.invalidateSize(); if (!pickerMode) loadMarkers(); }, 80);
+  };
+  const close = () => { modal.classList.add("hidden"); document.body.classList.remove("modal-open"); pickerMode = null; pendingCallback = null; };
+  document.getElementById("openMarketplaceMap")?.addEventListener("click", () => open("browse"));
+  document.getElementById("pickListingMapPoint")?.addEventListener("click", () => open("listing"));
+  document.getElementById("closeMarketplaceMap")?.addEventListener("click", close);
+  modal.addEventListener("click", event => { if (event.target === modal) close(); });
+  modal.querySelectorAll("[data-map-category]").forEach(el => el.addEventListener("change", () => { if (!pickerMode) loadMarkers(); }));
+  document.getElementById("confirmMapPoint")?.addEventListener("click", () => {
+    if (!pendingPoint) { alert("Сначала выберите точку на карте."); return; }
+    if (pickerMode === "listing") {
+      const lat = document.getElementById("listingLatitude"), lng = document.getElementById("listingLongitude"), status = document.getElementById("listingMapPointStatus");
+      if (lat) lat.value = pendingPoint.lat.toFixed(7);
+      if (lng) lng.value = pendingPoint.lng.toFixed(7);
+      if (status) status.textContent = `Точка выбрана: ${pendingPoint.lat.toFixed(5)}, ${pendingPoint.lng.toFixed(5)}`;
+    } else if (pickerMode === "search") {
+      window.hhSearchMapPoint = { lat: pendingPoint.lat, lng: pendingPoint.lng };
+      try { localStorage.setItem("hh_property_search_map_point", JSON.stringify(window.hhSearchMapPoint)); } catch (_) {}
+      const address = document.getElementById("propertySearchAddress");
+      if (address && !address.value) address.value = "Точка на карте";
+    }
+    pendingCallback?.(pendingPoint); close();
+  });
+  document.getElementById("mapUseCurrentLocation")?.addEventListener("click", () => {
+    if (!navigator.geolocation) { alert("Геолокация не поддерживается этим браузером."); return; }
+    navigator.geolocation.getCurrentPosition(pos => { ensureMap(); map.setView([pos.coords.latitude,pos.coords.longitude], 14); setPendingPoint(pos.coords.latitude,pos.coords.longitude); }, () => alert("Не удалось получить местоположение. Разрешите доступ к геолокации."), { enableHighAccuracy: true, timeout: 12000 });
+  });
+  try { window.hhSearchMapPoint = JSON.parse(localStorage.getItem("hh_property_search_map_point") || "null"); } catch (_) { window.hhSearchMapPoint = null; }
+  window.HHMap = { openPicker: mode => open(mode), distanceKm };
 })();

@@ -2457,6 +2457,7 @@ function selectCity(city) {
 
   closeCitySuggestions();
   if (formMessage) formMessage.textContent = "";
+  updatePropertyListingLocationSummary();
 }
 function updateCitySearchLanguage() {
   if (!citySearchInput) return;
@@ -2730,6 +2731,42 @@ if (citySuggestions) {
     if (!option) return;
     const city = availableCities.find(item => String(item.id) === option.dataset.cityId);
     if (city) selectCity(city);
+  });
+}
+// Property listing location: one compact summary, expandable geo/address fields.
+const propertyListingLocationAccordion = document.getElementById("propertyListingLocationAccordion");
+const propertyListingLocationToggle = document.getElementById("propertyListingLocationToggle");
+const propertyListingLocationFields = document.getElementById("propertyListingLocationFields");
+const propertyListingLocationSummaryText = document.getElementById("propertyListingLocationSummaryText");
+const propertyCityDistrictSelect = document.getElementById("propertyCityDistrictSelect");
+function updatePropertyListingLocationSummary() {
+  if (!propertyListingLocationSummaryText) return;
+  const city = availableCities.find(item => String(item.id) === String(citySelect?.value || ""));
+  const cityLabel = city ? cityName(city) : (citySearchInput?.value || "").trim();
+  const cityDistrict = propertyCityDistrictSelect?.selectedOptions?.[0]?.textContent?.trim();
+  const oblastRaion = propertyOblastRaionSelect?.selectedOptions?.[0]?.textContent?.trim();
+  const region = cityRegionSelect?.selectedOptions?.[0]?.textContent?.trim();
+  const parts = [cityLabel];
+  if (cityDistrict && propertyCityDistrictSelect.value) parts.push(cityDistrict);
+  else if (oblastRaion && propertyOblastRaionSelect?.value) parts.push(oblastRaion);
+  if (region && cityRegionSelect?.value && cityRegionSelect.value !== "__capital__") parts.push(region);
+  const summary = parts.filter(Boolean).join(", ");
+  propertyListingLocationSummaryText.textContent = summary || t("Оберіть місцезнаходження");
+  propertyListingLocationSummaryText.classList.toggle("is-placeholder", !summary);
+}
+if (propertyListingLocationToggle && propertyListingLocationFields) {
+  propertyListingLocationToggle.addEventListener("click", () => {
+    const expanded = propertyListingLocationToggle.getAttribute("aria-expanded") !== "true";
+    propertyListingLocationToggle.setAttribute("aria-expanded", String(expanded));
+    propertyListingLocationFields.hidden = !expanded;
+  });
+}
+if (addForm) {
+  addForm.addEventListener("change", event => {
+    if (event.target.matches("#cityRegionSelect,#propertyOblastRaionSelect,#propertyCityDistrictSelect,#citySelect")) updatePropertyListingLocationSummary();
+  });
+  addForm.addEventListener("input", event => {
+    if (event.target.matches("#citySearchInput")) updatePropertyListingLocationSummary();
   });
 }
 document.addEventListener("click", event => {
@@ -4729,9 +4766,9 @@ function openCategoryMenu(parentCategory = "") {
             <label class="property-search-field property-region-field"><select id="propertySearchOblastRaion" aria-label="${escapeHtml(t("Район области"))}"><option value="">${escapeHtml(t("Район области"))}</option></select><span class="property-field-chevron" aria-hidden="true">⌄</span></label>
             <label class="property-search-field property-city-field"><input id="propertySearchCity" type="text" autocomplete="off" placeholder="${escapeHtml(t("Город"))}" aria-label="${escapeHtml(t("Город"))}" aria-expanded="false" aria-controls="propertySearchCitySuggestions"><div id="propertySearchCitySuggestions" class="property-city-suggestions" role="listbox" hidden></div></label>
             <label class="property-search-field property-district-field"><select id="propertySearchDistrict" aria-label="${escapeHtml(t("Район города"))}"><option value="">${escapeHtml(t("Район города"))}</option></select><span class="property-field-chevron" aria-hidden="true">⌄</span></label>
-            <label class="property-search-field property-address-field"><input id="propertySearchAddress" type="text" placeholder="${escapeHtml(t("Улица, номер дома (необязательно)"))}" aria-label="${escapeHtml(t("Улица, номер дома (необязательно)"))}"><button type="button" id="propertyUseMapPoint" class="property-map-point" aria-label="${escapeHtml(t("Вказати точку на карті"))}" title="${escapeHtml(t("Вказати точку на карті"))}">⊙</button></label>
             </div>
             <div class="property-location-extra-grid">
+            <label class="property-search-field property-address-field"><input id="propertySearchAddress" type="text" placeholder="${escapeHtml(t("Адреса або точка на карті"))}" aria-label="${escapeHtml(t("Адреса або точка на карті"))}"><button type="button" id="propertyUseMapPoint" class="property-map-point" aria-label="${escapeHtml(t("Вказати точку на карті"))}" title="${escapeHtml(t("Вказати точку на карті"))}">⊙</button></label>
             <label class="property-search-field property-radius-field"><select id="propertySearchRadius" aria-label="${escapeHtml(t("Радіус, км"))}"><option value="">${escapeHtml(t("Радіус, км"))}</option><option value="5">5 км</option><option value="10">10 км</option><option value="20">20 км</option><option value="30">30 км</option><option value="50">50 км</option><option value="100">100 км</option></select><span class="property-field-chevron" aria-hidden="true">⌄</span></label>
             </div>
           </div>
@@ -5016,7 +5053,7 @@ function updatePropertyRadiusDisplay() {
   propertyRadiusSlider.setAttribute("aria-valuetext", `${value} ${unit}`);
   const max = Number(propertyRadiusSlider.max) || 50;
   const progress = max > 0 ? (value / max) * 100 : 0;
-  propertyRadiusSlider.style.setProperty("--radius-progress", `${progress}%`);
+  propertyRadiusSlider.style?.setProperty("--radius-progress", `${progress}%`);
 }
 
 if (propertyRadiusSlider) {
@@ -5184,7 +5221,16 @@ function syncPropertyListingFields() {
   const propertyDistrictField = document.getElementById("propertyDistrictField");
   if (propertyDistrictField) propertyDistrictField.hidden = !isProperty;
   if (propertyAddressField) propertyAddressField.hidden = !isProperty;
-  if (propertyRadiusField) propertyRadiusField.hidden = !isProperty;
+  if (propertyRadiusField) propertyRadiusField.hidden = true;
+  if (propertyListingLocationAccordion) {
+    propertyListingLocationAccordion.hidden = !isProperty;
+    if (!isProperty && propertyListingLocationFields) propertyListingLocationFields.hidden = false;
+    if (isProperty && propertyListingLocationFields) propertyListingLocationFields.hidden = propertyListingLocationToggle?.getAttribute("aria-expanded") !== "true";
+  }
+  if (!isProperty && propertyListingLocationSummaryText) propertyListingLocationSummaryText.classList.add("is-placeholder");
+  const mapPickButton = document.getElementById("pickListingMapPoint");
+  if (mapPickButton) mapPickButton.textContent = isProperty ? "⌖ Знайти на мапі" : "⌖ Указать точку на карте";
+  updatePropertyListingLocationSummary();
   if (!isProperty) setPropertyAdvancedFields(false);
 }
 

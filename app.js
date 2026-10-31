@@ -4347,22 +4347,25 @@ function preparePropertySearchMenu() {
   const locationSummary = document.getElementById("propertyLocationSummaryText");
   const updateLocationSummary = () => {
     if (!locationSummary) return;
-    const selectedText = select => select?.selectedOptions?.[0]?.textContent?.trim() || "";
-    const city = selectedCatalogCityId
-      ? cityName(availableCities.find(item => String(item.id) === String(selectedCatalogCityId)))
-      : (cityInput?.value.trim() || "");
+    // Empty selects must not contribute their placeholder (e.g. "Район міста") to the summary.
+    const selectedText = select => select?.value
+      ? (select.selectedOptions?.[0]?.textContent?.trim() || "")
+      : "";
+    const selectedCity = selectedCatalogCityId
+      ? availableCities.find(item => String(item.id) === String(selectedCatalogCityId))
+      : null;
+    const city = selectedCity ? cityName(selectedCity) : (cityInput?.value.trim() || "");
     const cityDistrict = selectedText(cityDistrictSelect);
     const oblastDistrict = selectedText(oblastRaionSelect);
     const region = selectedText(regionSelect);
-    const parts = cityDistrict && city
-      ? [cityDistrict, city]
-      : city && oblastDistrict
-        ? [city, oblastDistrict]
-        : city
-          ? [city, region]
-          : oblastDistrict
-            ? [oblastDistrict, region]
-            : region ? [region] : [];
+    // When a city is selected, show its selected city district first.
+    // An unselected city district means searching the whole city; an automatically
+    // matched oblast district must not replace the city/oblast in this summary.
+    const parts = city
+      ? (cityDistrict ? [cityDistrict, city, region] : [city, region])
+      : oblastDistrict
+        ? [oblastDistrict, region]
+        : region ? [region] : [];
     locationSummary.textContent = parts.filter(Boolean).join(", ") || t("Обрати місце розташування");
   };
   locationToggle?.addEventListener("click", () => {
@@ -4383,6 +4386,9 @@ function preparePropertySearchMenu() {
     if (!cityDistrictSelect) return;
     const rows = propertyCityDistricts.filter(row => city && (String(row.city_id || "") === String(city.id) || (!row.city_id && String(row.city_katottg_code || "") === String(city.official_code || ""))));
     cityDistrictSelect.innerHTML = `<option value="">${escapeHtml(t("Район города"))}</option>` + rows.map(row => `<option value="${escapeHtml(row.katottg_code)}">${escapeHtml(propertyGeoName(row))}</option>`).join("");
+    // Do not show a city-district filter when the catalog has no districts for this city.
+    const cityDistrictField = cityDistrictSelect.closest(".property-district-field");
+    if (cityDistrictField) cityDistrictField.hidden = rows.length === 0;
   };
   const renderSuggestions = () => {
     if (!citySuggestions) return;

@@ -4161,9 +4161,10 @@ function capturePropertySearchTab() {
     tab.selectedCityId = selectedCatalogCityId || "";
     // Keep the selected oblast from the applied search state as the source of
     // truth. The select can temporarily be empty while its options are rebuilt.
-    tab.regionCode = propertySearchClientFilters?.regionCode ||
-      document.getElementById("propertySearchRegion")?.value ||
-      activeRegionCode || tab.filters?.propertySearchRegion || "";
+    // The live controls are authoritative while the menu is open. Applied
+    // filters are only a fallback when the region select is temporarily empty.
+    tab.regionCode = document.getElementById("propertySearchRegion")?.value ||
+      activeRegionCode || propertySearchClientFilters?.regionCode || tab.filters?.propertySearchRegion || "";
     tab.type = document.getElementById("propertyTypeTrigger")?.dataset.value || "";
     tab.deal = propertySearchMenu?.dataset.realEstateDeal || "Все";
     tab.advanced = Boolean(document.getElementById("propertyMoreFields") && !document.getElementById("propertyMoreFields").hidden);
@@ -4433,17 +4434,38 @@ function preparePropertySearchMenu() {
     citySuggestions.hidden = false;
     cityInput.setAttribute("aria-expanded", "true");
   };
-  const initCities = async () => {
+  const initCities = async (restoreSavedGeo = false) => {
+    // Save the selected codes before rebuilding dependent <select> options.
+    // Assigning a value before its options exist silently turns it into an
+    // empty string, which was causing the oblast district to disappear.
+    const savedTab = restoreSavedGeo ? ensurePropertySearchTabs() : null;
+    const savedFilters = savedTab?.filters || {};
+    const savedClientFilters = savedTab?.clientFilters || propertySearchClientFilters || {};
+    const savedRegionCode = savedTab?.regionCode || savedFilters.propertySearchRegion || savedClientFilters.regionCode || activeRegionCode || "";
+    const savedOblastRaionCode = savedFilters.propertySearchOblastRaion || savedClientFilters.oblastRaionCode || "";
+    const savedCityDistrictCode = savedFilters.propertySearchDistrict || savedClientFilters.cityDistrictCode || "";
+    const savedCityId = savedTab?.selectedCityId || savedClientFilters.cityId || selectedCatalogCityId || "";
+
     if (!availableCities.length) { try { await loadCities(); } catch (error) { console.error("Не удалось загрузить города для поиска недвижимости:", error); } }
     try { await loadPropertyGeoCatalogs(); } catch (error) { console.error("Не удалось загрузить районы для поиска недвижимости:", error); }
+
+    // Rebuild the parent list first, then restore the selected parent and its
+    // dependent district lists in order.
+    activeRegionCode = savedRegionCode;
     renderRegions();
-    const selectedCity = availableCities.find(city => String(city.id) === String(selectedCatalogCityId));
-    renderSearchCityDistricts(selectedCity);
-    if (selectedCatalogCityId) {
-      const selected = availableCities.find(city => String(city.id) === selectedCatalogCityId);
-      if (selected) cityInput.value = cityName(selected);
-    }
+    if (regionSelect) regionSelect.value = savedRegionCode;
+    updatePropertyOblastRaions(savedRegionCode, oblastRaionSelect);
+    if (oblastRaionSelect) oblastRaionSelect.value = savedOblastRaionCode;
+
+    selectedCatalogCityId = savedCityId;
+    const selectedCity = availableCities.find(city => String(city.id) === String(savedCityId));
+    renderSearchCityDistricts(selectedCity || null);
+    if (cityInput) cityInput.value = selectedCity ? cityName(selectedCity) : (savedFilters.propertySearchCity || cityInput.value || "");
+    if (cityDistrictSelect) cityDistrictSelect.value = savedCityDistrictCode;
     updateLocationSummary();
+
+    // Keep the tab snapshot synchronized with the restored controls.
+    if (restoreSavedGeo && savedTab) capturePropertySearchTab();
   };
   cityInput.addEventListener("focus", async () => { await initCities(); renderSuggestions(); });
   cityInput.addEventListener("input", () => { selectedCatalogCityId = ""; renderSuggestions(); });
@@ -4716,7 +4738,7 @@ function openCategoryMenu(parentCategory = "") {
     restorePropertySearchTab(ensurePropertySearchTabs());
     // Restore may select an existing region/city; populate dependent district
     // lists only after those selections are back in the controls.
-    initializePropertySearchGeo?.();
+    initializePropertySearchGeo?.(true);
     propertySearchMenu.classList.remove("hidden");
     propertySearchBackdrop?.classList.remove("hidden");
     return;

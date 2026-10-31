@@ -2493,6 +2493,14 @@ function findOblastRaionForCity(city) {
   const cityCode = normalizeKatottgCode(city?.official_code);
   const regionCode = normalizeKatottgCode(city?.region_katottg_code);
   if (!cityCode) return null;
+  const cityRaionCode = normalizeKatottgCode(city?.raion_katottg_code);
+  if (cityRaionCode) {
+    return propertyOblastRaions.find(row =>
+      normalizeKatottgCode(row.katottg_code) === cityRaionCode &&
+      normalizeKatottgCode(row.region_katottg_code) === regionCode
+    ) || null;
+  }
+  // Compatibility fallback for legacy city records without a populated raion code.
   return propertyOblastRaions
     .filter(row => normalizeKatottgCode(row.region_katottg_code) === regionCode)
     .filter(row => {
@@ -2507,7 +2515,7 @@ function getPropertyGeoFilteredCities() {
   return citySearchIndex.filter(entry => {
     const city = entry.city;
     if (regionCode && normalizeKatottgCode(city.region_katottg_code) !== regionCode) return false;
-    if (raionCode && !normalizeKatottgCode(city.official_code).startsWith(raionCode)) return false;
+    if (raionCode && normalizeKatottgCode(city.raion_katottg_code) !== raionCode) return false;
     return true;
   });
 }
@@ -2562,7 +2570,7 @@ async function loadCities() {
   let from = 0;
   let cityError = null;
   while (true) {
-    const { data, error } = await db.from("cities").select("id, name_ru, name_uk, name_en, name_pl, official_code, settlement_category_code, region_katottg_code").order("id").range(from, from + pageSize - 1);
+    const { data, error } = await db.from("cities").select("id, name_ru, name_uk, name_en, name_pl, official_code, settlement_category_code, region_katottg_code, raion_katottg_code").order("id").range(from, from + pageSize - 1);
     if (error) { cityError = error; break; }
     allCities.push(...(data || []));
     if (!data || data.length < pageSize) break;
@@ -2651,7 +2659,7 @@ if (propertyOblastRaionSelect) {
     const selectedCity = availableCities.find(city => String(city.id) === String(citySelect?.value || ""));
     const cityMatchesRaion = selectedCity && (!selectedRaion ||
       (normalizeKatottgCode(selectedCity.region_katottg_code) === normalizeKatottgCode(selectedRaion.region_katottg_code) &&
-       normalizeKatottgCode(selectedCity.official_code).startsWith(normalizeKatottgCode(selectedRaion.katottg_code))));
+       normalizeKatottgCode(selectedCity.raion_katottg_code) === normalizeKatottgCode(selectedRaion.katottg_code)));
     if (!cityMatchesRaion) {
       if (citySelect) citySelect.value = "";
       if (citySearchInput) citySearchInput.value = "";
@@ -2812,7 +2820,7 @@ function restoreVehicleSearchTab(tab) {
     if (el && id !== "vehicleSearchModel") { if (el.type === "checkbox") el.checked = Boolean(tab.filters?.[id]); else el.value = tab.filters?.[id] ?? ""; }
   });
   selectedCatalogCityId = tab.selectedCityId || "";
-  activeRegionCode = tab.regionCode || "";
+  activeRegionCode = tab.regionCode || tab.clientFilters?.regionCode || tab.filters?.propertySearchRegion || "";
   const make = document.getElementById("vehicleSearchMake");
   const model = document.getElementById("vehicleSearchModel");
   if (make && model) {
@@ -3858,7 +3866,7 @@ async function loadListings() {
     ]);
     return;
   }
-  let query = db.from("listings").select("*, cities!inner(name_ru, name_uk, name_en, name_pl, region_katottg_code)").order("created_at", { ascending: false });
+  let query = db.from("listings").select("*, cities!inner(name_ru, name_uk, name_en, name_pl, region_katottg_code, raion_katottg_code)").order("created_at", { ascending: false });
   if (currentCategory) query = query.eq("category", currentCategory);
   if (selectedCatalogCityId) query = query.eq("city_id", selectedCatalogCityId);
   else if (activeRegionCode) query = query.eq("cities.region_katottg_code", activeRegionCode);
@@ -3950,9 +3958,9 @@ async function loadListings() {
         (!f.type || String(item.property_details?.type || item.property_type || "") === f.type) &&
         (f.deal === "Все" || String(item.property_details?.operation || item.property_operation || "") === f.deal) &&
         (!f.cityId || String(item.city_id || "") === String(f.cityId)) &&
-        (!f.regionCode || String(availableCities.find(city => String(city.id) === String(item.city_id || ""))?.region_katottg_code || "") === String(f.regionCode)) &&
+        (!f.regionCode || normalizeKatottgCode(item.cities?.region_katottg_code) === normalizeKatottgCode(f.regionCode)) &&
         (!f.cityDistrictCode || String(item.property_details?.district_code || "") === String(f.cityDistrictCode)) &&
-        (!f.oblastRaionCode || String(item.property_details?.oblast_raion_code || "") === String(f.oblastRaionCode)) &&
+        (!f.oblastRaionCode || normalizeKatottgCode(item.cities?.raion_katottg_code) === normalizeKatottgCode(f.oblastRaionCode)) &&
         (!f.district || String(item.property_details?.district || item.district || "").toLocaleLowerCase().includes(String(f.district).toLocaleLowerCase())) &&
         (!f.address || String(item.property_details?.address || item.property_address || "").toLocaleLowerCase().includes(String(f.address).toLocaleLowerCase())) &&
         within(item.price, f.priceFrom, f.priceTo) &&
@@ -4149,7 +4157,11 @@ function capturePropertySearchTab() {
       return [id, el ? (el.type === "checkbox" ? el.checked : el.value) : ""];
     }));
     tab.selectedCityId = selectedCatalogCityId || "";
-    tab.regionCode = document.getElementById("propertySearchRegion")?.value || activeRegionCode || "";
+    // Keep the selected oblast from the applied search state as the source of
+    // truth. The select can temporarily be empty while its options are rebuilt.
+    tab.regionCode = propertySearchClientFilters?.regionCode ||
+      document.getElementById("propertySearchRegion")?.value ||
+      activeRegionCode || tab.filters?.propertySearchRegion || "";
     tab.type = document.getElementById("propertyTypeTrigger")?.dataset.value || "";
     tab.deal = propertySearchMenu?.dataset.realEstateDeal || "Все";
     tab.advanced = Boolean(document.getElementById("propertyMoreFields") && !document.getElementById("propertyMoreFields").hidden);
@@ -4345,7 +4357,14 @@ function preparePropertySearchMenu() {
     if (!citySuggestions) return;
     const term = cityInput.value.trim();
     const variants = getQueryVariants(term);
-    const base = regionSelect?.value ? citySearchIndex.filter(entry => String(entry.city.region_katottg_code) === regionSelect.value) : citySearchIndex;
+    const selectedRegionCode = normalizeKatottgCode(regionSelect?.value);
+    const selectedRaionCode = normalizeKatottgCode(oblastRaionSelect?.value);
+    const base = citySearchIndex.filter(entry => {
+      const city = entry.city;
+      if (selectedRegionCode && normalizeKatottgCode(city.region_katottg_code) !== selectedRegionCode) return false;
+      if (selectedRaionCode && normalizeKatottgCode(city.raion_katottg_code) !== selectedRaionCode) return false;
+      return true;
+    });
     const ranked = term ? base.map(entry => ({entry, rank: rankCityEntry(entry, variants)})).filter(item => item.rank >= 0).sort((a,b) => a.rank-b.rank || cityName(a.entry.city).localeCompare(cityName(b.entry.city))).slice(0,10).map(item => item.entry) : [];
     citySuggestions.innerHTML = ranked.length ? ranked.map(entry => renderCitySuggestionButton(entry, "property-city-suggestion")).join("") : `<div class="city-suggestion-empty" role="status">${escapeHtml(cityTranslation(term ? "Город не найден" : "Введите название города"))}</div>`;
     citySuggestions.hidden = false;
@@ -4379,6 +4398,8 @@ function preparePropertySearchMenu() {
     renderRegions();
     if (regionSelect) regionSelect.value = activeRegionCode;
     updatePropertyOblastRaions(activeRegionCode, oblastRaionSelect);
+    const matchingRaion = findOblastRaionForCity(city);
+    if (oblastRaionSelect) oblastRaionSelect.value = matchingRaion ? String(matchingRaion.katottg_code) : "";
     renderSearchCityDistricts(city);
     if (citySuggestions) citySuggestions.hidden = true;
     cityInput.setAttribute("aria-expanded", "false");
@@ -4390,7 +4411,32 @@ function preparePropertySearchMenu() {
     if (city) selectCity(city);
   });
   regionSelect?.addEventListener("focus", initCities, {once:true});
-  regionSelect?.addEventListener("change", () => { activeRegionCode = regionSelect.value; selectedCatalogCityId = ""; cityInput.value = ""; updatePropertyOblastRaions(activeRegionCode, oblastRaionSelect); renderSearchCityDistricts(null); if (citySuggestions) citySuggestions.hidden = true; });
+  regionSelect?.addEventListener("change", () => {
+    activeRegionCode = regionSelect.value;
+    selectedCatalogCityId = "";
+    cityInput.value = "";
+    updatePropertyOblastRaions(activeRegionCode, oblastRaionSelect);
+    renderSearchCityDistricts(null);
+    if (citySuggestions) citySuggestions.hidden = true;
+    if (oblastRaionSelect) oblastRaionSelect.value = "";
+  });
+  oblastRaionSelect?.addEventListener("change", () => {
+    const selectedRaion = propertyOblastRaions.find(row =>
+      normalizeKatottgCode(row.katottg_code) === normalizeKatottgCode(oblastRaionSelect.value)
+    );
+    if (selectedRaion) {
+      const raionRegionCode = String(selectedRaion.region_katottg_code || "");
+      if (regionSelect && normalizeKatottgCode(regionSelect.value) !== normalizeKatottgCode(raionRegionCode)) {
+        regionSelect.value = raionRegionCode;
+        activeRegionCode = raionRegionCode;
+      }
+    }
+    selectedCatalogCityId = "";
+    cityInput.value = "";
+    renderSearchCityDistricts(null);
+    if (citySuggestions) citySuggestions.hidden = true;
+    cityInput.setAttribute("aria-expanded", "false");
+  });
   categoryMenuOptions?.querySelectorAll("[data-property-section]").forEach(button => button.addEventListener("click", () => {
     const section = button.dataset.propertySection;
     const content = section === "location" ? document.getElementById("propertyLocationFields") : section === "category" ? typeTrigger?.closest(".property-search-section")?.querySelector(".property-category-field") : button.closest(".property-search-section")?.querySelector(".real-estate-tabs");
@@ -4423,7 +4469,7 @@ function preparePropertySearchMenu() {
       district: cityDistrictSelect?.selectedOptions?.[0]?.textContent?.trim() || "",
       cityDistrictCode: cityDistrictSelect?.value || "",
       oblastRaionCode: oblastRaionSelect?.value || "",
-      regionCode: regionSelect?.value || "",
+      regionCode: regionSelect?.value || activeRegionCode || "",
       cityId: selectedCatalogCityId || "",
       address: document.getElementById("propertySearchAddress")?.value.trim() || "",
       radius: document.getElementById("propertySearchRadius")?.value || "",
@@ -4449,7 +4495,9 @@ function preparePropertySearchMenu() {
       },
       bathroom: document.getElementById("propertyFilterBathroom")?.value || ""
     };
-    if (searchInput) searchInput.value = "";
+    // Preserve the chosen oblast across the search execution and subsequent
+    // reopening of this saved-search tab.
+    activeRegionCode = propertySearchClientFilters.regionCode || activeRegionCode || "";
     const activeTab = ensurePropertySearchTabs();
     const selectedTypeLabel = document.querySelector("#propertyTypeOptions [data-property-type].is-selected")?.textContent.trim();
     activeTab.title = [selectedTypeLabel && selectedTypeLabel !== t("Оберіть категорію") ? selectedTypeLabel : "", t(activeTab.deal || "Все") !== t("Все") ? t(activeTab.deal || "Все") : ""].filter(Boolean).join(" · ");

@@ -4119,7 +4119,7 @@ let activePropertySearchTabId = "";
 let propertySearchTabSequence = 0;
 function newPropertySearchTab() {
   propertySearchTabSequence += 1;
-  return { id: `property-search-${Date.now()}-${propertySearchTabSequence}`, title: "", filters: {}, selectedCityId: "", regionCode: "", type: "", deal: "Все", advanced: false, listings: null, clientFilters: null, scrollY: 0 };
+  return { id: `property-search-${Date.now()}-${propertySearchTabSequence}`, title: "", filters: {}, selectedCityId: "", regionCode: "", geo: { regionCode: "", oblastRaionCode: "", cityId: "", cityDistrictCode: "" }, type: "", deal: "Все", advanced: false, listings: null, clientFilters: null, scrollY: 0 };
 }
 function ensurePropertySearchTabs() {
   if (!propertySearchTabs.length) {
@@ -4154,21 +4154,36 @@ function ensurePropertySearchTabsHost() {
 function capturePropertySearchTab() {
   const tab = ensurePropertySearchTabs();
   if (document.getElementById("propertySearchCity")) {
+    // Keep the previous snapshot before reading controls: dependent <select>
+    // elements can briefly have no options while the geo catalog is rebuilt.
+    const previousFilters = tab.filters || {};
+    const previousGeo = tab.geo || {};
+    const applied = propertySearchClientFilters || tab.clientFilters || {};
     tab.filters = Object.fromEntries(PROPERTY_SEARCH_FILTER_IDS.map(id => {
       const el = document.getElementById(id);
-      return [id, el ? (el.type === "checkbox" ? el.checked : el.value) : ""];
+      return [id, el ? (el.type === "checkbox" ? el.checked : el.value) : (previousFilters[id] ?? "")];
     }));
-    tab.selectedCityId = selectedCatalogCityId || "";
-    // Keep the selected oblast from the applied search state as the source of
-    // truth. The select can temporarily be empty while its options are rebuilt.
-    // The live controls are authoritative while the menu is open. Applied
-    // filters are only a fallback when the region select is temporarily empty.
-    tab.regionCode = document.getElementById("propertySearchRegion")?.value ||
-      activeRegionCode || propertySearchClientFilters?.regionCode || tab.filters?.propertySearchRegion || "";
-    tab.type = document.getElementById("propertyTypeTrigger")?.dataset.value || "";
-    tab.deal = propertySearchMenu?.dataset.realEstateDeal || "Все";
+    // When the menu is open, its controls are authoritative. Use the applied
+    // snapshot only if a control is genuinely absent, never to undo a user's
+    // deliberate clearing of a field.
+    const regionControl = document.getElementById("propertySearchRegion");
+    const oblastRaionControl = document.getElementById("propertySearchOblastRaion");
+    const cityDistrictControl = document.getElementById("propertySearchDistrict");
+    const cityInputControl = document.getElementById("propertySearchCity");
+    const regionCode = regionControl ? (regionControl.value || activeRegionCode || "") : (applied.regionCode || previousGeo.regionCode || tab.regionCode || "");
+    const oblastRaionCode = oblastRaionControl ? oblastRaionControl.value : (applied.oblastRaionCode || previousGeo.oblastRaionCode || "");
+    const cityDistrictCode = cityDistrictControl ? cityDistrictControl.value : (applied.cityDistrictCode || previousGeo.cityDistrictCode || "");
+    const previousCityId = previousGeo.cityId || tab.selectedCityId || applied.cityId || "";
+    const previousCity = availableCities.find(city => String(city.id) === String(previousCityId));
+    const cityTextMatchesPrevious = previousCity && cityInputControl && cityName(previousCity).trim() === cityInputControl.value.trim();
+    const cityId = selectedCatalogCityId || (cityTextMatchesPrevious ? previousCityId : (cityInputControl ? "" : (applied.cityId || previousGeo.cityId || tab.selectedCityId || "")));
+    tab.geo = { regionCode, oblastRaionCode, cityId, cityDistrictCode };
+    tab.selectedCityId = cityId;
+    tab.regionCode = regionCode;
+    tab.type = document.getElementById("propertyTypeTrigger")?.dataset.value || tab.type || "";
+    tab.deal = propertySearchMenu?.dataset.realEstateDeal || tab.deal || "Все";
     tab.advanced = Boolean(document.getElementById("propertyMoreFields") && !document.getElementById("propertyMoreFields").hidden);
-    tab.clientFilters = propertySearchClientFilters ? { ...propertySearchClientFilters } : null;
+    tab.clientFilters = propertySearchClientFilters ? { ...propertySearchClientFilters } : (tab.clientFilters ? { ...tab.clientFilters } : null);
     tab.scrollY = window.scrollY;
   }
   if (Array.isArray(visibleListings)) tab.listings = visibleListings.slice();
@@ -4196,10 +4211,15 @@ function restorePropertySearchTab(tab) {
     const el = document.getElementById(id);
     if (el) { if (el.type === "checkbox") el.checked = Boolean(tab.filters?.[id]); else el.value = tab.filters?.[id] ?? ""; }
   });
-  selectedCatalogCityId = tab.selectedCityId || "";
-  activeRegionCode = tab.regionCode || "";
+  const savedGeo = tab.geo || {};
+  selectedCatalogCityId = savedGeo.cityId || tab.selectedCityId || tab.clientFilters?.cityId || "";
+  activeRegionCode = savedGeo.regionCode || tab.regionCode || tab.clientFilters?.regionCode || "";
   const region = document.getElementById("propertySearchRegion");
-  if (region && tab.regionCode) region.value = tab.regionCode;
+  if (region && activeRegionCode) region.value = activeRegionCode;
+  const oblastRaion = document.getElementById("propertySearchOblastRaion");
+  if (oblastRaion) oblastRaion.value = savedGeo.oblastRaionCode || tab.filters?.propertySearchOblastRaion || tab.clientFilters?.oblastRaionCode || "";
+  const cityDistrict = document.getElementById("propertySearchDistrict");
+  if (cityDistrict) cityDistrict.value = savedGeo.cityDistrictCode || tab.filters?.propertySearchDistrict || tab.clientFilters?.cityDistrictCode || "";
   const cityInput = document.getElementById("propertySearchCity");
   const city = availableCities.find(item => String(item.id) === String(selectedCatalogCityId));
   if (cityInput) cityInput.value = city ? cityName(city) : (tab.filters?.propertySearchCity || "");
@@ -4374,13 +4394,13 @@ function preparePropertySearchMenu() {
         ? !isCity
         : cityDistrictRows.length === 0;
       if (cityDistrict) {
-        // City district first, then city: "Соборний район, Дніпро".
-        parts = [cityDistrict, city];
+        // Preserve the full hierarchy in the collapsed summary.
+        parts = [cityDistrict, city, region];
       } else if (selectedCity && isSmallSettlement) {
-        // Small settlement first, then its oblast district: "Малотаранівка, Краматорський район".
-        parts = [city, oblastDistrict];
+        // Settlement, raion and oblast must all remain visible in the summary.
+        parts = [city, oblastDistrict, region];
       } else {
-        // City without a selected city district: "Дніпро, Дніпропетровська область".
+        // City without a selected city district.
         parts = [city, region];
       }
     } else if (oblastDistrict) {
@@ -4441,10 +4461,14 @@ function preparePropertySearchMenu() {
     const savedTab = restoreSavedGeo ? ensurePropertySearchTabs() : null;
     const savedFilters = savedTab?.filters || {};
     const savedClientFilters = savedTab?.clientFilters || propertySearchClientFilters || {};
-    const savedRegionCode = savedTab?.regionCode || savedFilters.propertySearchRegion || savedClientFilters.regionCode || activeRegionCode || "";
-    const savedOblastRaionCode = savedFilters.propertySearchOblastRaion || savedClientFilters.oblastRaionCode || "";
-    const savedCityDistrictCode = savedFilters.propertySearchDistrict || savedClientFilters.cityDistrictCode || "";
-    const savedCityId = savedTab?.selectedCityId || savedClientFilters.cityId || selectedCatalogCityId || "";
+    const savedGeo = savedTab?.geo || null;
+    // An explicit empty value in geo is meaningful (the user cleared that
+    // filter). Do not fall through to an older applied clientFilters snapshot.
+    const hasGeoSnapshot = Boolean(savedGeo && typeof savedGeo === "object");
+    const savedRegionCode = hasGeoSnapshot ? (savedGeo.regionCode ?? "") : (savedTab?.regionCode || savedFilters.propertySearchRegion || savedClientFilters.regionCode || activeRegionCode || "");
+    const savedOblastRaionCode = hasGeoSnapshot ? (savedGeo.oblastRaionCode ?? "") : (savedFilters.propertySearchOblastRaion || savedClientFilters.oblastRaionCode || "");
+    const savedCityDistrictCode = hasGeoSnapshot ? (savedGeo.cityDistrictCode ?? "") : (savedFilters.propertySearchDistrict || savedClientFilters.cityDistrictCode || "");
+    const savedCityId = hasGeoSnapshot ? (savedGeo.cityId ?? "") : (savedTab?.selectedCityId || savedClientFilters.cityId || selectedCatalogCityId || "");
 
     if (!availableCities.length) { try { await loadCities(); } catch (error) { console.error("Не удалось загрузить города для поиска недвижимости:", error); } }
     try { await loadPropertyGeoCatalogs(); } catch (error) { console.error("Не удалось загрузить районы для поиска недвижимости:", error); }
@@ -4464,8 +4488,16 @@ function preparePropertySearchMenu() {
     if (cityDistrictSelect) cityDistrictSelect.value = savedCityDistrictCode;
     updateLocationSummary();
 
-    // Keep the tab snapshot synchronized with the restored controls.
-    if (restoreSavedGeo && savedTab) capturePropertySearchTab();
+    // Persist only after all dependent options exist and their selected values
+    // have been restored. This prevents an empty, not-yet-populated select from
+    // replacing a saved district code.
+    if (restoreSavedGeo && savedTab) {
+      savedTab.geo = { regionCode: savedRegionCode, oblastRaionCode: savedOblastRaionCode, cityId: savedCityId, cityDistrictCode: savedCityDistrictCode };
+      savedTab.selectedCityId = savedCityId;
+      savedTab.regionCode = savedRegionCode;
+      savedTab.filters = { ...(savedTab.filters || {}), propertySearchRegion: savedRegionCode, propertySearchOblastRaion: savedOblastRaionCode, propertySearchDistrict: savedCityDistrictCode };
+      updateLocationSummary();
+    }
   };
   cityInput.addEventListener("focus", async () => { await initCities(); renderSuggestions(); });
   cityInput.addEventListener("input", () => { selectedCatalogCityId = ""; renderSuggestions(); });
@@ -4588,6 +4620,14 @@ function preparePropertySearchMenu() {
     // reopening of this saved-search tab.
     activeRegionCode = propertySearchClientFilters.regionCode || activeRegionCode || "";
     const activeTab = ensurePropertySearchTabs();
+    activeTab.geo = {
+      regionCode: propertySearchClientFilters.regionCode || "",
+      oblastRaionCode: propertySearchClientFilters.oblastRaionCode || "",
+      cityId: propertySearchClientFilters.cityId || "",
+      cityDistrictCode: propertySearchClientFilters.cityDistrictCode || ""
+    };
+    activeTab.selectedCityId = propertySearchClientFilters.cityId || "";
+    activeTab.regionCode = propertySearchClientFilters.regionCode || "";
     const selectedTypeLabel = document.querySelector("#propertyTypeOptions [data-property-type].is-selected")?.textContent.trim();
     activeTab.title = [selectedTypeLabel && selectedTypeLabel !== t("Оберіть категорію") ? selectedTypeLabel : "", t(activeTab.deal || "Все") !== t("Все") ? t(activeTab.deal || "Все") : ""].filter(Boolean).join(" · ");
     activeTab.clientFilters = { ...propertySearchClientFilters };
@@ -4608,6 +4648,11 @@ function preparePropertySearchMenu() {
   document.getElementById("propertySearchReset")?.addEventListener("click", () => {
     ["propertySearchCity", "propertySearchRegion", "propertySearchOblastRaion", "propertySearchDistrict", "propertySearchAddress", "propertySearchRadius", "propertyPriceFrom", "propertyPriceTo", "propertyAreaFrom", "propertyAreaTo", "propertyFilterRooms", "propertyFilterBuilding", "propertyFilterFloorFrom", "propertyFilterFloorTo", "propertyFilterFloorsFrom", "propertyFilterFloorsTo", "propertyFilterKitchenFrom", "propertyFilterKitchenTo", "propertyFilterCondition", "propertyFilterFurniture", "propertyFilterBalcony", "propertyFilterLoggia", "propertyFilterMetroFrom", "propertyFilterMetroTo", "propertyFilterLandFrom", "propertyFilterLandTo", "propertyFilterAmenityRefrigerator", "propertyFilterAmenityWashingMachine", "propertyFilterAmenityStove", "propertyFilterAmenityDishwasher", "propertyFilterAmenityAirConditioning", "propertyFilterAmenityInternet", "propertyFilterAmenityParking", "propertyFilterBathroom"].forEach(id => { const field = document.getElementById(id); if (field) { if (field.type === "checkbox") field.checked = false; else field.value = ""; } });
     selectedCatalogCityId = ""; activeRegionCode = ""; propertySearchClientFilters = null;
+    const resetTab = ensurePropertySearchTabs();
+    resetTab.geo = { regionCode: "", oblastRaionCode: "", cityId: "", cityDistrictCode: "" };
+    resetTab.selectedCityId = "";
+    resetTab.regionCode = "";
+    resetTab.clientFilters = null;
     if (citySuggestions) citySuggestions.hidden = true;
     cityInput?.setAttribute("aria-expanded", "false");
     if (typeTrigger) { typeTrigger.dataset.value = ""; const label = typeTrigger.querySelector(".property-type-label"); if (label) label.textContent = t("Оберіть категорію"); }
@@ -4619,6 +4664,10 @@ function preparePropertySearchMenu() {
     if (advancedToggle) { advancedToggle.setAttribute("aria-expanded", "false"); advancedToggle.textContent = t("Більше"); }
     renderRegions();
     if (regionSelect) regionSelect.value = "";
+    updatePropertyOblastRaions("", oblastRaionSelect);
+    if (oblastRaionSelect) oblastRaionSelect.value = "";
+    renderSearchCityDistricts(null);
+    updateLocationSummary();
     capturePropertySearchTab();
     renderPropertySearchTabs();
   });

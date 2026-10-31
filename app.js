@@ -135,7 +135,6 @@ const translations = {
   "Найти": { ru: "Найти", uk: "Знайти", en: "Search", pl: "Szukaj" },
   "Все": { ru: "Все", uk: "Усі", en: "All", pl: "Wszystkie" },
   "Все объявления": { ru: "Все объявления", uk: "Усі оголошення", en: "All listings", pl: "Wszystkie ogłoszenia" },
-  "Карта объявлений": { ru: "Карта объявлений", uk: "Карта оголошень", en: "Listings Map", pl: "Mapa ogłoszeń" },
   "Бизнес и предпринимательство": { ru: "Бизнес и предпринимательство", uk: "Бізнес і підприємництво", en: "Business & entrepreneurship", pl: "Biznes i przedsiębiorczość" },
   "Куплю автомобиль": { ru: "Куплю автомобиль", uk: "Куплю автомобіль", en: "Buy a car", pl: "Kupię samochód" },
   "Арендую автомобиль": { ru: "Арендую автомобиль", uk: "Орендую автомобіль", en: "Rent a car", pl: "Wynajmę samochód" },
@@ -4730,9 +4729,9 @@ function openCategoryMenu(parentCategory = "") {
             <label class="property-search-field property-region-field"><select id="propertySearchOblastRaion" aria-label="${escapeHtml(t("Район области"))}"><option value="">${escapeHtml(t("Район области"))}</option></select><span class="property-field-chevron" aria-hidden="true">⌄</span></label>
             <label class="property-search-field property-city-field"><input id="propertySearchCity" type="text" autocomplete="off" placeholder="${escapeHtml(t("Город"))}" aria-label="${escapeHtml(t("Город"))}" aria-expanded="false" aria-controls="propertySearchCitySuggestions"><div id="propertySearchCitySuggestions" class="property-city-suggestions" role="listbox" hidden></div></label>
             <label class="property-search-field property-district-field"><select id="propertySearchDistrict" aria-label="${escapeHtml(t("Район города"))}"><option value="">${escapeHtml(t("Район города"))}</option></select><span class="property-field-chevron" aria-hidden="true">⌄</span></label>
+            <label class="property-search-field property-address-field"><input id="propertySearchAddress" type="text" placeholder="${escapeHtml(t("Улица, номер дома (необязательно)"))}" aria-label="${escapeHtml(t("Улица, номер дома (необязательно)"))}"><button type="button" id="propertyUseMapPoint" class="property-map-point" aria-label="${escapeHtml(t("Вказати точку на карті"))}" title="${escapeHtml(t("Вказати точку на карті"))}">⊙</button></label>
             </div>
             <div class="property-location-extra-grid">
-            <label class="property-search-field property-address-field"><input id="propertySearchAddress" type="text" placeholder="${escapeHtml(t("Адреса або точка на карті"))}" aria-label="${escapeHtml(t("Адреса або точка на карті"))}"><button type="button" id="propertyUseMapPoint" class="property-map-point" aria-label="${escapeHtml(t("Вказати точку на карті"))}" title="${escapeHtml(t("Вказати точку на карті"))}">⊙</button></label>
             <label class="property-search-field property-radius-field"><select id="propertySearchRadius" aria-label="${escapeHtml(t("Радіус, км"))}"><option value="">${escapeHtml(t("Радіус, км"))}</option><option value="5">5 км</option><option value="10">10 км</option><option value="20">20 км</option><option value="30">30 км</option><option value="50">50 км</option><option value="100">100 км</option></select><span class="property-field-chevron" aria-hidden="true">⌄</span></label>
             </div>
           </div>

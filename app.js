@@ -135,6 +135,7 @@ const translations = {
   "Найти": { ru: "Найти", uk: "Знайти", en: "Search", pl: "Szukaj" },
   "Все": { ru: "Все", uk: "Усі", en: "All", pl: "Wszystkie" },
   "Все объявления": { ru: "Все объявления", uk: "Усі оголошення", en: "All listings", pl: "Wszystkie ogłoszenia" },
+  "Карта объявлений": { ru: "Карта объявлений", uk: "Карта оголошень", en: "Listings Map", pl: "Mapa ogłoszeń" },
   "Бизнес и предпринимательство": { ru: "Бизнес и предпринимательство", uk: "Бізнес і підприємництво", en: "Business & entrepreneurship", pl: "Biznes i przedsiębiorczość" },
   "Куплю автомобиль": { ru: "Куплю автомобиль", uk: "Куплю автомобіль", en: "Buy a car", pl: "Kupię samochód" },
   "Арендую автомобиль": { ru: "Арендую автомобиль", uk: "Орендую автомобіль", en: "Rent a car", pl: "Wynajmę samochód" },

@@ -611,6 +611,8 @@ const vehicleSearchCitySuggestions = document.getElementById("vehicleSearchCityS
 const vehicleSearchRegionSelect = document.getElementById("vehicleSearchRegion");
 const cityRegionSelect = document.getElementById("cityRegionSelect");
 const citySearchInput = document.getElementById("citySearchInput");
+// City selection is validated by city_id in the submit handler. Do not use native required validation here: this input can be inside a collapsed location panel.
+citySearchInput?.removeAttribute("required");
 const citySuggestions = document.getElementById("citySuggestions");
 const citySelect = document.getElementById("citySelect");
 let availableCities = [];
@@ -1119,6 +1121,13 @@ async function initAuth() {
         if (vehicleMarketAuthPrompt) vehicleMarketAuthPrompt.hidden = true;
         closeAuthModal();
         setVehicleAdvancedFields(true);
+      }
+      const propertyMarketPanelAfterLogin = document.getElementById("propertyMarketPanel");
+      if (propertyMarketPanelAfterLogin && !propertyMarketPanelAfterLogin.hidden && listingCategorySelect?.value === "Недвижимость") {
+        const propertyMarketAuthPrompt = propertyMarketPanelAfterLogin.querySelector(".vehicle-market-auth");
+        if (propertyMarketAuthPrompt) propertyMarketAuthPrompt.hidden = true;
+        closeAuthModal();
+        setPropertyAdvancedFields(true);
       }
       if (pendingListingPublish && addForm) {
         pendingListingPublish = false;
@@ -3103,12 +3112,6 @@ function openListing(item, galleryOnly = false) {
 
   showPhoto(0);
   dialog.showModal();
-  dialog.addEventListener('click', event => {
-    const more = event.target.closest('.property-listing-more');
-    if (!more) return;
-    const advanced = dialog.querySelector('.property-advanced-fields');
-    if (advanced) { advanced.hidden = !advanced.hidden; more.setAttribute('aria-expanded', String(!advanced.hidden)); }
-  });
   document.body.style.overflow = "hidden";
 }
 
@@ -5184,6 +5187,16 @@ function setPropertyAdvancedFields(expanded) {
   if (propertyAdvancedFields) propertyAdvancedFields.hidden = !expanded;
   const propertyMarketPanel = document.getElementById("propertyMarketPanel");
   if (propertyMarketPanel) propertyMarketPanel.hidden = !expanded;
+
+  // Match the vehicle form: opening advanced details advances the progress indicator.
+  const steps = addModal?.querySelectorAll(".listing-progress-step") || [];
+  steps.forEach((step, index) => {
+    step.classList.toggle("is-active", expanded ? index === 1 : index === 0);
+    step.classList.toggle("is-complete", expanded && index === 0);
+  });
+  const lines = addModal?.querySelectorAll(".listing-progress > i") || [];
+  lines.forEach((line, index) => line.classList.toggle("is-complete", expanded && index === 0));
+
   // Keep the price estimate visible, but do not prompt an authenticated user to sign in/register.
   const propertyMarketAuthPrompt = propertyMarketPanel?.querySelector(".vehicle-market-auth");
   if (propertyMarketAuthPrompt) propertyMarketAuthPrompt.hidden = Boolean(currentUser);
@@ -5419,7 +5432,9 @@ function openPropertyListingForm(propertyType = "", operation = "") {
   syncVehicleListingFields();
   // Keep the property form independent from the vehicle form visibility state.
   if (listingAdvancedCommonFields) listingAdvancedCommonFields.hidden = false;
-  loadPropertyGeoCatalogs().then(() => {
+  // Preload both catalogs when the property form opens. This prevents a valid
+  // city_id from being rejected simply because availableCities is still empty.
+  Promise.all([ensureCitiesLoaded(), loadPropertyGeoCatalogs()]).then(() => {
     updatePropertyOblastRaions(formRegionCode);
     const selected = availableCities.find(city => String(city.id) === String(citySelect?.value || ""));
     updatePropertyCityDistricts(selected || null);
@@ -5579,10 +5594,22 @@ if (addForm) {
     if (formMessage) formMessage.textContent = "";
     if (!db) { if (formMessage) formMessage.textContent = "Сначала подключим Supabase — сейчас работает демо-режим."; return; }
     const form = new FormData(e.target);
-    const cityId = form.get("city_id");
+    // Ensure the city catalog is ready before checking the selected hidden city_id.
+    try {
+      await ensureCitiesLoaded();
+    } catch (error) {
+      console.error("Не удалось загрузить города перед публикацией:", error);
+    }
+    const cityId = String(form.get("city_id") || "");
     if (!cityId || !availableCities.some(city => String(city.id) === cityId)) {
       if (formMessage) formMessage.textContent = cityTranslation("Выберите город из списка");
+      // Reveal the collapsed property-location panel before focusing the city input.
+      if (listingCategorySelect?.value === "Недвижимость" && propertyListingLocationFields?.hidden) {
+        propertyListingLocationToggle?.setAttribute("aria-expanded", "true");
+        propertyListingLocationFields.hidden = false;
+      }
       citySearchInput?.focus();
+      formMessage?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
     const selectedCategory = String(form.get("category") || "");

@@ -6,7 +6,10 @@
   <meta name="google" content="notranslate">
   <title>Hryvnia Hub — объявления Украины</title>
   <meta name="description" content="Hryvnia Hub — хаб объявлений: автомобили, недвижимость и бизнес.">
-  <link rel="stylesheet" href="styles.css?v=20261030-property-card-v10">
+  <link rel="stylesheet" href="styles.css?v=20261031-map-v1">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
 </head>
 <body>
   <header class="header">
@@ -69,6 +72,9 @@
         </span>
       </button>
     </div>
+  </section>
+  <section class="container map-entry-row">
+    <button type="button" class="btn map-open-button" id="openMarketplaceMap">⌖ <span data-i18n="Карта объявлений">Карта объявлений</span></button>
   </section>
 
   <main>
@@ -434,6 +440,9 @@
           <label id="propertyOblastRaionField" class="property-location-field" hidden><span data-i18n="Район области">Район области</span><select id="propertyOblastRaionSelect" name="property_oblast_raion"><option value="">Оберіть район області</option></select></label>
           <label class="property-location-field"><span data-i18n="Город">Город</span><div class="city-search"><input id="citySearchInput" type="search" required autocomplete="off" placeholder="Введите название города" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="citySuggestions"><div id="citySuggestions" class="city-suggestions" role="listbox" hidden></div><input type="hidden" name="city_id" id="citySelect"></div></label>
         </div>
+        <input type="hidden" name="latitude" id="listingLatitude">
+        <input type="hidden" name="longitude" id="listingLongitude">
+        <div class="listing-map-location"><button type="button" class="btn map-pick-button" id="pickListingMapPoint">⌖ Указать точку на карте</button><span id="listingMapPointStatus" class="muted" aria-live="polite">Точка на карте не выбрана</span></div>
         <label id="propertyDistrictField" class="property-location-field" hidden><span data-i18n="Район города">Район города</span><select name="property_district" id="propertyCityDistrictSelect"><option value="">Оберіть район міста</option></select></label>
         <label id="propertyAddressField" class="property-location-field" hidden><span data-i18n="Адреса">Адреса</span><input name="property_address" type="text" autocomplete="street-address" placeholder="Вулиця, будинок"></label>
         <label id="propertyRadiusField" class="property-location-field property-radius-field" hidden>
@@ -524,6 +533,15 @@
         <label>Описание<textarea name="description" rows="4" placeholder="Коротко опишите предложение"></textarea></label>
         <fieldset id="photoFields" class="photo-fields"><legend id="photoLabel">Фотографии</legend><button id="photoPickerButton" class="btn" type="button">Добавить фотографии</button><input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple hidden aria-labelledby="photoLabel" aria-describedby="photoHint photoMessage"><p id="photoHint" class="muted">До 10 фото: JPEG, PNG или WebP, до 10 МБ каждое. Первое фото — главное.</p><p id="photoMessage" class="form-message" role="status" aria-live="polite"></p><div id="photoPreview" class="photo-preview"></div></fieldset>
         <button class="btn btn-primary full" type="submit">Опубликовать</button><p id="formMessage" class="form-message"></p></div></form></div></div>
+  <div class="modal map-modal hidden" id="marketplaceMapModal" role="dialog" aria-modal="true" aria-labelledby="marketplaceMapTitle">
+    <div class="modal-card map-modal-card"><button class="modal-close" id="closeMarketplaceMap" type="button" aria-label="Закрыть">×</button>
+      <h2 id="marketplaceMapTitle">Карта Hryvnia Hub</h2>
+      <div class="map-toolbar"><label><input type="checkbox" data-map-category="Автомобили" checked> Автомобили</label><label><input type="checkbox" data-map-category="Недвижимость" checked> Недвижимость</label><label><input type="checkbox" data-map-category="Готовый бизнес" checked> Бизнес</label><label><input type="checkbox" data-map-category="Инвестиции" checked> Инвестиции</label></div>
+      <p class="map-hint" id="marketplaceMapHint">Нажмите на карту, чтобы выбрать точку. В режиме просмотра нажмите на маркер объявления.</p>
+      <div id="marketplaceMapCanvas" class="marketplace-map-canvas" aria-label="Карта объявлений"></div>
+      <div class="map-modal-actions"><button type="button" class="btn" id="mapUseCurrentLocation">Моё местоположение</button><button type="button" class="btn btn-primary" id="confirmMapPoint">Использовать эту точку</button></div>
+    </div>
+  </div>
   <div class="modal hidden" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authTitle"><div class="modal-card auth-card"><button class="modal-close" id="authClose" type="button" aria-label="Закрыть">×</button><p class="eyebrow" id="authEyebrow">Аккаунт</p><h2 id="authTitle">Настройки аккаунта</h2>
     <section id="authGuest"><div class="auth-tabs" role="tablist" aria-label="Авторизация"><button class="auth-tab active" type="button" data-auth-tab="login" role="tab" aria-selected="true">Вход</button><button class="auth-tab" type="button" data-auth-tab="register" role="tab" aria-selected="false">Регистрация</button></div>
       <form id="authLoginForm" class="auth-form"><label><span>Электронная почта</span><input type="email" name="email" autocomplete="email" required></label><label><span>Пароль</span>
@@ -559,6 +577,9 @@
   </div></div>
   <div class="modal hidden" id="favoritesModal" role="dialog" aria-modal="true" aria-labelledby="favoritesTitle"><div class="modal-card"><button class="modal-close" id="closeFavorites" type="button" aria-label="Закрыть">×</button><h2 id="favoritesTitle" data-i18n="Избранное">Избранное</h2><div id="favoritesList" class="favorites-list"></div></div></div>
   <div class="modal hidden" id="messagesModal" role="dialog" aria-modal="true" aria-labelledby="messagesTitle"><div class="modal-card messages-card"><button class="modal-close" id="closeMessages" type="button" aria-label="Закрыть">×</button><h2 id="messagesTitle" data-i18n="Сообщения">Сообщения</h2><div id="messagesContent"><p class="muted" id="messagesGuestHint">Войдите, чтобы видеть сообщения.</p><div id="conversationsList" class="conversations-list hidden"></div><div id="messagesThread" class="messages-thread hidden"><button class="link-btn" id="backToConvs" type="button">← К списку</button><div id="threadMessages" class="thread-messages"></div><form id="sendMessageForm" class="send-message-form"><input type="text" name="body" placeholder="Ваше сообщение..." required maxlength="2000" autocomplete="off"><button class="btn btn-primary" type="submit">Отправить</button></form></div></div></div></div>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="app.js?v=20261030-property-editor-v11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <script src="app.js?v=20261031-map-v1"></script>
 </body>
 </html>

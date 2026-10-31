@@ -40,6 +40,7 @@ function updateClock() {
 }
 
 const translations = {
+  "Де шукати": { ru: "Где искать", uk: "Де шукати", en: "Where to search", pl: "Gdzie szukać" },
   "Район области": {ru:"Район области",uk:"Район області",en:"Oblast district",pl:"Rejon obwodu"},
   "Район города": {ru:"Район города",uk:"Район міста",en:"City district",pl:"Dzielnica miasta"},
   "Количество комнат": {ru:"Количество комнат",uk:"Кількість кімнат",en:"Number of rooms",pl:"Liczba pokoi"},
@@ -4708,6 +4709,7 @@ function openCategoryMenu(parentCategory = "") {
     propertySearchMenu.dataset.realEstateDeal = activePropertyTab.deal;
     propertySearchContent.innerHTML = `
       <div class="property-search-shell">
+        <div class="property-search-location-heading">${escapeHtml(t("Де шукати"))}</div>
         <section class="property-search-section" aria-label="${escapeHtml(t("Локація"))}">
           <div class="property-location-accordion" id="propertyLocationAccordion">
             <button type="button" class="property-location-summary" id="propertyLocationToggle" aria-expanded="false" aria-controls="propertyLocationFields">

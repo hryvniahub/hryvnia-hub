@@ -40,6 +40,7 @@ function updateClock() {
 }
 
 const translations = {
+  "Де шукати": { ru: "Где искать", uk: "Де шукати", en: "Where to search", pl: "Gdzie szukać" },
   "Район области": {ru:"Район области",uk:"Район області",en:"Oblast district",pl:"Rejon obwodu"},
   "Район города": {ru:"Район города",uk:"Район міста",en:"City district",pl:"Dzielnica miasta"},
   "Количество комнат": {ru:"Количество комнат",uk:"Кількість кімнат",en:"Number of rooms",pl:"Liczba pokoi"},
@@ -285,6 +286,8 @@ const translations = {
   "Убрать из избранного": { ru: "Убрать из избранного", uk: "Прибрати з обраного", en: "Remove from favorites", pl: "Usuń z ulubionych" },
   "Объявление": { ru: "Объявление", uk: "Оголошення", en: "Listing", pl: "Ogłoszenie" },
   "Локація": { ru: "Местоположение", uk: "Локація", en: "Location", pl: "Lokalizacja" },
+  "Обрати місце розташування": { ru: "Выбрать местоположение", uk: "Обрати місце розташування", en: "Choose location", pl: "Wybierz lokalizację" },
+  "Наприклад: Шевченківський район, Київ": { ru: "Например: Шевченковский район, Киев", uk: "Наприклад: Шевченківський район, Київ", en: "E.g. Shevchenkivskyi District, Kyiv", pl: "Np. dzielnica Szewczenki, Kijów" },
   "Категорія нерухомості": { ru: "Категория недвижимости", uk: "Категорія нерухомості", en: "Property type", pl: "Rodzaj nieruchomości" },
   "Оберіть категорію": { ru: "Выберите категорию", uk: "Оберіть категорію", en: "Choose a category", pl: "Wybierz kategorię" },
   "Тип угоди": { ru: "Тип сделки", uk: "Тип угоди", en: "Deal type", pl: "Rodzaj transakcji" },
@@ -4117,7 +4120,7 @@ let activePropertySearchTabId = "";
 let propertySearchTabSequence = 0;
 function newPropertySearchTab() {
   propertySearchTabSequence += 1;
-  return { id: `property-search-${Date.now()}-${propertySearchTabSequence}`, title: "", filters: {}, selectedCityId: "", regionCode: "", type: "", deal: "Все", advanced: false, listings: null, clientFilters: null, scrollY: 0 };
+  return { id: `property-search-${Date.now()}-${propertySearchTabSequence}`, title: "", filters: {}, selectedCityId: "", regionCode: "", geo: { regionCode: "", oblastRaionCode: "", cityId: "", cityDistrictCode: "" }, type: "", deal: "Все", advanced: false, listings: null, clientFilters: null, scrollY: 0 };
 }
 function ensurePropertySearchTabs() {
   if (!propertySearchTabs.length) {
@@ -4152,20 +4155,36 @@ function ensurePropertySearchTabsHost() {
 function capturePropertySearchTab() {
   const tab = ensurePropertySearchTabs();
   if (document.getElementById("propertySearchCity")) {
+    // Keep the previous snapshot before reading controls: dependent <select>
+    // elements can briefly have no options while the geo catalog is rebuilt.
+    const previousFilters = tab.filters || {};
+    const previousGeo = tab.geo || {};
+    const applied = propertySearchClientFilters || tab.clientFilters || {};
     tab.filters = Object.fromEntries(PROPERTY_SEARCH_FILTER_IDS.map(id => {
       const el = document.getElementById(id);
-      return [id, el ? (el.type === "checkbox" ? el.checked : el.value) : ""];
+      return [id, el ? (el.type === "checkbox" ? el.checked : el.value) : (previousFilters[id] ?? "")];
     }));
-    tab.selectedCityId = selectedCatalogCityId || "";
-    // Keep the selected oblast from the applied search state as the source of
-    // truth. The select can temporarily be empty while its options are rebuilt.
-    tab.regionCode = propertySearchClientFilters?.regionCode ||
-      document.getElementById("propertySearchRegion")?.value ||
-      activeRegionCode || tab.filters?.propertySearchRegion || "";
-    tab.type = document.getElementById("propertyTypeTrigger")?.dataset.value || "";
-    tab.deal = propertySearchMenu?.dataset.realEstateDeal || "Все";
+    // When the menu is open, its controls are authoritative. Use the applied
+    // snapshot only if a control is genuinely absent, never to undo a user's
+    // deliberate clearing of a field.
+    const regionControl = document.getElementById("propertySearchRegion");
+    const oblastRaionControl = document.getElementById("propertySearchOblastRaion");
+    const cityDistrictControl = document.getElementById("propertySearchDistrict");
+    const cityInputControl = document.getElementById("propertySearchCity");
+    const regionCode = regionControl ? (regionControl.value || activeRegionCode || "") : (applied.regionCode || previousGeo.regionCode || tab.regionCode || "");
+    const oblastRaionCode = oblastRaionControl ? oblastRaionControl.value : (applied.oblastRaionCode || previousGeo.oblastRaionCode || "");
+    const cityDistrictCode = cityDistrictControl ? cityDistrictControl.value : (applied.cityDistrictCode || previousGeo.cityDistrictCode || "");
+    const previousCityId = previousGeo.cityId || tab.selectedCityId || applied.cityId || "";
+    const previousCity = availableCities.find(city => String(city.id) === String(previousCityId));
+    const cityTextMatchesPrevious = previousCity && cityInputControl && cityName(previousCity).trim() === cityInputControl.value.trim();
+    const cityId = selectedCatalogCityId || (cityTextMatchesPrevious ? previousCityId : (cityInputControl ? "" : (applied.cityId || previousGeo.cityId || tab.selectedCityId || "")));
+    tab.geo = { regionCode, oblastRaionCode, cityId, cityDistrictCode };
+    tab.selectedCityId = cityId;
+    tab.regionCode = regionCode;
+    tab.type = document.getElementById("propertyTypeTrigger")?.dataset.value || tab.type || "";
+    tab.deal = propertySearchMenu?.dataset.realEstateDeal || tab.deal || "Все";
     tab.advanced = Boolean(document.getElementById("propertyMoreFields") && !document.getElementById("propertyMoreFields").hidden);
-    tab.clientFilters = propertySearchClientFilters ? { ...propertySearchClientFilters } : null;
+    tab.clientFilters = propertySearchClientFilters ? { ...propertySearchClientFilters } : (tab.clientFilters ? { ...tab.clientFilters } : null);
     tab.scrollY = window.scrollY;
   }
   if (Array.isArray(visibleListings)) tab.listings = visibleListings.slice();
@@ -4193,10 +4212,15 @@ function restorePropertySearchTab(tab) {
     const el = document.getElementById(id);
     if (el) { if (el.type === "checkbox") el.checked = Boolean(tab.filters?.[id]); else el.value = tab.filters?.[id] ?? ""; }
   });
-  selectedCatalogCityId = tab.selectedCityId || "";
-  activeRegionCode = tab.regionCode || "";
+  const savedGeo = tab.geo || {};
+  selectedCatalogCityId = savedGeo.cityId || tab.selectedCityId || tab.clientFilters?.cityId || "";
+  activeRegionCode = savedGeo.regionCode || tab.regionCode || tab.clientFilters?.regionCode || "";
   const region = document.getElementById("propertySearchRegion");
-  if (region && tab.regionCode) region.value = tab.regionCode;
+  if (region && activeRegionCode) region.value = activeRegionCode;
+  const oblastRaion = document.getElementById("propertySearchOblastRaion");
+  if (oblastRaion) oblastRaion.value = savedGeo.oblastRaionCode || tab.filters?.propertySearchOblastRaion || tab.clientFilters?.oblastRaionCode || "";
+  const cityDistrict = document.getElementById("propertySearchDistrict");
+  if (cityDistrict) cityDistrict.value = savedGeo.cityDistrictCode || tab.filters?.propertySearchDistrict || tab.clientFilters?.cityDistrictCode || "";
   const cityInput = document.getElementById("propertySearchCity");
   const city = availableCities.find(item => String(item.id) === String(selectedCatalogCityId));
   if (cityInput) cityInput.value = city ? cityName(city) : (tab.filters?.propertySearchCity || "");
@@ -4341,6 +4365,64 @@ function preparePropertySearchMenu() {
   });
   const oblastRaionSelect = document.getElementById("propertySearchOblastRaion");
   const cityDistrictSelect = document.getElementById("propertySearchDistrict");
+  const locationFields = document.getElementById("propertyLocationFields");
+  const locationToggle = document.getElementById("propertyLocationToggle");
+  const locationSummary = document.getElementById("propertyLocationSummaryText");
+  const updateLocationSummary = () => {
+    if (!locationSummary) return;
+    const selectedText = select => select?.value
+      ? (select.selectedOptions?.[0]?.textContent?.trim() || "")
+      : "";
+    const selectedCity = selectedCatalogCityId
+      ? availableCities.find(item => String(item.id) === String(selectedCatalogCityId))
+      : null;
+    const city = selectedCity ? cityName(selectedCity) : (cityInput?.value.trim() || "");
+    const cityDistrict = selectedText(cityDistrictSelect);
+    const oblastDistrict = selectedText(oblastRaionSelect);
+    const region = selectedText(regionSelect);
+
+    let parts = [];
+    if (city) {
+      const cityDistrictRows = selectedCity
+        ? propertyCityDistricts.filter(row =>
+            String(row.city_id || "") === String(selectedCity.id) ||
+            (!row.city_id && normalizeKatottgCode(row.city_katottg_code) === normalizeKatottgCode(selectedCity.official_code))
+          )
+        : [];
+      const settlementCategory = String(selectedCity?.settlement_category_code || "").trim().toUpperCase();
+      const isCity = ["М", "M", "CITY", "МІСТО"].includes(settlementCategory);
+      const isSmallSettlement = settlementCategory
+        ? !isCity
+        : cityDistrictRows.length === 0;
+      if (cityDistrict) {
+        // Preserve the full hierarchy in the collapsed summary.
+        parts = [cityDistrict, city, region];
+      } else if (selectedCity && isSmallSettlement) {
+        // Settlement, raion and oblast must all remain visible in the summary.
+        parts = [city, oblastDistrict, region];
+      } else {
+        // City without a selected city district.
+        parts = [city, region];
+      }
+    } else if (oblastDistrict) {
+      parts = [oblastDistrict];
+    } else if (region) {
+      parts = [region];
+    }
+
+    const hasSelection = parts.some(Boolean);
+    locationSummary.textContent = hasSelection
+      ? parts.filter(Boolean).join(", ")
+      : t("Наприклад: Шевченківський район, Київ");
+    locationSummary.classList.toggle("is-placeholder", !hasSelection);
+  };
+  locationToggle?.addEventListener("click", () => {
+    const opening = locationFields?.hidden !== false;
+    if (locationFields) locationFields.hidden = !opening;
+    locationToggle.setAttribute("aria-expanded", String(opening));
+  });
+  [regionSelect, oblastRaionSelect, cityDistrictSelect].forEach(select => select?.addEventListener("change", updateLocationSummary));
+  cityInput?.addEventListener("input", updateLocationSummary);
   const renderRegions = () => {
     if (!regionSelect) return;
     const codes = [...new Set(availableCities.map(city => String(city.region_katottg_code || "")).filter(Boolean))].sort();
@@ -4352,6 +4434,9 @@ function preparePropertySearchMenu() {
     if (!cityDistrictSelect) return;
     const rows = propertyCityDistricts.filter(row => city && (String(row.city_id || "") === String(city.id) || (!row.city_id && String(row.city_katottg_code || "") === String(city.official_code || ""))));
     cityDistrictSelect.innerHTML = `<option value="">${escapeHtml(t("Район города"))}</option>` + rows.map(row => `<option value="${escapeHtml(row.katottg_code)}">${escapeHtml(propertyGeoName(row))}</option>`).join("");
+    // Do not show a city-district filter when the catalog has no districts for this city.
+    const cityDistrictField = cityDistrictSelect.closest(".property-search-field");
+    if (cityDistrictField) cityDistrictField.hidden = rows.length === 0;
   };
   const renderSuggestions = () => {
     if (!citySuggestions) return;
@@ -4370,15 +4455,49 @@ function preparePropertySearchMenu() {
     citySuggestions.hidden = false;
     cityInput.setAttribute("aria-expanded", "true");
   };
-  const initCities = async () => {
+  const initCities = async (restoreSavedGeo = false) => {
+    // Save the selected codes before rebuilding dependent <select> options.
+    // Assigning a value before its options exist silently turns it into an
+    // empty string, which was causing the oblast district to disappear.
+    const savedTab = restoreSavedGeo ? ensurePropertySearchTabs() : null;
+    const savedFilters = savedTab?.filters || {};
+    const savedClientFilters = savedTab?.clientFilters || propertySearchClientFilters || {};
+    const savedGeo = savedTab?.geo || null;
+    // An explicit empty value in geo is meaningful (the user cleared that
+    // filter). Do not fall through to an older applied clientFilters snapshot.
+    const hasGeoSnapshot = Boolean(savedGeo && typeof savedGeo === "object");
+    const savedRegionCode = hasGeoSnapshot ? (savedGeo.regionCode ?? "") : (savedTab?.regionCode || savedFilters.propertySearchRegion || savedClientFilters.regionCode || activeRegionCode || "");
+    const savedOblastRaionCode = hasGeoSnapshot ? (savedGeo.oblastRaionCode ?? "") : (savedFilters.propertySearchOblastRaion || savedClientFilters.oblastRaionCode || "");
+    const savedCityDistrictCode = hasGeoSnapshot ? (savedGeo.cityDistrictCode ?? "") : (savedFilters.propertySearchDistrict || savedClientFilters.cityDistrictCode || "");
+    const savedCityId = hasGeoSnapshot ? (savedGeo.cityId ?? "") : (savedTab?.selectedCityId || savedClientFilters.cityId || selectedCatalogCityId || "");
+
     if (!availableCities.length) { try { await loadCities(); } catch (error) { console.error("Не удалось загрузить города для поиска недвижимости:", error); } }
     try { await loadPropertyGeoCatalogs(); } catch (error) { console.error("Не удалось загрузить районы для поиска недвижимости:", error); }
+
+    // Rebuild the parent list first, then restore the selected parent and its
+    // dependent district lists in order.
+    activeRegionCode = savedRegionCode;
     renderRegions();
-    const selectedCity = availableCities.find(city => String(city.id) === String(selectedCatalogCityId));
-    renderSearchCityDistricts(selectedCity);
-    if (selectedCatalogCityId) {
-      const selected = availableCities.find(city => String(city.id) === selectedCatalogCityId);
-      if (selected) cityInput.value = cityName(selected);
+    if (regionSelect) regionSelect.value = savedRegionCode;
+    updatePropertyOblastRaions(savedRegionCode, oblastRaionSelect);
+    if (oblastRaionSelect) oblastRaionSelect.value = savedOblastRaionCode;
+
+    selectedCatalogCityId = savedCityId;
+    const selectedCity = availableCities.find(city => String(city.id) === String(savedCityId));
+    renderSearchCityDistricts(selectedCity || null);
+    if (cityInput) cityInput.value = selectedCity ? cityName(selectedCity) : (savedFilters.propertySearchCity || cityInput.value || "");
+    if (cityDistrictSelect) cityDistrictSelect.value = savedCityDistrictCode;
+    updateLocationSummary();
+
+    // Persist only after all dependent options exist and their selected values
+    // have been restored. This prevents an empty, not-yet-populated select from
+    // replacing a saved district code.
+    if (restoreSavedGeo && savedTab) {
+      savedTab.geo = { regionCode: savedRegionCode, oblastRaionCode: savedOblastRaionCode, cityId: savedCityId, cityDistrictCode: savedCityDistrictCode };
+      savedTab.selectedCityId = savedCityId;
+      savedTab.regionCode = savedRegionCode;
+      savedTab.filters = { ...(savedTab.filters || {}), propertySearchRegion: savedRegionCode, propertySearchOblastRaion: savedOblastRaionCode, propertySearchDistrict: savedCityDistrictCode };
+      updateLocationSummary();
     }
   };
   cityInput.addEventListener("focus", async () => { await initCities(); renderSuggestions(); });
@@ -4403,6 +4522,7 @@ function preparePropertySearchMenu() {
     renderSearchCityDistricts(city);
     if (citySuggestions) citySuggestions.hidden = true;
     cityInput.setAttribute("aria-expanded", "false");
+    updateLocationSummary();
   };
   citySuggestions?.addEventListener("mousedown", event => { if (event.target.closest("[data-city-id]")) event.preventDefault(); });
   citySuggestions?.addEventListener("click", event => {
@@ -4419,6 +4539,7 @@ function preparePropertySearchMenu() {
     renderSearchCityDistricts(null);
     if (citySuggestions) citySuggestions.hidden = true;
     if (oblastRaionSelect) oblastRaionSelect.value = "";
+    updateLocationSummary();
   });
   oblastRaionSelect?.addEventListener("change", () => {
     const selectedRaion = propertyOblastRaions.find(row =>
@@ -4436,6 +4557,7 @@ function preparePropertySearchMenu() {
     renderSearchCityDistricts(null);
     if (citySuggestions) citySuggestions.hidden = true;
     cityInput.setAttribute("aria-expanded", "false");
+    updateLocationSummary();
   });
   categoryMenuOptions?.querySelectorAll("[data-property-section]").forEach(button => button.addEventListener("click", () => {
     const section = button.dataset.propertySection;
@@ -4499,6 +4621,14 @@ function preparePropertySearchMenu() {
     // reopening of this saved-search tab.
     activeRegionCode = propertySearchClientFilters.regionCode || activeRegionCode || "";
     const activeTab = ensurePropertySearchTabs();
+    activeTab.geo = {
+      regionCode: propertySearchClientFilters.regionCode || "",
+      oblastRaionCode: propertySearchClientFilters.oblastRaionCode || "",
+      cityId: propertySearchClientFilters.cityId || "",
+      cityDistrictCode: propertySearchClientFilters.cityDistrictCode || ""
+    };
+    activeTab.selectedCityId = propertySearchClientFilters.cityId || "";
+    activeTab.regionCode = propertySearchClientFilters.regionCode || "";
     const selectedTypeLabel = document.querySelector("#propertyTypeOptions [data-property-type].is-selected")?.textContent.trim();
     activeTab.title = [selectedTypeLabel && selectedTypeLabel !== t("Оберіть категорію") ? selectedTypeLabel : "", t(activeTab.deal || "Все") !== t("Все") ? t(activeTab.deal || "Все") : ""].filter(Boolean).join(" · ");
     activeTab.clientFilters = { ...propertySearchClientFilters };
@@ -4519,6 +4649,11 @@ function preparePropertySearchMenu() {
   document.getElementById("propertySearchReset")?.addEventListener("click", () => {
     ["propertySearchCity", "propertySearchRegion", "propertySearchOblastRaion", "propertySearchDistrict", "propertySearchAddress", "propertySearchRadius", "propertyPriceFrom", "propertyPriceTo", "propertyAreaFrom", "propertyAreaTo", "propertyFilterRooms", "propertyFilterBuilding", "propertyFilterFloorFrom", "propertyFilterFloorTo", "propertyFilterFloorsFrom", "propertyFilterFloorsTo", "propertyFilterKitchenFrom", "propertyFilterKitchenTo", "propertyFilterCondition", "propertyFilterFurniture", "propertyFilterBalcony", "propertyFilterLoggia", "propertyFilterMetroFrom", "propertyFilterMetroTo", "propertyFilterLandFrom", "propertyFilterLandTo", "propertyFilterAmenityRefrigerator", "propertyFilterAmenityWashingMachine", "propertyFilterAmenityStove", "propertyFilterAmenityDishwasher", "propertyFilterAmenityAirConditioning", "propertyFilterAmenityInternet", "propertyFilterAmenityParking", "propertyFilterBathroom"].forEach(id => { const field = document.getElementById(id); if (field) { if (field.type === "checkbox") field.checked = false; else field.value = ""; } });
     selectedCatalogCityId = ""; activeRegionCode = ""; propertySearchClientFilters = null;
+    const resetTab = ensurePropertySearchTabs();
+    resetTab.geo = { regionCode: "", oblastRaionCode: "", cityId: "", cityDistrictCode: "" };
+    resetTab.selectedCityId = "";
+    resetTab.regionCode = "";
+    resetTab.clientFilters = null;
     if (citySuggestions) citySuggestions.hidden = true;
     cityInput?.setAttribute("aria-expanded", "false");
     if (typeTrigger) { typeTrigger.dataset.value = ""; const label = typeTrigger.querySelector(".property-type-label"); if (label) label.textContent = t("Оберіть категорію"); }
@@ -4530,6 +4665,10 @@ function preparePropertySearchMenu() {
     if (advancedToggle) { advancedToggle.setAttribute("aria-expanded", "false"); advancedToggle.textContent = t("Більше"); }
     renderRegions();
     if (regionSelect) regionSelect.value = "";
+    updatePropertyOblastRaions("", oblastRaionSelect);
+    if (oblastRaionSelect) oblastRaionSelect.value = "";
+    renderSearchCityDistricts(null);
+    updateLocationSummary();
     capturePropertySearchTab();
     renderPropertySearchTabs();
   });
@@ -4570,14 +4709,23 @@ function openCategoryMenu(parentCategory = "") {
     propertySearchMenu.dataset.realEstateDeal = activePropertyTab.deal;
     propertySearchContent.innerHTML = `
       <div class="property-search-shell">
+        <div class="property-search-location-heading">${escapeHtml(t("Де шукати"))}</div>
         <section class="property-search-section" aria-label="${escapeHtml(t("Локація"))}">
-          <div class="property-location-grid" id="propertyLocationFields">
+          <div class="property-location-accordion" id="propertyLocationAccordion">
+            <button type="button" class="property-location-summary" id="propertyLocationToggle" aria-expanded="false" aria-controls="propertyLocationFields">
+              <span id="propertyLocationSummaryText" class="is-placeholder">${escapeHtml(t("Наприклад: Шевченківський район, Київ"))}</span>
+              <span class="property-location-summary-chevron" aria-hidden="true">⌄</span>
+            </button>
+            <div class="property-location-grid" id="propertyLocationFields" hidden>
             <label class="property-search-field property-region-field"><select id="propertySearchRegion" aria-label="${escapeHtml(t("Область"))}"><option value="">${escapeHtml(t("Область"))}</option></select><span class="property-field-chevron" aria-hidden="true">⌄</span></label>
             <label class="property-search-field property-region-field"><select id="propertySearchOblastRaion" aria-label="${escapeHtml(t("Район области"))}"><option value="">${escapeHtml(t("Район области"))}</option></select><span class="property-field-chevron" aria-hidden="true">⌄</span></label>
             <label class="property-search-field property-city-field"><input id="propertySearchCity" type="text" autocomplete="off" placeholder="${escapeHtml(t("Город"))}" aria-label="${escapeHtml(t("Город"))}" aria-expanded="false" aria-controls="propertySearchCitySuggestions"><div id="propertySearchCitySuggestions" class="property-city-suggestions" role="listbox" hidden></div></label>
             <label class="property-search-field property-district-field"><select id="propertySearchDistrict" aria-label="${escapeHtml(t("Район города"))}"><option value="">${escapeHtml(t("Район города"))}</option></select><span class="property-field-chevron" aria-hidden="true">⌄</span></label>
+            </div>
+            <div class="property-location-extra-grid">
             <label class="property-search-field property-address-field"><input id="propertySearchAddress" type="text" placeholder="${escapeHtml(t("Адреса або точка на карті"))}" aria-label="${escapeHtml(t("Адреса або точка на карті"))}"><button type="button" id="propertyUseMapPoint" class="property-map-point" aria-label="${escapeHtml(t("Вказати точку на карті"))}" title="${escapeHtml(t("Вказати точку на карті"))}">⊙</button></label>
             <label class="property-search-field property-radius-field"><select id="propertySearchRadius" aria-label="${escapeHtml(t("Радіус, км"))}"><option value="">${escapeHtml(t("Радіус, км"))}</option><option value="5">5 км</option><option value="10">10 км</option><option value="20">20 км</option><option value="30">30 км</option><option value="50">50 км</option><option value="100">100 км</option></select><span class="property-field-chevron" aria-hidden="true">⌄</span></label>
+            </div>
           </div>
         </section>
         <section class="property-search-section" aria-label="${escapeHtml(t("Категорія нерухомості"))}">
@@ -4641,7 +4789,7 @@ function openCategoryMenu(parentCategory = "") {
     restorePropertySearchTab(ensurePropertySearchTabs());
     // Restore may select an existing region/city; populate dependent district
     // lists only after those selections are back in the controls.
-    initializePropertySearchGeo?.();
+    initializePropertySearchGeo?.(true);
     propertySearchMenu.classList.remove("hidden");
     propertySearchBackdrop?.classList.remove("hidden");
     return;

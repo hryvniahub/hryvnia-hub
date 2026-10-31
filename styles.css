@@ -3295,3 +3295,38 @@ main{
   opacity: 0 !important;
   pointer-events: none !important;
 }
+
+
+/* Collapsible real-estate location selector */
+.property-search-menu .property-location-accordion{display:flex;flex-direction:column;gap:10px;min-width:0;}
+.property-search-menu .property-location-summary{
+  display:flex;align-items:center;gap:12px;width:100%;min-height:54px;padding:10px 15px;
+  border:1px solid rgba(168,201,40,.7);border-radius:14px;background:#fff;
+  color:#20352b;text-align:left;font:inherit;font-size:15px;font-weight:700;cursor:pointer;
+  box-shadow:0 1px 2px rgba(0,0,0,.08);transition:border-color .16s ease,box-shadow .16s ease;
+}
+.property-search-menu .property-location-summary:hover,
+.property-search-menu .property-location-summary:focus-visible{
+  border-color:#A8C928;box-shadow:0 0 0 3px rgba(168,201,40,.18);outline:none;
+}
+.property-search-menu .property-location-summary:active{transform:translateY(1px);}
+.property-search-menu .property-location-summary #propertyLocationSummaryText.is-placeholder{
+  color:#78847d;font-weight:500;
+}
+.property-search-menu .property-location-summary #propertyLocationSummaryText{
+  flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.property-search-menu .property-location-summary-chevron{
+  flex:0 0 auto;color:#A8C928;font-size:23px;line-height:1;transition:transform .18s ease;
+}
+.property-search-menu .property-location-summary[aria-expanded="true"] .property-location-summary-chevron{transform:rotate(180deg);}
+.property-search-menu .property-location-grid[hidden]{display:none!important;}
+.property-search-menu .property-location-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+@media(max-width:380px){
+  .property-search-menu .property-location-summary{min-height:50px;padding:9px 12px;font-size:13px;}
+}
+
+.property-search-menu .property-location-grid .property-search-field{grid-column:auto!important;}
+.property-search-menu .property-location-extra-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(110px,1fr);gap:10px;margin-top:10px;}
+.property-search-menu .property-location-extra-grid .property-search-field{grid-column:auto!important;}
+@media(max-width:480px){.property-search-menu .property-location-extra-grid{grid-template-columns:minmax(0,1fr) minmax(96px,.7fr);gap:8px;}}

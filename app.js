@@ -286,6 +286,7 @@ const translations = {
   "Объявление": { ru: "Объявление", uk: "Оголошення", en: "Listing", pl: "Ogłoszenie" },
   "Локація": { ru: "Местоположение", uk: "Локація", en: "Location", pl: "Lokalizacja" },
   "Обрати місце розташування": { ru: "Выбрать местоположение", uk: "Обрати місце розташування", en: "Choose location", pl: "Wybierz lokalizację" },
+  "Наприклад: Шевченківський район, Київ": { ru: "Например: Шевченковский район, Киев", uk: "Наприклад: Шевченківський район, Київ", en: "E.g. Shevchenkivskyi District, Kyiv", pl: "Np. dzielnica Szewczenki, Kijów" },
   "Категорія нерухомості": { ru: "Категория недвижимости", uk: "Категорія нерухомості", en: "Property type", pl: "Rodzaj nieruchomości" },
   "Оберіть категорію": { ru: "Выберите категорию", uk: "Оберіть категорію", en: "Choose a category", pl: "Wybierz kategorię" },
   "Тип угоди": { ru: "Тип сделки", uk: "Тип угоди", en: "Deal type", pl: "Rodzaj transakcji" },
@@ -4347,7 +4348,6 @@ function preparePropertySearchMenu() {
   const locationSummary = document.getElementById("propertyLocationSummaryText");
   const updateLocationSummary = () => {
     if (!locationSummary) return;
-    // Empty selects must not contribute their placeholder (e.g. "Район міста") to the summary.
     const selectedText = select => select?.value
       ? (select.selectedOptions?.[0]?.textContent?.trim() || "")
       : "";
@@ -4358,15 +4358,41 @@ function preparePropertySearchMenu() {
     const cityDistrict = selectedText(cityDistrictSelect);
     const oblastDistrict = selectedText(oblastRaionSelect);
     const region = selectedText(regionSelect);
-    // When a city is selected, show its selected city district first.
-    // An unselected city district means searching the whole city; an automatically
-    // matched oblast district must not replace the city/oblast in this summary.
-    const parts = city
-      ? (cityDistrict ? [cityDistrict, city, region] : [city, region])
-      : oblastDistrict
-        ? [oblastDistrict, region]
-        : region ? [region] : [];
-    locationSummary.textContent = parts.filter(Boolean).join(", ") || t("Обрати місце розташування");
+
+    let parts = [];
+    if (city) {
+      const cityDistrictRows = selectedCity
+        ? propertyCityDistricts.filter(row =>
+            String(row.city_id || "") === String(selectedCity.id) ||
+            (!row.city_id && normalizeKatottgCode(row.city_katottg_code) === normalizeKatottgCode(selectedCity.official_code))
+          )
+        : [];
+      const settlementCategory = String(selectedCity?.settlement_category_code || "").trim().toUpperCase();
+      const isCity = ["М", "M", "CITY", "МІСТО"].includes(settlementCategory);
+      const isSmallSettlement = settlementCategory
+        ? !isCity
+        : cityDistrictRows.length === 0;
+      if (cityDistrict) {
+        // City district first, then city: "Соборний район, Дніпро".
+        parts = [cityDistrict, city];
+      } else if (selectedCity && isSmallSettlement) {
+        // Small settlement first, then its oblast district: "Малотаранівка, Краматорський район".
+        parts = [city, oblastDistrict];
+      } else {
+        // City without a selected city district: "Дніпро, Дніпропетровська область".
+        parts = [city, region];
+      }
+    } else if (oblastDistrict) {
+      parts = [oblastDistrict];
+    } else if (region) {
+      parts = [region];
+    }
+
+    const hasSelection = parts.some(Boolean);
+    locationSummary.textContent = hasSelection
+      ? parts.filter(Boolean).join(", ")
+      : t("Наприклад: Шевченківський район, Київ");
+    locationSummary.classList.toggle("is-placeholder", !hasSelection);
   };
   locationToggle?.addEventListener("click", () => {
     const opening = locationFields?.hidden !== false;
@@ -4387,7 +4413,7 @@ function preparePropertySearchMenu() {
     const rows = propertyCityDistricts.filter(row => city && (String(row.city_id || "") === String(city.id) || (!row.city_id && String(row.city_katottg_code || "") === String(city.official_code || ""))));
     cityDistrictSelect.innerHTML = `<option value="">${escapeHtml(t("Район города"))}</option>` + rows.map(row => `<option value="${escapeHtml(row.katottg_code)}">${escapeHtml(propertyGeoName(row))}</option>`).join("");
     // Do not show a city-district filter when the catalog has no districts for this city.
-    const cityDistrictField = cityDistrictSelect.closest(".property-district-field");
+    const cityDistrictField = cityDistrictSelect.closest(".property-search-field");
     if (cityDistrictField) cityDistrictField.hidden = rows.length === 0;
   };
   const renderSuggestions = () => {
@@ -4614,7 +4640,7 @@ function openCategoryMenu(parentCategory = "") {
         <section class="property-search-section" aria-label="${escapeHtml(t("Локація"))}">
           <div class="property-location-accordion" id="propertyLocationAccordion">
             <button type="button" class="property-location-summary" id="propertyLocationToggle" aria-expanded="false" aria-controls="propertyLocationFields">
-              <span id="propertyLocationSummaryText">${escapeHtml(t("Обрати місце розташування"))}</span>
+              <span id="propertyLocationSummaryText" class="is-placeholder">${escapeHtml(t("Наприклад: Шевченківський район, Київ"))}</span>
               <span class="property-location-summary-chevron" aria-hidden="true">⌄</span>
             </button>
             <div class="property-location-grid" id="propertyLocationFields" hidden>

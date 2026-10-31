@@ -3030,7 +3030,8 @@ function openListing(item, galleryOnly = false) {
   if (editorPropertyFields) {
     const bindEditorPropertySelect = (name) => {
       const select = editorPropertyFields.querySelector(`select[name="${name}"]`);
-      const wrapper = select?.parentElement?.querySelector('.hh-property-select');
+      const wrapper = select?.parentElement?.querySelector('.hh-property-select')
+        || editorPropertyFields.querySelector(`.hh-property-select[data-for="${select?.id || ""}"]`);
       if (!select || !wrapper) return;
       select.required = false;
       select.disabled = false;
@@ -3162,7 +3163,7 @@ async function editListing(item, labels) {
   const operational = [["roadworthy","roadworthy"],["needs_repair","needs_repair"],["not_running","not_running"],["after_accident","after_accident"]];
 
   const editCityField = `
-    <label class="edit-city-field">${escapeHtml(L.city)}
+    <label class="edit-city-field" style="grid-column:1 / -1">${escapeHtml(L.city)}
       <input name="city_search" type="text" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="editCitySuggestions" placeholder="${escapeHtml(cityTranslation("Введите название города"))}" value="${escapeHtml(initialCityName)}" required>
       <input name="city_id" type="hidden" value="${escapeHtml(selectedCityId)}">
       <div class="edit-city-suggestions" id="editCitySuggestions" role="listbox" hidden></div>
@@ -3170,11 +3171,24 @@ async function editListing(item, labels) {
   const editPriceField = `<label>${escapeHtml(L.price)}<input name="price" type="number" min="0" step="0.01" required value="${escapeHtml(String(item.price ?? ""))}"></label>`;
   // Property editor is built from the exact live create-form fields: one source of truth.
   const propertyDetails = item.property_details || {};
+  const legacyTitle = String(item.title || "");
+  const legacyPropertyType = item.property_type
+    || (/квартир|apartment/i.test(legacyTitle) ? "Квартиры"
+      : /дом|house|будин/i.test(legacyTitle) ? "Дома"
+      : /комнат|room/i.test(legacyTitle) ? "Комнаты"
+      : /коммерч|commercial/i.test(legacyTitle) ? "Коммерческая недвижимость"
+      : /гараж|паркомест|garage|parking/i.test(legacyTitle) ? "Гаражи и парковочные места"
+      : "");
+  const legacyPropertyOperation = item.property_operation
+    || (/аренд|rent|оренд/i.test(legacyTitle) ? "Аренда"
+      : /продаж|sale|купів|покуп/i.test(legacyTitle) ? "Продажа" : "");
   const propertySource = document.querySelector('#addForm #propertyListingFields');
   const propertyLocationBlock = (() => {
     const source = document.querySelector('#addForm #listingAdvancedCommonFields');
     if (!source) return '';
     const wrapper = document.createElement('div');
+    wrapper.className = 'edit-property-location';
+    wrapper.style.gridColumn = '1 / -1';
     ['#propertyDistrictField','#propertyAddressField','#propertyRadiusField'].forEach(selector => {
       const node = source.querySelector(selector);
       if (node) {
@@ -3202,16 +3216,17 @@ async function editListing(item, labels) {
     if (!propertySource) return '';
     const clone = propertySource.cloneNode(true);
     clone.removeAttribute('id'); clone.removeAttribute('disabled'); clone.hidden = false;
+    clone.style.gridColumn = '1 / -1';
     clone.querySelectorAll('[id]').forEach(node => node.removeAttribute('id'));
     clone.querySelectorAll('[data-i18n]').forEach(node => { const key=node.getAttribute('data-i18n'); node.textContent=t(key); });
     // Keep the exact custom selectors from the create form. Their DOM markup is
     // cloned here; their event handlers are rebound after the editor enters the DOM.
     clone.querySelectorAll('[data-property-for]').forEach(node => {
       const allowed = (node.dataset.propertyFor || '').split(',');
-      if (allowed.length && !allowed.includes(String(propertyDetails.type || ''))) node.hidden = true;
+      if (allowed.length && !allowed.includes(String(propertyDetails.type || legacyPropertyType || ''))) node.hidden = true;
     });
     const values = {
-      property_operation: propertyDetails.operation, property_type: propertyDetails.type,
+      property_operation: propertyDetails.operation || legacyPropertyOperation, property_type: propertyDetails.type || legacyPropertyType,
       property_rooms: propertyDetails.rooms, property_area: propertyDetails.area_m2,
       property_floor: propertyDetails.floor, property_floors_total: propertyDetails.floors_total,
       property_kitchen_area: propertyDetails.kitchen_area_m2, property_building_type: propertyDetails.building_type,
@@ -3232,13 +3247,40 @@ async function editListing(item, labels) {
       if (name.startsWith('property_amenity_')) control.checked = !!propertyDetails.amenities?.[name.replace('property_amenity_','')];
       else if (name.startsWith('property_accessibility_') && control.type === 'checkbox') control.checked = !!propertyDetails.accessibility?.[name.replace('property_accessibility_','')];
       else if (name === 'property_bathroom_type') control.checked = control.value === propertyDetails.bathroom_type;
-      else if (Object.prototype.hasOwnProperty.call(values,name)) control.value = values[name] ?? '';
+      else if (Object.prototype.hasOwnProperty.call(values,name)) {
+        if (control.type === 'checkbox' || control.type === 'radio') control.checked = control.value === String(values[name] ?? '');
+        else control.value = values[name] ?? '';
+      }
+    });
+
+    // cloneNode copies attributes, not the live state of form controls. Before
+    // converting the clone to HTML, serialize each live value/selection/check
+    // into attributes so the dialog receives the saved property values.
+    clone.querySelectorAll('input,select,textarea').forEach(control => {
+      if (control.tagName === 'SELECT') {
+        [...control.options].forEach(option => option.toggleAttribute('selected', option.selected));
+      } else if (control.tagName === 'TEXTAREA') {
+        control.textContent = control.value;
+      } else if (control.type === 'checkbox' || control.type === 'radio') {
+        control.toggleAttribute('checked', control.checked);
+      } else {
+        control.setAttribute('value', control.value);
+      }
+      // The source create form may currently be disabled because another
+      // category was selected. The editor clone must be independently usable.
+      control.disabled = false;
+    });
+    clone.querySelectorAll('[data-property-for]').forEach(field => {
+      const allowed = (field.dataset.propertyFor || '').split(',').map(value => value.trim());
+      const applicable = allowed.includes(String(propertyDetails.type || ''));
+      field.hidden = !applicable;
+      field.querySelectorAll('input,select,textarea').forEach(control => { control.disabled = !applicable; });
     });
     const advanced = clone.querySelector('.property-advanced-fields');
     if (advanced) advanced.hidden = false;
     return clone.outerHTML;
   })();
-  const editPropertyPriceField = `<div class="listing-price-row"><label>${escapeHtml(t("Цена"))}<input name="price" type="number" min="0" step="0.01" required value="${escapeHtml(String(item.price ?? ""))}"></label><label>${escapeHtml(t("Валюта"))}<select name="price_currency">${[['UAH','₴ UAH'],['USD','$ USD'],['EUR','€ EUR'],['PLN','zł PLN']].map(([v,l])=>`<option value="${v}" ${String(item.currency||'UAH')===v?'selected':''}>${l}</option>`).join('')}</select></label></div>`;
+  const editPropertyPriceField = `<div class="listing-price-row" style="grid-column:1 / -1"><label>${escapeHtml(t("Цена"))}<input name="price" type="number" min="0" step="0.01" required value="${escapeHtml(String(item.price ?? ""))}"></label><label>${escapeHtml(t("Валюта"))}<select name="price_currency">${[['UAH','₴ UAH'],['USD','$ USD'],['EUR','€ EUR'],['PLN','zł PLN']].map(([v,l])=>`<option value="${v}" ${String(item.currency||'UAH')===v?'selected':''}>${l}</option>`).join('')}</select></label></div>`;
 
 
   const vehicleBlock = isVehicle ? `
@@ -3274,14 +3316,16 @@ async function editListing(item, labels) {
 
   const dialog = document.createElement("dialog");
   dialog.className = "modal-card listing-edit-dialog";
+  const isPropertyListing = String(item.category || "") === "Недвижимость";
+  const editTitleField = isVehicle ? "" : `<label>${escapeHtml(L.title)}<input name="title" required maxlength="180" value="${escapeHtml(item.title || "")}"></label>`;
   dialog.innerHTML = `<form class="listing-edit-form"><header class="listing-edit-header"><p class="eyebrow">${escapeHtml(t("Редактирование объявления"))}</p></header>
     <input type="hidden" name="category" value="${categoryValue}">
-    ${isVehicle ? "" : `<label>${escapeHtml(L.title)}<input name="title" required maxlength="180" value="${escapeHtml(item.title || "")}"></label>`}
+    ${isVehicle ? "" : (isPropertyListing ? editCityField : editTitleField)}
     ${vehicleBlock}
-    ${isVehicle ? "" : editCityField}
-    ${String(item.category || "") === "Недвижимость" ? propertyLocationBlock : ""}
-    ${isVehicle ? "" : (String(item.category || "") === "Недвижимость" ? editPropertyPriceField : editPriceField)}
-    ${String(item.category || "") === "Недвижимость" ? propertyEditorBlock : ""}
+    ${isPropertyListing ? propertyLocationBlock : ""}
+    ${isVehicle ? "" : (isPropertyListing ? editPropertyPriceField : editPriceField)}
+    ${isPropertyListing ? propertyEditorBlock : ""}
+    ${isPropertyListing ? editTitleField : ""}
     <label>${escapeHtml(L.description)}<textarea name="description" rows="5" maxlength="10000">${escapeHtml(item.description || "")}</textarea></label>
     <fieldset class="edit-photo-fields">
       <legend>${escapeHtml(L.photos)}</legend>
@@ -5417,7 +5461,7 @@ document.getElementById("vehicleMarketRegister")?.addEventListener("click", () =
 
 categorySelectTrigger?.addEventListener("click", () => openCategoryMenu());
 
-function openPropertyListingForm(propertyType = "", operation = "") {
+async function openPropertyListingForm(propertyType = "", operation = "") {
   const categorySelect = addForm?.querySelector('select[name="category"]');
   if (!categorySelect || ![...categorySelect.options].some(option => option.value === "Недвижимость")) return;
   categorySelect.value = "Недвижимость";
@@ -5432,13 +5476,23 @@ function openPropertyListingForm(propertyType = "", operation = "") {
   syncVehicleListingFields();
   // Keep the property form independent from the vehicle form visibility state.
   if (listingAdvancedCommonFields) listingAdvancedCommonFields.hidden = false;
-  // Preload both catalogs when the property form opens. This prevents a valid
-  // city_id from being rejected simply because availableCities is still empty.
-  Promise.all([ensureCitiesLoaded(), loadPropertyGeoCatalogs()]).then(() => {
+  if (propertyListingLocationFields) propertyListingLocationFields.hidden = false;
+  propertyListingLocationToggle?.setAttribute("aria-expanded", "true");
+  propertyListingLocationToggle?.classList.remove("has-error");
+  citySearchInput?.classList.remove("has-error");
+  // Load geo catalogs before the user starts filling the property form.
+  try {
+    await Promise.all([ensureCitiesLoaded(), loadPropertyGeoCatalogs()]);
     updatePropertyOblastRaions(formRegionCode);
     const selected = availableCities.find(city => String(city.id) === String(citySelect?.value || ""));
     updatePropertyCityDistricts(selected || null);
-  }).catch(error => console.error("Не удалось загрузить географию недвижимости:", error));
+  } catch (error) {
+    console.error("Не удалось загрузить географию недвижимости:", error);
+    if (formMessage) {
+      formMessage.textContent = "Не удалось загрузить список городов. Обновите страницу и попробуйте снова.";
+      formMessage.classList.add("error");
+    }
+  }
   if (propertyListingFields) {
     propertyListingFields.hidden = false;
     propertyListingFields.disabled = false;
@@ -5591,8 +5645,13 @@ if (addForm) {
   addForm.addEventListener("submit", async e => {
     e.preventDefault();
     if (publishing || validatingPhotos) return;
-    if (formMessage) formMessage.textContent = "";
-    if (!db) { if (formMessage) formMessage.textContent = "Сначала подключим Supabase — сейчас работает демо-режим."; return; }
+    if (formMessage) { formMessage.textContent = ""; formMessage.classList.remove("error"); }
+    propertyListingLocationToggle?.classList.remove("has-error");
+    citySearchInput?.classList.remove("has-error");
+    if (!db) {
+      if (formMessage) { formMessage.textContent = "Сначала подключим Supabase — сейчас работает демо-режим."; formMessage.classList.add("error"); }
+      return;
+    }
     const form = new FormData(e.target);
     // Ensure the city catalog is ready before checking the selected hidden city_id.
     try {
@@ -5602,14 +5661,21 @@ if (addForm) {
     }
     const cityId = String(form.get("city_id") || "");
     if (!cityId || !availableCities.some(city => String(city.id) === cityId)) {
-      if (formMessage) formMessage.textContent = cityTranslation("Выберите город из списка");
-      // Reveal the collapsed property-location panel before focusing the city input.
-      if (listingCategorySelect?.value === "Недвижимость" && propertyListingLocationFields?.hidden) {
+      if (formMessage) {
+        formMessage.textContent = cityTranslation("Выберите город из списка");
+        formMessage.classList.add("error");
+      }
+      // Reveal and highlight the location controls: city_id is mandatory.
+      if (listingCategorySelect?.value === "Недвижимость") {
         propertyListingLocationToggle?.setAttribute("aria-expanded", "true");
         propertyListingLocationFields.hidden = false;
+        propertyListingLocationToggle?.classList.add("has-error");
       }
+      citySearchInput?.classList.add("has-error");
       citySearchInput?.focus();
+      (propertyListingLocationToggle || formMessage)?.scrollIntoView({ behavior: "smooth", block: "center" });
       formMessage?.scrollIntoView({ behavior: "smooth", block: "center" });
+      console.warn("[addForm early return]", { step: "city", cityId, availableCities: availableCities.length });
       return;
     }
     const selectedCategory = String(form.get("category") || "");
@@ -5634,7 +5700,11 @@ if (addForm) {
       const propertyType = String(form.get("property_type") || "").trim();
       const propertyOperation = String(form.get("property_operation") || "").trim();
       if (!propertyType || !propertyOperation) {
-        if (formMessage) formMessage.textContent = "Выберите операцию и тип недвижимости.";
+        if (formMessage) {
+          formMessage.textContent = "Выберите операцию и тип недвижимости.";
+          formMessage.classList.add("error");
+        }
+        console.warn("[addForm early return]", { step: "property-fields", propertyType, propertyOperation });
         (!propertyOperation ? propertyOperationSelect : propertyTypeSelect)?.focus();
         return;
       }
@@ -5763,6 +5833,12 @@ if (addForm) {
         payload.image_urls = await uploadListingPhotos();
         payload.image_url = payload.image_urls[0];
       }
+      console.info("[addForm] inserting listing", {
+        category: payload.category,
+        city_id: payload.city_id,
+        user_id: payload.user_id,
+        hasPropertyDetails: !!payload.property_details
+      });
       const { data: insertedListings, error } = await db.from("listings").insert(payload).select("id");
       if (error) {
         const raw = String(error.message || "");
@@ -5782,6 +5858,7 @@ if (addForm) {
         formMessage.textContent = withPhotos
           ? (errorText === photoText("setup") ? errorText : `${photoText("failed")} ${errorText}`)
           : `Ошибка: ${errorText}`;
+        formMessage.classList.add("error");
       }
     } finally {
       publishing = false;

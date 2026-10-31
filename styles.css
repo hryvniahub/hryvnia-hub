@@ -3327,9 +3327,10 @@ main{
 }
 
 .property-search-menu .property-location-grid .property-search-field{grid-column:auto!important;}
-.property-search-menu .property-location-extra-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(110px,1fr);gap:10px;margin-top:10px;}
+.property-search-menu .property-location-grid .property-address-field{grid-column:1/-1!important;}
+.property-search-menu .property-location-extra-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;margin-top:10px;}
 .property-search-menu .property-location-extra-grid .property-search-field{grid-column:auto!important;}
-@media(max-width:480px){.property-search-menu .property-location-extra-grid{grid-template-columns:minmax(0,1fr) minmax(96px,.7fr);gap:8px;}}
+@media(max-width:480px){.property-search-menu .property-location-extra-grid{grid-template-columns:minmax(0,1fr);gap:8px;}}
 
 /* Unified marketplace map */
 .map-entry-row{display:flex;justify-content:flex-end;padding-top:8px;padding-bottom:8px}

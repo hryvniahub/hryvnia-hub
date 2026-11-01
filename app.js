@@ -614,11 +614,6 @@ const citySearchInput = document.getElementById("citySearchInput");
 citySearchInput?.removeAttribute("required");
 const citySuggestions = document.getElementById("citySuggestions");
 const citySelect = document.getElementById("citySelect");
-// TEMPORARY DIAGNOSTIC: bypass the cities catalog only for Real Estate creation.
-// Real Supabase city ID for Dnipro; remove this switch after the isolation test.
-const PROPERTY_CITY_TEST_MODE = true;
-const PROPERTY_TEST_CITY_ID = 1;
-console.info("[Real Estate diagnostic] City catalog bypass is ACTIVE; city_id=1 (Dnipro).");
 // Vehicle listing location has its own controls and state; it never reuses property form nodes.
 const vehicleListingRegionSelect = document.getElementById("vehicleListingRegionSelect");
 const vehicleListingCitySearchInput = document.getElementById("vehicleListingCitySearchInput");
@@ -2554,9 +2549,8 @@ function updateCities(items, names = {}) {
   updateCatalogCitySearchLanguage();
   if (vehicleSearchCityInput) { const selectedVehicleCity = availableCities.find(city => String(city.id) === selectedCatalogCityId); if (selectedVehicleCity) vehicleSearchCityInput.value = cityName(selectedVehicleCity); }
 }
-// TEMPORARY DIAGNOSTIC SWITCH: bypass oblast/city district catalogs in the property
-// creation form only. The database tables and other app flows remain untouched.
-const DISABLE_PROPERTY_DISTRICTS_FOR_CREATION = true;
+// Property district catalogs are enabled for listing creation.
+const DISABLE_PROPERTY_DISTRICTS_FOR_CREATION = false;
 let propertyOblastRaions = [];
 let propertyCityDistricts = [];
 let propertyGeoCatalogsPromise = null;
@@ -2810,19 +2804,10 @@ if (catalogCitySuggestions) {
 }
 if (citySearchInput) {
   citySearchInput.addEventListener("input", () => {
-    if (PROPERTY_CITY_TEST_MODE && listingCategorySelect?.value === "Недвижимость") {
-      if (citySelect) citySelect.value = String(PROPERTY_TEST_CITY_ID);
-      closeCitySuggestions();
-      return;
-    }
     if (citySelect) citySelect.value = "";
     renderCitySuggestions();
   });
   citySearchInput.addEventListener("focus", async () => {
-    if (PROPERTY_CITY_TEST_MODE && listingCategorySelect?.value === "Недвижимость") {
-      closeCitySuggestions();
-      return;
-    }
     if (!availableCities.length) {
       citySuggestions && (citySuggestions.innerHTML = `<div class="city-suggestion-empty" role="status">${escapeHtml(cityTranslation("Загрузка городов…"))}</div>`);
       citySuggestions && (citySuggestions.hidden = false);
@@ -5833,16 +5818,7 @@ async function openPropertyListingForm(propertyType = "", operation = "") {
   // their options and dependent district lists are ready.
   addModal?.classList.remove("hidden");
 
-  if (PROPERTY_CITY_TEST_MODE) {
-    // Use a known-valid FK while bypassing the city catalog for this diagnostic.
-    if (citySelect) citySelect.value = String(PROPERTY_TEST_CITY_ID);
-    if (citySearchInput) {
-      citySearchInput.disabled = false;
-      citySearchInput.value = "Дніпро";
-    }
-    if (cityRegionSelect) cityRegionSelect.disabled = false;
-    propertyListingLocationFields?.removeAttribute("aria-busy");
-  } else {
+  {
     const geoControls = [
       cityRegionSelect,
       citySearchInput,
@@ -6088,10 +6064,9 @@ addForm.addEventListener("submit", async e => {
     // Load the catalogs required by this category before reading FormData.
     // FormData is a snapshot: taking it before async loading can preserve stale/empty values.
     try {
-      if (selectedCategory === "Недвижимость" && PROPERTY_CITY_TEST_MODE) {
-        // Deliberately bypass cities and property geo catalogs for this test only.
-      } else if (selectedCategory === "Недвижимость") {
-        await Promise.all([ensureCitiesLoaded(), loadPropertyGeoCatalogs()]);
+      if (selectedCategory === "Недвижимость") {
+        await ensureCitiesLoaded();
+        if (!DISABLE_PROPERTY_DISTRICTS_FOR_CREATION) await loadPropertyGeoCatalogs();
       } else {
         await ensureCitiesLoaded();
       }
@@ -6105,8 +6080,7 @@ addForm.addEventListener("submit", async e => {
 
       return;
     }
-    if (!(selectedCategory === "Недвижимость" && PROPERTY_CITY_TEST_MODE)
-      && (!Array.isArray(availableCities) || !availableCities.length)) {
+    if (!Array.isArray(availableCities) || !availableCities.length) {
       if (formMessage) {
         formMessage.textContent = "Не удалось загрузить список населённых пунктов. Проверьте соединение и повторите попытку.";
         formMessage.classList.add("error");
@@ -6120,15 +6094,9 @@ addForm.addEventListener("submit", async e => {
       : selectedCategory === "Недвижимость"
         ? "city_id"
         : "generic_city_id";
-    const cityId = selectedCategory === "Недвижимость" && PROPERTY_CITY_TEST_MODE
-      ? String(PROPERTY_TEST_CITY_ID)
-      : String(form.get(cityFieldName) || "");
-    const propertyTestCityTextMissing = selectedCategory === "Недвижимость"
-      && PROPERTY_CITY_TEST_MODE
-      && !String(citySearchInput?.value || "").trim();
-    if (propertyTestCityTextMissing || !cityId || !Number.isFinite(Number(cityId)) || Number(cityId) <= 0
-      || (!(selectedCategory === "Недвижимость" && PROPERTY_CITY_TEST_MODE)
-        && !availableCities.some(city => String(city.id) === cityId))) {
+    const cityId = String(form.get(cityFieldName) || "");
+    if (!cityId || !Number.isFinite(Number(cityId)) || Number(cityId) <= 0
+      || !availableCities.some(city => String(city.id) === cityId)) {
       if (formMessage) {
         formMessage.textContent = cityTranslation("Выберите город из списка");
         formMessage.classList.add("error");

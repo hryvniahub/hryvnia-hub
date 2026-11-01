@@ -2483,12 +2483,19 @@ function selectCity(city) {
   formRegionCode = isCapital ? "" : String(city.region_katottg_code || "");
   if (cityRegionSelect) cityRegionSelect.value = isCapital ? "__capital__" : formRegionCode;
 
-  // A selected settlement resolves its oblast raion through the KATOTTG code hierarchy.
-  updatePropertyOblastRaions(formRegionCode);
-  const matchingRaion = findOblastRaionForCity(city);
-  const raionSelect = document.getElementById("propertyOblastRaionSelect");
-  if (raionSelect) raionSelect.value = matchingRaion ? String(matchingRaion.katottg_code) : "";
-  updatePropertyCityDistricts(city);
+  if (!DISABLE_PROPERTY_DISTRICTS_FOR_CREATION) {
+    // A selected settlement resolves its oblast raion through the KATOTTG code hierarchy.
+    updatePropertyOblastRaions(formRegionCode);
+    const matchingRaion = findOblastRaionForCity(city);
+    const raionSelect = document.getElementById("propertyOblastRaionSelect");
+    if (raionSelect) raionSelect.value = matchingRaion ? String(matchingRaion.katottg_code) : "";
+    updatePropertyCityDistricts(city);
+  } else {
+    const raionSelect = document.getElementById("propertyOblastRaionSelect");
+    const cityDistrictSelect = document.getElementById("propertyCityDistrictSelect");
+    if (raionSelect) raionSelect.value = "";
+    if (cityDistrictSelect) cityDistrictSelect.value = "";
+  }
 
   closeCitySuggestions();
   if (formMessage) formMessage.textContent = "";
@@ -2542,6 +2549,9 @@ function updateCities(items, names = {}) {
   updateCatalogCitySearchLanguage();
   if (vehicleSearchCityInput) { const selectedVehicleCity = availableCities.find(city => String(city.id) === selectedCatalogCityId); if (selectedVehicleCity) vehicleSearchCityInput.value = cityName(selectedVehicleCity); }
 }
+// TEMPORARY DIAGNOSTIC SWITCH: bypass oblast/city district catalogs in the property
+// creation form only. The database tables and other app flows remain untouched.
+const DISABLE_PROPERTY_DISTRICTS_FOR_CREATION = true;
 let propertyOblastRaions = [];
 let propertyCityDistricts = [];
 let propertyGeoCatalogsPromise = null;
@@ -2581,7 +2591,9 @@ function getCityOblastRaionCode(city) {
   return normalizeKatottgCode(matchedRaion?.katottg_code);
 }
 function getPropertyGeoFilteredCities() {
-  const raionCode = normalizeKatottgCode(document.getElementById("propertyOblastRaionSelect")?.value);
+  const raionCode = DISABLE_PROPERTY_DISTRICTS_FOR_CREATION
+    ? ""
+    : normalizeKatottgCode(document.getElementById("propertyOblastRaionSelect")?.value);
   const regionCode = normalizeKatottgCode(formRegionCode);
   return citySearchIndex.filter(entry => {
     const city = entry.city;
@@ -2704,8 +2716,10 @@ if (catalogRegionSelect) {
 if (cityRegionSelect) {
   cityRegionSelect.addEventListener("focus", async () => {
     if (!availableCities.length) await loadCities().catch(error => console.error("Не удалось загрузить города:", error));
-    await loadPropertyGeoCatalogs().catch(error => console.error("Не удалось загрузить географические справочники:", error));
-    updatePropertyOblastRaions(formRegionCode);
+    if (!DISABLE_PROPERTY_DISTRICTS_FOR_CREATION) {
+      await loadPropertyGeoCatalogs().catch(error => console.error("Не удалось загрузить географические справочники:", error));
+      updatePropertyOblastRaions(formRegionCode);
+    }
   }, { once: true });
   cityRegionSelect.addEventListener("change", async () => {
     formRegionCode = cityRegionSelect.value === "__capital__" ? "" : cityRegionSelect.value;
@@ -2716,9 +2730,11 @@ if (cityRegionSelect) {
       if (citySearchInput) citySearchInput.value = "";
       updatePropertyCityDistricts(null);
     }
-    await loadPropertyGeoCatalogs().catch(error => console.error("Не удалось загрузить географические справочники:", error));
-    updatePropertyOblastRaions(formRegionCode);
-    const selectedRaion = propertyOblastRaions.find(row => normalizeKatottgCode(row.katottg_code) === normalizeKatottgCode(propertyOblastRaionSelect?.value));
+    if (!DISABLE_PROPERTY_DISTRICTS_FOR_CREATION) {
+      await loadPropertyGeoCatalogs().catch(error => console.error("Не удалось загрузить географические справочники:", error));
+      updatePropertyOblastRaions(formRegionCode);
+    }
+    const selectedRaion = DISABLE_PROPERTY_DISTRICTS_FOR_CREATION ? null : propertyOblastRaions.find(row => normalizeKatottgCode(row.katottg_code) === normalizeKatottgCode(propertyOblastRaionSelect?.value));
     if (selectedRaion && normalizeKatottgCode(selectedRaion.region_katottg_code) !== normalizeKatottgCode(formRegionCode)) {
       if (propertyOblastRaionSelect) propertyOblastRaionSelect.value = "";
     }
@@ -2795,7 +2811,9 @@ if (citySearchInput) {
       citySuggestions && (citySuggestions.hidden = false);
       try { await loadCities(); } catch (error) { console.error("Не удалось загрузить города:", error); }
     }
-    try { await loadPropertyGeoCatalogs(); updatePropertyOblastRaions(formRegionCode); } catch (error) { console.error("Не удалось загрузить географические справочники:", error); }
+    if (!DISABLE_PROPERTY_DISTRICTS_FOR_CREATION) {
+      try { await loadPropertyGeoCatalogs(); updatePropertyOblastRaions(formRegionCode); } catch (error) { console.error("Не удалось загрузить географические справочники:", error); }
+    }
     renderCitySuggestions();
   });
   citySearchInput.addEventListener("keydown", event => {
@@ -2991,8 +3009,8 @@ function updatePropertyListingLocationSummary() {
   if (!propertyListingLocationSummaryText) return;
   const city = availableCities.find(item => String(item.id) === String(citySelect?.value || ""));
   const cityLabel = city ? cityName(city) : (citySearchInput?.value || "").trim();
-  const cityDistrict = propertyCityDistrictSelect?.selectedOptions?.[0]?.textContent?.trim();
-  const oblastRaion = propertyOblastRaionSelect?.selectedOptions?.[0]?.textContent?.trim();
+  const cityDistrict = DISABLE_PROPERTY_DISTRICTS_FOR_CREATION ? "" : propertyCityDistrictSelect?.selectedOptions?.[0]?.textContent?.trim();
+  const oblastRaion = DISABLE_PROPERTY_DISTRICTS_FOR_CREATION ? "" : propertyOblastRaionSelect?.selectedOptions?.[0]?.textContent?.trim();
   const region = cityRegionSelect?.selectedOptions?.[0]?.textContent?.trim();
   const parts = [cityLabel];
   if (cityDistrict && propertyCityDistrictSelect.value) parts.push(cityDistrict);
@@ -5532,7 +5550,9 @@ function syncPropertyListingFields() {
   const eurOption = document.querySelector('#listingPriceCurrency option[value="EUR"]');
   if (eurOption) eurOption.hidden = isProperty;
   const propertyDistrictField = document.getElementById("propertyDistrictField");
-  if (propertyDistrictField) propertyDistrictField.hidden = !isProperty;
+  const propertyOblastRaionField = document.getElementById("propertyOblastRaionField");
+  if (propertyDistrictField) propertyDistrictField.hidden = DISABLE_PROPERTY_DISTRICTS_FOR_CREATION || !isProperty;
+  if (propertyOblastRaionField) propertyOblastRaionField.hidden = DISABLE_PROPERTY_DISTRICTS_FOR_CREATION || !isProperty;
   if (propertyAddressField) propertyAddressField.hidden = !isProperty;
   if (propertyRadiusField) propertyRadiusField.hidden = true;
   if (propertyListingLocationAccordion) propertyListingLocationAccordion.hidden = isVehicle;
@@ -5799,21 +5819,28 @@ async function openPropertyListingForm(propertyType = "", operation = "") {
   const geoControls = [
     cityRegionSelect,
     citySearchInput,
-    propertyOblastRaionSelect,
-    propertyCityDistrictSelect
+    ...(DISABLE_PROPERTY_DISTRICTS_FOR_CREATION ? [] : [propertyOblastRaionSelect, propertyCityDistrictSelect])
   ].filter(Boolean);
   const previousDisabledStates = geoControls.map(control => control.disabled);
   geoControls.forEach(control => { control.disabled = true; });
   propertyListingLocationFields?.setAttribute("aria-busy", "true");
 
-  Promise.all([ensureCitiesLoaded(), loadPropertyGeoCatalogs()])
+  Promise.all([
+    ensureCitiesLoaded(),
+    DISABLE_PROPERTY_DISTRICTS_FOR_CREATION ? Promise.resolve(true) : loadPropertyGeoCatalogs()
+  ])
     .then(([cities]) => {
       if (!Array.isArray(cities) || !cities.length) {
         throw new Error("Справочник населённых пунктов не загружен.");
       }
-      updatePropertyOblastRaions(formRegionCode);
-      const selected = availableCities.find(city => String(city.id) === String(citySelect?.value || ""));
-      updatePropertyCityDistricts(selected || null);
+      if (!DISABLE_PROPERTY_DISTRICTS_FOR_CREATION) {
+        updatePropertyOblastRaions(formRegionCode);
+        const selected = availableCities.find(city => String(city.id) === String(citySelect?.value || ""));
+        updatePropertyCityDistricts(selected || null);
+      } else {
+        if (propertyOblastRaionSelect) propertyOblastRaionSelect.value = "";
+        if (propertyCityDistrictSelect) propertyCityDistrictSelect.value = "";
+      }
     })
     .catch(error => {
       console.error("Не удалось загрузить географию недвижимости:", error);
@@ -6141,10 +6168,10 @@ addForm.addEventListener("submit", async e => {
         property_details: {
           operation: propertyOperation,
           type: propertyType,
-          district: String(propertyCityDistrictSelect?.selectedOptions?.[0]?.textContent || "").trim() || null,
-          district_code: String(form.get("property_district") || "").trim() || null,
-          oblast_raion: String(propertyOblastRaionSelect?.selectedOptions?.[0]?.textContent || "").trim() || null,
-          oblast_raion_code: String(form.get("property_oblast_raion") || "").trim() || null,
+          district: DISABLE_PROPERTY_DISTRICTS_FOR_CREATION ? null : (String(propertyCityDistrictSelect?.selectedOptions?.[0]?.textContent || "").trim() || null),
+          district_code: DISABLE_PROPERTY_DISTRICTS_FOR_CREATION ? null : (String(form.get("property_district") || "").trim() || null),
+          oblast_raion: DISABLE_PROPERTY_DISTRICTS_FOR_CREATION ? null : (String(propertyOblastRaionSelect?.selectedOptions?.[0]?.textContent || "").trim() || null),
+          oblast_raion_code: DISABLE_PROPERTY_DISTRICTS_FOR_CREATION ? null : (String(form.get("property_oblast_raion") || "").trim() || null),
           address: String(form.get("property_address") || "").trim() || null,
           radius_km: optionalNumber("property_radius_km"),
           area_m2: optionalNumber("property_area"),

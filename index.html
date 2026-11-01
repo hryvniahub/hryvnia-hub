@@ -6,7 +6,7 @@
   <meta name="google" content="notranslate">
   <title>Hryvnia Hub — объявления Украины</title>
   <meta name="description" content="Hryvnia Hub — хаб объявлений: автомобили, недвижимость и бизнес.">
-  <link rel="stylesheet" href="styles.css?v=20261031-map-v1">
+  <link rel="stylesheet" href="styles.css?v=20261101-locsplit1">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
@@ -415,7 +415,6 @@
             <i aria-hidden="true"></i><div class="listing-progress-step"><span>4</span><small>Публикация</small></div>
           </div>
         <label id="listingTitleField">Название<input name="title" required placeholder="Например: Skoda Octavia 1.6"></label>
-        <div id="listingLocationFields" class="listing-location-block">
         <section id="propertyListingLocationAccordion" class="property-listing-location-accordion" aria-label="Місцезнаходження">
           <button type="button" id="propertyListingLocationToggle" class="property-listing-location-summary" aria-expanded="false" aria-controls="propertyListingLocationFields">
             <span id="propertyListingLocationSummaryText" class="is-placeholder">Оберіть місцезнаходження</span><span class="property-listing-location-chevron" aria-hidden="true">⌄</span>
@@ -432,9 +431,27 @@
         <input type="hidden" name="longitude" id="listingLongitude">
         <div class="listing-map-location property-listing-map-action"><button type="button" class="btn map-pick-button" id="pickListingMapPoint">⌖ Знайти на мапі</button><span id="listingMapPointStatus" class="muted" aria-live="polite">Точка на карті не вибрана</span></div>
         <input type="hidden" name="property_radius_km" id="propertyRadiusSlider" value="0">
-        </div>
         <fieldset id="vehicleListingFields" class="vehicle-listing-fields" hidden>
           <legend>Характеристики автомобиля</legend>
+          <section id="vehicleListingLocationBlock" class="vehicle-listing-location" aria-label="Местоположение автомобиля">
+            <h3>Местоположение автомобиля</h3>
+            <label class="vehicle-location-field">Область
+              <select id="vehicleListingRegionSelect" aria-label="Область автомобиля"><option value="">Все области</option></select>
+            </label>
+            <label class="vehicle-location-field">Населённый пункт
+              <div class="city-search">
+                <input id="vehicleListingCitySearchInput" type="search" autocomplete="off" placeholder="Введите название населённого пункта" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="vehicleListingCitySuggestions">
+                <div id="vehicleListingCitySuggestions" class="city-suggestions" role="listbox" hidden></div>
+                <input type="hidden" name="vehicle_city_id" id="vehicleListingCitySelect">
+              </div>
+            </label>
+            <input type="hidden" name="vehicle_latitude" id="vehicleListingLatitude">
+            <input type="hidden" name="vehicle_longitude" id="vehicleListingLongitude">
+            <div class="listing-map-location vehicle-listing-map-action">
+              <button type="button" class="btn map-pick-button" id="pickVehicleListingMapPoint">⌖ Указать точку на карте</button>
+              <span id="vehicleListingMapPointStatus" class="muted" aria-live="polite">Точка на карте не выбрана</span>
+            </div>
+          </section>
           <label>Марка автомобиля<span class="vehicle-make-control"><select name="vehicle_make_slug" id="vehicleListingMake" aria-describedby="vehicleListingMakeStatus"><option value="">Выберите марку</option></select><span class="vehicle-make-spinner hidden" id="vehicleListingMakeSpinner" aria-hidden="true"></span></span><span class="vehicle-make-load-status" id="vehicleListingMakeStatus" role="status" aria-live="polite"></span></label>
           <label>Модель автомобиля<select name="vehicle_model_slug" id="vehicleListingModel" disabled><option value="">Сначала выберите марку</option></select></label>
           <label>Год выпуска<input name="vehicle_year" type="number" min="1900" max="2100" placeholder="2018"></label>
@@ -674,6 +691,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-  <script src="app.js?v=20261031-map-v1"></script>
+  <script src="app.js?v=20261101-locsplit1"></script>
 </body>
 </html>

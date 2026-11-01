@@ -322,7 +322,6 @@ const translations = {
   "Рік від": { ru: "Год от", uk: "Рік від", en: "Year from", pl: "Rok od" },
   "Рік до": { ru: "Год до", uk: "Рік до", en: "Year to", pl: "Rok do" },
 
-
   "Пробіг від, км": { ru: "Пробег от, км", uk: "Пробіг від, км", en: "Mileage from, km", pl: "Przebieg od, km" },
   "Пробіг до, км": { ru: "Пробег до, км", uk: "Пробіг до, км", en: "Mileage to, km", pl: "Przebieg do, km" },
   "Об’єм двигуна від, л": { ru: "Объём двигателя от, л", uk: "Об’єм двигуна від, л", en: "Engine size from, L", pl: "Pojemność silnika od, l" },
@@ -2166,7 +2165,6 @@ async function loadMarketQuotes() {
   tickerSetText("icon", "usd", icons.usd);
   tickerSetText("icon", "pln", icons.pln);
 
-
   try {
     const [usdResult, plnResult, btcResult, xauResult] = await Promise.allSettled([
       fetchCachedQuote("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=USD&json", FIAT_QUOTE_TTL),
@@ -2561,41 +2559,13 @@ function getPropertyGeoFilteredCities() {
 }
 async function loadPropertyGeoCatalogs() {
   if (!db) return false;
-  if (propertyGeoCatalogsLoaded) {
-    window.__hhGeoLoadDiagnostics = {
-      ...(window.__hhGeoLoadDiagnostics || {}),
-      propertyGeoCatalogs: { status: "cached", durationMs: 0 }
-    };
-    return true;
-  }
+  if (propertyGeoCatalogsLoaded) return true;
   if (propertyGeoCatalogsPromise) return propertyGeoCatalogsPromise;
 
   propertyGeoCatalogsPromise = (async () => {
-    const totalStartedAt = performance.now();
-    const queryTimings = {};
-    const timedQuery = async (name, query) => {
-      const startedAt = performance.now();
-      try {
-        const result = await query;
-        queryTimings[name] = {
-          durationMs: Math.round(performance.now() - startedAt),
-          rows: result.data?.length ?? 0,
-          error: result.error?.message || null
-        };
-        return result;
-      } catch (error) {
-        queryTimings[name] = {
-          durationMs: Math.round(performance.now() - startedAt),
-          rows: 0,
-          error: error?.message || String(error)
-        };
-        throw error;
-      }
-    };
-
     const [raionsResult, districtsResult] = await Promise.all([
-      timedQuery("oblast_raions", db.from("oblast_raions").select("id, katottg_code, region_katottg_code, name_uk, name_ru, name_en, name_pl").eq("is_active", true).order("name_uk")),
-      timedQuery("city_districts", db.from("city_districts").select("id, katottg_code, city_id, city_katottg_code, name_uk, name_ru, name_en, name_pl").eq("is_active", true).order("name_uk"))
+      db.from("oblast_raions").select("id, katottg_code, region_katottg_code, name_uk, name_ru, name_en, name_pl").eq("is_active", true).order("name_uk"),
+      db.from("city_districts").select("id, katottg_code, city_id, city_katottg_code, name_uk, name_ru, name_en, name_pl").eq("is_active", true).order("name_uk")
     ]);
 
     if (raionsResult.error) {
@@ -2607,22 +2577,9 @@ async function loadPropertyGeoCatalogs() {
       throw districtsResult.error;
     }
 
-    const assignStartedAt = performance.now();
     propertyOblastRaions = raionsResult.data || [];
     propertyCityDistricts = districtsResult.data || [];
     propertyGeoCatalogsLoaded = true;
-    const diagnostics = {
-      status: "loaded",
-      totalDurationMs: Math.round(performance.now() - totalStartedAt),
-      assignDurationMs: Math.round(performance.now() - assignStartedAt),
-      queries: queryTimings,
-      loadedAt: new Date().toISOString()
-    };
-    window.__hhGeoLoadDiagnostics = {
-      ...(window.__hhGeoLoadDiagnostics || {}),
-      propertyGeoCatalogs: diagnostics
-    };
-    console.info("[HH GEO TIMING] Property district catalogs:", diagnostics);
     return true;
   })();
 
@@ -2662,21 +2619,12 @@ async function loadCities() {
   if (citiesLoadPromise) return citiesLoadPromise;
   if (window.hryvniaCitiesLoaded && availableCities.length) return availableCities;
   citiesLoadPromise = (async () => {
-  const citiesStartedAt = performance.now();
   const allCities = [];
   const pageSize = 1000;
   let from = 0;
-  let pageCount = 0;
   let cityError = null;
   while (true) {
-    const pageStartedAt = performance.now();
     const { data, error } = await db.from("cities").select("id, name_ru, name_uk, name_en, name_pl, official_code, settlement_category_code, region_katottg_code, raion_katottg_code").order("id").range(from, from + pageSize - 1);
-    pageCount += 1;
-    console.info("[HH GEO TIMING] cities page", pageCount, {
-      durationMs: Math.round(performance.now() - pageStartedAt),
-      rows: data?.length ?? 0,
-      error: error?.message || null
-    });
     if (error) { cityError = error; break; }
     allCities.push(...(data || []));
     if (!data || data.length < pageSize) break;
@@ -2698,23 +2646,8 @@ async function loadCities() {
       regionsLoaded = Object.keys(regionNames).length > 0;
     }
   } catch (err) { console.error("Не удалось загрузить регионы:", err); }
-  const renderCitiesStartedAt = performance.now();
   updateCities(allCities, regionNames);
   window.hryvniaCitiesLoaded = regionsLoaded;
-  const cityDiagnostics = {
-    status: "loaded",
-    totalDurationMs: Math.round(performance.now() - citiesStartedAt),
-    pageCount,
-    totalRows: allCities.length,
-    renderDurationMs: Math.round(performance.now() - renderCitiesStartedAt),
-    regionsLoaded,
-    loadedAt: new Date().toISOString()
-  };
-  window.__hhGeoLoadDiagnostics = {
-    ...(window.__hhGeoLoadDiagnostics || {}),
-    cities: cityDiagnostics
-  };
-  console.info("[HH GEO TIMING] Cities catalog:", cityDiagnostics);
     return availableCities;
   })();
   try {
@@ -3458,7 +3391,6 @@ async function editListing(item, labels) {
     return clone.outerHTML;
   })();
   const editPropertyPriceField = `<div class="listing-price-row" style="grid-column:1 / -1"><label>${escapeHtml(t("Цена"))}<input name="price" type="number" min="0" step="0.01" required value="${escapeHtml(String(item.price ?? ""))}"></label><label>${escapeHtml(t("Валюта"))}<select name="price_currency">${[['UAH','₴ UAH'],['USD','$ USD'],['EUR','€ EUR'],['PLN','zł PLN']].map(([v,l])=>`<option value="${v}" ${String(item.currency||'UAH')===v?'selected':''}>${l}</option>`).join('')}</select></label></div>`;
-
 
   const vehicleBlock = isVehicle ? `
     <fieldset class="vehicle-listing-fields">
@@ -5000,7 +4932,7 @@ function openCategoryMenu(parentCategory = "") {
         </section>
         <section class="property-search-section" aria-label="${escapeHtml(t("Категорія нерухомості"))}">
           <div class="property-search-field property-category-field">
-            
+
             <button type="button" id="propertyTypeTrigger" class="property-type-trigger" data-value="" aria-haspopup="listbox" aria-expanded="false" aria-controls="propertyTypeOptions" aria-label="${escapeHtml(t("Категорія нерухомості"))}"><span class="property-type-label">${escapeHtml(t("Оберіть категорію"))}</span><span class="property-field-chevron" aria-hidden="true">⌄</span></button>
             <div id="propertyTypeOptions" class="property-type-options" role="listbox" aria-label="${escapeHtml(t("Категорія нерухомості"))}" hidden>
               ${[``, ...propertyTypes].map(label => { const value = label; const text = label ? t(label) : t("Оберіть категорію"); return `<button type="button" class="property-type-option${!label ? " is-selected" : ""}" role="option" aria-selected="${!label ? "true" : "false"}" data-property-type="${escapeHtml(value)}">${escapeHtml(text)}<span class="property-type-radio" aria-hidden="true"></span></button>`; }).join("")}
@@ -5307,7 +5239,7 @@ function refreshPropertyListingSelect(select) {
   const selected = select.options[select.selectedIndex];
   if (label) label.textContent = select.value
     ? (selected?.textContent?.trim() || "")
-    : "Выберите тип объекта"; 
+    : "Выберите тип объекта";
   trigger?.classList.toggle("hh-required-missing", !select.value);
   control.querySelectorAll("[data-property-select-value]").forEach(option => {
     const active = option.dataset.propertySelectValue === select.value;
@@ -5726,44 +5658,14 @@ async function openPropertyListingForm(propertyType = "", operation = "") {
   geoControls.forEach(control => { control.disabled = true; });
   propertyListingLocationFields?.setAttribute("aria-busy", "true");
 
-  const geoOpenStartedAt = performance.now();
   Promise.all([ensureCitiesLoaded(), loadPropertyGeoCatalogs()])
     .then(([cities]) => {
       if (!Array.isArray(cities) || !cities.length) {
         throw new Error("Справочник населённых пунктов не загружен.");
       }
-      const renderStartedAt = performance.now();
       updatePropertyOblastRaions(formRegionCode);
       const selected = availableCities.find(city => String(city.id) === String(citySelect?.value || ""));
       updatePropertyCityDistricts(selected || null);
-      const diagnostics = {
-        modalToReadyMs: Math.round(performance.now() - geoOpenStartedAt),
-        dropdownRenderMs: Math.round(performance.now() - renderStartedAt),
-        cities: window.__hhGeoLoadDiagnostics?.cities || { status: "cached/previously loaded" },
-        districts: window.__hhGeoLoadDiagnostics?.propertyGeoCatalogs || { status: "cached/previously loaded" }
-      };
-      window.__hhGeoLoadDiagnostics = {
-        ...(window.__hhGeoLoadDiagnostics || {}),
-        propertyFormReady: diagnostics
-      };
-      console.info("[HH GEO TIMING] Property form ready:", diagnostics);
-      const cityTime = diagnostics.cities.totalDurationMs != null
-        ? `${diagnostics.cities.totalDurationMs} мс (${diagnostics.cities.pageCount} страниц, ${diagnostics.cities.totalRows} записей)`
-        : "уже загружен";
-      const raionTime = diagnostics.districts.queries?.oblast_raions?.durationMs != null
-        ? `${diagnostics.districts.queries.oblast_raions.durationMs} мс`
-        : "уже загружен";
-      const districtTime = diagnostics.districts.queries?.city_districts?.durationMs != null
-        ? `${diagnostics.districts.queries.city_districts.durationMs} мс`
-        : "уже загружен";
-      alert(
-        "ДИАГНОСТИКА ЗАГРУЗКИ ГЕОДАННЫХ:\\n" +
-        `Города: ${cityTime}\\n` +
-        `Районы областей: ${raionTime}\\n` +
-        `Районы городов: ${districtTime}\\n` +
-        `От открытия меню до готовности: ${diagnostics.modalToReadyMs} мс\\n` +
-        `Отрисовка списков: ${diagnostics.dropdownRenderMs} мс`
-      );
     })
     .catch(error => {
       console.error("Не удалось загрузить географию недвижимости:", error);
@@ -5922,65 +5824,33 @@ if (closeAddBtn) closeAddBtn.addEventListener("click", () => addModal?.classList
 if (addModal) addModal.addEventListener("click", e => { if (e.target === addModal) addModal.classList.add("hidden"); });
 
 if (addForm) {
-  // TEMP DIAGNOSTICS: surface unexpected JavaScript errors during submit.
-  window.addEventListener("error", event => {
-    console.error("[HH SUBMIT UNCAUGHT ERROR]", event.error || event.message);
-    alert("ОШИБКА JAVASCRIPT ПРИ ПУБЛИКАЦИИ:\\n" + (event.message || event.error?.message || "неизвестная ошибка"));
-  }, { once: true });
-
-  // TEMP DIAGNOSTICS: confirm that the publish button and submit handler respond.
-  const diagnosticPublishButton = addForm.querySelector('button[type="submit"]');
-  diagnosticPublishButton?.addEventListener("click", () => {
-    alert("ДИАГНОСТИКА: кнопка «Опубликовать» нажата. Проверяем отправку формы.");
-  });
-
-  addForm.addEventListener("submit", async e => {
+addForm.addEventListener("submit", async e => {
     e.preventDefault();
-    alert("ДИАГНОСТИКА: обработчик отправки формы запущен.");
-    if (publishing || validatingPhotos) { alert("ДИАГНОСТИКА: отправка остановлена — уже идёт сохранение или проверка фотографий."); return; }
+
+    if (publishing || validatingPhotos) return;
     if (formMessage) { formMessage.textContent = ""; formMessage.classList.remove("error"); }
     propertyListingLocationToggle?.classList.remove("has-error");
     citySearchInput?.classList.remove("has-error");
     vehicleListingCitySearchInput?.classList.remove("has-error");
     if (!db) {
       if (formMessage) { formMessage.textContent = "Сначала подключим Supabase — сейчас работает демо-режим."; formMessage.classList.add("error"); }
-      alert("ДИАГНОСТИКА: остановка — объект Supabase db не создан.");
+
       return;
     }
     const form = new FormData(e.target);
     const selectedCategory = String(form.get("category") || "");
     const submittedCityId = String(form.get(selectedCategory === "Автомобили" ? "vehicle_city_id" : "city_id") || "");
-    const submittedCityText = selectedCategory === "Автомобили" ? vehicleListingCitySearchInput?.value : citySearchInput?.value;
-    console.info("[addForm submit]", {
-      category: selectedCategory,
-      cityId: submittedCityId,
-      cityText: String(submittedCityText || ""),
-      citiesLoaded: availableCities.length,
-      propertyType: String(form.get("property_type") || ""),
-      propertyOperation: String(form.get("property_operation") || ""),
-      userId: currentUser?.id || null
-    });
-    // TEMP DIAGNOSTICS: identify whether city catalog loading is blocking submit.
-    alert("ДИАГНОСТИКА: сейчас начинается загрузка справочника городов.");
-    console.info("[HH SUBMIT] before ensureCitiesLoaded", {
-      category: selectedCategory,
-      selectedCityId: submittedCityId,
-      citiesLoaded: availableCities.length
-    });
     // Ensure the city catalog is ready before checking the selected hidden city_id.
     try {
       await ensureCitiesLoaded();
-      console.info("[HH SUBMIT] ensureCitiesLoaded completed", {
-        citiesLoaded: availableCities.length
-      });
-      alert("ДИАГНОСТИКА: справочник городов загружен. Количество городов: " + availableCities.length);
+
     } catch (error) {
       console.error("[addForm] city catalog load failed:", error);
       if (formMessage) {
         formMessage.textContent = "Не удалось загрузить справочник городов. Проверьте соединение и повторите попытку.";
         formMessage.classList.add("error");
       }
-      alert("ДИАГНОСТИКА: остановка — не загрузился справочник городов. Подробности смотрите в сообщении формы.");
+
       return;
     }
     const cityId = submittedCityId;
@@ -6007,11 +5877,10 @@ if (addForm) {
         (propertyListingLocationToggle || formMessage)?.scrollIntoView({ behavior: "smooth", block: "center" });
       }
       formMessage?.scrollIntoView({ behavior: "smooth", block: "center" });
-      console.warn("[addForm early return]", { step: "city", cityId, availableCities: availableCities.length });
-      alert("ДИАГНОСТИКА: публикация остановлена на проверке города.\nВыбранный city_id: " + (cityId || "пусто") + "\nЗагружено городов: " + availableCities.length + "\nПроверьте выбор города из списка.");
+
       return;
     }
-    alert("ДИАГНОСТИКА: проверка города пройдена. city_id = " + cityId);
+
     const descriptionFieldName = selectedCategory === "Автомобили" ? "vehicle_description" : selectedCategory === "Недвижимость" ? "property_description" : "description";
     const priceFieldName = selectedCategory === "Автомобили" ? "vehicle_price" : selectedCategory === "Недвижимость" ? "property_price" : "price";
     const currencyFieldName = selectedCategory === "Автомобили" ? "vehicle_price_currency" : selectedCategory === "Недвижимость" ? "property_price_currency" : "price_currency";
@@ -6019,7 +5888,7 @@ if (addForm) {
     const generatedRealEstateTitle = selectedCategory === "Недвижимость"
       ? (description.split(/\r?\n/)[0].trim().slice(0, 100) || (translations["Недвижимость"]?.[lang] || "Недвижимость"))
       : "";
-    alert("ДИАГНОСТИКА: начинаю формировать общий payload объявления.");
+
     const payload = {
       category: selectedCategory,
       title: selectedCategory === "Недвижимость" ? generatedRealEstateTitle : String(form.get("title") || "").trim(),
@@ -6033,7 +5902,7 @@ if (addForm) {
       latitude: String(form.get(selectedCategory === "Автомобили" ? "vehicle_latitude" : "latitude") || "") === "" ? null : Number(form.get(selectedCategory === "Автомобили" ? "vehicle_latitude" : "latitude")),
       longitude: String(form.get(selectedCategory === "Автомобили" ? "vehicle_longitude" : "longitude") || "") === "" ? null : Number(form.get(selectedCategory === "Автомобили" ? "vehicle_longitude" : "longitude"))
     };
-    alert("ДИАГНОСТИКА: общий payload сформирован. Категория: " + selectedCategory + "; цена: " + payload.price + "; user_id: " + (payload.user_id || "NULL"));
+
     if (selectedCategory === "Недвижимость") {
       const propertyType = String(form.get("property_type") || "").trim();
       const propertyOperation = String(form.get("property_operation") || "").trim();
@@ -6047,8 +5916,7 @@ if (addForm) {
         propertyTypeTrigger?.classList.toggle("hh-required-missing", !propertyType);
         (!propertyOperation ? propertyOperationSelect : propertyTypeTrigger)?.scrollIntoView({ behavior: "smooth", block: "center" });
         formMessage?.scrollIntoView({ behavior: "smooth", block: "center" });
-        console.warn("[addForm early return]", { step: "property-fields", propertyType, propertyOperation });
-        alert("ДИАГНОСТИКА: публикация остановлена на обязательных полях недвижимости.\nТип объекта: " + (propertyType || "не выбран") + "\nОперация: " + (propertyOperation || "не выбрана"));
+
         return;
       }
       const optionalNumber = name => {
@@ -6100,7 +5968,7 @@ if (addForm) {
       const typeLabel = translations[propertyType]?.[lang] || propertyType;
       const operationLabel = translations[propertyOperation]?.[lang] || propertyOperation;
       payload.title = `${typeLabel} — ${operationLabel.toLocaleLowerCase(lang === "uk" ? "uk-UA" : lang === "pl" ? "pl-PL" : lang === "en" ? "en-US" : "ru-RU")}`;
-      alert("ДИАГНОСТИКА: обязательные поля недвижимости проверены. Тип: " + propertyType + "; операция: " + propertyOperation);
+
     }
     if (selectedCategory === "Автомобили") {
       const makeSlug = String(form.get("vehicle_make_slug") || "").trim();
@@ -6108,7 +5976,7 @@ if (addForm) {
       if (!makeSlug || !modelSlug) {
         if (formMessage) formMessage.textContent = "Выберите марку и модель автомобиля.";
         (!makeSlug ? vehicleListingMake : vehicleListingModel)?.focus();
-        alert("ДИАГНОСТИКА: публикация остановлена — не выбрана марка или модель автомобиля.\nМарка: " + (makeSlug || "не выбрана") + "\nМодель: " + (modelSlug || "не выбрана"));
+
         return;
       }
       let catalog;
@@ -6116,7 +5984,7 @@ if (addForm) {
       catch (error) {
         console.error("Не удалось проверить марку и модель автомобиля", error);
         if (formMessage) formMessage.textContent = "Не удалось проверить каталог автомобилей. Повторите попытку.";
-        alert("ДИАГНОСТИКА: публикация остановлена — не удалось загрузить каталог автомобилей.\nОшибка: " + (error?.message || error));
+
         return;
       }
       const makeRow = catalog.find(row => String(row.make_slug) === makeSlug);
@@ -6124,7 +5992,7 @@ if (addForm) {
       if (!makeRow || !modelRow) {
         if (formMessage) formMessage.textContent = "Марка или модель не найдена в каталоге. Выберите их заново.";
         if (!makeRow) vehicleListingMake?.focus(); else vehicleListingModel?.focus();
-        alert("ДИАГНОСТИКА: публикация остановлена — марка или модель не найдена в каталоге.\nМарка: " + makeSlug + "\nМодель: " + modelSlug);
+
         return;
       }
       payload.title = [makeRow.make_name, modelRow.model_name].filter(Boolean).join(" ");
@@ -6153,7 +6021,7 @@ if (addForm) {
       if (formMessage) formMessage.textContent = "Выберите марку и модель автомобиля или добавьте описание объявления.";
       if (selectedCategory === "Автомобили") vehicleListingMake?.focus();
       else addForm?.querySelector(`textarea[name="${descriptionFieldName}"]`)?.focus();
-      alert("ДИАГНОСТИКА: публикация остановлена — не сформировано название объявления. Проверьте описание или марку/модель.");
+
       return;
     }
     // Validate the listing before asking the visitor to sign in.
@@ -6165,11 +6033,11 @@ if (addForm) {
       }
       // Keep the form and selected File objects in memory while auth is open.
       openAuthModal();
-      alert("ДИАГНОСТИКА: публикация остановлена — currentUser отсутствует. Открыто окно авторизации.");
+
       return;
     }
     payload.user_id = currentUser.id;
-    alert("ДИАГНОСТИКА: проверки формы пройдены. Пользователь подтверждён. Готовим сохранение.");
+
     const withPhotos = selectedPhotos.length > 0;
     publishing = true;
     const controls = [...addForm.elements].map(control => [control, control.disabled]);
@@ -6180,33 +6048,14 @@ if (addForm) {
     if (formMessage) formMessage.textContent = withPhotos ? photoText("saving") : publishLabel;
     try {
       if (withPhotos) {
-        alert("ДИАГНОСТИКА: начинаем загрузку фотографий.");
+
         payload.image_urls = await uploadListingPhotos();
         payload.image_url = payload.image_urls[0];
-        alert("ДИАГНОСТИКА: фотографии загружены.");
+
       }
-      console.info("[addForm] inserting listing", {
-        category: payload.category,
-        city_id: payload.city_id,
-        user_id: payload.user_id,
-        hasPropertyDetails: !!payload.property_details,
-        payloadFields: Object.keys(payload)
-      });
-      alert(
-        "ДИАГНОСТИКА: данные подготовлены. Отправляем INSERT в Supabase.\\n" +
-        "Категория: " + (payload.category || "не указана") + "\\n" +
-        "city_id: " + (payload.city_id ?? "NULL") + "\\n" +
-        "user_id: " + (payload.user_id || "NULL")
-      );
+
       const { data: insertedListings, error } = await db.from("listings").insert(payload).select("id");
       if (error) {
-        alert(
-          "SUPABASE ОТКЛОНИЛ СОХРАНЕНИЕ\\n\\n" +
-          "Код: " + (error.code || "нет") + "\\n" +
-          "Ошибка: " + (error.message || "неизвестная ошибка") + "\\n" +
-          "Подробности: " + (error.details || "нет") + "\\n" +
-          "Подсказка: " + (error.hint || "нет")
-        );
         console.error("[addForm] Supabase insert failed:", {
           message: error.message,
           code: error.code,
@@ -6221,10 +6070,7 @@ if (addForm) {
         }
         throw error;
       }
-      alert(
-        "ДИАГНОСТИКА: Supabase успешно сохранил объявление.\\n" +
-        "ID объявления: " + (insertedListings?.[0]?.id ?? "не получен")
-      );
+
       e.target.reset();
       resetPhotos();
       if (formMessage) formMessage.textContent = "Объявление опубликовано!";
@@ -6528,7 +6374,6 @@ setInterval(loadMarketQuotes, 15 * 60 * 1000);
 loadListings();
 initAuth();
 
-
 // Keep keyboard and modal viewport behavior in one place.
 (() => {
   const modal = document.getElementById("messagesModal");
@@ -6557,7 +6402,6 @@ initAuth();
   window.addEventListener("resize", updateVisibleViewport);
   updateVisibleViewport();
 })();
-
 
 // Hryvnia Hub unified map: shared map picker + category markers + persisted viewport.
 (() => {

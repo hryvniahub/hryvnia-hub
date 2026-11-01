@@ -5859,9 +5859,20 @@ if (addForm) {
       propertyOperation: String(form.get("property_operation") || ""),
       userId: currentUser?.id || null
     });
+    // TEMP DIAGNOSTICS: identify whether city catalog loading is blocking submit.
+    alert("ДИАГНОСТИКА: сейчас начинается загрузка справочника городов.");
+    console.info("[HH SUBMIT] before ensureCitiesLoaded", {
+      category: selectedCategory,
+      selectedCityId: submittedCityId,
+      citiesLoaded: availableCities.length
+    });
     // Ensure the city catalog is ready before checking the selected hidden city_id.
     try {
       await ensureCitiesLoaded();
+      console.info("[HH SUBMIT] ensureCitiesLoaded completed", {
+        citiesLoaded: availableCities.length
+      });
+      alert("ДИАГНОСТИКА: справочник городов загружен. Количество городов: " + availableCities.length);
     } catch (error) {
       console.error("[addForm] city catalog load failed:", error);
       if (formMessage) {

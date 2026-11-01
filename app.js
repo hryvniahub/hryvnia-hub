@@ -5659,24 +5659,56 @@ if (addForm) {
     } catch (error) {
       console.error("Не удалось загрузить города перед публикацией:", error);
     }
-    const cityId = String(form.get("city_id") || "");
+    let cityId = String(form.get("city_id") || "");
     if (!cityId || !availableCities.some(city => String(city.id) === cityId)) {
-      if (formMessage) {
-        formMessage.textContent = cityTranslation("Выберите город из списка");
-        formMessage.classList.add("error");
+      // Resolve only an unambiguous exact settlement-name match.
+      // Never guess between duplicate settlements in different regions.
+      const typedCity = String(citySearchInput?.value || "").trim();
+      let resolvedCity = null;
+      if (typedCity && citySearchIndex.length) {
+        const variants = getQueryVariants(typedCity);
+        const ranked = citySearchIndex
+          .map(entry => ({ entry, rank: rankCityEntry(entry, variants) }))
+          .filter(row => row.rank === 0)
+          .filter(row => availableCities.some(city => String(city.id) === String(row.entry.city.id)))
+          .sort((a, b) => cityName(a.entry.city).localeCompare(cityName(b.entry.city)));
+        if (ranked.length === 1) resolvedCity = ranked[0].entry.city;
       }
-      // Reveal and highlight the location controls: city_id is mandatory.
-      if (listingCategorySelect?.value === "Недвижимость") {
-        propertyListingLocationToggle?.setAttribute("aria-expanded", "true");
-        propertyListingLocationFields.hidden = false;
-        propertyListingLocationToggle?.classList.add("has-error");
+
+      if (resolvedCity) {
+        selectCity(resolvedCity);
+        cityId = String(citySelect?.value || "");
+        // FormData is a snapshot; update it explicitly after selectCity().
+        if (cityId) form.set("city_id", cityId);
       }
-      citySearchInput?.classList.add("has-error");
-      citySearchInput?.focus();
-      (propertyListingLocationToggle || formMessage)?.scrollIntoView({ behavior: "smooth", block: "center" });
-      formMessage?.scrollIntoView({ behavior: "smooth", block: "center" });
-      console.warn("[addForm early return]", { step: "city", cityId, availableCities: availableCities.length });
-      return;
+
+      if (!cityId || !availableCities.some(city => String(city.id) === cityId)) {
+        if (formMessage) {
+          formMessage.textContent = cityTranslation("Выберите город из списка");
+          formMessage.classList.add("error");
+        }
+        // Reveal and highlight the location controls: city_id is mandatory.
+        if (listingCategorySelect?.value === "Недвижимость") {
+          propertyListingLocationToggle?.setAttribute("aria-expanded", "true");
+          propertyListingLocationFields.hidden = false;
+          propertyListingLocationToggle?.classList.add("has-error");
+        }
+        citySearchInput?.classList.add("has-error");
+        citySearchInput?.focus();
+        (propertyListingLocationToggle || formMessage)?.scrollIntoView({ behavior: "smooth", block: "center" });
+        formMessage?.scrollIntoView({ behavior: "smooth", block: "center" });
+        const exactMatches = typedCity
+          ? citySearchIndex.filter(entry =>
+              rankCityEntry(entry, getQueryVariants(typedCity)) === 0 &&
+              availableCities.some(city => String(city.id) === String(entry.city.id))
+            ).length
+          : 0;
+        console.warn("[addForm early return]", {
+          step: "city", cityId, typedCity, exactMatches,
+          availableCities: availableCities.length
+        });
+        return;
+      }
     }
     const selectedCategory = String(form.get("category") || "");
     const description = String(form.get("description") || "").trim();

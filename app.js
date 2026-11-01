@@ -5966,6 +5966,37 @@ addForm.addEventListener("submit", async e => {
 
       return;
     }
+    // Check the live Supabase session before any required-field or category validation.
+    // This lets signed-out visitors reach the login/register modal even when the form is incomplete.
+    let authenticatedUser = null;
+    try {
+      const { data: authData, error: authError } = await db.auth.getUser();
+      if (authError) throw authError;
+      authenticatedUser = authData?.user || null;
+      currentUser = authenticatedUser;
+    } catch (error) {
+      console.error("[addForm] auth check failed:", error);
+      if (formMessage) {
+        formMessage.textContent = "Не удалось проверить авторизацию. Проверьте соединение и повторите попытку.";
+        formMessage.classList.add("error");
+      }
+      return;
+    }
+
+    if (!authenticatedUser) {
+      pendingListingPublish = true;
+      if (formMessage) {
+        formMessage.textContent = t("Войдите, чтобы сохранить и опубликовать объявление");
+        formMessage.classList.remove("success", "error");
+      }
+      openAuthModal();
+      return;
+    }
+
+    // Native HTML validation is intentionally deferred until after authentication.
+    // The form has novalidate so the submit handler can open auth first.
+    if (!e.target.reportValidity()) return;
+
     const selectedCategory = String(new FormData(e.target).get("category") || "");
     // Load the catalogs required by this category before reading FormData.
     // FormData is a snapshot: taking it before async loading can preserve stale/empty values.
@@ -6175,19 +6206,8 @@ addForm.addEventListener("submit", async e => {
 
       return;
     }
-    // Validate the listing before asking the visitor to sign in.
-    if (!currentUser) {
-      pendingListingPublish = true;
-      if (formMessage) {
-        formMessage.textContent = t("Войдите, чтобы сохранить и опубликовать объявление");
-        formMessage.classList.remove("success", "error");
-      }
-      // Keep the form and selected File objects in memory while auth is open.
-      openAuthModal();
-
-      return;
-    }
-    payload.user_id = currentUser.id;
+    // authenticatedUser was read from Supabase immediately before validation.
+    payload.user_id = authenticatedUser.id;
 
     const photosForThisListing = getPhotoBucket(selectedCategory);
     const withPhotos = photosForThisListing.length > 0;

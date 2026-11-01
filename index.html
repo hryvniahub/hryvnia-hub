@@ -551,6 +551,82 @@
         <label>Описание<textarea name="description" rows="4" placeholder="Коротко опишите предложение"></textarea></label>
         <fieldset id="photoFields" class="photo-fields"><legend id="photoLabel">Фотографии</legend><button id="photoPickerButton" class="btn" type="button">Добавить фотографии</button><input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple hidden aria-labelledby="photoLabel" aria-describedby="photoHint photoMessage"><p id="photoHint" class="muted">До 10 фото: JPEG, PNG или WebP, до 10 МБ каждое. Первое фото — главное.</p><p id="photoMessage" class="form-message" role="status" aria-live="polite"></p><div id="photoPreview" class="photo-preview"></div></fieldset>
         <p id="formMessage" class="form-message" role="status" aria-live="polite"></p><button class="btn btn-primary full" type="submit">Опубликовать</button></div></form></div></div>
+
+    <template id="propertyEditorTemplate">
+    <fieldset class="property-listing-fields">
+              <legend data-i18n="Недвижимость">Недвижимость</legend>
+              <div class="property-listing-context">
+                <label><span data-i18n="Операция">Операция</span><select id="propertyOperation" name="property_operation" required><option value="" data-i18n="Выберите операцию">Выберите операцию</option><option value="Продажа" data-i18n="Продажа">Продажа</option><option value="Аренда" data-i18n="Аренда">Аренда</option></select></label>
+                <label><span data-i18n="Тип объекта">Тип объекта</span><select id="propertyType" name="property_type" required><option value="" data-i18n="Выберите тип объекта">Выберите тип объекта</option><option value="Квартиры" data-i18n="Квартира">Квартира</option><option value="Дома" data-i18n="Дом">Дом</option><option value="Комнаты" data-i18n="Комната">Комната</option><option value="Коммерческая недвижимость" data-i18n="Коммерческая недвижимость">Коммерческая недвижимость</option><option value="Гаражи и парковочные места" data-i18n="Гараж / паркоместо">Гараж / паркоместо</option></select></label>
+              </div>
+              <div class="property-listing-grid property-primary-grid">
+                <label><span data-i18n="Количество комнат">Количество комнат</span><select name="property_rooms"><option value="" data-i18n="Не указано">Не указано</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5+">5+</option></select></label>
+                <label><span data-i18n="Общая площадь, м²">Общая площадь, м²</span><input name="property_area" type="number" min="0" step="0.1" placeholder="65"></label>
+                <label><span data-i18n="Этаж">Этаж</span><input name="property_floor" type="number" min="0" step="1" placeholder="4"></label>
+                <label><span data-i18n="Этажность здания">Этажность здания</span><input name="property_floors_total" type="number" min="1" step="1" placeholder="9"></label>
+              </div>
+              <span id="propertyListingPriceHome" hidden></span>
+              <button type="button" class="btn btn-primary full property-listing-more" id="propertyListingMore" aria-expanded="false" aria-controls="propertyAdvancedFields"><span data-i18n="Більше">Больше</span><span aria-hidden="true" class="property-listing-more-icon">⌄</span></button>
+              <section id="propertyMarketPanel" class="vehicle-market-panel property-market-panel" hidden aria-live="polite">
+                <h3 data-i18n="Орієнтовна ринкова ціна">Ориентировочная рыночная цена</h3>
+                <p class="property-market-title" data-i18n="Вкажіть параметри об’єкта для оцінки ціни">Укажите параметры объекта для оценки цены</p>
+                <div class="market-price-scale" role="img" aria-label="Шкала рыночной цены"><span></span><i></i></div>
+                <div class="market-price-scale-labels"><span data-i18n="Нижче ринку">Ниже рынка</span><span data-i18n="Ринкова ціна">Рыночная цена</span><span data-i18n="Вище ринку">Выше рынка</span></div>
+                <p class="muted" data-i18n="Для попередньої оцінки потрібні основні параметри об’єкта.">Для предварительной оценки нужны основные параметры объекта.</p>
+                <div class="vehicle-market-auth"><p data-i18n="Увійдіть або зареєструйтеся, щоб отримати точнішу оцінку та продовжити заповнення оголошення.">Войдите или зарегистрируйтесь, чтобы получить более точную оценку и продолжить заполнение объявления.</p><div class="vehicle-market-auth-actions"><button type="button" class="btn btn-primary" id="propertyMarketLogin" data-i18n="Вхід">Войти</button><button type="button" class="btn" id="propertyMarketRegister" data-i18n="Реєстрація">Зарегистрироваться</button></div></div>
+              </section>
+              <section id="propertyAdvancedFields" class="property-advanced-fields" hidden>
+              <h3 data-i18n="Додаткові параметри">Дополнительные параметры</h3>
+              <div class="property-listing-grid">
+                <label class="property-field" data-property-for="Квартиры,Дома"><span data-i18n="Площадь кухни, м²">Площадь кухни, м²</span><input name="property_kitchen_area" type="number" min="0" step="0.1" placeholder="12"></label>
+                <label class="property-field" data-property-for="Квартиры,Дома,Коммерческая недвижимость,Гаражи и парковочные места"><span data-i18n="Тип здания">Тип здания</span><select name="property_building_type"><option value="" data-i18n="Не указано">Не указано</option><option value="Кирпичный" data-i18n="Кирпичный">Кирпичный</option><option value="Панельный" data-i18n="Панельный">Панельный</option><option value="Монолитный" data-i18n="Монолитный">Монолитный</option><option value="Монолитно-кирпичный" data-i18n="Монолитно-кирпичный">Монолитно-кирпичный</option><option value="Деревянный" data-i18n="Деревянный">Деревянный</option><option value="Другое" data-i18n="Другое">Другое</option></select></label>
+                <label class="property-field" data-property-for="Квартиры,Дома,Комнаты,Коммерческая недвижимость,Гаражи и парковочные места"><span data-i18n="Состояние">Состояние</span><select name="property_condition"><option value="" data-i18n="Не указано">Не указано</option><option value="Новостройка" data-i18n="Новостройка">Новостройка</option><option value="Новый ремонт" data-i18n="Новый ремонт">Новый ремонт</option><option value="Жилое состояние" data-i18n="Жилое состояние">Жилое состояние</option><option value="Нужен ремонт" data-i18n="Нужен ремонт">Нужен ремонт</option><option value="Под ремонт" data-i18n="Под ремонт">Под ремонт</option></select></label>
+                <label class="property-field" data-property-for="Квартиры,Дома,Комнаты"><span data-i18n="Мебель">Меблі</span><select name="property_furniture"><option value="" data-i18n="Не указано">Не указано</option><option value="Есть" data-i18n="Есть">Есть</option><option value="Нет" data-i18n="Нет">Нет</option><option value="Частично" data-i18n="Частично">Частично</option></select></label>
+                <label class="property-field" data-property-for="Квартиры,Дома,Комнаты"><span data-i18n="Балкон">Балкон</span><select name="property_balcony"><option value="" data-i18n="Не указано">Не указано</option><option value="Есть" data-i18n="Есть">Есть</option><option value="Нет" data-i18n="Нет">Нет</option></select></label>
+                <label class="property-field" data-property-for="Квартиры,Дома,Комнаты"><span data-i18n="Лоджия">Лоджия</span><select name="property_loggia"><option value="" data-i18n="Не указано">Не указано</option><option value="Есть" data-i18n="Есть">Есть</option><option value="Нет" data-i18n="Нет">Нет</option></select></label>
+                <label class="property-field"><span data-i18n="Отдельный вход (чаще для коммерческой недвижимости)">Отдельный вход (чаще для коммерческой недвижимости)</span><select name="property_separate_entry"><option value="" data-i18n="Не указано">Не указано</option><option value="Есть" data-i18n="Есть">Есть</option><option value="Нет" data-i18n="Нет">Нет</option></select></label>
+                <label class="property-field"><span data-i18n="Парковочные места">Парковочные места</span><select name="property_parking_spaces"><option value="" data-i18n="Не указано">Не указано</option><option value="Нет" data-i18n="Нет">Нет</option><option value="1" data-i18n="1 место">1 место</option><option value="2+" data-i18n="2 и более">2 и более</option></select></label>
+                <label class="property-field" data-property-for="Гаражи и парковочные места"><span data-i18n="Тип гаража">Тип гаража</span><select name="property_garage_type"><option value="" data-i18n="Не указано">Не указано</option><option value="Капитальный" data-i18n="Капитальный">Капитальный</option><option value="Металлический" data-i18n="Металлический">Металлический</option><option value="Подземный" data-i18n="Подземный">Подземный</option><option value="Гаражный бокс" data-i18n="Гаражный бокс">Гаражный бокс</option></select></label>
+                <label class="property-field" data-property-for="Гаражи и парковочные места"><span data-i18n="Дополнительно">Дополнительно</span><select name="property_garage_features"><option value="" data-i18n="Не указано">Не указано</option><option value="Смотровая яма" data-i18n="Смотровая яма">Смотровая яма</option><option value="Погреб" data-i18n="Погреб">Погреб</option><option value="Яма и погреб" data-i18n="Яма и погреб">Яма и погреб</option></select></label>
+                <label class="property-field" data-property-for="Гаражи и парковочные места"><span data-i18n="Электричество">Электричество</span><select name="property_garage_electricity"><option value="" data-i18n="Не указано">Не указано</option><option value="Есть" data-i18n="Есть">Есть</option><option value="Нет" data-i18n="Нет">Нет</option></select></label>
+                <label class="property-field" data-property-for="Квартиры,Дома,Комнаты,Коммерческая недвижимость"><span data-i18n="До метро, м">До метро, м</span><input name="property_metro_distance" type="number" min="0" step="1" placeholder="600"></label>
+                <label class="property-field" data-property-for="Дома"><span data-i18n="Площадь участка, м²">Площадь участка, м²</span><input name="property_land_area_m2" type="number" min="0" step="1" placeholder="600"></label>
+                <label class="property-field" data-property-for="Квартиры,Дома,Комнаты,Коммерческая недвижимость"><span data-i18n="До школы, м">До школы, м</span><input name="property_school_distance" type="number" min="0" step="1" placeholder="350"></label>
+                <label class="property-field" data-property-for="Квартиры,Дома,Комнаты,Коммерческая недвижимость,Гаражи и парковочные места"><span data-i18n="До остановки, м">До остановки, м</span><input name="property_stop_distance" type="number" min="0" step="1" placeholder="150"></label>
+              </div>
+              <section class="property-amenities property-amenities-fixed" aria-label="Удобства">
+                <h3 data-i18n="Удобства">Удобства</h3>
+                <div class="property-amenity-grid">
+                  <label><input type="checkbox" name="property_amenity_refrigerator"><span data-i18n="Холодильник">Холодильник</span></label>
+                  <label><input type="checkbox" name="property_amenity_washing_machine"><span data-i18n="Стиральная машина">Стиральная машина</span></label>
+                  <label><input type="checkbox" name="property_amenity_stove"><span data-i18n="Плита">Плита</span></label>
+                  <label><input type="checkbox" name="property_amenity_dishwasher"><span data-i18n="Посудомоечная машина">Посудомоечная машина</span></label>
+                  <label><input type="checkbox" name="property_amenity_air_conditioning"><span data-i18n="Кондиционер">Кондиционер</span></label>
+                  <label><input type="checkbox" name="property_amenity_internet"><span data-i18n="Интернет">Интернет</span></label>
+                  <label><input type="checkbox" name="property_amenity_parking"><span data-i18n="Парковка">Парковка</span></label>
+                </div>
+                <fieldset class="property-bathroom-field">
+                  <legend data-i18n="Санузел">Санузел</legend>
+                  <label><input type="radio" name="property_bathroom_type" value="separate"><span data-i18n="Раздельный">Раздельный</span></label>
+                  <label><input type="radio" name="property_bathroom_type" value="combined"><span data-i18n="Совмещённый">Совмещённый</span></label>
+                </fieldset>
+              </section>
+              <section class="property-amenities property-amenities-fixed property-accessibility" aria-label="Инклюзивность и доступность">
+                <h3 data-i18n="Инклюзивность и доступность">Инклюзивность и доступность</h3>
+                <div class="property-amenity-grid">
+                  <label><input type="checkbox" name="property_accessibility_ramp"><span data-i18n="Пандус">Пандус</span></label>
+                  <label><input type="checkbox" name="property_accessibility_elevator"><span data-i18n="Лифт">Лифт</span></label>
+                  <label><input type="checkbox" name="property_accessibility_step_free_entrance"><span data-i18n="Вход без ступенек">Вход без ступенек</span></label>
+                  <label><input type="checkbox" name="property_accessibility_handrails"><span data-i18n="Поручни на лестнице">Поручни на лестнице</span></label>
+                </div>
+                <div class="property-listing-grid property-accessibility-measurements">
+                  <label><span data-i18n="Ширина дверей лифта, см">Ширина дверей лифта, см</span><input type="number" name="property_accessibility_elevator_door_width_cm" min="0" step="1" placeholder="90"></label>
+                  <label><span data-i18n="Размер кабины лифта, см (Ш × Г)">Размер кабины лифта, см (Ш × Г)</span><input type="text" name="property_accessibility_elevator_cabin_size_cm" maxlength="30" placeholder="110 × 140"></label>
+                </div>
+              </section>
+              </section>
+            </fieldset>
+  </template>
   <div class="modal map-modal hidden" id="marketplaceMapModal" role="dialog" aria-modal="true" aria-labelledby="marketplaceMapTitle">
     <div class="modal-card map-modal-card"><button class="modal-close" id="closeMarketplaceMap" type="button" aria-label="Закрыть">×</button>
       <h2 id="marketplaceMapTitle">Карта Hryvnia Hub</h2>

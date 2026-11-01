@@ -3183,38 +3183,24 @@ async function editListing(item, labels) {
   const legacyPropertyOperation = item.property_operation
     || (/аренд|rent|оренд/i.test(legacyTitle) ? "Аренда"
       : /продаж|sale|купів|покуп/i.test(legacyTitle) ? "Продажа" : "");
-  const propertySource = document.querySelector('#addForm #propertyListingFields');
+  // The edit dialog owns a dedicated property template. It does not clone or
+  // depend on the create form, vehicle fieldset, or their live UI state.
+  const propertySource = document.getElementById('propertyEditorTemplate')?.content?.querySelector('.property-listing-fields');
   const propertyLocationBlock = (() => {
-    const source = document.querySelector('#addForm #listingAdvancedCommonFields');
-    if (!source) return '';
-    const wrapper = document.createElement('div');
-    wrapper.className = 'edit-property-location';
-    wrapper.style.gridColumn = '1 / -1';
-    ['#propertyDistrictField','#propertyAddressField','#propertyRadiusField'].forEach(selector => {
-      const node = source.querySelector(selector);
-      if (node) {
-        const copy=node.cloneNode(true); copy.hidden=false;
-        copy.querySelectorAll('[id]').forEach(el=>el.removeAttribute('id'));
-        if (selector === '#propertyDistrictField') {
-          const select = copy.querySelector('select[name="property_district"]');
-          if (select) {
-            const input = document.createElement('input');
-            input.type = 'text'; input.name = 'property_district'; input.autocomplete = 'address-level3';
-            input.value = propertyDetails.district || '';
-            select.replaceWith(input);
-          }
-        }
-        wrapper.append(copy);
-      }
-    });
-    wrapper.querySelectorAll('[name]').forEach(control => {
-      const values={property_address:propertyDetails.address,property_radius_km:propertyDetails.radius_km};
-      if (control.name !== 'property_district') control.value=values[control.name] ?? (control.name==='property_radius_km' ? 0 : '');
-    });
-    return wrapper.innerHTML;
+    const field = (label, name, value, type = 'text', extra = '') =>
+      `<label class="property-location-field"><span>${escapeHtml(t(label))}</span><input name="${name}" type="${type}" value="${escapeHtml(String(value ?? ''))}" ${extra}></label>`;
+    return `<div class="edit-property-location" style="grid-column:1 / -1">
+      ${field('Район области', 'property_oblast_raion', propertyDetails.oblast_raion || '', 'text', 'autocomplete="address-level2"')}
+      ${field('Район города', 'property_district', propertyDetails.district || '', 'text', 'autocomplete="address-level3"')}
+      ${field('Адреса', 'property_address', propertyDetails.address || '', 'text', 'autocomplete="street-address"')}
+      ${field('Радиус поиска, км', 'property_radius_km', propertyDetails.radius_km ?? 0, 'number', 'min="0" step="1"')}
+    </div>`;
   })();
   const propertyEditorBlock = (() => {
-    if (!propertySource) return '';
+    if (!propertySource) {
+      console.error('Не найден независимый шаблон редактора недвижимости (#propertyEditorTemplate).');
+      return '';
+    }
     const clone = propertySource.cloneNode(true);
     clone.removeAttribute('id'); clone.removeAttribute('disabled'); clone.hidden = false;
     clone.style.gridColumn = '1 / -1';
@@ -3273,7 +3259,7 @@ async function editListing(item, labels) {
     });
     clone.querySelectorAll('[data-property-for]').forEach(field => {
       const allowed = (field.dataset.propertyFor || '').split(',').map(value => value.trim());
-      const applicable = allowed.includes(String(propertyDetails.type || ''));
+      const applicable = allowed.includes(String(propertyDetails.type || legacyPropertyType || ''));
       field.hidden = !applicable;
       field.querySelectorAll('input,select,textarea').forEach(control => { control.disabled = !applicable; });
     });
@@ -3572,7 +3558,8 @@ async function editListing(item, labels) {
       payload.currency = v("price_currency") || "UAH";
       payload.property_details = {
         ...(item.property_details || {}), operation:propertyOperation, type:propertyType,
-        district:v("property_district"), address:v("property_address"), radius_km:n("property_radius_km"),
+        oblast_raion:v("property_oblast_raion"), district:v("property_district"),
+        address:v("property_address"), radius_km:n("property_radius_km"),
         rooms:v("property_rooms"), area_m2:n("property_area"), floor:n("property_floor"), floors_total:n("property_floors_total"),
         kitchen_area_m2:n("property_kitchen_area"), building_type:v("property_building_type"), condition:v("property_condition"),
         land_area_m2:n("property_land_area_m2"), separate_entry:v("property_separate_entry"), parking_spaces:v("property_parking_spaces"),

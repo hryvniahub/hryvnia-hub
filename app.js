@@ -5827,8 +5827,15 @@ if (closeAddBtn) closeAddBtn.addEventListener("click", () => addModal?.classList
 if (addModal) addModal.addEventListener("click", e => { if (e.target === addModal) addModal.classList.add("hidden"); });
 
 if (addForm) {
+  // TEMP DIAGNOSTICS: confirm that the publish button and submit handler respond.
+  const diagnosticPublishButton = addForm.querySelector('button[type="submit"]');
+  diagnosticPublishButton?.addEventListener("click", () => {
+    alert("ДИАГНОСТИКА: кнопка «Опубликовать» нажата. Проверяем отправку формы.");
+  });
+
   addForm.addEventListener("submit", async e => {
     e.preventDefault();
+    alert("ДИАГНОСТИКА: обработчик отправки формы запущен.");
     if (publishing || validatingPhotos) return;
     if (formMessage) { formMessage.textContent = ""; formMessage.classList.remove("error"); }
     propertyListingLocationToggle?.classList.remove("has-error");
@@ -6054,34 +6061,23 @@ if (addForm) {
         category: payload.category,
         city_id: payload.city_id,
         user_id: payload.user_id,
-        hasPropertyDetails: !!payload.property_details
+        hasPropertyDetails: !!payload.property_details,
+        payloadFields: Object.keys(payload)
       });
+      alert(
+        "ДИАГНОСТИКА: данные подготовлены. Отправляем INSERT в Supabase.\\n" +
+        "Категория: " + (payload.category || "не указана") + "\\n" +
+        "city_id: " + (payload.city_id ?? "NULL") + "\\n" +
+        "user_id: " + (payload.user_id || "NULL")
+      );
       const { data: insertedListings, error } = await db.from("listings").insert(payload).select("id");
-      const insertDiagnostics = {
-        stage: "listings INSERT",
-        category: payload.category || null,
-        city_id: payload.city_id ?? null,
-        user_id: payload.user_id || null,
-        payloadFields: Object.keys(payload),
-        success: !error,
-        insertedId: insertedListings?.[0]?.id ?? null,
-        errorCode: error?.code || null,
-        errorMessage: error?.message || null,
-        errorDetails: error?.details || null,
-        errorHint: error?.hint || null
-      };
-      console.info("[HH INSERT DIAGNOSTICS]", insertDiagnostics);
       if (error) {
         alert(
-          "ОШИБКА СОХРАНЕНИЯ В SUPABASE\n\n" +
-          "Этап: INSERT listings\n" +
-          "Категория: " + (insertDiagnostics.category || "не указана") + "\n" +
-          "city_id: " + (insertDiagnostics.city_id ?? "NULL") + "\n" +
-          "user_id: " + (insertDiagnostics.user_id || "NULL") + "\n\n" +
-          "Код: " + (insertDiagnostics.errorCode || "нет") + "\n" +
-          "Ошибка: " + (insertDiagnostics.errorMessage || "неизвестная ошибка") + "\n" +
-          "Подробности: " + (insertDiagnostics.errorDetails || "нет") + "\n" +
-          "Подсказка: " + (insertDiagnostics.errorHint || "нет")
+          "SUPABASE ОТКЛОНИЛ СОХРАНЕНИЕ\\n\\n" +
+          "Код: " + (error.code || "нет") + "\\n" +
+          "Ошибка: " + (error.message || "неизвестная ошибка") + "\\n" +
+          "Подробности: " + (error.details || "нет") + "\\n" +
+          "Подсказка: " + (error.hint || "нет")
         );
         console.error("[addForm] Supabase insert failed:", {
           message: error.message,
@@ -6098,10 +6094,8 @@ if (addForm) {
         throw error;
       }
       alert(
-        "ДИАГНОСТИКА SUPABASE\n\n" +
-        "INSERT выполнен успешно.\n" +
-        "Категория: " + (insertDiagnostics.category || "не указана") + "\n" +
-        "ID объявления: " + (insertDiagnostics.insertedId ?? "не получен")
+        "ДИАГНОСТИКА: Supabase успешно сохранил объявление.\\n" +
+        "ID объявления: " + (insertedListings?.[0]?.id ?? "не получен")
       );
       e.target.reset();
       resetPhotos();

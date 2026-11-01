@@ -1205,7 +1205,14 @@ const photoInput = document.getElementById("photoInput");
 const photoPreview = document.getElementById("photoPreview");
 const photoMessage = document.getElementById("photoMessage");
 const addForm = document.getElementById("addForm");
-let selectedPhotos = [];
+const selectedPhotosGeneric = [];
+const selectedPhotosVehicle = [];
+const selectedPhotosProperty = [];
+function getPhotoBucket(category = listingCategorySelect?.value || "") {
+  if (category === "Автомобили") return selectedPhotosVehicle;
+  if (category === "Недвижимость") return selectedPhotosProperty;
+  return selectedPhotosGeneric;
+}
 let publishing = false;
 let pendingListingPublish = false;
 let validatingPhotos = false;
@@ -1221,7 +1228,8 @@ function photoText(key) { return (photoTranslations[lang] || photoTranslations.r
 
 function renderPhotoPreview() {
   if (!photoPreview) return;
-  photoPreview.innerHTML = selectedPhotos.map((photo, index) => `
+  const activePhotos = getPhotoBucket();
+  photoPreview.innerHTML = activePhotos.map((photo, index) => `
     <div class="photo-item">
       <img src="${photo.previewUrl}" alt="${escapeHtml(photo.file.name)}">
       <span>${index === 0 ? photoText("main") : index + 1}</span>
@@ -1244,9 +1252,9 @@ function updatePhotoFields() {
   renderPhotoPreview();
 }
 
-function resetPhotos() {
-  selectedPhotos.forEach(photo => URL.revokeObjectURL(photo.previewUrl));
-  selectedPhotos = [];
+function resetPhotos(bucket = getPhotoBucket()) {
+  bucket.forEach(photo => URL.revokeObjectURL(photo.previewUrl));
+  bucket.length = 0;
   if (photoInput) photoInput.value = "";
   if (photoMessage) photoMessage.textContent = "";
   updatePhotoFields();
@@ -1258,9 +1266,10 @@ if (photoInput) {
   photoInput.addEventListener("change", async () => {
     if (publishing || validatingPhotos) return;
     const files = [...photoInput.files];
+    const targetPhotoBucket = getPhotoBucket();
     photoInput.value = "";
     if (photoMessage) photoMessage.textContent = "";
-    if (files.length + selectedPhotos.length > MAX_PHOTOS) {
+    if (files.length + targetPhotoBucket.length > MAX_PHOTOS) {
       if (photoMessage) photoMessage.textContent = photoText("limit");
       return;
     }
@@ -1282,7 +1291,7 @@ if (photoInput) {
           img.src = previewUrl;
         });
       }
-      selectedPhotos.push(...additions);
+      targetPhotoBucket.push(...additions);
     } catch {
       additions.forEach(photo => URL.revokeObjectURL(photo.previewUrl));
       if (photoMessage) photoMessage.textContent = photoText("unreadable");
@@ -1299,10 +1308,12 @@ if (photoPreview) {
     const button = event.target.closest("button");
     if (!button) return;
     if (button.dataset.photoRemove !== undefined) {
-      const [removed] = selectedPhotos.splice(Number(button.dataset.photoRemove), 1);
-      URL.revokeObjectURL(removed.previewUrl);
+      const activePhotos = getPhotoBucket();
+      const [removed] = activePhotos.splice(Number(button.dataset.photoRemove), 1);
+      if (removed) URL.revokeObjectURL(removed.previewUrl);
     } else if (button.dataset.photoMain !== undefined) {
-      selectedPhotos.unshift(...selectedPhotos.splice(Number(button.dataset.photoMain), 1));
+      const activePhotos = getPhotoBucket();
+      activePhotos.unshift(...activePhotos.splice(Number(button.dataset.photoMain), 1));
     }
     if (photoMessage) photoMessage.textContent = "";
     renderPhotoPreview();
@@ -1362,7 +1373,7 @@ async function compressPhoto(file) {
   return { blob, mime, width, height, compressed: true, undecodable: false };
 }
 
-async function uploadListingPhotos(photosToUpload = selectedPhotos) {
+async function uploadListingPhotos(photosToUpload = getPhotoBucket()) {
   const { error: schemaError } = await db.from("listings").select("image_urls").limit(0);
   if (schemaError) throw new Error(photoText("setup"));
   const bucket = db.storage.from(PHOTO_BUCKET);
@@ -5631,7 +5642,10 @@ vehicleListingMake?.addEventListener("change", () => {
     vehicleListingModel.disabled = !make;
   }
 });
-listingCategorySelect?.addEventListener("change", syncVehicleListingFields);
+listingCategorySelect?.addEventListener("change", () => {
+  syncVehicleListingFields();
+  renderPhotoPreview();
+});
 syncVehicleListingFields();
 
 async function estimateVehicleMarketPrice() {
@@ -5753,7 +5767,6 @@ async function openPropertyListingForm(propertyType = "", operation = "") {
   const geoControls = [
     cityRegionSelect,
     citySearchInput,
-    citySelect,
     propertyOblastRaionSelect,
     propertyCityDistrictSelect
   ].filter(Boolean);
@@ -5934,7 +5947,16 @@ if (addForm) {
 addForm.addEventListener("submit", async e => {
     e.preventDefault();
 
-    if (publishing || validatingPhotos) return;
+    if (publishing || validatingPhotos) {
+      if (formMessage) {
+        formMessage.textContent = validatingPhotos
+          ? "Дождитесь завершения обработки фотографий."
+          : "Публикация уже выполняется.";
+        formMessage.classList.add("error");
+        formMessage.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+      return;
+    }
     if (formMessage) { formMessage.textContent = ""; formMessage.classList.remove("error"); }
     propertyListingLocationToggle?.classList.remove("has-error");
     citySearchInput?.classList.remove("has-error");
@@ -5963,6 +5985,14 @@ addForm.addEventListener("submit", async e => {
 
       return;
     }
+    if (!Array.isArray(availableCities) || !availableCities.length) {
+      if (formMessage) {
+        formMessage.textContent = "Не удалось загрузить список населённых пунктов. Проверьте соединение и повторите попытку.";
+        formMessage.classList.add("error");
+        formMessage.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+      return;
+    }
     const form = new FormData(e.target);
     const cityFieldName = selectedCategory === "Автомобили"
       ? "vehicle_city_id"
@@ -5970,7 +6000,8 @@ addForm.addEventListener("submit", async e => {
         ? "city_id"
         : "generic_city_id";
     const cityId = String(form.get(cityFieldName) || "");
-    if (!cityId || !availableCities.some(city => String(city.id) === cityId)) {
+    if (!cityId || !Number.isFinite(Number(cityId)) || Number(cityId) <= 0
+      || !availableCities.some(city => String(city.id) === cityId)) {
       if (formMessage) {
         formMessage.textContent = cityTranslation("Выберите город из списка");
         formMessage.classList.add("error");
@@ -6158,7 +6189,8 @@ addForm.addEventListener("submit", async e => {
     }
     payload.user_id = currentUser.id;
 
-    const withPhotos = selectedPhotos.length > 0;
+    const photosForThisListing = getPhotoBucket(selectedCategory);
+    const withPhotos = photosForThisListing.length > 0;
     publishing = true;
     const controls = [...addForm.elements].map(control => [control, control.disabled]);
     const publishButton = addForm.querySelector('button[type="submit"]');
@@ -6169,7 +6201,7 @@ addForm.addEventListener("submit", async e => {
     try {
       if (withPhotos) {
 
-        payload.image_urls = await uploadListingPhotos();
+        payload.image_urls = await uploadListingPhotos(photosForThisListing);
         payload.image_url = payload.image_urls[0];
 
       }
@@ -6186,13 +6218,20 @@ addForm.addEventListener("submit", async e => {
         });
         const raw = String(error.message || "");
         if (/row-level security|permission denied|new row violates/i.test(raw)) {
-          throw new Error(t("Ошибка") + ": " + raw + " — проверьте права доступа.");
+          throw new Error("Не удалось опубликовать объявление из-за ограничений доступа. Проверьте права публикации.");
+        }
+        if (/violates foreign key/i.test(raw)) {
+          throw new Error("Выбранный населённый пункт не найден. Выберите город заново.");
+        }
+        if (/null value in column [\"]city_id[\"]/i.test(raw)) {
+          throw new Error("Не выбран населённый пункт. Выберите город из списка.");
         }
         throw error;
       }
 
       e.target.reset();
-      resetPhotos();
+      resetPhotos(photosForThisListing);
+      renderPhotoPreview();
       if (formMessage) formMessage.textContent = "Объявление опубликовано!";
       await loadListings();
       setTimeout(() => addModal?.classList.add("hidden"), 700);

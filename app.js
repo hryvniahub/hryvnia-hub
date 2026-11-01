@@ -2561,13 +2561,41 @@ function getPropertyGeoFilteredCities() {
 }
 async function loadPropertyGeoCatalogs() {
   if (!db) return false;
-  if (propertyGeoCatalogsLoaded) return true;
+  if (propertyGeoCatalogsLoaded) {
+    window.__hhGeoLoadDiagnostics = {
+      ...(window.__hhGeoLoadDiagnostics || {}),
+      propertyGeoCatalogs: { status: "cached", durationMs: 0 }
+    };
+    return true;
+  }
   if (propertyGeoCatalogsPromise) return propertyGeoCatalogsPromise;
 
   propertyGeoCatalogsPromise = (async () => {
+    const totalStartedAt = performance.now();
+    const queryTimings = {};
+    const timedQuery = async (name, query) => {
+      const startedAt = performance.now();
+      try {
+        const result = await query;
+        queryTimings[name] = {
+          durationMs: Math.round(performance.now() - startedAt),
+          rows: result.data?.length ?? 0,
+          error: result.error?.message || null
+        };
+        return result;
+      } catch (error) {
+        queryTimings[name] = {
+          durationMs: Math.round(performance.now() - startedAt),
+          rows: 0,
+          error: error?.message || String(error)
+        };
+        throw error;
+      }
+    };
+
     const [raionsResult, districtsResult] = await Promise.all([
-      db.from("oblast_raions").select("id, katottg_code, region_katottg_code, name_uk, name_ru, name_en, name_pl").eq("is_active", true).order("name_uk"),
-      db.from("city_districts").select("id, katottg_code, city_id, city_katottg_code, name_uk, name_ru, name_en, name_pl").eq("is_active", true).order("name_uk")
+      timedQuery("oblast_raions", db.from("oblast_raions").select("id, katottg_code, region_katottg_code, name_uk, name_ru, name_en, name_pl").eq("is_active", true).order("name_uk")),
+      timedQuery("city_districts", db.from("city_districts").select("id, katottg_code, city_id, city_katottg_code, name_uk, name_ru, name_en, name_pl").eq("is_active", true).order("name_uk"))
     ]);
 
     if (raionsResult.error) {
@@ -2579,9 +2607,22 @@ async function loadPropertyGeoCatalogs() {
       throw districtsResult.error;
     }
 
+    const assignStartedAt = performance.now();
     propertyOblastRaions = raionsResult.data || [];
     propertyCityDistricts = districtsResult.data || [];
     propertyGeoCatalogsLoaded = true;
+    const diagnostics = {
+      status: "loaded",
+      totalDurationMs: Math.round(performance.now() - totalStartedAt),
+      assignDurationMs: Math.round(performance.now() - assignStartedAt),
+      queries: queryTimings,
+      loadedAt: new Date().toISOString()
+    };
+    window.__hhGeoLoadDiagnostics = {
+      ...(window.__hhGeoLoadDiagnostics || {}),
+      propertyGeoCatalogs: diagnostics
+    };
+    console.info("[HH GEO TIMING] Property district catalogs:", diagnostics);
     return true;
   })();
 
@@ -2621,12 +2662,21 @@ async function loadCities() {
   if (citiesLoadPromise) return citiesLoadPromise;
   if (window.hryvniaCitiesLoaded && availableCities.length) return availableCities;
   citiesLoadPromise = (async () => {
+  const citiesStartedAt = performance.now();
   const allCities = [];
   const pageSize = 1000;
   let from = 0;
+  let pageCount = 0;
   let cityError = null;
   while (true) {
+    const pageStartedAt = performance.now();
     const { data, error } = await db.from("cities").select("id, name_ru, name_uk, name_en, name_pl, official_code, settlement_category_code, region_katottg_code, raion_katottg_code").order("id").range(from, from + pageSize - 1);
+    pageCount += 1;
+    console.info("[HH GEO TIMING] cities page", pageCount, {
+      durationMs: Math.round(performance.now() - pageStartedAt),
+      rows: data?.length ?? 0,
+      error: error?.message || null
+    });
     if (error) { cityError = error; break; }
     allCities.push(...(data || []));
     if (!data || data.length < pageSize) break;
@@ -2648,8 +2698,23 @@ async function loadCities() {
       regionsLoaded = Object.keys(regionNames).length > 0;
     }
   } catch (err) { console.error("Не удалось загрузить регионы:", err); }
+  const renderCitiesStartedAt = performance.now();
   updateCities(allCities, regionNames);
   window.hryvniaCitiesLoaded = regionsLoaded;
+  const cityDiagnostics = {
+    status: "loaded",
+    totalDurationMs: Math.round(performance.now() - citiesStartedAt),
+    pageCount,
+    totalRows: allCities.length,
+    renderDurationMs: Math.round(performance.now() - renderCitiesStartedAt),
+    regionsLoaded,
+    loadedAt: new Date().toISOString()
+  };
+  window.__hhGeoLoadDiagnostics = {
+    ...(window.__hhGeoLoadDiagnostics || {}),
+    cities: cityDiagnostics
+  };
+  console.info("[HH GEO TIMING] Cities catalog:", cityDiagnostics);
     return availableCities;
   })();
   try {
@@ -5661,14 +5726,44 @@ async function openPropertyListingForm(propertyType = "", operation = "") {
   geoControls.forEach(control => { control.disabled = true; });
   propertyListingLocationFields?.setAttribute("aria-busy", "true");
 
+  const geoOpenStartedAt = performance.now();
   Promise.all([ensureCitiesLoaded(), loadPropertyGeoCatalogs()])
     .then(([cities]) => {
       if (!Array.isArray(cities) || !cities.length) {
         throw new Error("Справочник населённых пунктов не загружен.");
       }
+      const renderStartedAt = performance.now();
       updatePropertyOblastRaions(formRegionCode);
       const selected = availableCities.find(city => String(city.id) === String(citySelect?.value || ""));
       updatePropertyCityDistricts(selected || null);
+      const diagnostics = {
+        modalToReadyMs: Math.round(performance.now() - geoOpenStartedAt),
+        dropdownRenderMs: Math.round(performance.now() - renderStartedAt),
+        cities: window.__hhGeoLoadDiagnostics?.cities || { status: "cached/previously loaded" },
+        districts: window.__hhGeoLoadDiagnostics?.propertyGeoCatalogs || { status: "cached/previously loaded" }
+      };
+      window.__hhGeoLoadDiagnostics = {
+        ...(window.__hhGeoLoadDiagnostics || {}),
+        propertyFormReady: diagnostics
+      };
+      console.info("[HH GEO TIMING] Property form ready:", diagnostics);
+      const cityTime = diagnostics.cities.totalDurationMs != null
+        ? `${diagnostics.cities.totalDurationMs} мс (${diagnostics.cities.pageCount} страниц, ${diagnostics.cities.totalRows} записей)`
+        : "уже загружен";
+      const raionTime = diagnostics.districts.queries?.oblast_raions?.durationMs != null
+        ? `${diagnostics.districts.queries.oblast_raions.durationMs} мс`
+        : "уже загружен";
+      const districtTime = diagnostics.districts.queries?.city_districts?.durationMs != null
+        ? `${diagnostics.districts.queries.city_districts.durationMs} мс`
+        : "уже загружен";
+      alert(
+        "ДИАГНОСТИКА ЗАГРУЗКИ ГЕОДАННЫХ:\\n" +
+        `Города: ${cityTime}\\n` +
+        `Районы областей: ${raionTime}\\n` +
+        `Районы городов: ${districtTime}\\n` +
+        `От открытия меню до готовности: ${diagnostics.modalToReadyMs} мс\\n` +
+        `Отрисовка списков: ${diagnostics.dropdownRenderMs} мс`
+      );
     })
     .catch(error => {
       console.error("Не удалось загрузить географию недвижимости:", error);

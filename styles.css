@@ -3433,3 +3433,38 @@ main{
   border-color: #d96b6b;
   box-shadow: 0 0 0 2px rgba(217, 107, 107, 0.25);
 }
+
+
+/* Independent city/region selector for business and investment listing creation. */
+#addModal #addForm .generic-listing-location{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  width:100%;
+  min-width:0;
+  margin:0 0 14px;
+  padding:14px;
+  border:1px solid var(--accent-border);
+  border-radius:14px;
+  background:#fff;
+}
+#addModal #addForm .generic-listing-location[hidden]{display:none!important;}
+#addModal #addForm .generic-listing-location h3{
+  grid-column:1/-1;
+  margin:0;
+  color:var(--dark);
+  font-size:16px;
+}
+#addModal #addForm .generic-listing-location > label{
+  display:block;
+  min-width:0;
+  margin:0;
+  font-weight:700;
+}
+#addModal #addForm .generic-listing-location .city-search{margin-top:6px;}
+#addModal #addForm .generic-listing-location input,
+#addModal #addForm .generic-listing-location select{width:100%;min-width:0;}
+@media(max-width:560px){
+  #addModal #addForm .generic-listing-location{grid-template-columns:minmax(0,1fr);}
+  #addModal #addForm .generic-listing-location h3{grid-column:auto;}
+}

@@ -5642,13 +5642,43 @@ if (closeAddBtn) closeAddBtn.addEventListener("click", () => addModal?.classList
 if (addModal) addModal.addEventListener("click", e => { if (e.target === addModal) addModal.classList.add("hidden"); });
 
 if (addForm) {
+  // TEMPORARY MOBILE PUBLISH DIAGNOSTICS: remove after the publication issue is identified.
+  const publishDiagnostic = (() => {
+    let panel = document.getElementById("hhPublishDiagnostic");
+    if (!panel) {
+      panel = document.createElement("div");
+      panel.id = "hhPublishDiagnostic";
+      panel.setAttribute("role", "status");
+      panel.setAttribute("aria-live", "polite");
+      panel.style.cssText = "display:block;margin:12px 0;padding:12px;border:2px solid #b6c96a;border-radius:8px;background:#f7f9ed;color:#203526;font:14px/1.45 sans-serif;white-space:pre-wrap;overflow-wrap:anywhere;";
+      const submit = addForm.querySelector('button[type="submit"]');
+      addForm.insertBefore(panel, submit || null);
+    }
+    return (stage, details = "") => {
+      const stamp = new Date().toLocaleTimeString();
+      const detailText = typeof details === "string" ? details : JSON.stringify(details, null, 2);
+      panel.textContent = `ДИАГНОСТИКА ПУБЛИКАЦИИ · ${stamp}\nЭтап: ${stage}${detailText ? `\n${detailText}` : ""}`;
+      console.info("[HH publish diagnostic]", stage, details);
+    };
+  })();
+  addForm.addEventListener("invalid", event => {
+    publishDiagnostic("HTML_VALIDATION_BLOCKED", {
+      field: event.target?.name || event.target?.id || event.target?.tagName,
+      message: event.target?.validationMessage || "Поле не прошло встроенную проверку"
+    });
+  }, true);
   addForm.addEventListener("submit", async e => {
     e.preventDefault();
-    if (publishing || validatingPhotos) return;
+    publishDiagnostic("SUBMIT_HANDLER_REACHED");
+    if (publishing || validatingPhotos) {
+      publishDiagnostic("BLOCKED_BUSY", { publishing, validatingPhotos });
+      return;
+    }
     if (formMessage) { formMessage.textContent = ""; formMessage.classList.remove("error"); }
     propertyListingLocationToggle?.classList.remove("has-error");
     citySearchInput?.classList.remove("has-error");
     if (!db) {
+      publishDiagnostic("SUPABASE_CLIENT_MISSING");
       if (formMessage) { formMessage.textContent = "Сначала подключим Supabase — сейчас работает демо-режим."; formMessage.classList.add("error"); }
       return;
     }
@@ -5676,6 +5706,7 @@ if (addForm) {
       (propertyListingLocationToggle || formMessage)?.scrollIntoView({ behavior: "smooth", block: "center" });
       formMessage?.scrollIntoView({ behavior: "smooth", block: "center" });
       console.warn("[addForm early return]", { step: "city", cityId, availableCities: availableCities.length });
+      publishDiagnostic("EARLY_RETURN_CITY", { cityId, availableCities: availableCities.length, typedCity: citySearchInput?.value || "" });
       return;
     }
     const selectedCategory = String(form.get("category") || "");
@@ -5705,6 +5736,7 @@ if (addForm) {
           formMessage.classList.add("error");
         }
         console.warn("[addForm early return]", { step: "property-fields", propertyType, propertyOperation });
+        publishDiagnostic("EARLY_RETURN_PROPERTY_FIELDS", { propertyType, propertyOperation });
         (!propertyOperation ? propertyOperationSelect : propertyTypeSelect)?.focus();
         return;
       }
@@ -5810,6 +5842,7 @@ if (addForm) {
     }
     // Validate the listing before asking the visitor to sign in.
     if (!currentUser) {
+      publishDiagnostic("WAITING_FOR_AUTH", { category: payload.category, city_id: payload.city_id, hasPropertyDetails: !!payload.property_details });
       pendingListingPublish = true;
       if (formMessage) {
         formMessage.textContent = t("Войдите, чтобы сохранить и опубликовать объявление");
@@ -5833,6 +5866,13 @@ if (addForm) {
         payload.image_urls = await uploadListingPhotos();
         payload.image_url = payload.image_urls[0];
       }
+      publishDiagnostic("SUPABASE_INSERT_START", {
+        category: payload.category,
+        city_id: payload.city_id,
+        user_id_present: !!payload.user_id,
+        hasPropertyDetails: !!payload.property_details,
+        photoCount: payload.image_urls?.length || 0
+      });
       console.info("[addForm] inserting listing", {
         category: payload.category,
         city_id: payload.city_id,
@@ -5841,18 +5881,21 @@ if (addForm) {
       });
       const { data: insertedListings, error } = await db.from("listings").insert(payload).select("id");
       if (error) {
+        publishDiagnostic("SUPABASE_INSERT_ERROR", { message: error.message, code: error.code, details: error.details, hint: error.hint });
         const raw = String(error.message || "");
         if (/row-level security|permission denied|new row violates/i.test(raw)) {
           throw new Error(t("Ошибка") + ": " + raw + " — проверьте права доступа.");
         }
         throw error;
       }
+      publishDiagnostic("SUPABASE_INSERT_SUCCESS", { insertedId: insertedListings?.[0]?.id || null });
       e.target.reset();
       resetPhotos();
       if (formMessage) formMessage.textContent = "Объявление опубликовано!";
       await loadListings();
       setTimeout(() => addModal?.classList.add("hidden"), 700);
     } catch (error) {
+      publishDiagnostic("CAUGHT_ERROR", { name: error?.name, message: error?.message || String(error), code: error?.code, details: error?.details, hint: error?.hint });
       if (formMessage) {
         const errorText = error?.message || String(error);
         formMessage.textContent = withPhotos

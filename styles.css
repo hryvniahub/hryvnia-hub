@@ -3330,3 +3330,10 @@ main{
 .property-search-menu .property-location-extra-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(110px,1fr);gap:10px;margin-top:10px;}
 .property-search-menu .property-location-extra-grid .property-search-field{grid-column:auto!important;}
 @media(max-width:480px){.property-search-menu .property-location-extra-grid{grid-template-columns:minmax(0,1fr) minmax(96px,.7fr);gap:8px;}}
+
+
+/* Required property type selector state; applied only after submit validation. */
+.hh-property-select-trigger.hh-required-missing {
+  border-color: #d96b6b !important;
+  box-shadow: 0 0 0 2px rgba(217, 107, 107, 0.25) !important;
+}

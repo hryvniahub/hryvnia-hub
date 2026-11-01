@@ -456,6 +456,10 @@
           <label>Модель автомобиля<select name="vehicle_model_slug" id="vehicleListingModel" disabled><option value="">Сначала выберите марку</option></select></label>
           <label>Год выпуска<input name="vehicle_year" type="number" min="1900" max="2100" placeholder="2018"></label>
           <label>Коробка передач<select name="vehicle_transmission"><option value="">Выберите коробку</option><option value="Механічна">Механическая</option><option value="Автоматична">Автоматическая</option><option value="Варіатор">Вариатор</option><option value="Робот">Робот</option></select></label>
+          <div class="listing-price-row" id="vehicleListingPriceRow">
+            <label>Цена<input name="vehicle_price" type="number" min="0" required placeholder="450000"></label>
+            <label>Валюта<select id="vehicleListingPriceCurrency" name="vehicle_price_currency"><option value="UAH">₴ UAH</option><option value="USD">$ USD</option><option value="PLN">zł PLN</option></select></label>
+          </div>
           <label>Пробег, км<input name="vehicle_mileage_km" type="number" min="0" placeholder="125000"></label>
           <label>Объём двигателя, л<input name="vehicle_engine_liters" type="number" min="0" max="20" step="0.1" placeholder="1.6"></label>
           <label>Мощность, л.с.<input name="vehicle_power_hp" type="number" min="1" max="3000" placeholder="110"></label>
@@ -486,6 +490,7 @@
             <h4 data-i18n="Документы и принадлежности">Документы и принадлежности</h4><div class="property-amenity-grid"><label><input type="checkbox" name="vehicle_equipment_spare_wheel"><span data-i18n="Запасное колесо (запаска)">Запасное колесо (запаска)</span></label><label><input type="checkbox" name="vehicle_equipment_service_book"><span data-i18n="Сервисная книжка">Сервисная книжка</span></label><label><input type="checkbox" name="vehicle_equipment_tire_set_gift"><span data-i18n="Комплект резины в подарок">Комплект резины в подарок</span></label><label><input type="checkbox" name="vehicle_equipment_toolkit"><span data-i18n="Набор инструментов">Набор инструментов</span></label><label><input type="checkbox" name="vehicle_equipment_fire_extinguisher"><span data-i18n="Огнетушитель">Огнетушитель</span></label><label><input type="checkbox" name="vehicle_equipment_first_aid_kit"><span data-i18n="Аптечка">Аптечка</span></label></div>
           </section>
           </div>
+          <label id="vehicleListingDescriptionField">Описание<textarea name="vehicle_description" rows="4" maxlength="10000" placeholder="Коротко опишите предложение"></textarea></label>
         </fieldset>
         <div id="listingAdvancedCommonFields" class="listing-advanced-common" hidden>
         <fieldset id="propertyListingFields" class="property-listing-fields" hidden disabled>
@@ -501,6 +506,10 @@
             <label><span data-i18n="Этажность здания">Этажность здания</span><input name="property_floors_total" type="number" min="1" step="1" placeholder="9"></label>
           </div>
           <span id="propertyListingPriceHome" hidden></span>
+          <div class="listing-price-row" id="propertyListingPriceRow">
+            <label>Цена<input name="property_price" type="number" min="0" required placeholder="450000"></label>
+            <label>Валюта<select id="propertyListingPriceCurrency" name="property_price_currency"><option value="UAH">₴ UAH</option><option value="USD">$ USD</option><option value="PLN">zł PLN</option></select></label>
+          </div>
           <button type="button" class="btn btn-primary full property-listing-more" id="propertyListingMore" aria-expanded="false" aria-controls="propertyAdvancedFields"><span data-i18n="Більше">Больше</span><span aria-hidden="true" class="property-listing-more-icon">⌄</span></button>
           <section id="propertyMarketPanel" class="vehicle-market-panel property-market-panel" hidden aria-live="polite">
             <h3 data-i18n="Орієнтовна ринкова ціна">Ориентировочная рыночная цена</h3>
@@ -560,12 +569,13 @@
             </div>
           </section>
           </section>
+          <label id="propertyListingDescriptionField">Описание<textarea name="property_description" rows="4" maxlength="10000" placeholder="Коротко опишите предложение"></textarea></label>
         </fieldset>
         <span id="listingPriceHome" hidden></span><div class="listing-price-row" id="listingPriceRow">
           <label>Цена<input name="price" type="number" min="0" required placeholder="450000"></label>
           <label id="listingCurrencyField">Валюта<select id="listingPriceCurrency" name="price_currency"><option value="UAH">₴ UAH</option><option value="USD">$ USD</option><option value="EUR">€ EUR</option><option value="PLN">zł PLN</option></select></label>
         </div>
-        <label>Описание<textarea name="description" rows="4" placeholder="Коротко опишите предложение"></textarea></label>
+        <label id="listingDescriptionField">Описание<textarea name="description" rows="4" maxlength="10000" placeholder="Коротко опишите предложение"></textarea></label>
         <fieldset id="photoFields" class="photo-fields"><legend id="photoLabel">Фотографии</legend><button id="photoPickerButton" class="btn" type="button">Добавить фотографии</button><input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple hidden aria-labelledby="photoLabel" aria-describedby="photoHint photoMessage"><p id="photoHint" class="muted">До 10 фото: JPEG, PNG или WebP, до 10 МБ каждое. Первое фото — главное.</p><p id="photoMessage" class="form-message" role="status" aria-live="polite"></p><div id="photoPreview" class="photo-preview"></div></fieldset>
         <p id="formMessage" class="form-message" role="status" aria-live="polite"></p><button class="btn btn-primary full" type="submit">Опубликовать</button></div></form></div></div>
 
@@ -691,6 +701,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-  <script src="app.js?v=20261101-locsplit1"></script>
+  <script src="app.js?v=20261101-categoriesplit2"></script>
 </body>
 </html>

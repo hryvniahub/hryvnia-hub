@@ -5836,13 +5836,14 @@ if (addForm) {
   addForm.addEventListener("submit", async e => {
     e.preventDefault();
     alert("ДИАГНОСТИКА: обработчик отправки формы запущен.");
-    if (publishing || validatingPhotos) return;
+    if (publishing || validatingPhotos) { alert("ДИАГНОСТИКА: отправка остановлена — уже идёт сохранение или проверка фотографий."); return; }
     if (formMessage) { formMessage.textContent = ""; formMessage.classList.remove("error"); }
     propertyListingLocationToggle?.classList.remove("has-error");
     citySearchInput?.classList.remove("has-error");
     vehicleListingCitySearchInput?.classList.remove("has-error");
     if (!db) {
       if (formMessage) { formMessage.textContent = "Сначала подключим Supabase — сейчас работает демо-режим."; formMessage.classList.add("error"); }
+      alert("ДИАГНОСТИКА: остановка — объект Supabase db не создан.");
       return;
     }
     const form = new FormData(e.target);
@@ -5867,6 +5868,7 @@ if (addForm) {
         formMessage.textContent = "Не удалось загрузить справочник городов. Проверьте соединение и повторите попытку.";
         formMessage.classList.add("error");
       }
+      alert("ДИАГНОСТИКА: остановка — не загрузился справочник городов. Подробности смотрите в сообщении формы.");
       return;
     }
     const cityId = submittedCityId;
@@ -5894,6 +5896,7 @@ if (addForm) {
       }
       formMessage?.scrollIntoView({ behavior: "smooth", block: "center" });
       console.warn("[addForm early return]", { step: "city", cityId, availableCities: availableCities.length });
+      alert("ДИАГНОСТИКА: публикация остановлена на проверке города.\nВыбранный city_id: " + (cityId || "пусто") + "\nЗагружено городов: " + availableCities.length + "\nПроверьте выбор города из списка.");
       return;
     }
     const descriptionFieldName = selectedCategory === "Автомобили" ? "vehicle_description" : selectedCategory === "Недвижимость" ? "property_description" : "description";
@@ -5930,6 +5933,7 @@ if (addForm) {
         (!propertyOperation ? propertyOperationSelect : propertyTypeTrigger)?.scrollIntoView({ behavior: "smooth", block: "center" });
         formMessage?.scrollIntoView({ behavior: "smooth", block: "center" });
         console.warn("[addForm early return]", { step: "property-fields", propertyType, propertyOperation });
+        alert("ДИАГНОСТИКА: публикация остановлена на обязательных полях недвижимости.\nТип объекта: " + (propertyType || "не выбран") + "\nОперация: " + (propertyOperation || "не выбрана"));
         return;
       }
       const optionalNumber = name => {
@@ -5988,6 +5992,7 @@ if (addForm) {
       if (!makeSlug || !modelSlug) {
         if (formMessage) formMessage.textContent = "Выберите марку и модель автомобиля.";
         (!makeSlug ? vehicleListingMake : vehicleListingModel)?.focus();
+        alert("ДИАГНОСТИКА: публикация остановлена — не выбрана марка или модель автомобиля.\nМарка: " + (makeSlug || "не выбрана") + "\nМодель: " + (modelSlug || "не выбрана"));
         return;
       }
       let catalog;
@@ -5995,6 +6000,7 @@ if (addForm) {
       catch (error) {
         console.error("Не удалось проверить марку и модель автомобиля", error);
         if (formMessage) formMessage.textContent = "Не удалось проверить каталог автомобилей. Повторите попытку.";
+        alert("ДИАГНОСТИКА: публикация остановлена — не удалось загрузить каталог автомобилей.\nОшибка: " + (error?.message || error));
         return;
       }
       const makeRow = catalog.find(row => String(row.make_slug) === makeSlug);
@@ -6002,6 +6008,7 @@ if (addForm) {
       if (!makeRow || !modelRow) {
         if (formMessage) formMessage.textContent = "Марка или модель не найдена в каталоге. Выберите их заново.";
         if (!makeRow) vehicleListingMake?.focus(); else vehicleListingModel?.focus();
+        alert("ДИАГНОСТИКА: публикация остановлена — марка или модель не найдена в каталоге.\nМарка: " + makeSlug + "\nМодель: " + modelSlug);
         return;
       }
       payload.title = [makeRow.make_name, modelRow.model_name].filter(Boolean).join(" ");
@@ -6030,6 +6037,7 @@ if (addForm) {
       if (formMessage) formMessage.textContent = "Выберите марку и модель автомобиля или добавьте описание объявления.";
       if (selectedCategory === "Автомобили") vehicleListingMake?.focus();
       else addForm?.querySelector(`textarea[name="${descriptionFieldName}"]`)?.focus();
+      alert("ДИАГНОСТИКА: публикация остановлена — не сформировано название объявления. Проверьте описание или марку/модель.");
       return;
     }
     // Validate the listing before asking the visitor to sign in.
@@ -6041,6 +6049,7 @@ if (addForm) {
       }
       // Keep the form and selected File objects in memory while auth is open.
       openAuthModal();
+      alert("ДИАГНОСТИКА: публикация остановлена — currentUser отсутствует. Открыто окно авторизации.");
       return;
     }
     payload.user_id = currentUser.id;

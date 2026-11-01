@@ -5838,32 +5838,6 @@ if (addForm) {
       if (formMessage) { formMessage.textContent = "Сначала подключим Supabase — сейчас работает демо-режим."; formMessage.classList.add("error"); }
       return;
     }
-    // TEMP: diagnose Supabase session and app user when Publish is pressed.
-    try {
-      const { data: authData, error: authError } = await db.auth.getSession();
-      const sessionUserId = authData?.session?.user?.id || null;
-      const appUserId = currentUser?.id || null;
-      const authDiagnostics = {
-        sessionExists: !!authData?.session,
-        sessionUserId,
-        currentUserId: appUserId,
-        userIdsMatch: !!sessionUserId && sessionUserId === appUserId,
-        authError: authError?.message || null
-      };
-      console.info("[HH AUTH DIAGNOSTICS]", authDiagnostics);
-      alert(
-        "ДИАГНОСТИКА SUPABASE\n\n" +
-        "Сессия: " + (authDiagnostics.sessionExists ? "ЕСТЬ" : "НЕТ") + "\n" +
-        "ID Supabase: " + (sessionUserId || "NULL") + "\n" +
-        "ID приложения: " + (appUserId || "NULL") + "\n" +
-        "Совпадение ID: " + (authDiagnostics.userIdsMatch ? "ДА" : "НЕТ") + "\n" +
-        "Ошибка авторизации: " + (authDiagnostics.authError || "нет")
-      );
-    } catch (diagnosticError) {
-      console.error("[HH AUTH DIAGNOSTICS ERROR]", diagnosticError);
-      alert("Не удалось проверить сессию Supabase: " + (diagnosticError?.message || diagnosticError));
-    }
-
     const form = new FormData(e.target);
     const selectedCategory = String(form.get("category") || "");
     const submittedCityId = String(form.get(selectedCategory === "Автомобили" ? "vehicle_city_id" : "city_id") || "");
@@ -6083,7 +6057,32 @@ if (addForm) {
         hasPropertyDetails: !!payload.property_details
       });
       const { data: insertedListings, error } = await db.from("listings").insert(payload).select("id");
+      const insertDiagnostics = {
+        stage: "listings INSERT",
+        category: payload.category || null,
+        city_id: payload.city_id ?? null,
+        user_id: payload.user_id || null,
+        payloadFields: Object.keys(payload),
+        success: !error,
+        insertedId: insertedListings?.[0]?.id ?? null,
+        errorCode: error?.code || null,
+        errorMessage: error?.message || null,
+        errorDetails: error?.details || null,
+        errorHint: error?.hint || null
+      };
+      console.info("[HH INSERT DIAGNOSTICS]", insertDiagnostics);
       if (error) {
+        alert(
+          "ОШИБКА СОХРАНЕНИЯ В SUPABASE\n\n" +
+          "Этап: INSERT listings\n" +
+          "Категория: " + (insertDiagnostics.category || "не указана") + "\n" +
+          "city_id: " + (insertDiagnostics.city_id ?? "NULL") + "\n" +
+          "user_id: " + (insertDiagnostics.user_id || "NULL") + "\n\n" +
+          "Код: " + (insertDiagnostics.errorCode || "нет") + "\n" +
+          "Ошибка: " + (insertDiagnostics.errorMessage || "неизвестная ошибка") + "\n" +
+          "Подробности: " + (insertDiagnostics.errorDetails || "нет") + "\n" +
+          "Подсказка: " + (insertDiagnostics.errorHint || "нет")
+        );
         console.error("[addForm] Supabase insert failed:", {
           message: error.message,
           code: error.code,
@@ -6098,6 +6097,12 @@ if (addForm) {
         }
         throw error;
       }
+      alert(
+        "ДИАГНОСТИКА SUPABASE\n\n" +
+        "INSERT выполнен успешно.\n" +
+        "Категория: " + (insertDiagnostics.category || "не указана") + "\n" +
+        "ID объявления: " + (insertDiagnostics.insertedId ?? "не получен")
+      );
       e.target.reset();
       resetPhotos();
       if (formMessage) formMessage.textContent = "Объявление опубликовано!";

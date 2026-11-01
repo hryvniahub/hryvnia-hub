@@ -5910,6 +5910,7 @@ if (addForm) {
       alert("ДИАГНОСТИКА: публикация остановлена на проверке города.\nВыбранный city_id: " + (cityId || "пусто") + "\nЗагружено городов: " + availableCities.length + "\nПроверьте выбор города из списка.");
       return;
     }
+    alert("ДИАГНОСТИКА: проверка города пройдена. city_id = " + cityId);
     const descriptionFieldName = selectedCategory === "Автомобили" ? "vehicle_description" : selectedCategory === "Недвижимость" ? "property_description" : "description";
     const priceFieldName = selectedCategory === "Автомобили" ? "vehicle_price" : selectedCategory === "Недвижимость" ? "property_price" : "price";
     const currencyFieldName = selectedCategory === "Автомобили" ? "vehicle_price_currency" : selectedCategory === "Недвижимость" ? "property_price_currency" : "price_currency";
@@ -5996,6 +5997,7 @@ if (addForm) {
       const typeLabel = translations[propertyType]?.[lang] || propertyType;
       const operationLabel = translations[propertyOperation]?.[lang] || propertyOperation;
       payload.title = `${typeLabel} — ${operationLabel.toLocaleLowerCase(lang === "uk" ? "uk-UA" : lang === "pl" ? "pl-PL" : lang === "en" ? "en-US" : "ru-RU")}`;
+      alert("ДИАГНОСТИКА: обязательные поля недвижимости проверены. Тип: " + propertyType + "; операция: " + propertyOperation);
     }
     if (selectedCategory === "Автомобили") {
       const makeSlug = String(form.get("vehicle_make_slug") || "").trim();
@@ -6064,6 +6066,7 @@ if (addForm) {
       return;
     }
     payload.user_id = currentUser.id;
+    alert("ДИАГНОСТИКА: проверки формы пройдены. Пользователь подтверждён. Готовим сохранение.");
     const withPhotos = selectedPhotos.length > 0;
     publishing = true;
     const controls = [...addForm.elements].map(control => [control, control.disabled]);
@@ -6074,8 +6077,10 @@ if (addForm) {
     if (formMessage) formMessage.textContent = withPhotos ? photoText("saving") : publishLabel;
     try {
       if (withPhotos) {
+        alert("ДИАГНОСТИКА: начинаем загрузку фотографий.");
         payload.image_urls = await uploadListingPhotos();
         payload.image_url = payload.image_urls[0];
+        alert("ДИАГНОСТИКА: фотографии загружены.");
       }
       console.info("[addForm] inserting listing", {
         category: payload.category,

@@ -2452,6 +2452,7 @@ function renderCitySuggestions() {
 }
 function selectCity(city) {
   citySelect.value = String(city.id);
+  citySelect.dispatchEvent(new Event("change", { bubbles: true }));
   citySearchInput.value = cityName(city);
   const isCapital = String(city.official_code || "") === "UA80000000000093317" || Number(city.id) === 29707;
   formRegionCode = isCapital ? "" : String(city.region_katottg_code || "");
@@ -5126,7 +5127,10 @@ function refreshPropertyListingSelect(select) {
   const trigger = control.querySelector(".hh-property-select-trigger");
   const label = control.querySelector(".hh-property-select-label");
   const selected = select.options[select.selectedIndex];
-  if (label) label.textContent = selected?.textContent?.trim() || "";
+  if (label) label.textContent = select.value
+    ? (selected?.textContent?.trim() || "")
+    : "Выберите тип объекта"; 
+  trigger?.classList.toggle("hh-required-missing", !select.value);
   control.querySelectorAll("[data-property-select-value]").forEach(option => {
     const active = option.dataset.propertySelectValue === select.value;
     const sourceOption = [...select.options].find(item => item.value === option.dataset.propertySelectValue);
@@ -5279,23 +5283,26 @@ function syncPropertyListingFields() {
   if (propertyDistrictField) propertyDistrictField.hidden = !isProperty;
   if (propertyAddressField) propertyAddressField.hidden = !isProperty;
   if (propertyRadiusField) propertyRadiusField.hidden = true;
-  const needsListingLocation = isProperty || isVehicle;
-  const sharedListingLocation = document.getElementById("listingLocationFields");
-  if (sharedListingLocation) sharedListingLocation.hidden = !needsListingLocation;
   if (propertyListingLocationAccordion) {
-    propertyListingLocationAccordion.hidden = !needsListingLocation;
-    if (isVehicle) {
-      propertyListingLocationToggle?.setAttribute("aria-expanded", "true");
-      if (propertyListingLocationFields) propertyListingLocationFields.hidden = false;
+    // Location is required for both vehicle and real-estate listings.
+    // Keep the accordion available for vehicles even though property-only
+    // fields remain hidden by syncPropertyListingFields().
+    propertyListingLocationAccordion.hidden = !(isProperty || isVehicle);
+    if (propertyListingLocationToggle) {
+      propertyListingLocationToggle.hidden = isVehicle;
+      if (isVehicle) propertyListingLocationToggle.setAttribute("aria-expanded", "true");
+    }
+    if (isVehicle && propertyListingLocationFields) {
+      propertyListingLocationFields.hidden = false;
+    } else if (!isProperty && propertyListingLocationFields) {
+      propertyListingLocationFields.hidden = false;
     } else if (isProperty && propertyListingLocationFields) {
       propertyListingLocationFields.hidden = propertyListingLocationToggle?.getAttribute("aria-expanded") !== "true";
-    } else if (propertyListingLocationFields) {
-      propertyListingLocationFields.hidden = true;
     }
   }
-  if (!needsListingLocation && propertyListingLocationSummaryText) propertyListingLocationSummaryText.classList.add("is-placeholder");
+  if (!isProperty && propertyListingLocationSummaryText) propertyListingLocationSummaryText.classList.add("is-placeholder");
   const mapPickButton = document.getElementById("pickListingMapPoint");
-  if (mapPickButton) mapPickButton.textContent = "⌖ Знайти на мапі";
+  if (mapPickButton) mapPickButton.textContent = isProperty ? "⌖ Знайти на мапі" : "⌖ Указать точку на карте";
   updatePropertyListingLocationSummary();
   if (!isProperty) setPropertyAdvancedFields(false);
 }
@@ -5305,6 +5312,8 @@ function syncVehicleListingFields() {
   const isVehicle = category === "Автомобили";
   const isProperty = category === "Недвижимость";
   const hidesManualTitle = isVehicle || isProperty;
+  const listingLocationFields = document.getElementById("listingLocationFields");
+  const listingLocationHome = document.getElementById("listingLocationHome");
   const listingPriceRow = document.getElementById("listingPriceRow");
   const listingPriceHome = document.getElementById("listingPriceHome");
   const propertyListingPriceHome = document.getElementById("propertyListingPriceHome");
@@ -5314,12 +5323,19 @@ function syncVehicleListingFields() {
     listingPriceHome.after(listingPriceRow);
   }
   if (isVehicle && vehicleListingFields) {
+    const firstVehicleLabel = vehicleListingFields.querySelector("label");
+    if (listingLocationFields && firstVehicleLabel && listingLocationFields.parentElement !== vehicleListingFields) {
+      vehicleListingFields.insertBefore(listingLocationFields, firstVehicleLabel);
+    }
     const transmissionInput = vehicleListingFields.querySelector('[name="vehicle_transmission"]');
     const transmissionLabel = transmissionInput?.closest("label");
     if (listingPriceRow && transmissionLabel && listingPriceRow.parentElement !== vehicleListingFields) {
       transmissionLabel.after(listingPriceRow);
     }
   } else {
+    if (listingLocationFields && listingLocationHome?.parentElement && listingLocationFields.parentElement !== listingLocationHome.parentElement) {
+      listingLocationHome.after(listingLocationFields);
+    }
     if (!isProperty && listingPriceRow && listingPriceHome?.parentElement && listingPriceRow.parentElement !== listingPriceHome.parentElement) {
       listingPriceHome.after(listingPriceRow);
     }
@@ -5328,7 +5344,9 @@ function syncVehicleListingFields() {
   if (vehicleListingMore) vehicleListingMore.hidden = !isVehicle;
   if (vehicleMarketPanel) vehicleMarketPanel.hidden = true;
   if (vehicleAdvancedFields) vehicleAdvancedFields.hidden = true;
-  if (listingAdvancedCommonFields) listingAdvancedCommonFields.hidden = isVehicle;
+  // The common wrapper contains the shared location selector. Do not hide it
+  // for vehicles; syncPropertyListingFields() hides property-only controls.
+  if (listingAdvancedCommonFields) listingAdvancedCommonFields.hidden = false;
   vehicleListingFields?.querySelectorAll("input,select").forEach(el => { el.disabled = !isVehicle; });
   syncPropertyListingFields();
   if (listingTitleField) {
@@ -5473,6 +5491,9 @@ async function openPropertyListingForm(propertyType = "", operation = "") {
   }
   refreshPropertyListingSelect(propertyTypeSelect);
   refreshPropertyListingSelect(propertyOperationSelect);
+  const propertyTypeTrigger = propertyTypeSelect?.parentElement?.querySelector(".hh-property-select-trigger")
+    || document.querySelector('.hh-property-select[data-for="propertyType"] .hh-property-select-trigger');
+  propertyTypeTrigger?.classList.toggle("hh-required-missing", !propertyTypeSelect?.value);
   syncVehicleListingFields();
   // Keep the property form independent from the vehicle form visibility state.
   if (listingAdvancedCommonFields) listingAdvancedCommonFields.hidden = false;
@@ -5653,11 +5674,26 @@ if (addForm) {
       return;
     }
     const form = new FormData(e.target);
+    const selectedCategory = String(form.get("category") || "");
+    console.info("[addForm submit]", {
+      category: selectedCategory,
+      cityId: String(form.get("city_id") || ""),
+      cityText: String(citySearchInput?.value || ""),
+      citiesLoaded: availableCities.length,
+      propertyType: String(form.get("property_type") || ""),
+      propertyOperation: String(form.get("property_operation") || ""),
+      userId: currentUser?.id || null
+    });
     // Ensure the city catalog is ready before checking the selected hidden city_id.
     try {
       await ensureCitiesLoaded();
     } catch (error) {
-      console.error("Не удалось загрузить города перед публикацией:", error);
+      console.error("[addForm] city catalog load failed:", error);
+      if (formMessage) {
+        formMessage.textContent = "Не удалось загрузить справочник городов. Проверьте соединение и повторите попытку.";
+        formMessage.classList.add("error");
+      }
+      return;
     }
     const cityId = String(form.get("city_id") || "");
     if (!cityId || !availableCities.some(city => String(city.id) === cityId)) {
@@ -5666,10 +5702,12 @@ if (addForm) {
         formMessage.classList.add("error");
       }
       // Reveal and highlight the location controls: city_id is mandatory.
-      if (listingCategorySelect?.value === "Недвижимость") {
-        propertyListingLocationToggle?.setAttribute("aria-expanded", "true");
-        propertyListingLocationFields.hidden = false;
-        propertyListingLocationToggle?.classList.add("has-error");
+      propertyListingLocationAccordion && (propertyListingLocationAccordion.hidden = false);
+      if (propertyListingLocationFields) propertyListingLocationFields.hidden = false;
+      if (propertyListingLocationToggle && selectedCategory !== "Автомобили") {
+        propertyListingLocationToggle.hidden = false;
+        propertyListingLocationToggle.setAttribute("aria-expanded", "true");
+        propertyListingLocationToggle.classList.add("has-error");
       }
       citySearchInput?.classList.add("has-error");
       citySearchInput?.focus();
@@ -5678,7 +5716,6 @@ if (addForm) {
       console.warn("[addForm early return]", { step: "city", cityId, availableCities: availableCities.length });
       return;
     }
-    const selectedCategory = String(form.get("category") || "");
     const description = String(form.get("description") || "").trim();
     const generatedRealEstateTitle = selectedCategory === "Недвижимость"
       ? (description.split(/\r?\n/)[0].trim().slice(0, 100) || (translations["Недвижимость"]?.[lang] || "Недвижимость"))
@@ -5704,8 +5741,12 @@ if (addForm) {
           formMessage.textContent = "Выберите операцию и тип недвижимости.";
           formMessage.classList.add("error");
         }
+        const propertyTypeTrigger = propertyTypeSelect?.parentElement?.querySelector(".hh-property-select-trigger")
+          || document.querySelector('.hh-property-select[data-for="propertyType"] .hh-property-select-trigger');
+        propertyTypeTrigger?.classList.toggle("hh-required-missing", !propertyType);
+        (!propertyOperation ? propertyOperationSelect : propertyTypeTrigger)?.scrollIntoView({ behavior: "smooth", block: "center" });
+        formMessage?.scrollIntoView({ behavior: "smooth", block: "center" });
         console.warn("[addForm early return]", { step: "property-fields", propertyType, propertyOperation });
-        (!propertyOperation ? propertyOperationSelect : propertyTypeSelect)?.focus();
         return;
       }
       const optionalNumber = name => {
@@ -5716,9 +5757,9 @@ if (addForm) {
         property_details: {
           operation: propertyOperation,
           type: propertyType,
-          district: String(document.querySelector("#propertyCityDistrictSelect option:checked")?.textContent || "").trim() || null,
+          district: String(propertyCityDistrictSelect?.selectedOptions?.[0]?.textContent || "").trim() || null,
           district_code: String(form.get("property_district") || "").trim() || null,
-          oblast_raion: String(document.querySelector("#propertyOblastRaionSelect option:checked")?.textContent || "").trim() || null,
+          oblast_raion: String(propertyOblastRaionSelect?.selectedOptions?.[0]?.textContent || "").trim() || null,
           oblast_raion_code: String(form.get("property_oblast_raion") || "").trim() || null,
           address: String(form.get("property_address") || "").trim() || null,
           radius_km: optionalNumber("property_radius_km"),
@@ -5841,6 +5882,14 @@ if (addForm) {
       });
       const { data: insertedListings, error } = await db.from("listings").insert(payload).select("id");
       if (error) {
+        console.error("[addForm] Supabase insert failed:", {
+          message: error.message,
+          code: error.code,
+          details: error.details,
+          hint: error.hint,
+          category: payload.category,
+          city_id: payload.city_id
+        });
         const raw = String(error.message || "");
         if (/row-level security|permission denied|new row violates/i.test(raw)) {
           throw new Error(t("Ошибка") + ": " + raw + " — проверьте права доступа.");

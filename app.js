@@ -1166,7 +1166,7 @@ const PHOTO_TYPES = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "we
   const form = document.getElementById("addForm");
   if (!form) return;
 
-  if (!form.querySelector('textarea[name="description"]')) {
+  if (!form.querySelector('textarea[name="description"], textarea[name="vehicle_description"], textarea[name="property_description"]')) {
     const description = document.createElement("label");
     description.innerHTML = `<span>${escapeHtml(t("Описание"))}</span><textarea name="description" rows="5" maxlength="10000" placeholder="${escapeHtml(t("Коротко опишите предложение"))}"></textarea>`;
     const submit = form.querySelector('button[type="submit"]');
@@ -5151,8 +5151,9 @@ const vehicleListingMore = document.getElementById("vehicleListingMore");
 // Keep the listing-creation currency set to UAH, USD and PLN.
 // The search filters have their own currency selector and are not changed here.
 function syncVehicleListingFormOptions() {
-  const currencySelect = document.getElementById("listingPriceCurrency");
-  currencySelect?.querySelector('option[value="EUR"]')?.remove();
+  ["listingPriceCurrency", "vehicleListingPriceCurrency", "propertyListingPriceCurrency"].forEach(id => {
+    document.getElementById(id)?.querySelector('option[value="EUR"]')?.remove();
+  });
 
   if (vehicleListingMore) {
     vehicleListingMore.textContent = t("Розширений пошук");
@@ -5409,34 +5410,60 @@ function syncVehicleListingFields() {
   const category = listingCategorySelect?.value || "";
   const isVehicle = category === "Автомобили";
   const isProperty = category === "Недвижимость";
+  const isOther = !isVehicle && !isProperty;
   const hidesManualTitle = isVehicle || isProperty;
-  const listingPriceRow = document.getElementById("listingPriceRow");
-  const listingPriceHome = document.getElementById("listingPriceHome");
-  const propertyListingPriceHome = document.getElementById("propertyListingPriceHome");
-  if (isProperty && propertyListingFields && listingPriceRow && propertyListingPriceHome?.parentElement) {
-    propertyListingPriceHome.after(listingPriceRow);
-  } else if (!isVehicle && listingPriceRow && listingPriceHome?.parentElement && listingPriceRow.parentElement !== listingPriceHome.parentElement) {
-    listingPriceHome.after(listingPriceRow);
+
+  // Category-owned price and description controls are never moved between forms.
+  const genericPriceRow = document.getElementById("listingPriceRow");
+  const genericDescription = document.getElementById("listingDescriptionField");
+  const vehiclePriceRow = document.getElementById("vehicleListingPriceRow");
+  const vehicleDescription = document.getElementById("vehicleListingDescriptionField");
+  const propertyPriceRow = document.getElementById("propertyListingPriceRow");
+  const propertyDescription = document.getElementById("propertyListingDescriptionField");
+
+  if (genericPriceRow) genericPriceRow.hidden = !isOther;
+  if (genericDescription) genericDescription.hidden = !isOther;
+  genericPriceRow?.querySelectorAll("input,select").forEach(control => { control.disabled = !isOther; });
+  genericDescription?.querySelectorAll("input,select,textarea").forEach(control => { control.disabled = !isOther; });
+
+  if (vehicleListingFields) vehicleListingFields.disabled = !isVehicle;
+  if (vehiclePriceRow) vehiclePriceRow.hidden = !isVehicle;
+  if (vehicleDescription) vehicleDescription.hidden = !isVehicle;
+  vehiclePriceRow?.querySelectorAll("input,select").forEach(control => { control.disabled = !isVehicle; });
+  vehicleDescription?.querySelectorAll("input,select,textarea").forEach(control => { control.disabled = !isVehicle; });
+
+  if (propertyListingFields) {
+    propertyListingFields.hidden = !isProperty;
+    propertyListingFields.disabled = !isProperty;
   }
-  if (isVehicle && vehicleListingFields) {
-    const transmissionInput = vehicleListingFields.querySelector('[name="vehicle_transmission"]');
-    const transmissionLabel = transmissionInput?.closest("label");
-    if (listingPriceRow && transmissionLabel && listingPriceRow.parentElement !== vehicleListingFields) {
-      transmissionLabel.after(listingPriceRow);
-    }
-  } else {
-    if (!isProperty && listingPriceRow && listingPriceHome?.parentElement && listingPriceRow.parentElement !== listingPriceHome.parentElement) {
-      listingPriceHome.after(listingPriceRow);
-    }
-  }
+  syncPropertyListingFields();
+  if (propertyPriceRow) propertyPriceRow.hidden = !isProperty;
+  if (propertyDescription) propertyDescription.hidden = !isProperty;
+  propertyPriceRow?.querySelectorAll("input,select").forEach(control => { control.disabled = !isProperty; });
+  propertyDescription?.querySelectorAll("input,select,textarea").forEach(control => { control.disabled = !isProperty; });
+
   if (vehicleListingFields) vehicleListingFields.hidden = !isVehicle;
   if (vehicleListingMore) vehicleListingMore.hidden = !isVehicle;
   if (vehicleMarketPanel) vehicleMarketPanel.hidden = true;
   if (vehicleAdvancedFields) vehicleAdvancedFields.hidden = true;
-  // Vehicle location lives inside the vehicle fieldset and is never moved from the property form.
-  if (listingAdvancedCommonFields) listingAdvancedCommonFields.hidden = false;
-  vehicleListingFields?.querySelectorAll("input,select").forEach(el => { el.disabled = !isVehicle; });
-  syncPropertyListingFields();
+  if (listingAdvancedCommonFields) listingAdvancedCommonFields.hidden = !(isProperty || isOther);
+
+  // Property location UI belongs only to property creation. Vehicle location is its own block.
+  if (propertyListingLocationAccordion) propertyListingLocationAccordion.hidden = !isProperty;
+  if (propertyListingLocationToggle) propertyListingLocationToggle.hidden = !isProperty;
+  if (propertyListingLocationFields) propertyListingLocationFields.hidden = !isProperty || propertyListingLocationToggle?.getAttribute("aria-expanded") !== "true";
+  const propertyMapAction = document.getElementById("pickListingMapPoint")?.closest(".property-listing-map-action");
+  if (propertyMapAction) propertyMapAction.hidden = !isProperty;
+  if (!isProperty && propertyListingLocationSummaryText) propertyListingLocationSummaryText.classList.add("is-placeholder");
+  const propertyMapPickButton = document.getElementById("pickListingMapPoint");
+  if (propertyMapPickButton) propertyMapPickButton.textContent = "⌖ Знайти на мапі";
+  updatePropertyListingLocationSummary();
+  if (!isProperty) setPropertyAdvancedFields(false);
+
+  const currencyField = document.getElementById("listingCurrencyField");
+  if (currencyField) currencyField.hidden = !isOther;
+
+  vehicleListingFields?.querySelectorAll("input,select,textarea").forEach(el => { el.disabled = !isVehicle; });
   if (listingTitleField) {
     listingTitleField.hidden = hidesManualTitle;
     const titleInput = listingTitleField.querySelector('input[name="title"]');
@@ -5813,7 +5840,10 @@ if (addForm) {
       console.warn("[addForm early return]", { step: "city", cityId, availableCities: availableCities.length });
       return;
     }
-    const description = String(form.get("description") || "").trim();
+    const descriptionFieldName = selectedCategory === "Автомобили" ? "vehicle_description" : selectedCategory === "Недвижимость" ? "property_description" : "description";
+    const priceFieldName = selectedCategory === "Автомобили" ? "vehicle_price" : selectedCategory === "Недвижимость" ? "property_price" : "price";
+    const currencyFieldName = selectedCategory === "Автомобили" ? "vehicle_price_currency" : selectedCategory === "Недвижимость" ? "property_price_currency" : "price_currency";
+    const description = String(form.get(descriptionFieldName) || "").trim();
     const generatedRealEstateTitle = selectedCategory === "Недвижимость"
       ? (description.split(/\r?\n/)[0].trim().slice(0, 100) || (translations["Недвижимость"]?.[lang] || "Недвижимость"))
       : "";
@@ -5821,8 +5851,8 @@ if (addForm) {
       category: selectedCategory,
       title: selectedCategory === "Недвижимость" ? generatedRealEstateTitle : String(form.get("title") || "").trim(),
       city_id: Number(cityId),
-      price: Number(form.get("price")),
-      currency: String(form.get("price_currency") || "UAH"),
+      price: Number(form.get(priceFieldName)),
+      currency: String(form.get(currencyFieldName) || "UAH"),
       description,
       is_hot: false,
       is_urgent: false,
@@ -5943,7 +5973,7 @@ if (addForm) {
     if (!String(payload.title || "").trim()) {
       if (formMessage) formMessage.textContent = "Выберите марку и модель автомобиля или добавьте описание объявления.";
       if (selectedCategory === "Автомобили") vehicleListingMake?.focus();
-      else addForm?.querySelector('textarea[name="description"]')?.focus();
+      else addForm?.querySelector(`textarea[name="${descriptionFieldName}"]`)?.focus();
       return;
     }
     // Validate the listing before asking the visitor to sign in.
@@ -6205,7 +6235,11 @@ function translatePage(selectedLanguage) {
       ["#vehicleListingCitySearchInput", "Город"],
       ["#vehicleListingRegionSelect", "Область / регион"],
       ['input[name="price"]', "Цена, грн"],
-      ['textarea[name="description"]', "Описание"]
+      ['input[name="vehicle_price"]', "Цена, грн"],
+      ['input[name="property_price"]', "Цена, грн"],
+      ['textarea[name="description"]', "Описание"],
+      ['textarea[name="vehicle_description"]', "Описание"],
+      ['textarea[name="property_description"]', "Описание"]
     ];
     sharedFieldLabels.forEach(([selector, key]) => {
       const field = addModal.querySelector(selector);
@@ -6216,8 +6250,8 @@ function translatePage(selectedLanguage) {
     });
     const cityInput = addModal.querySelector("#citySearchInput");
     if (cityInput) cityInput.placeholder = cityTranslation("Введите название города");
-    const addDescriptionField = addModal.querySelector('textarea[name="description"]');
-    if (addDescriptionField) addDescriptionField.placeholder = t("Коротко опишите предложение");
+    const addDescriptionFields = addModal.querySelectorAll('textarea[name="description"], textarea[name="vehicle_description"], textarea[name="property_description"]');
+    addDescriptionFields.forEach(field => { field.placeholder = t("Коротко опишите предложение"); });
     const regionSelect = addModal.querySelector("#cityRegionSelect");
     if (regionSelect?.options[0]) regionSelect.options[0].textContent = cityTranslation("Все области");
     const categorySelect = addModal.querySelector('select[name="category"]');
@@ -6231,8 +6265,8 @@ function translatePage(selectedLanguage) {
     }
     const titleInput = addModal.querySelector('input[name="title"]');
     if (titleInput) titleInput.placeholder = translations["Например: Skoda Octavia 1.6"][lang];
-    const descriptionInput = addModal.querySelector('textarea[name="description"]');
-    if (descriptionInput) descriptionInput.placeholder = translations["Коротко опишите предложение"][lang];
+    const descriptionInputs = addModal.querySelectorAll('textarea[name="description"], textarea[name="vehicle_description"], textarea[name="property_description"]');
+    descriptionInputs.forEach(field => { field.placeholder = translations["Коротко опишите предложение"][lang]; });
     const publishButton = addModal.querySelector('button[type="submit"]');
     if (publishButton) translateTextElement(publishButton, "Опубликовать");
   }

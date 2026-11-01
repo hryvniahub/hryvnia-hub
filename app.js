@@ -5827,6 +5827,12 @@ if (closeAddBtn) closeAddBtn.addEventListener("click", () => addModal?.classList
 if (addModal) addModal.addEventListener("click", e => { if (e.target === addModal) addModal.classList.add("hidden"); });
 
 if (addForm) {
+  // TEMP DIAGNOSTICS: surface unexpected JavaScript errors during submit.
+  window.addEventListener("error", event => {
+    console.error("[HH SUBMIT UNCAUGHT ERROR]", event.error || event.message);
+    alert("ОШИБКА JAVASCRIPT ПРИ ПУБЛИКАЦИИ:\\n" + (event.message || event.error?.message || "неизвестная ошибка"));
+  }, { once: true });
+
   // TEMP DIAGNOSTICS: confirm that the publish button and submit handler respond.
   const diagnosticPublishButton = addForm.querySelector('button[type="submit"]');
   diagnosticPublishButton?.addEventListener("click", () => {
@@ -5918,6 +5924,7 @@ if (addForm) {
     const generatedRealEstateTitle = selectedCategory === "Недвижимость"
       ? (description.split(/\r?\n/)[0].trim().slice(0, 100) || (translations["Недвижимость"]?.[lang] || "Недвижимость"))
       : "";
+    alert("ДИАГНОСТИКА: начинаю формировать общий payload объявления.");
     const payload = {
       category: selectedCategory,
       title: selectedCategory === "Недвижимость" ? generatedRealEstateTitle : String(form.get("title") || "").trim(),
@@ -5931,6 +5938,7 @@ if (addForm) {
       latitude: String(form.get(selectedCategory === "Автомобили" ? "vehicle_latitude" : "latitude") || "") === "" ? null : Number(form.get(selectedCategory === "Автомобили" ? "vehicle_latitude" : "latitude")),
       longitude: String(form.get(selectedCategory === "Автомобили" ? "vehicle_longitude" : "longitude") || "") === "" ? null : Number(form.get(selectedCategory === "Автомобили" ? "vehicle_longitude" : "longitude"))
     };
+    alert("ДИАГНОСТИКА: общий payload сформирован. Категория: " + selectedCategory + "; цена: " + payload.price + "; user_id: " + (payload.user_id || "NULL"));
     if (selectedCategory === "Недвижимость") {
       const propertyType = String(form.get("property_type") || "").trim();
       const propertyOperation = String(form.get("property_operation") || "").trim();

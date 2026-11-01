@@ -2572,13 +2572,21 @@ function findOblastRaionForCity(city) {
     })
     .sort((a, b) => normalizeKatottgCode(b.katottg_code).length - normalizeKatottgCode(a.katottg_code).length)[0] || null;
 }
+function getCityOblastRaionCode(city) {
+  // Prefer the explicit city column. Older/incomplete city rows may not have
+  // raion_katottg_code, so resolve the oblast raion from the KATOTTG hierarchy.
+  const explicitCode = normalizeKatottgCode(city?.raion_katottg_code);
+  if (explicitCode) return explicitCode;
+  const matchedRaion = findOblastRaionForCity(city);
+  return normalizeKatottgCode(matchedRaion?.katottg_code);
+}
 function getPropertyGeoFilteredCities() {
   const raionCode = normalizeKatottgCode(document.getElementById("propertyOblastRaionSelect")?.value);
   const regionCode = normalizeKatottgCode(formRegionCode);
   return citySearchIndex.filter(entry => {
     const city = entry.city;
     if (regionCode && normalizeKatottgCode(city.region_katottg_code) !== regionCode) return false;
-    if (raionCode && normalizeKatottgCode(city.raion_katottg_code) !== raionCode) return false;
+    if (raionCode && getCityOblastRaionCode(city) !== raionCode) return false;
     return true;
   });
 }
@@ -2738,7 +2746,7 @@ if (propertyOblastRaionSelect) {
     const selectedCity = availableCities.find(city => String(city.id) === String(citySelect?.value || ""));
     const cityMatchesRaion = selectedCity && (!selectedRaion ||
       (normalizeKatottgCode(selectedCity.region_katottg_code) === normalizeKatottgCode(selectedRaion.region_katottg_code) &&
-       normalizeKatottgCode(selectedCity.raion_katottg_code) === normalizeKatottgCode(selectedRaion.katottg_code)));
+       getCityOblastRaionCode(selectedCity) === normalizeKatottgCode(selectedRaion.katottg_code)));
     if (!cityMatchesRaion) {
       if (citySelect) citySelect.value = "";
       if (citySearchInput) citySearchInput.value = "";

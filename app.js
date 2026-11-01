@@ -5035,6 +5035,7 @@ function refreshPropertyListingSelect(select) {
   const label = control.querySelector(".hh-property-select-label");
   const selected = select.options[select.selectedIndex];
   if (label) label.textContent = selected?.textContent?.trim() || "";
+  trigger?.classList.toggle("hh-required-missing", !select.value);
   control.querySelectorAll("[data-property-select-value]").forEach(option => {
     const active = option.dataset.propertySelectValue === select.value;
     const sourceOption = [...select.options].find(item => item.value === option.dataset.propertySelectValue);
@@ -5518,6 +5519,9 @@ const closeAddBtn = document.getElementById("closeAdd");
 if (closeAddBtn) closeAddBtn.addEventListener("click", () => addModal?.classList.add("hidden"));
 if (addModal) addModal.addEventListener("click", e => { if (e.target === addModal) addModal.classList.add("hidden"); });
 
+citySearchInput?.addEventListener("input", () => citySearchInput.classList.remove("has-error"));
+propertyTypeSelect?.addEventListener("change", () => refreshPropertyListingSelect(propertyTypeSelect));
+
 if (addForm) {
   addForm.addEventListener("submit", async e => {
     e.preventDefault();
@@ -5526,11 +5530,38 @@ if (addForm) {
     if (!db) { if (formMessage) formMessage.textContent = "Сначала подключим Supabase — сейчас работает демо-режим."; return; }
     const form = new FormData(e.target);
     const cityId = form.get("city_id");
-    if (!cityId || !availableCities.some(city => String(city.id) === cityId)) {
-      if (formMessage) formMessage.textContent = cityTranslation("Выберите город из списка");
+    const selectedCategoryForLog = String(form.get("category") || "");
+    console.info("[submit] start", {
+      category: selectedCategoryForLog,
+      cityId,
+      propertyType: form.get("property_type"),
+      propertyOperation: form.get("property_operation"),
+      price: form.get("price"),
+      currentUser: currentUser?.id || null,
+      citiesLoaded: availableCities.length,
+      cityInputVisible: (() => {
+        const el = document.getElementById("citySearchInput");
+        return el ? el.offsetParent !== null : null;
+      })(),
+      citySelectValue: document.getElementById("citySelect")?.value || "",
+      typeSelectValue: document.getElementById("propertyType")?.value || ""
+    });
+    if (!cityId || !availableCities.some(city => String(city.id) === String(cityId))) {
+      console.warn("[submit] blocked at: city_id check", {
+        cityId,
+        availableCities: availableCities.length,
+        category: selectedCategoryForLog
+      });
+      if (formMessage) {
+        formMessage.textContent = cityTranslation("Выберите город из списка");
+        formMessage.classList.add("error");
+      }
+      citySearchInput?.classList.add("has-error");
       citySearchInput?.focus();
+      citySearchInput?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
+    citySearchInput?.classList.remove("has-error");
     const selectedCategory = String(form.get("category") || "");
     const description = String(form.get("description") || "").trim();
     const generatedRealEstateTitle = selectedCategory === "Недвижимость"
@@ -5551,8 +5582,25 @@ if (addForm) {
       const propertyType = String(form.get("property_type") || "").trim();
       const propertyOperation = String(form.get("property_operation") || "").trim();
       if (!propertyType || !propertyOperation) {
-        if (formMessage) formMessage.textContent = "Выберите операцию и тип недвижимости.";
-        (!propertyOperation ? propertyOperationSelect : propertyTypeSelect)?.focus();
+        console.warn("[submit] blocked at: property_type check", {
+          propertyType,
+          propertyOperation
+        });
+        if (formMessage) {
+          formMessage.textContent = "Выберите операцию и тип недвижимости.";
+          formMessage.classList.add("error");
+        }
+        const propertyTypeTrigger = propertyTypeSelect?.parentElement?.querySelector(".hh-property-select-trigger");
+        propertyTypeTrigger?.classList.toggle("hh-required-missing", !propertyType);
+        const invalidPropertyControl = !propertyOperation
+          ? propertyOperationSelect?.parentElement?.querySelector(".hh-property-operation-tabs")
+          : propertyTypeTrigger;
+        invalidPropertyControl?.scrollIntoView({ behavior: "smooth", block: "center" });
+        if (propertyType) {
+          propertyOperationSelect?.parentElement?.querySelector(".hh-property-operation-button:not(.active)")?.focus();
+        } else {
+          propertyTypeTrigger?.focus();
+        }
         return;
       }
       const optionalNumber = name => {
@@ -5675,11 +5723,15 @@ if (addForm) {
     controls.forEach(([control]) => { if (control !== publishButton) control.disabled = true; });
     setButtonLoading(publishButton, true, publishLabel);
     if (formMessage) formMessage.textContent = withPhotos ? photoText("saving") : publishLabel;
+    let publishStage = "starting";
     try {
       if (withPhotos) {
+        publishStage = "photo_upload";
         payload.image_urls = await uploadListingPhotos();
         payload.image_url = payload.image_urls[0];
       }
+      publishStage = "database_insert";
+      console.info("[submit] inserting payload", payload);
       const { data: insertedListings, error } = await db.from("listings").insert(payload).select("id");
       if (error) {
         const raw = String(error.message || "");
@@ -5694,6 +5746,14 @@ if (addForm) {
       await loadListings();
       setTimeout(() => addModal?.classList.add("hidden"), 700);
     } catch (error) {
+      console.error("[submit] failed", {
+        stage: publishStage,
+        message: error?.message || String(error),
+        code: error?.code || null,
+        details: error?.details || null,
+        hint: error?.hint || null,
+        error
+      });
       if (formMessage) {
         const errorText = error?.message || String(error);
         formMessage.textContent = withPhotos

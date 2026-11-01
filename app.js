@@ -2522,6 +2522,7 @@ function updateCities(items, names = {}) {
 let propertyOblastRaions = [];
 let propertyCityDistricts = [];
 let propertyGeoCatalogsPromise = null;
+let propertyGeoCatalogsLoaded = false;
 const propertyGeoName = row => {
   if (!row) return "";
   const key = lang === "ru" ? "name_ru" : lang === "en" ? "name_en" : lang === "pl" ? "name_pl" : "name_uk";
@@ -2559,20 +2560,36 @@ function getPropertyGeoFilteredCities() {
   });
 }
 async function loadPropertyGeoCatalogs() {
-  if (!db) return;
+  if (!db) return false;
+  if (propertyGeoCatalogsLoaded) return true;
   if (propertyGeoCatalogsPromise) return propertyGeoCatalogsPromise;
+
   propertyGeoCatalogsPromise = (async () => {
     const [raionsResult, districtsResult] = await Promise.all([
       db.from("oblast_raions").select("id, katottg_code, region_katottg_code, name_uk, name_ru, name_en, name_pl").eq("is_active", true).order("name_uk"),
       db.from("city_districts").select("id, katottg_code, city_id, city_katottg_code, name_uk, name_ru, name_en, name_pl").eq("is_active", true).order("name_uk")
     ]);
-    if (raionsResult.error) console.error("Не удалось загрузить районы областей:", raionsResult.error);
-    else propertyOblastRaions = raionsResult.data || [];
-    if (districtsResult.error) console.error("Не удалось загрузить районы городов:", districtsResult.error);
-    else propertyCityDistricts = districtsResult.data || [];
+
+    if (raionsResult.error) {
+      console.error("Не удалось загрузить районы областей:", raionsResult.error);
+      throw raionsResult.error;
+    }
+    if (districtsResult.error) {
+      console.error("Не удалось загрузить районы городов:", districtsResult.error);
+      throw districtsResult.error;
+    }
+
+    propertyOblastRaions = raionsResult.data || [];
+    propertyCityDistricts = districtsResult.data || [];
+    propertyGeoCatalogsLoaded = true;
+    return true;
   })();
-  try { await propertyGeoCatalogsPromise; }
-  finally { propertyGeoCatalogsPromise = null; }
+
+  try {
+    return await propertyGeoCatalogsPromise;
+  } finally {
+    propertyGeoCatalogsPromise = null;
+  }
 }
 function updatePropertyOblastRaions(regionCode, select = document.getElementById("propertyOblastRaionSelect")) {
   if (!select) return;
@@ -5402,7 +5419,7 @@ function syncPropertyListingFields() {
   if (!isProperty && propertyListingLocationSummaryText) propertyListingLocationSummaryText.classList.add("is-placeholder");
   const propertyMapPickButton = document.getElementById("pickListingMapPoint");
   if (propertyMapPickButton) propertyMapPickButton.textContent = isProperty ? "⌖ Знайти на мапі" : "⌖ Указать точку на карте";
-  updatePropertyListingLocationSummary();
+  if (isProperty) updatePropertyListingLocationSummary();
   if (!isProperty) setPropertyAdvancedFields(false);
 }
 
@@ -5457,7 +5474,6 @@ function syncVehicleListingFields() {
   if (!isProperty && propertyListingLocationSummaryText) propertyListingLocationSummaryText.classList.add("is-placeholder");
   const propertyMapPickButton = document.getElementById("pickListingMapPoint");
   if (propertyMapPickButton) propertyMapPickButton.textContent = "⌖ Знайти на мапі";
-  updatePropertyListingLocationSummary();
   if (!isProperty) setPropertyAdvancedFields(false);
 
   const currencyField = document.getElementById("listingCurrencyField");
@@ -5616,19 +5632,6 @@ async function openPropertyListingForm(propertyType = "", operation = "") {
   propertyListingLocationToggle?.setAttribute("aria-expanded", "true");
   propertyListingLocationToggle?.classList.remove("has-error");
   citySearchInput?.classList.remove("has-error");
-  // Load geo catalogs before the user starts filling the property form.
-  try {
-    await Promise.all([ensureCitiesLoaded(), loadPropertyGeoCatalogs()]);
-    updatePropertyOblastRaions(formRegionCode);
-    const selected = availableCities.find(city => String(city.id) === String(citySelect?.value || ""));
-    updatePropertyCityDistricts(selected || null);
-  } catch (error) {
-    console.error("Не удалось загрузить географию недвижимости:", error);
-    if (formMessage) {
-      formMessage.textContent = "Не удалось загрузить список городов. Обновите страницу и попробуйте снова.";
-      formMessage.classList.add("error");
-    }
-  }
   if (propertyListingFields) {
     propertyListingFields.hidden = false;
     propertyListingFields.disabled = false;
@@ -5637,8 +5640,54 @@ async function openPropertyListingForm(propertyType = "", operation = "") {
   if (vehicleListingFields) vehicleListingFields.hidden = true;
   closeCategoryMenu();
   closeAddCategoryMenu();
+  if (formMessage) {
+    formMessage.textContent = "";
+    formMessage.classList.remove("error");
+  }
+
+  // Show the form immediately. Geo catalogs load in the background so a cold
+  // cache cannot delay the modal; location controls remain unavailable until
+  // their options and dependent district lists are ready.
   addModal?.classList.remove("hidden");
-  if (formMessage) formMessage.textContent = "";
+
+  const geoControls = [
+    cityRegionSelect,
+    citySearchInput,
+    citySelect,
+    propertyOblastRaionSelect,
+    propertyCityDistrictSelect
+  ].filter(Boolean);
+  const previousDisabledStates = geoControls.map(control => control.disabled);
+  geoControls.forEach(control => { control.disabled = true; });
+  propertyListingLocationFields?.setAttribute("aria-busy", "true");
+
+  Promise.all([ensureCitiesLoaded(), loadPropertyGeoCatalogs()])
+    .then(([cities]) => {
+      if (!Array.isArray(cities) || !cities.length) {
+        throw new Error("Справочник населённых пунктов не загружен.");
+      }
+      updatePropertyOblastRaions(formRegionCode);
+      const selected = availableCities.find(city => String(city.id) === String(citySelect?.value || ""));
+      updatePropertyCityDistricts(selected || null);
+    })
+    .catch(error => {
+      console.error("Не удалось загрузить географию недвижимости:", error);
+      const propertyFormIsActive = listingCategorySelect?.value === "Недвижимость"
+        && !addModal?.classList.contains("hidden");
+      if (propertyFormIsActive && formMessage) {
+        formMessage.textContent = "Не удалось загрузить список населённых пунктов. Проверьте соединение и повторите попытку.";
+        formMessage.classList.add("error");
+      }
+    })
+    .finally(() => {
+      const propertyFormIsActive = listingCategorySelect?.value === "Недвижимость";
+      geoControls.forEach((control, index) => {
+        control.disabled = propertyFormIsActive
+          ? previousDisabledStates[index]
+          : true;
+      });
+      propertyListingLocationFields?.removeAttribute("aria-busy");
+    });
 }
 
 categoryMenuOptions?.addEventListener("click", event => {
@@ -5789,6 +5838,32 @@ if (addForm) {
       if (formMessage) { formMessage.textContent = "Сначала подключим Supabase — сейчас работает демо-режим."; formMessage.classList.add("error"); }
       return;
     }
+    // TEMP: diagnose Supabase session and app user when Publish is pressed.
+    try {
+      const { data: authData, error: authError } = await db.auth.getSession();
+      const sessionUserId = authData?.session?.user?.id || null;
+      const appUserId = currentUser?.id || null;
+      const authDiagnostics = {
+        sessionExists: !!authData?.session,
+        sessionUserId,
+        currentUserId: appUserId,
+        userIdsMatch: !!sessionUserId && sessionUserId === appUserId,
+        authError: authError?.message || null
+      };
+      console.info("[HH AUTH DIAGNOSTICS]", authDiagnostics);
+      alert(
+        "ДИАГНОСТИКА SUPABASE\n\n" +
+        "Сессия: " + (authDiagnostics.sessionExists ? "ЕСТЬ" : "НЕТ") + "\n" +
+        "ID Supabase: " + (sessionUserId || "NULL") + "\n" +
+        "ID приложения: " + (appUserId || "NULL") + "\n" +
+        "Совпадение ID: " + (authDiagnostics.userIdsMatch ? "ДА" : "НЕТ") + "\n" +
+        "Ошибка авторизации: " + (authDiagnostics.authError || "нет")
+      );
+    } catch (diagnosticError) {
+      console.error("[HH AUTH DIAGNOSTICS ERROR]", diagnosticError);
+      alert("Не удалось проверить сессию Supabase: " + (diagnosticError?.message || diagnosticError));
+    }
+
     const form = new FormData(e.target);
     const selectedCategory = String(form.get("category") || "");
     const submittedCityId = String(form.get(selectedCategory === "Автомобили" ? "vehicle_city_id" : "city_id") || "");

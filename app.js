@@ -5472,14 +5472,8 @@ function setPropertyAdvancedFields(expanded) {
   const propertyMarketPanel = document.getElementById("propertyMarketPanel");
   if (propertyMarketPanel) propertyMarketPanel.hidden = !expanded;
 
-  // Match the vehicle form: opening advanced details advances the progress indicator.
-  const steps = addModal?.querySelectorAll(".listing-progress-step") || [];
-  steps.forEach((step, index) => {
-    step.classList.toggle("is-active", expanded ? index === 1 : index === 0);
-    step.classList.toggle("is-complete", expanded && index === 0);
-  });
-  const lines = addModal?.querySelectorAll(".listing-progress > i") || [];
-  lines.forEach((line, index) => line.classList.toggle("is-complete", expanded && index === 0));
+  // Progress is driven by the required property fields, not by opening More.
+  updatePropertyListingProgress();
 
   // Keep the price estimate visible, but do not prompt an authenticated user to sign in/register.
   const propertyMarketAuthPrompt = propertyMarketPanel?.querySelector(".vehicle-market-auth");
@@ -5494,6 +5488,28 @@ function setPropertyAdvancedFields(expanded) {
     const icon = propertyListingMore.querySelector(".property-listing-more-icon");
     if (icon) icon.textContent = expanded ? "⌃" : "⌄";
   }
+}
+
+function updatePropertyListingProgress() {
+  if (listingCategorySelect?.value !== "Недвижимость") return;
+
+  // These are the same minimum fields checked before publication:
+  // operation, property type, selected city and a positive price.
+  const operationReady = Boolean(propertyOperationSelect?.value);
+  const typeReady = Boolean(propertyTypeSelect?.value);
+  const cityReady = Boolean(String(citySelect?.value || "").trim());
+  const priceInput = addForm?.querySelector('input[name="property_price"]');
+  const priceValue = Number(priceInput?.value);
+  const priceReady = Boolean(priceInput?.value.trim()) && Number.isFinite(priceValue) && priceValue > 0;
+  const ready = operationReady && typeReady && cityReady && priceReady;
+
+  const steps = addModal?.querySelectorAll(".listing-progress-step") || [];
+  steps.forEach((step, index) => {
+    step.classList.toggle("is-active", ready ? index === 1 : index === 0);
+    step.classList.toggle("is-complete", ready && index === 0);
+  });
+  const lines = addModal?.querySelectorAll(".listing-progress > i") || [];
+  lines.forEach((line, index) => line.classList.toggle("is-complete", ready && index === 0));
 }
 
 function syncPropertyListingFields() {
@@ -5611,6 +5627,13 @@ function syncVehicleListingFields() {
 }
 propertyTypeSelect?.addEventListener("change", syncPropertyListingFields);
 propertyListingMore?.addEventListener("click", () => setPropertyAdvancedFields(Boolean(propertyAdvancedFields?.hidden)));
+// Re-evaluate the property wizard step whenever a required value changes.
+addForm?.addEventListener("input", event => {
+  if (event.target.matches('input[name="property_price"]')) updatePropertyListingProgress();
+});
+addForm?.addEventListener("change", event => {
+  if (event.target.matches('#propertyOperation, #propertyType, #citySelect')) updatePropertyListingProgress();
+});
 for (const action of ["Login", "Register"]) {
   document.getElementById(`propertyMarket${action}`)?.addEventListener("click", () => {
     const authView = action === "Login" ? "login" : "register";
@@ -5759,6 +5782,7 @@ async function openPropertyListingForm(propertyType = "", operation = "") {
     propertyListingFields.disabled = false;
   }
   setPropertyAdvancedFields(false);
+  updatePropertyListingProgress();
   if (vehicleListingFields) vehicleListingFields.hidden = true;
   closeCategoryMenu();
   closeAddCategoryMenu();

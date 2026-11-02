@@ -3059,7 +3059,9 @@ function ensureVehicleSearchTabs() {
     vehicleSearchTabs = [tab];
     activeVehicleSearchTabId = tab.id;
   }
-  return vehicleSearchTabs.find(tab => tab.id === activeVehicleSearchTabId) || vehicleSearchTabs[0];
+  const activeTab = vehicleSearchTabs.find(tab => tab.id === activeVehicleSearchTabId) || vehicleSearchTabs[0];
+  activeVehicleSearchTabId = activeTab.id;
+  return activeTab;
 }
 function captureVehicleSearchTab() {
   const tab = ensureVehicleSearchTabs();
@@ -3117,7 +3119,7 @@ function restoreVehicleSearchTab(tab) {
     if (el && id !== "vehicleSearchModel") { if (el.type === "checkbox") el.checked = Boolean(tab.filters?.[id]); else el.value = tab.filters?.[id] ?? ""; }
   });
   selectedCatalogCityId = tab.selectedCityId || "";
-  activeRegionCode = tab.regionCode || tab.clientFilters?.regionCode || tab.filters?.propertySearchRegion || "";
+  activeRegionCode = tab.regionCode || "";
   const make = document.getElementById("vehicleSearchMake");
   const model = document.getElementById("vehicleSearchModel");
   if (make && model) {
@@ -3390,6 +3392,18 @@ function syncEditorPropertyFields(propertyFields, typeSelect) {
   });
 }
 
+function preserveVehicleSelectValue(select, value, label = value) {
+  const saved = String(value ?? "");
+  if (!select || !saved) return;
+  if (![...select.options].some(option => option.value === saved)) {
+    const option = document.createElement("option");
+    option.value = saved;
+    option.textContent = String(label || saved);
+    select.append(option);
+  }
+  select.value = saved;
+}
+
 async function editListing(item, labels) {
   // Opening the editor must never wait for city/region catalogs.
   // City data is loaded lazily only when the user focuses the city field.
@@ -3435,6 +3449,7 @@ async function editListing(item, labels) {
       <div class="edit-city-suggestions" id="editCitySuggestions" role="listbox" hidden></div>
     </label>`;
   const editPriceField = `<label>${escapeHtml(L.price)}<input name="price" type="number" min="0" step="0.01" required value="${escapeHtml(String(item.price ?? ""))}"></label>`;
+  const editVehiclePriceField = `<div class="listing-price-row" style="grid-column:1 / -1"><label>${escapeHtml(t("Цена"))}<input name="price" type="number" min="0" step="0.01" required value="${escapeHtml(String(item.price ?? ""))}"></label><label>${escapeHtml(t("Валюта"))}<select name="price_currency">${["UAH","USD","PLN"].map(currency => `<option value="${currency}" ${String(item.currency || "UAH") === currency ? "selected" : ""}>${currency}</option>`).join("")}</select></label></div>`;
   // Property editor is built from the exact live create-form fields: one source of truth.
   const propertyDetails = item.property_details || {};
   const legacyTitle = String(item.title || "");
@@ -3542,7 +3557,7 @@ async function editListing(item, labels) {
         </select>
       </label>
       <label>${escapeHtml(t("Год выпуска"))}<input name="vehicle_year" type="number" min="1900" max="2100" value="${escapeHtml(String(item.vehicle_year ?? ""))}"></label>
-      ${editPriceField}
+      ${editVehiclePriceField}
       <label>${escapeHtml(t("Пробег, км"))}<input name="vehicle_mileage_km" type="number" min="0" value="${escapeHtml(String(item.vehicle_mileage_km ?? ""))}"></label>
       <label>${escapeHtml(t("Объём двигателя, л"))}<input name="vehicle_engine_liters" type="number" min="0" max="20" step="0.1" value="${escapeHtml(String(item.vehicle_engine_liters ?? ""))}"></label>
       <label>${escapeHtml(t("Мощность, л.с."))}<input name="vehicle_power_hp" type="number" min="1" max="3000" value="${escapeHtml(String(item.vehicle_power_hp ?? ""))}"></label>
@@ -3582,7 +3597,19 @@ async function editListing(item, labels) {
     <label class="hot-toggle"><input type="checkbox" name="is_hot" ${item.is_hot ? "checked" : ""}> ${escapeHtml(L.hot)}</label>
     <label class="hot-toggle"><input type="checkbox" name="is_urgent" ${item.is_urgent ? "checked" : ""}> ${escapeHtml(L.urgent)}</label>
     <p class="muted">${escapeHtml(L.published)}: ${item.created_at ? escapeHtml(new Date(item.created_at).toLocaleDateString()) : "—"}</p>
-    <div class="edit-actions"><button class="btn btn-primary" type="submit">${escapeHtml(L.save)}</button><button class="btn" type="button" data-edit-cancel>${escapeHtml(L.cancel)}</button></div><p class="form-message" role="status"></p></form>`;
+    <div class="edit-actions"><button class="btn btn-primary" type="submit">${escapeHtml(L.save)}</button><button class="btn" type="button" data-edit-cancel>${escapeHtml(L.cancel)}</button></div><p class="form-message" data-edit-message role="status"></p></form>`;
+
+  if (isVehicle) {
+    dialog.querySelectorAll('.vehicle-listing-fields select[name]').forEach(select => {
+      if (select.name.startsWith("vehicle_") && !["vehicle_make_slug", "vehicle_model_slug"].includes(select.name)) {
+        preserveVehicleSelectValue(select, item[select.name]);
+      }
+    });
+    preserveVehicleSelectValue(dialog.querySelector('[name="seller_type"]'), item.seller_type || "private");
+    preserveVehicleSelectValue(dialog.querySelector('[name="price_currency"]'), item.currency || "UAH");
+    preserveVehicleSelectValue(dialog.querySelector("#editVehicleMake"), item.vehicle_make_slug, item.vehicle_make_name);
+    preserveVehicleSelectValue(dialog.querySelector("#editVehicleModel"), item.vehicle_model_slug, item.vehicle_model_name);
+  }
 
   if (isPropertyListing) {
     const propertyFields = dialog.querySelector(".property-listing-fields");
@@ -3604,6 +3631,7 @@ async function editListing(item, labels) {
   const editPhotoPick = dialog.querySelector("[data-edit-photo-pick]");
   let editPhotos = photos.map(url => ({ file: null, previewUrl: url, uploadedUrl: url, existing: true }));
   let editPhotosBusy = false;
+  let editSaving = false;
   const renderEditPhotos = () => {
     editPhotoPreview.innerHTML = editPhotos.map((photo, index) => `
       <div class="photo-item edit-photo-item">
@@ -3615,9 +3643,9 @@ async function editListing(item, labels) {
         </div>
       </div>`).join("");
   };
-  editPhotoPick.addEventListener("click", () => { if (!editPhotosBusy) editPhotoInput.click(); });
+  editPhotoPick.addEventListener("click", () => { if (!editPhotosBusy && !editSaving) editPhotoInput.click(); });
   editPhotoInput.addEventListener("change", async () => {
-    if (editPhotosBusy) return;
+    if (editPhotosBusy || editSaving) return;
     const files = [...editPhotoInput.files];
     editPhotoInput.value = "";
     editPhotoMessage.textContent = "";
@@ -3645,7 +3673,7 @@ async function editListing(item, labels) {
     }
   });
   editPhotoPreview.addEventListener("click", event => {
-    if (editPhotosBusy) return;
+    if (editPhotosBusy || editSaving) return;
     const button = event.target.closest("button");
     if (!button) return;
     if (button.dataset.editPhotoRemove !== undefined) {
@@ -3755,151 +3783,145 @@ async function editListing(item, labels) {
     if (!event.target.closest(".edit-city-field")) closeEditCitySuggestions();
   });
 
-  if (isVehicle) {
-    const makeSelect = dialog.querySelector("#editVehicleMake");
-    const modelSelect = dialog.querySelector("#editVehicleModel");
-    try {
-      const catalog = await fetchAllVehicleModels();
-      const makes = [...new Map(catalog.map(r => [r.make_slug, r.make_name])).entries()]
-        .sort((a, b) => a[1].localeCompare(b[1]));
-      makeSelect.innerHTML = `<option value="">${escapeHtml(t("Выберите марку"))}</option>` +
-        makes.map(([slug, name]) => `<option value="${escapeHtml(slug)}" ${slug === item.vehicle_make_slug ? "selected" : ""}>${escapeHtml(name)}</option>`).join("");
-      const fillModels = (makeSlug, selectedModel) => {
-        const models = catalog.filter(r => r.make_slug === makeSlug);
-        modelSelect.innerHTML = `<option value="">${escapeHtml(t("Выберите модель"))}</option>` +
-          [...new Map(models.map(r => [r.model_slug, r.model_name])).entries()]
-            .map(([slug, name]) => `<option value="${escapeHtml(slug)}" ${slug === selectedModel ? "selected" : ""}>${escapeHtml(name)}</option>`).join("");
-        modelSelect.disabled = !makeSlug;
-      };
-      fillModels(item.vehicle_make_slug || "", item.vehicle_model_slug || "");
-      makeSelect.addEventListener("change", () => fillModels(makeSelect.value, ""));
-    } catch (err) {
-      console.error("Не удалось загрузить каталог автомобилей для редактирования", err);
-    }
-  }
-
   dialog.querySelector("[data-edit-cancel]").addEventListener("click", () => dialog.close());
+  dialog.addEventListener("cancel", event => { if (editSaving) event.preventDefault(); });
   dialog.addEventListener("close", () => dialog.remove(), { once: true });
 
   dialog.querySelector("form").addEventListener("submit", async event => {
     event.preventDefault();
     const form = event.currentTarget;
-    const button = form.querySelector('button[type="submit"]');
-    const message = form.querySelector(".form-message");
+    if (editSaving) return;
+    const message = form.querySelector("[data-edit-message]");
+    if (!form.reportValidity()) return;
     const price = Number(form.elements.price.value);
-    if (!Number.isFinite(price) || price < 0) { message.textContent = labels.failed; return; }
-    if (editPhotosBusy) return;
-    let urls = editPhotos.map(photo => photo.uploadedUrl).filter(Boolean).slice(0, MAX_PHOTOS);
-
-    const cityIdValue = String(form.elements.city_id.value || "");
-    const originalCityId = String(item.city_id || item.cities?.id || "");
-    const cityWasChanged = cityIdValue !== originalCityId;
-    if (!cityIdValue || (cityWasChanged && !availableCities.some(city => String(city.id) === cityIdValue))) {
-      message.textContent = t("Выберите город из предложенных вариантов");
-      form.elements.city_search.focus();
+    if (!String(form.elements.price.value).trim() || !Number.isFinite(price) || price < 0) { message.textContent = labels.failed; return; }
+    const currencyChanged = isVehicle && (item.currency || "UAH") !== form.elements.price_currency.value;
+    if (editPhotosBusy) { message.textContent = photoText("saving"); return; }
+    if (!currentUser || String(currentUser.id) !== String(item.user_id || "")) {
+      message.textContent = labels.denied;
       return;
     }
-    const payload = {
-      category: form.elements.category.value,
-      ...(cityWasChanged ? { city_id: Number(cityIdValue) } : {}),
-      price,
-      previous_price: Number(item.price) !== price ? Number(item.price) : (item.previous_price ?? null),
-      description: form.elements.description.value.trim(),
-      image_urls: urls,
-      image_url: urls[0] || null,
-      is_hot: form.elements.is_hot.checked,
-      is_urgent: Boolean(form.elements.is_urgent?.checked),
-      latitude: item.latitude ?? null,
-      longitude: item.longitude ?? null
-    };
-
-    if (String(item.category || "") === "Недвижимость" && form.querySelector(".property-listing-fields")) {
-      const n = name => {
-        const control = form.elements[name];
-        if (control?.disabled) return undefined;
-        const value = String(control?.value || "").trim();
-        return value === "" ? null : Number(value);
-      };
-      const v = name => {
-        const control = form.elements[name];
-        return control?.disabled ? undefined : (String(control?.value || "") || null);
-      };
-      const checked = name => {
-        const control = form.elements[name];
-        return control?.disabled ? undefined : Boolean(control?.checked);
-      };
-      const propertyType = v("property_type"), propertyOperation = v("property_operation");
-      if (!propertyType || !propertyOperation) { message.textContent = t("Выберите операцию и тип недвижимости."); return; }
-      const landAreaM2 = n("property_land_area_m2");
-      payload.currency = v("price_currency") || "UAH";
-      const propertyDetails = item.property_details || {};
-      const amenities = mergePropertyValues(propertyDetails.amenities, Object.fromEntries(["refrigerator","washing_machine","stove","dishwasher","air_conditioning","internet","parking"].map(key=>[key,checked(`property_amenity_${key}`)])));
-      const accessibility = mergePropertyValues(propertyDetails.accessibility, Object.fromEntries(["ramp","elevator","step_free_entrance","handrails"].map(key=>[key,checked(`property_accessibility_${key}`)]).concat([["elevator_door_width_cm",n("property_accessibility_elevator_door_width_cm")],["elevator_cabin_size_cm",v("property_accessibility_elevator_cabin_size_cm")]])));
-      payload.property_details = mergePropertyValues(propertyDetails, {
-        operation:propertyOperation, type:propertyType,
-        oblast_raion:v("property_oblast_raion"), district:v("property_district"),
-        address:v("property_address"), radius_km:n("property_radius_km"),
-        rooms:v("property_rooms"), area_m2:n("property_area"), floor:n("property_floor"), floors_total:n("property_floors_total"),
-        kitchen_area_m2:n("property_kitchen_area"), building_type:v("property_building_type"), condition:v("property_condition"),
-        land_area_m2:landAreaM2, land_area_sotkas:landAreaM2 === null ? null : landAreaM2 / 100,
-        separate_entry:v("property_separate_entry"), parking_spaces:v("property_parking_spaces"),
-        garage_type:v("property_garage_type"), garage_features:v("property_garage_features"), garage_electricity:v("property_garage_electricity"),
-        furniture:v("property_furniture"), balcony:v("property_balcony"), loggia:v("property_loggia"),
-        metro_distance_m:n("property_metro_distance"), school_distance_m:n("property_school_distance"), stop_distance_m:n("property_stop_distance"),
-        amenities,
-        bathroom_type:v("property_bathroom_type"), accessibility
-      });
-    }
-    if (isVehicle) {
-      const makeSlug = form.elements.vehicle_make_slug.value;
-      const modelSlug = form.elements.vehicle_model_slug.value;
-      if (!makeSlug || !modelSlug) { message.textContent = t("Выберите марку и модель автомобиля."); return; }
-      const catalog = await fetchAllVehicleModels().catch(() => []);
-      const makeRow = catalog.find(r => r.make_slug === makeSlug);
-      const modelRow = catalog.find(r => r.make_slug === makeSlug && r.model_slug === modelSlug);
-      if (!makeRow || !modelRow) { message.textContent = t("Марка или модель не найдена в каталоге. Выберите их заново."); return; }
-      payload.title = [makeRow.make_name, modelRow.model_name].filter(Boolean).join(" ");
-      Object.assign(payload, {
-        vehicle_make_slug: makeSlug,
-        vehicle_make_name: makeRow.make_name,
-        vehicle_model_slug: modelSlug,
-        vehicle_model_name: modelRow.model_name,
-        vehicle_year: form.elements.vehicle_year.value ? Number(form.elements.vehicle_year.value) : null,
-        vehicle_body_type: form.elements.vehicle_body_type.value || null,
-        vehicle_fuel_type: form.elements.vehicle_fuel_type.value || null,
-        vehicle_engine_liters: form.elements.vehicle_engine_liters.value ? Number(form.elements.vehicle_engine_liters.value) : null,
-        vehicle_power_hp: form.elements.vehicle_power_hp.value ? Number(form.elements.vehicle_power_hp.value) : null,
-        vehicle_transmission: form.elements.vehicle_transmission.value || null,
-        vehicle_drive: form.elements.vehicle_drive.value || null,
-        vehicle_mileage_km: form.elements.vehicle_mileage_km.value ? Number(form.elements.vehicle_mileage_km.value) : null,
-        vehicle_condition: form.elements.vehicle_condition.value || null,
-        vehicle_operational_condition: form.elements.vehicle_operational_condition.value || null,
-        vehicle_doors: form.elements.vehicle_doors.value ? Number(form.elements.vehicle_doors.value) : null,
-        vehicle_color: form.elements.vehicle_color.value || null,
-        seller_type: form.elements.seller_type.value || "private",
-        vehicle_equipment: Object.fromEntries(["air_conditioning","power_steering","power_windows","audio","audio_usb","audio_bluetooth","audio_1din","audio_2din","seat_heating","rear_window_heating","windshield_heating","mirrors_heating","spare_wheel","service_book","tire_set_gift","toolkit","fire_extinguisher","first_aid_kit"].map(key => [key, Boolean(form.elements[`vehicle_equipment_${key}`]?.checked)]))
-      });
-    } else {
-      const title = form.elements.title?.value.trim() || "";
-      if (!title) { message.textContent = labels.failed; return; }
-      payload.title = title;
-    }
-
-    button.disabled = true;
-    editPhotoPick.disabled = true;
-    message.textContent = photoText("saving");
+    const ownerId = currentUser.id;
+    editSaving = true;
+    const controls = [...form.elements].map(control => [control, control.disabled]);
+    if (isVehicle) controls.forEach(([control]) => { control.disabled = true; });
     try {
-      urls = await uploadListingPhotos(editPhotos);
+      let urls = editPhotos.map(photo => photo.uploadedUrl).filter(Boolean).slice(0, MAX_PHOTOS);
+
+      const cityIdValue = String(form.elements.city_id.value || "");
+      const originalCityId = String(item.city_id || item.cities?.id || "");
+      const cityWasChanged = cityIdValue !== originalCityId;
+      if (!cityIdValue || (cityWasChanged && !availableCities.some(city => String(city.id) === cityIdValue))) {
+        message.textContent = t("Выберите город из предложенных вариантов");
+        form.elements.city_search.focus();
+        return;
+      }
+      const payload = {
+        category: form.elements.category.value,
+        ...(cityWasChanged ? { city_id: Number(cityIdValue) } : {}),
+        price,
+        previous_price: Number(item.price) !== price ? Number(item.price) : (item.previous_price ?? null),
+        description: form.elements.description.value.trim(),
+        image_urls: urls,
+        image_url: urls[0] || null,
+        is_hot: form.elements.is_hot.checked,
+        is_urgent: Boolean(form.elements.is_urgent?.checked),
+        latitude: item.latitude ?? null,
+        longitude: item.longitude ?? null
+      };
+
+      if (String(item.category || "") === "Недвижимость" && form.querySelector(".property-listing-fields")) {
+        const n = name => {
+          const control = form.elements[name];
+          if (control?.disabled) return undefined;
+          const value = String(control?.value || "").trim();
+          return value === "" ? null : Number(value);
+        };
+        const v = name => {
+          const control = form.elements[name];
+          return control?.disabled ? undefined : (String(control?.value || "") || null);
+        };
+        const checked = name => {
+          const control = form.elements[name];
+          return control?.disabled ? undefined : Boolean(control?.checked);
+        };
+        const propertyType = v("property_type"), propertyOperation = v("property_operation");
+        if (!propertyType || !propertyOperation) { message.textContent = t("Выберите операцию и тип недвижимости."); return; }
+        const landAreaM2 = n("property_land_area_m2");
+        payload.currency = v("price_currency") || "UAH";
+        const propertyDetails = item.property_details || {};
+        const amenities = mergePropertyValues(propertyDetails.amenities, Object.fromEntries(["refrigerator","washing_machine","stove","dishwasher","air_conditioning","internet","parking"].map(key=>[key,checked(`property_amenity_${key}`)])));
+        const accessibility = mergePropertyValues(propertyDetails.accessibility, Object.fromEntries(["ramp","elevator","step_free_entrance","handrails"].map(key=>[key,checked(`property_accessibility_${key}`)]).concat([["elevator_door_width_cm",n("property_accessibility_elevator_door_width_cm")],["elevator_cabin_size_cm",v("property_accessibility_elevator_cabin_size_cm")]])));
+        payload.property_details = mergePropertyValues(propertyDetails, {
+          operation:propertyOperation, type:propertyType,
+          oblast_raion:v("property_oblast_raion"), district:v("property_district"),
+          address:v("property_address"), radius_km:n("property_radius_km"),
+          rooms:v("property_rooms"), area_m2:n("property_area"), floor:n("property_floor"), floors_total:n("property_floors_total"),
+          kitchen_area_m2:n("property_kitchen_area"), building_type:v("property_building_type"), condition:v("property_condition"),
+          land_area_m2:landAreaM2, land_area_sotkas:landAreaM2 === null ? null : landAreaM2 / 100,
+          separate_entry:v("property_separate_entry"), parking_spaces:v("property_parking_spaces"),
+          garage_type:v("property_garage_type"), garage_features:v("property_garage_features"), garage_electricity:v("property_garage_electricity"),
+          furniture:v("property_furniture"), balcony:v("property_balcony"), loggia:v("property_loggia"),
+          metro_distance_m:n("property_metro_distance"), school_distance_m:n("property_school_distance"), stop_distance_m:n("property_stop_distance"),
+          amenities,
+          bathroom_type:v("property_bathroom_type"), accessibility
+        });
+      }
+      if (isVehicle) {
+        const makeSlug = form.elements.vehicle_make_slug.value;
+        const modelSlug = form.elements.vehicle_model_slug.value;
+        if (!makeSlug || !modelSlug) { message.textContent = t("Выберите марку и модель автомобиля."); return; }
+        const unchanged = makeSlug === item.vehicle_make_slug && modelSlug === item.vehicle_model_slug;
+        let makeName = item.vehicle_make_name, modelName = item.vehicle_model_name;
+        if (!unchanged) {
+          const catalog = await fetchAllVehicleModels();
+          const modelRow = catalog.find(r => r.make_slug === makeSlug && r.model_slug === modelSlug);
+          if (!modelRow) { message.textContent = t("Марка или модель не найдена в каталоге. Выберите их заново."); return; }
+          makeName = modelRow.make_name;
+          modelName = modelRow.model_name;
+        }
+        payload.title = unchanged ? item.title : [makeName, modelName].filter(Boolean).join(" ");
+        payload.currency = form.elements.price_currency.value || "UAH";
+        if (currencyChanged) payload.previous_price = null;
+        Object.assign(payload, {
+          vehicle_make_slug: makeSlug,
+          vehicle_make_name: makeName,
+          vehicle_model_slug: modelSlug,
+          vehicle_model_name: modelName,
+          vehicle_year: form.elements.vehicle_year.value ? Number(form.elements.vehicle_year.value) : null,
+          vehicle_body_type: form.elements.vehicle_body_type.value || null,
+          vehicle_fuel_type: form.elements.vehicle_fuel_type.value || null,
+          vehicle_engine_liters: form.elements.vehicle_engine_liters.value ? Number(form.elements.vehicle_engine_liters.value) : null,
+          vehicle_power_hp: form.elements.vehicle_power_hp.value ? Number(form.elements.vehicle_power_hp.value) : null,
+          vehicle_transmission: form.elements.vehicle_transmission.value || null,
+          vehicle_drive: form.elements.vehicle_drive.value || null,
+          vehicle_mileage_km: form.elements.vehicle_mileage_km.value ? Number(form.elements.vehicle_mileage_km.value) : null,
+          vehicle_condition: form.elements.vehicle_condition.value || null,
+          vehicle_operational_condition: form.elements.vehicle_operational_condition.value || null,
+          vehicle_doors: form.elements.vehicle_doors.value ? Number(form.elements.vehicle_doors.value) : null,
+          vehicle_color: form.elements.vehicle_color.value || null,
+          seller_type: form.elements.seller_type.value || "private",
+          vehicle_equipment: { ...item.vehicle_equipment, ...Object.fromEntries(["air_conditioning","power_steering","power_windows","audio","audio_usb","audio_bluetooth","audio_1din","audio_2din","seat_heating","rear_window_heating","windshield_heating","mirrors_heating","spare_wheel","service_book","tire_set_gift","toolkit","fire_extinguisher","first_aid_kit"].map(key => [key, Boolean(form.elements[`vehicle_equipment_${key}`]?.checked)])) }
+        });
+      } else {
+        const title = form.elements.title?.value.trim() || "";
+        if (!title) { message.textContent = labels.failed; return; }
+        payload.title = title;
+      }
+
+      controls.forEach(([control]) => { control.disabled = true; });
+      message.textContent = photoText("saving");
+      urls = editPhotos.length ? await uploadListingPhotos(editPhotos) : [];
       payload.image_urls = urls;
       payload.image_url = urls[0] || null;
       const { data, error } = await db.from("listings")
-        .update(payload).eq("id", item.id).eq("user_id", currentUser.id)
+        .update(payload).eq("id", item.id).eq("user_id", ownerId)
         .select("id").maybeSingle();
       if (error) throw error;
       if (!data) throw new Error(labels.denied);
-      if (Number(item.price) !== price) {
+      if (!currencyChanged && Number(item.price) !== price) {
         const { error: historyError } = await db.from("listing_price_history").insert({
-          listing_id: item.id, user_id: currentUser.id,
+          listing_id: item.id, user_id: ownerId,
           old_price: Number(item.price), new_price: price,
           changed_at: new Date().toISOString()
         });
@@ -3908,11 +3930,40 @@ async function editListing(item, labels) {
       dialog.close();
       await loadListings();
     } catch (error) {
+      console.error("Could not save listing edits:", error);
       message.textContent = error?.message || labels.failed;
-      button.disabled = false;
-      editPhotoPick.disabled = false;
+    } finally {
+      editSaving = false;
+      controls.forEach(([control, disabled]) => { control.disabled = disabled; });
     }
   });
+
+  if (isVehicle) {
+    const makeSelect = dialog.querySelector("#editVehicleMake");
+    const modelSelect = dialog.querySelector("#editVehicleModel");
+    const fillModels = (catalog, selectedModel) => {
+      modelSelect.innerHTML = `<option value="">${escapeHtml(t("Выберите модель"))}</option>` +
+        [...new Map(catalog.filter(row => row.make_slug === makeSelect.value).map(row => [row.model_slug, row.model_name])).entries()]
+          .map(([slug, name]) => `<option value="${escapeHtml(slug)}">${escapeHtml(name)}</option>`).join("");
+      preserveVehicleSelectValue(modelSelect, selectedModel, item.vehicle_model_name);
+      modelSelect.disabled = !makeSelect.value;
+    };
+    makeSelect.addEventListener("change", () => fillModels(vehicleModelsCache, ""));
+    try {
+      const catalog = await fetchAllVehicleModels();
+      if (!dialog.open || editSaving) return;
+      const makeSlug = makeSelect.value, modelSlug = modelSelect.value;
+      const makes = [...new Map(catalog.map(row => [row.make_slug, row.make_name])).entries()]
+        .sort((a, b) => a[1].localeCompare(b[1]));
+      makeSelect.innerHTML = `<option value="">${escapeHtml(t("Выберите марку"))}</option>` +
+        makes.map(([slug, name]) => `<option value="${escapeHtml(slug)}">${escapeHtml(name)}</option>`).join("");
+      preserveVehicleSelectValue(makeSelect, makeSlug, item.vehicle_make_name);
+      fillModels(catalog, modelSlug);
+    } catch (error) {
+      console.error("Не удалось загрузить каталог автомобилей для редактирования", error);
+      if (dialog.open) dialog.querySelector("[data-edit-message]").textContent = vehicleMakeStatusText("error");
+    }
+  }
 }
 
 async function deleteListing(item, labels) {
@@ -4287,18 +4338,21 @@ async function loadListings() {
     if (model) query = query.eq("vehicle_model_slug", model);
     if (yearFrom !== null) query = query.gte("vehicle_year", yearFrom);
     if (yearTo !== null) query = query.lte("vehicle_year", yearTo);
-    query = query.eq("currency", currency);
+    query = currency === "UAH" ? query.or("currency.eq.UAH,currency.is.null,currency.eq.") : query.eq("currency", currency);
     if (priceFrom !== null) query = query.gte("price", priceFrom);
     if (priceTo !== null) query = query.lte("price", priceTo);
     if (mileageFrom !== null) query = query.gte("vehicle_mileage_km", mileageFrom);
     if (mileageTo !== null) query = query.lte("vehicle_mileage_km", mileageTo);
     if (engineFrom !== null) query = query.gte("vehicle_engine_liters", engineFrom);
     if (engineTo !== null) query = query.lte("vehicle_engine_liters", engineTo);
-    if (body) query = query.eq("vehicle_body_type", body);
+    if (body) query = ["Универсал", "Універсал"].includes(body)
+      ? query.in("vehicle_body_type", ["Универсал", "Універсал"])
+      : query.eq("vehicle_body_type", body);
     if (fuel) query = query.eq("vehicle_fuel_type", fuel);
     if (transmission) query = query.eq("vehicle_transmission", transmission);
     if (status) query = query.eq("vehicle_condition", status);
     if (operationalCondition) query = query.eq("vehicle_operational_condition", operationalCondition);
+    closeVehicleSearch();
   }
   isSearching = true;
   setButtonLoading(searchBtn, true, t("Ищем…"));
@@ -4356,8 +4410,10 @@ async function loadListings() {
     if (currentCategory === "Автомобили" && vehicleClientFilters) {
       const f = vehicleClientFilters;
       const within = (value, min, max) => {
+        if (min === null && max === null) return true;
+        if (value === null || value === undefined || String(value).trim() === "") return false;
         const n = Number(value);
-        if (!Number.isFinite(n)) return min === null && max === null;
+        if (!Number.isFinite(n)) return false;
         return (min === null || n >= min) && (max === null || n <= max);
       };
       rows = rows.filter(item =>
@@ -4367,7 +4423,8 @@ async function loadListings() {
         within(item.price, f.priceFrom, f.priceTo) &&
         within(item.vehicle_mileage_km, f.mileageFrom, f.mileageTo) &&
         within(item.vehicle_engine_liters, f.engineFrom, f.engineTo) &&
-        (!f.body || item.vehicle_body_type === f.body) &&
+        (!f.body || item.vehicle_body_type === f.body ||
+          (["Универсал", "Універсал"].includes(f.body) && ["Универсал", "Універсал"].includes(item.vehicle_body_type))) &&
         (!f.fuel || item.vehicle_fuel_type === f.fuel) &&
         (!f.transmission || item.vehicle_transmission === f.transmission) &&
         (!f.status || item.vehicle_condition === f.status) &&
@@ -5180,7 +5237,9 @@ function openCategoryMenu(parentCategory = "") {
 function openCategorySubmenu(category) {
   if (!category) return;
 
-  resetCatalogFilters();
+  if (category !== "Автомобили" || currentCategory !== category || !vehicleSearchTabs.length) {
+    resetCatalogFilters();
+  }
   if (category !== "Автомобили") {
     vehicleSearchTabs = [];
     activeVehicleSearchTabId = "";
@@ -5986,7 +6045,7 @@ document.getElementById("vehicleSearchReset")?.addEventListener("click", () => {
   setVehicleSearchAdvanced(false);
 });
 document.getElementById("vehicleSearchApply")?.addEventListener("click", () => {
-  currentCategory = "Автомобили"; closeVehicleSearch(); loadListings();
+  currentCategory = "Автомобили"; loadListings();
 });
 document.addEventListener("keydown", event => { if (event.key === "Escape") { closeCategoryMenu(); closeVehicleSearch(); closeAddCategoryMenu(); } });
 if (searchBtn) searchBtn.addEventListener("click", loadListings);

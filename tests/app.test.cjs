@@ -301,3 +301,27 @@ test("P3: property editor fields follow the selected property type", () => {
     }
   }
 });
+
+test("P1: saving a property preserves disabled fields and nested legacy values", () => {
+  const helperSource = section("function mergePropertyValues(", "\nfunction syncEditorPropertyFields(");
+  const mergePropertyValues = vm.runInNewContext(`${helperSource}; mergePropertyValues;`);
+  const existing = {
+    rooms: 3,
+    land_area_m2: 800,
+    amenities: { refrigerator: true, parking: true },
+    accessibility: { elevator: true, elevator_door_width_cm: 90 }
+  };
+  const updates = {
+    rooms: undefined,
+    land_area_m2: 900,
+    amenities: mergePropertyValues(existing.amenities, { refrigerator: false, parking: undefined }),
+    accessibility: mergePropertyValues(existing.accessibility, { elevator: undefined, elevator_door_width_cm: 100 })
+  };
+
+  assert.deepEqual(JSON.parse(JSON.stringify(mergePropertyValues(existing, updates))), {
+    rooms: 3,
+    land_area_m2: 900,
+    amenities: { refrigerator: false, parking: true },
+    accessibility: { elevator: true, elevator_door_width_cm: 100 }
+  });
+});

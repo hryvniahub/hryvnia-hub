@@ -3371,6 +3371,14 @@ async function ensureCitiesLoaded() {
 }
 
 // ==== РАСШИРЕННОЕ РЕДАКТИРОВАНИЕ (включая авто-поля) ====
+function mergePropertyValues(existing, updates) {
+  const merged = { ...(existing || {}) };
+  Object.entries(updates).forEach(([key, value]) => {
+    if (value !== undefined) merged[key] = value;
+  });
+  return merged;
+}
+
 function syncEditorPropertyFields(propertyFields, typeSelect) {
   propertyFields.querySelectorAll("[data-property-for]").forEach(field => {
     const allowed = (field.dataset.propertyFor || "").split(",").map(value => value.trim());
@@ -3824,8 +3832,11 @@ async function editListing(item, labels) {
       if (!propertyType || !propertyOperation) { message.textContent = t("Выберите операцию и тип недвижимости."); return; }
       const landAreaM2 = n("property_land_area_m2");
       payload.currency = v("price_currency") || "UAH";
-      payload.property_details = {
-        ...(item.property_details || {}), operation:propertyOperation, type:propertyType,
+      const propertyDetails = item.property_details || {};
+      const amenities = mergePropertyValues(propertyDetails.amenities, Object.fromEntries(["refrigerator","washing_machine","stove","dishwasher","air_conditioning","internet","parking"].map(key=>[key,checked(`property_amenity_${key}`)])));
+      const accessibility = mergePropertyValues(propertyDetails.accessibility, Object.fromEntries(["ramp","elevator","step_free_entrance","handrails"].map(key=>[key,checked(`property_accessibility_${key}`)]).concat([["elevator_door_width_cm",n("property_accessibility_elevator_door_width_cm")],["elevator_cabin_size_cm",v("property_accessibility_elevator_cabin_size_cm")]])));
+      payload.property_details = mergePropertyValues(propertyDetails, {
+        operation:propertyOperation, type:propertyType,
         oblast_raion:v("property_oblast_raion"), district:v("property_district"),
         address:v("property_address"), radius_km:n("property_radius_km"),
         rooms:v("property_rooms"), area_m2:n("property_area"), floor:n("property_floor"), floors_total:n("property_floors_total"),
@@ -3835,9 +3846,9 @@ async function editListing(item, labels) {
         garage_type:v("property_garage_type"), garage_features:v("property_garage_features"), garage_electricity:v("property_garage_electricity"),
         furniture:v("property_furniture"), balcony:v("property_balcony"), loggia:v("property_loggia"),
         metro_distance_m:n("property_metro_distance"), school_distance_m:n("property_school_distance"), stop_distance_m:n("property_stop_distance"),
-        amenities:Object.fromEntries(["refrigerator","washing_machine","stove","dishwasher","air_conditioning","internet","parking"].map(key=>[key,checked(`property_amenity_${key}`)])),
-        bathroom_type:v("property_bathroom_type"), accessibility:Object.fromEntries(["ramp","elevator","step_free_entrance","handrails"].map(key=>[key,checked(`property_accessibility_${key}`)]).concat([["elevator_door_width_cm",n("property_accessibility_elevator_door_width_cm")],["elevator_cabin_size_cm",v("property_accessibility_elevator_cabin_size_cm")]]))
-      };
+        amenities,
+        bathroom_type:v("property_bathroom_type"), accessibility
+      });
     }
     if (isVehicle) {
       const makeSlug = form.elements.vehicle_make_slug.value;

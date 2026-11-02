@@ -3371,6 +3371,17 @@ async function ensureCitiesLoaded() {
 }
 
 // ==== РАСШИРЕННОЕ РЕДАКТИРОВАНИЕ (включая авто-поля) ====
+function syncEditorPropertyFields(propertyFields, typeSelect) {
+  propertyFields.querySelectorAll("[data-property-for]").forEach(field => {
+    const allowed = (field.dataset.propertyFor || "").split(",").map(value => value.trim());
+    const applicable = allowed.includes(typeSelect.value);
+    field.hidden = !applicable;
+    field.querySelectorAll("input,select,textarea").forEach(control => {
+      control.disabled = !applicable;
+    });
+  });
+}
+
 async function editListing(item, labels) {
   // Opening the editor must never wait for city/region catalogs.
   // City data is loaded lazily only when the user focuses the city field.
@@ -3454,10 +3465,6 @@ async function editListing(item, labels) {
     clone.querySelectorAll('[data-i18n]').forEach(node => { const key=node.getAttribute('data-i18n'); node.textContent=t(key); });
     // Keep the exact custom selectors from the create form. Their DOM markup is
     // cloned here; their event handlers are rebound after the editor enters the DOM.
-    clone.querySelectorAll('[data-property-for]').forEach(node => {
-      const allowed = (node.dataset.propertyFor || '').split(',');
-      if (allowed.length && !allowed.includes(String(propertyDetails.type || legacyPropertyType || ''))) node.hidden = true;
-    });
     const values = {
       property_operation: propertyDetails.operation || legacyPropertyOperation, property_type: propertyDetails.type || legacyPropertyType,
       property_rooms: propertyDetails.rooms, property_area: propertyDetails.area_m2,
@@ -3503,11 +3510,8 @@ async function editListing(item, labels) {
       // category was selected. The editor clone must be independently usable.
       control.disabled = false;
     });
-    clone.querySelectorAll('[data-property-for]').forEach(field => {
-      const allowed = (field.dataset.propertyFor || '').split(',').map(value => value.trim());
-      const applicable = allowed.includes(String(propertyDetails.type || legacyPropertyType || ''));
-      field.hidden = !applicable;
-      field.querySelectorAll('input,select,textarea').forEach(control => { control.disabled = !applicable; });
+    syncEditorPropertyFields(clone, {
+      value: String(propertyDetails.type || legacyPropertyType || "")
     });
     const advanced = clone.querySelector('.property-advanced-fields');
     if (advanced) advanced.hidden = false;
@@ -3571,6 +3575,16 @@ async function editListing(item, labels) {
     <label class="hot-toggle"><input type="checkbox" name="is_urgent" ${item.is_urgent ? "checked" : ""}> ${escapeHtml(L.urgent)}</label>
     <p class="muted">${escapeHtml(L.published)}: ${item.created_at ? escapeHtml(new Date(item.created_at).toLocaleDateString()) : "—"}</p>
     <div class="edit-actions"><button class="btn btn-primary" type="submit">${escapeHtml(L.save)}</button><button class="btn" type="button" data-edit-cancel>${escapeHtml(L.cancel)}</button></div><p class="form-message" role="status"></p></form>`;
+
+  if (isPropertyListing) {
+    const propertyFields = dialog.querySelector(".property-listing-fields");
+    const propertyTypeSelect = propertyFields?.querySelector('select[name="property_type"]');
+    if (propertyFields && propertyTypeSelect) {
+      const updatePropertyFields = () => syncEditorPropertyFields(propertyFields, propertyTypeSelect);
+      updatePropertyFields();
+      propertyTypeSelect.addEventListener("change", updatePropertyFields);
+    }
+  }
 
   document.body.append(dialog);
   dialog.showModal();
@@ -3792,9 +3806,20 @@ async function editListing(item, labels) {
     };
 
     if (String(item.category || "") === "Недвижимость" && form.querySelector(".property-listing-fields")) {
-      const n = name => { const value=String(form.elements[name]?.value || "").trim(); return value === "" ? null : Number(value); };
-      const v = name => String(form.elements[name]?.value || "") || null;
-      const checked = name => Boolean(form.elements[name]?.checked);
+      const n = name => {
+        const control = form.elements[name];
+        if (control?.disabled) return undefined;
+        const value = String(control?.value || "").trim();
+        return value === "" ? null : Number(value);
+      };
+      const v = name => {
+        const control = form.elements[name];
+        return control?.disabled ? undefined : (String(control?.value || "") || null);
+      };
+      const checked = name => {
+        const control = form.elements[name];
+        return control?.disabled ? undefined : Boolean(control?.checked);
+      };
       const propertyType = v("property_type"), propertyOperation = v("property_operation");
       if (!propertyType || !propertyOperation) { message.textContent = t("Выберите операцию и тип недвижимости."); return; }
       const landAreaM2 = n("property_land_area_m2");

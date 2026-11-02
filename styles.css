@@ -3385,10 +3385,10 @@ main{
   #addModal #addForm .property-listing-map-action .map-pick-button{min-height:52px;font-size:15px;padding:10px;}
 }
 
-/* Required-field highlight for property type */
+/* Required property type selector state; applied only after submit validation. */
 .hh-property-select-trigger.hh-required-missing {
-  border-color: #d96b6b;
-  box-shadow: 0 0 0 2px rgba(217, 107, 107, 0.25);
+  border-color: #d96b6b !important;
+  box-shadow: 0 0 0 2px rgba(217, 107, 107, 0.25) !important;
 }
 
 

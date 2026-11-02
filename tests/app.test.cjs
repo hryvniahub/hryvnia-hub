@@ -4,6 +4,7 @@ const { test } = require("node:test");
 const vm = require("node:vm");
 
 const source = readFileSync(require("node:path").join(__dirname, "../app.js"), "utf8");
+const propertyTemplate = readFileSync(require("node:path").join(__dirname, "../index.html"), "utf8");
 function section(start, end) {
   const first = source.indexOf(start);
   const last = source.indexOf(end, first);
@@ -268,3 +269,59 @@ for (const stage of ["auth", "catalog", "photos", "insert"]) {
     p.idle();
   });
 }
+
+test("P3: property editor fields follow the selected property type", () => {
+  const helperSource = section("function syncEditorPropertyFields(", "\nasync function editListing(");
+  const syncEditorPropertyFields = vm.runInNewContext(`${helperSource}; syncEditorPropertyFields;`);
+  const editSource = section("async function editListing(", "\nasync function deleteListing(");
+  assert.equal((editSource.match(/propertyTypeSelect\.addEventListener\("change", updatePropertyFields\)/g) || []).length, 1);
+
+  const types = ["Квартиры", "Дома", "Комнаты", "Коммерческая недвижимость", "Гаражи и парковочные места"];
+  const allowedTypes = [...new Set([...propertyTemplate.matchAll(/data-property-for="([^"]+)"/g)]
+    .flatMap(([, allowed]) => allowed.split(",")))];
+  assert.deepEqual(allowedTypes.sort(), types.slice().sort());
+
+  const fields = [...propertyTemplate.matchAll(/data-property-for="([^"]+)"/g)].map(([, allowed]) => {
+    const control = { disabled: false };
+    return {
+      dataset: { propertyFor: allowed },
+      hidden: false,
+      controls: [control],
+      querySelectorAll: () => [control]
+    };
+  });
+  const propertyFields = { querySelectorAll: () => fields };
+
+  for (const type of types) {
+    syncEditorPropertyFields(propertyFields, { value: type });
+    for (const field of fields) {
+      const applicable = field.dataset.propertyFor.split(",").map(value => value.trim()).includes(type);
+      assert.equal(field.hidden, !applicable, `${type}: field visibility`);
+      assert.equal(field.controls[0].disabled, !applicable, `${type}: field availability`);
+    }
+  }
+});
+
+test("P1: saving a property preserves disabled fields and nested legacy values", () => {
+  const helperSource = section("function mergePropertyValues(", "\nfunction syncEditorPropertyFields(");
+  const mergePropertyValues = vm.runInNewContext(`${helperSource}; mergePropertyValues;`);
+  const existing = {
+    rooms: 3,
+    land_area_m2: 800,
+    amenities: { refrigerator: true, parking: true },
+    accessibility: { elevator: true, elevator_door_width_cm: 90 }
+  };
+  const updates = {
+    rooms: undefined,
+    land_area_m2: 900,
+    amenities: mergePropertyValues(existing.amenities, { refrigerator: false, parking: undefined }),
+    accessibility: mergePropertyValues(existing.accessibility, { elevator: undefined, elevator_door_width_cm: 100 })
+  };
+
+  assert.deepEqual(JSON.parse(JSON.stringify(mergePropertyValues(existing, updates))), {
+    rooms: 3,
+    land_area_m2: 900,
+    amenities: { refrigerator: false, parking: true },
+    accessibility: { elevator: true, elevator_door_width_cm: 100 }
+  });
+});

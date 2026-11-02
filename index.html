@@ -320,7 +320,7 @@
       </label>
       <div class="vehicle-price-range">
         <label>Ціна від<input id="vehiclePriceFrom" type="number" min="0" placeholder="0"></label>
-        <label class="vehicle-currency-label">Валюта<select id="vehiclePriceCurrency" aria-label="Валюта ціни"><option value="UAH">₴ UAH</option><option value="USD">$ USD</option></select></label>
+        <label class="vehicle-currency-label">Валюта<select id="vehiclePriceCurrency" aria-label="Валюта ціни"><option value="UAH">₴ UAH</option><option value="USD">$ USD</option><option value="PLN">zł PLN</option></select></label>
         <label>Ціна до<input id="vehiclePriceTo" type="number" min="0" placeholder="Будь-яка"></label>
       </div>
 
@@ -457,7 +457,7 @@
           <label>Год выпуска<input name="vehicle_year" type="number" min="1900" max="2100" placeholder="2018"></label>
           <label>Коробка передач<select name="vehicle_transmission"><option value="">Выберите коробку</option><option value="Механічна">Механическая</option><option value="Автоматична">Автоматическая</option><option value="Варіатор">Вариатор</option><option value="Робот">Робот</option></select></label>
           <div class="listing-price-row" id="vehicleListingPriceRow">
-            <label>Цена<input name="vehicle_price" type="number" min="0" required placeholder="450000"></label>
+            <label>Цена<input name="vehicle_price" type="number" min="0" step="0.01" required placeholder="450000"></label>
             <label>Валюта<select id="vehicleListingPriceCurrency" name="vehicle_price_currency"><option value="UAH">₴ UAH</option><option value="USD">$ USD</option><option value="PLN">zł PLN</option></select></label>
           </div>
           <label>Пробег, км<input name="vehicle_mileage_km" type="number" min="0" placeholder="125000"></label>

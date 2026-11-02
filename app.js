@@ -6199,13 +6199,13 @@ addForm.addEventListener("submit", async e => {
           metro_distance_m: optionalNumber("property_metro_distance"),
           school_distance_m: optionalNumber("property_school_distance"),
           stop_distance_m: optionalNumber("property_stop_distance"),
-          amenities: Object.fromEntries(["refrigerator","washing_machine","stove","dishwasher","air_conditioning","internet","parking"].map(key => [key, form.querySelector(`[name="property_amenity_${key}"]`)?.checked === true])),
+          amenities: Object.fromEntries(["refrigerator","washing_machine","stove","dishwasher","air_conditioning","internet","parking"].map(key => [key, addForm.querySelector(`[name="property_amenity_${key}"]`)?.checked === true])),
           bathroom_type: String(form.get("property_bathroom_type") || "") || null,
           accessibility: {
-            ramp: form.querySelector('[name="property_accessibility_ramp"]')?.checked === true,
-            elevator: form.querySelector('[name="property_accessibility_elevator"]')?.checked === true,
-            step_free_entrance: form.querySelector('[name="property_accessibility_step_free_entrance"]')?.checked === true,
-            handrails: form.querySelector('[name="property_accessibility_handrails"]')?.checked === true,
+            ramp: addForm.querySelector('[name="property_accessibility_ramp"]')?.checked === true,
+            elevator: addForm.querySelector('[name="property_accessibility_elevator"]')?.checked === true,
+            step_free_entrance: addForm.querySelector('[name="property_accessibility_step_free_entrance"]')?.checked === true,
+            handrails: addForm.querySelector('[name="property_accessibility_handrails"]')?.checked === true,
             elevator_door_width_cm: optionalNumber("property_accessibility_elevator_door_width_cm"),
             elevator_cabin_size_cm: String(form.get("property_accessibility_elevator_cabin_size_cm") || "").trim() || null
           }
@@ -6260,7 +6260,7 @@ addForm.addEventListener("submit", async e => {
         vehicle_doors: form.get("vehicle_doors") ? Number(form.get("vehicle_doors")) : null,
         vehicle_color: form.get("vehicle_color") || null,
         seller_type: form.get("seller_type") || "private",
-        vehicle_equipment: Object.fromEntries(["air_conditioning","power_steering","power_windows","audio","audio_usb","audio_bluetooth","audio_1din","audio_2din","seat_heating","rear_window_heating","windshield_heating","mirrors_heating","spare_wheel","service_book","tire_set_gift","toolkit","fire_extinguisher","first_aid_kit"].map(key => [key, form.querySelector(`[name="vehicle_equipment_${key}"]`)?.checked === true]))
+        vehicle_equipment: Object.fromEntries(["air_conditioning","power_steering","power_windows","audio","audio_usb","audio_bluetooth","audio_1din","audio_2din","seat_heating","rear_window_heating","windshield_heating","mirrors_heating","spare_wheel","service_book","tire_set_gift","toolkit","fire_extinguisher","first_aid_kit"].map(key => [key, addForm.querySelector(`[name="vehicle_equipment_${key}"]`)?.checked === true]))
       });
     }
     if (!String(payload.title || "").trim()) {

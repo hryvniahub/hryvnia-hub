@@ -49,6 +49,8 @@ const translations = {
   "Этаж": {ru:"Этаж",uk:"Поверх",en:"Floor",pl:"Piętro"},
   "Этажность здания": {ru:"Этажность здания",uk:"Кількість поверхів у будинку",en:"Building floors",pl:"Liczba pięter w budynku"},
   "Площадь участка, м²": {ru:"Площадь участка, м²",uk:"Площа ділянки, м²",en:"Plot area, m²",pl:"Powierzchnia działki, m²"},
+  "Площа ділянки, м² від": {ru:"Площадь участка, м² от",uk:"Площа ділянки, м² від",en:"Plot area from, m²",pl:"Powierzchnia działki od, m²"},
+  "Площа ділянки, м² до": {ru:"Площадь участка, м² до",uk:"Площа ділянки, м² до",en:"Plot area to, m²",pl:"Powierzchnia działki do, m²"},
   "Отдельный вход (чаще для коммерческой недвижимости)": {ru:"Отдельный вход (чаще для коммерческой недвижимости)",uk:"Окремий вхід (частіше для комерційної нерухомості)",en:"Separate entrance (more common for commercial property)",pl:"Oddzielne wejście (częściej w nieruchomościach komercyjnych)"},
   "Парковочные места": {ru:"Парковочные места",uk:"Паркувальні місця",en:"Parking spaces",pl:"Miejsca parkingowe"},
   "1 место": {ru:"1 место",uk:"1 місце",en:"1 space",pl:"1 miejsce"},
@@ -3480,7 +3482,7 @@ async function editListing(item, labels) {
       property_separate_entry: propertyDetails.separate_entry, property_parking_spaces: propertyDetails.parking_spaces,
       property_garage_type: propertyDetails.garage_type, property_garage_features: propertyDetails.garage_features,
       property_garage_electricity: propertyDetails.garage_electricity,
-      property_land_area_m2: propertyDetails.land_area_m2,
+      property_land_area_m2: propertyLandAreaM2(propertyDetails),
       property_metro_distance: propertyDetails.metro_distance_m,
       property_school_distance: propertyDetails.school_distance_m,
       property_stop_distance: propertyDetails.stop_distance_m,
@@ -3812,6 +3814,7 @@ async function editListing(item, labels) {
       const checked = name => Boolean(form.elements[name]?.checked);
       const propertyType = v("property_type"), propertyOperation = v("property_operation");
       if (!propertyType || !propertyOperation) { message.textContent = t("Выберите операцию и тип недвижимости."); return; }
+      const landAreaM2 = n("property_land_area_m2");
       payload.currency = v("price_currency") || "UAH";
       payload.property_details = {
         ...(item.property_details || {}), operation:propertyOperation, type:propertyType,
@@ -3819,7 +3822,8 @@ async function editListing(item, labels) {
         address:v("property_address"), radius_km:n("property_radius_km"),
         rooms:v("property_rooms"), area_m2:n("property_area"), floor:n("property_floor"), floors_total:n("property_floors_total"),
         kitchen_area_m2:n("property_kitchen_area"), building_type:v("property_building_type"), condition:v("property_condition"),
-        land_area_m2:n("property_land_area_m2"), separate_entry:v("property_separate_entry"), parking_spaces:v("property_parking_spaces"),
+        land_area_m2:landAreaM2, land_area_sotkas:landAreaM2 === null ? null : landAreaM2 / 100,
+        separate_entry:v("property_separate_entry"), parking_spaces:v("property_parking_spaces"),
         garage_type:v("property_garage_type"), garage_features:v("property_garage_features"), garage_electricity:v("property_garage_electricity"),
         furniture:v("property_furniture"), balcony:v("property_balcony"), loggia:v("property_loggia"),
         metro_distance_m:n("property_metro_distance"), school_distance_m:n("property_school_distance"), stop_distance_m:n("property_stop_distance"),
@@ -3971,6 +3975,15 @@ function propertyCardTitle(item) {
   return [typeLabel, operationLabel, roomLabel].filter(Boolean).join(" · ");
 }
 
+function propertyLandAreaM2(details) {
+  const m2 = details?.land_area_m2;
+  const hasM2 = m2 != null && String(m2).trim() !== "";
+  const value = hasM2 ? m2 : details?.land_area_sotkas;
+  if (value == null || String(value).trim() === "") return null;
+  const area = Number(value) * (hasM2 ? 1 : 100);
+  return Number.isFinite(area) && area >= 0 ? area : null;
+}
+
 function propertyCardSpecs(item) {
   if (String(item.category || "") !== "Недвижимость" || !item.property_details) return [];
   const d = item.property_details;
@@ -3987,7 +4000,7 @@ function propertyCardSpecs(item) {
       house: "Дом",
       floor: (f, total) => nonEmpty(total) ? `${f}-й этаж из ${total}` : `${f}-й этаж`,
       floors: n => `${n} этаж${Number(n) === 1 ? "" : Number(n) >= 2 && Number(n) <= 4 ? "а" : "ей"}`,
-      land: n => `участок ${n} соток`,
+      land: n => `участок ${n} м²`,
       furnished: { "Есть": "С мебелью", "Нет": "Без мебели", "Частично": "Частично с мебелью" },
       condition: { "Новостройка": "Новостройка", "Новый ремонт": "После ремонта", "Жилое состояние": "Жилое состояние", "Нужен ремонт": "Нужен ремонт", "Под ремонт": "Под ремонт" },
       building: { "Кирпичный": "Кирпичный дом", "Панельный": "Панельный дом", "Монолитный": "Монолитный дом", "Монолитно-кирпичный": "Монолитно-кирпичный дом", "Деревянный": "Деревянный дом" },
@@ -4002,7 +4015,7 @@ function propertyCardSpecs(item) {
       house: "Будинок",
       floor: (f, total) => nonEmpty(total) ? `${f}-й поверх із ${total}` : `${f}-й поверх`,
       floors: n => `${n} поверх${Number(n) === 1 ? "" : Number(n) >= 2 && Number(n) <= 4 ? "и" : "ів"}`,
-      land: n => `ділянка ${n} соток`,
+      land: n => `ділянка ${n} м²`,
       furnished: { "Есть": "З меблями", "Нет": "Без меблів", "Частично": "Частково з меблями" },
       condition: { "Новостройка": "Новобудова", "Новый ремонт": "Після ремонту", "Жилое состояние": "Житловий стан", "Нужен ремонт": "Потрібен ремонт", "Под ремонт": "Під ремонт" },
       building: { "Кирпичный": "Цегляний будинок", "Панельный": "Панельний будинок", "Монолитный": "Монолітний будинок", "Монолитно-кирпичный": "Монолітно-цегляний будинок", "Деревянный": "Дерев’яний будинок" },
@@ -4017,7 +4030,7 @@ function propertyCardSpecs(item) {
       house: "House",
       floor: (f, total) => nonEmpty(total) ? `Floor ${f} of ${total}` : `Floor ${f}`,
       floors: n => `${n} floors`,
-      land: n => `${n} sotkas of land`,
+      land: n => `${n} m² of land`,
       furnished: { "Есть": "Furnished", "Нет": "Unfurnished", "Частично": "Partly furnished" },
       condition: { "Новостройка": "New build", "Новый ремонт": "Recently renovated", "Жилое состояние": "Habitable condition", "Нужен ремонт": "Needs renovation", "Под ремонт": "For renovation" },
       building: { "Кирпичный": "Brick building", "Панельный": "Panel building", "Монолитный": "Monolithic building", "Монолитно-кирпичный": "Brick-monolithic building", "Деревянный": "Wooden building" },
@@ -4032,7 +4045,7 @@ function propertyCardSpecs(item) {
       house: "Dom",
       floor: (f, total) => nonEmpty(total) ? `Piętro ${f} z ${total}` : `Piętro ${f}`,
       floors: n => `${n} piętra`,
-      land: n => `działka ${n} arów`,
+      land: n => `działka ${n} m²`,
       furnished: { "Есть": "Umeblowane", "Нет": "Bez mebli", "Частично": "Częściowo umeblowane" },
       condition: { "Новостройка": "Nowe budownictwo", "Новый ремонт": "Po remoncie", "Жилое состояние": "Do zamieszkania", "Нужен ремонт": "Do remontu", "Под ремонт": "Do remontu" },
       building: { "Кирпичный": "Budynek z cegły", "Панельный": "Budynek z wielkiej płyty", "Монолитный": "Budynek monolityczny", "Монолитно-кирпичный": "Budynek ceglano-monolityczny", "Деревянный": "Budynek drewniany" },
@@ -4046,7 +4059,7 @@ function propertyCardSpecs(item) {
   const L = labels || {
     room: n => `${n}-bedroom`, house: "House",
     floor: (f, total) => nonEmpty(total) ? `Floor ${f} of ${total}` : `Floor ${f}`,
-    floors: n => `${n} floors`, land: n => `${n} sotkas of land`,
+    floors: n => `${n} floors`, land: n => `${n} m² of land`,
     furnished: {}, condition: {}, building: {}, balcony: {}, loggia: {}, bathroom: {}, amenity: {},
     kitchen: n => `kitchen ${n} m²`, metro: n => `metro ${n} m`, school: n => `school ${n} m`, stop: n => `stop ${n} m`
   };
@@ -4055,7 +4068,7 @@ function propertyCardSpecs(item) {
   const rooms = d.rooms;
   const floor = d.floor;
   const floorsTotal = d.floors_total;
-  const land = d.land_area_sotkas;
+  const land = propertyLandAreaM2(d);
   const first = [];
   const second = [];
 
@@ -4289,8 +4302,9 @@ async function loadListings() {
         if (!Number.isFinite(n)) return false;
         return (min === null || n >= min) && (max === null || n <= max);
       };
-      rows = rows.filter(item =>
-        (!f.type || String(item.property_details?.type || item.property_type || "") === f.type) &&
+      rows = rows.filter(item => {
+        const landAreaM2 = propertyLandAreaM2(item.property_details);
+        return (!f.type || String(item.property_details?.type || item.property_type || "") === f.type) &&
         (f.deal === "Все" || String(item.property_details?.operation || item.property_operation || "") === f.deal) &&
         (!f.cityId || String(item.city_id || "") === String(f.cityId)) &&
         (!f.regionCode || normalizeKatottgCode(item.cities?.region_katottg_code) === normalizeKatottgCode(f.regionCode)) &&
@@ -4312,8 +4326,9 @@ async function loadListings() {
         (!f.bathroom || item.property_details?.bathroom_type === f.bathroom) &&
         Object.entries(f.amenities || {}).every(([key, required]) => !required || item.property_details?.amenities?.[key] === true) &&
         within(item.property_details?.metro_distance_m, f.metroFrom, f.metroTo) &&
-        within(item.property_details?.land_area_sotkas, f.landFrom, f.landTo)
-      );
+        ((f.landFrom === null && f.landTo === null) ||
+          (landAreaM2 !== null && within(landAreaM2, f.landFrom, f.landTo)));
+      });
       const point = window.hhSearchMapPoint;
       const radiusKm = Number(f.radius || 0);
       if (point && radiusKm > 0) {
@@ -5103,8 +5118,8 @@ function openCategoryMenu(parentCategory = "") {
             </div>
             <label>${escapeHtml(t("До метро, м від"))}<input id="propertyFilterMetroFrom" type="number" min="0"></label>
             <label>${escapeHtml(t("До метро, м до"))}<input id="propertyFilterMetroTo" type="number" min="0"></label>
-            <label>${escapeHtml(t("Площа ділянки, соток від"))}<input id="propertyFilterLandFrom" type="number" min="0" step="0.1"></label>
-            <label>${escapeHtml(t("Площа ділянки, соток до"))}<input id="propertyFilterLandTo" type="number" min="0" step="0.1"></label>
+            <label>${escapeHtml(t("Площа ділянки, м² від"))}<input id="propertyFilterLandFrom" type="number" min="0" step="any"></label>
+            <label>${escapeHtml(t("Площа ділянки, м² до"))}<input id="propertyFilterLandTo" type="number" min="0" step="any"></label>
             <label>${escapeHtml(t("Санузел"))}<select id="propertyFilterBathroom"><option value="">${escapeHtml(t("Будь-який"))}</option><option value="separate">${escapeHtml(t("Раздельный"))}</option><option value="combined">${escapeHtml(t("Совмещённый"))}</option></select></label>
             <div class="property-search-amenities">
               <strong>${escapeHtml(t("Удобства"))}</strong>
@@ -6169,6 +6184,7 @@ addForm.addEventListener("submit", async e => {
         const value = String(form.get(name) || "").trim();
         return value === "" ? null : Number(value);
       };
+      const landAreaM2 = optionalNumber("property_land_area_m2");
       Object.assign(payload, {
         property_details: {
           operation: propertyOperation,
@@ -6186,13 +6202,13 @@ addForm.addEventListener("submit", async e => {
           kitchen_area_m2: optionalNumber("property_kitchen_area"),
           building_type: String(form.get("property_building_type") || "") || null,
           condition: String(form.get("property_condition") || "") || null,
-          land_area_m2: optionalNumber("property_land_area_m2"),
+          land_area_m2: landAreaM2,
           separate_entry: String(form.get("property_separate_entry") || "") || null,
           parking_spaces: String(form.get("property_parking_spaces") || "") || null,
           garage_type: String(form.get("property_garage_type") || "") || null,
           garage_features: String(form.get("property_garage_features") || "") || null,
           garage_electricity: String(form.get("property_garage_electricity") || "") || null,
-          land_area_sotkas: null,
+          land_area_sotkas: landAreaM2 === null ? null : landAreaM2 / 100,
           furniture: String(form.get("property_furniture") || "") || null,
           balcony: String(form.get("property_balcony") || "") || null,
           loggia: String(form.get("property_loggia") || "") || null,
@@ -6672,7 +6688,7 @@ initAuth();
     map.addLayer(markerLayer);
     map.on("moveend", () => { try { localStorage.setItem(stateKey, JSON.stringify({ center: map.getCenter(), zoom: map.getZoom() })); } catch (_) {} });
     map.on("click", event => {
-      if (pickerMode !== "listing" && pickerMode !== "search") return;
+      if (pickerMode !== "listing" && pickerMode !== "vehicle-listing" && pickerMode !== "search") return;
       setPendingPoint(event.latlng.lat, event.latlng.lng);
     });
   };

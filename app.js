@@ -44,10 +44,6 @@ const translations = {
   "Де шукати": { ru: "Где искать", uk: "Де шукати", en: "Where to search", pl: "Gdzie szukać" },
   "Район области": {ru:"Район области",uk:"Район області",en:"Oblast district",pl:"Rejon obwodu"},
   "Район города": {ru:"Район города",uk:"Район міста",en:"City district",pl:"Dzielnica miasta"},
-  "Количество комнат": {ru:"Количество комнат",uk:"Кількість кімнат",en:"Number of rooms",pl:"Liczba pokoi"},
-  "Общая площадь, м²": {ru:"Общая площадь, м²",uk:"Загальна площа, м²",en:"Total area, m²",pl:"Powierzchnia całkowita, m²"},
-  "Этаж": {ru:"Этаж",uk:"Поверх",en:"Floor",pl:"Piętro"},
-  "Этажность здания": {ru:"Этажность здания",uk:"Кількість поверхів у будинку",en:"Building floors",pl:"Liczba pięter w budynku"},
   "Площадь участка, м²": {ru:"Площадь участка, м²",uk:"Площа ділянки, м²",en:"Plot area, m²",pl:"Powierzchnia działki, m²"},
   "Площа ділянки, м² від": {ru:"Площадь участка, м² от",uk:"Площа ділянки, м² від",en:"Plot area from, m²",pl:"Powierzchnia działki od, m²"},
   "Площа ділянки, м² до": {ru:"Площадь участка, м² до",uk:"Площа ділянки, м² до",en:"Plot area to, m²",pl:"Powierzchnia działki do, m²"},
@@ -303,7 +299,6 @@ const translations = {
   "Площа від, м²": { ru: "Площадь от, м²", uk: "Площа від, м²", en: "Area from, m²", pl: "Powierzchnia od, m²" },
   "Загальна площа, м²": { ru: "Общая площадь, м²", uk: "Загальна площа, м²", en: "Total area, m²", pl: "Powierzchnia całkowita, m²" },
   "Площа кухні, м²": { ru: "Площадь кухни, м²", uk: "Площа кухні, м²", en: "Kitchen area, m²", pl: "Powierzchnia kuchni, m²" },
-  "До метро, м": { ru: "До метро, м", uk: "До метро, м", en: "Distance to metro, m", pl: "Odległość do metra, m" },
   "До школи, м": { ru: "До школы, м", uk: "До школи, м", en: "Distance to school, m", pl: "Odległość do szkoły, m" },
   "До зупинки, м": { ru: "До остановки, м", uk: "До зупинки, м", en: "Distance to stop, m", pl: "Odległość do przystanku, m" },
   "Площа до, м²": { ru: "Площадь до, м²", uk: "Площа до, м²", en: "Area to, m²", pl: "Powierzchnia do, m²" },
@@ -509,12 +504,6 @@ const translations = {
   "Комфорт и управление": { ru:"Комфорт и управление", uk:"Комфорт і керування", en:"Comfort and controls", pl:"Komfort i sterowanie" },
   "Музыка и мультимедиа": { ru:"Музыка и мультимедиа", uk:"Музика та мультимедіа", en:"Audio and multimedia", pl:"Audio i multimedia" },
   "Документы и принадлежности": { ru:"Документы и принадлежности", uk:"Документи та приладдя", en:"Documents and accessories", pl:"Dokumenty i wyposażenie" },
-  "Гидроусилитель руля": { ru:"ГУР", uk:"ГПК", en:"Power steering", pl:"Wspomaganie kierownicy" },
-  "Электростеклоподъёмники": { ru:"Электростеклоподъёмники", uk:"Електросклопідіймачі", en:"Power windows", pl:"Elektryczne szyby" },
-  "Подогрев сидений": { ru:"Подогрев сидений", uk:"Підігрів сидінь", en:"Heated seats", pl:"Podgrzewane fotele" },
-  "Подогрев заднего стекла": { ru:"Подогрев заднего стекла", uk:"Обігрів заднього скла", en:"Heated rear window", pl:"Podgrzewana tylna szyba" },
-  "Подогрев лобового стекла": { ru:"Подогрев лобового стекла", uk:"Обігрів лобового скла", en:"Heated windshield", pl:"Podgrzewana przednia szyba" },
-  "Подогрев зеркал": { ru:"Подогрев зеркал", uk:"Підігрів дзеркал", en:"Heated mirrors", pl:"Podgrzewane lusterka" },
   "Магнитола 1 DIN": { ru:"Магнитола 1 DIN", uk:"Магнітола 1 DIN", en:"1-DIN head unit", pl:"Radio 1 DIN" },
   "Магнитола 2 DIN": { ru:"Магнитола 2 DIN", uk:"Магнітола 2 DIN", en:"2-DIN head unit", pl:"Radio 2 DIN" },
   "Запасное колесо (запаска)": { ru:"Запасное колесо (запаска)", uk:"Запасне колесо", en:"Spare wheel", pl:"Koło zapasowe" },
@@ -621,8 +610,6 @@ const vehicleListingRegionSelect = document.getElementById("vehicleListingRegion
 const vehicleListingCitySearchInput = document.getElementById("vehicleListingCitySearchInput");
 const vehicleListingCitySuggestions = document.getElementById("vehicleListingCitySuggestions");
 const vehicleListingCitySelect = document.getElementById("vehicleListingCitySelect");
-const vehicleListingLatitude = document.getElementById("vehicleListingLatitude");
-const vehicleListingLongitude = document.getElementById("vehicleListingLongitude");
 const vehicleListingMapPointStatus = document.getElementById("vehicleListingMapPointStatus");
 // Business and investment listings own a separate city/region selector.
 const genericListingLocationBlock = document.getElementById("genericListingLocationBlock");
@@ -2663,7 +2650,6 @@ async function loadCities() {
   if (!db || availableCities.length) return availableCities;
   // Share one in-flight catalog request between all callers; never download the same catalog twice.
   if (citiesLoadPromise) return citiesLoadPromise;
-  if (window.hryvniaCitiesLoaded && availableCities.length) return availableCities;
   citiesLoadPromise = (async () => {
   const allCities = [];
   const pageSize = 1000;
@@ -3663,7 +3649,6 @@ async function editListing(item, labels) {
     editCityInput.setAttribute("aria-expanded", "false");
   };
   let editCityLoadStarted = false;
-  let editCityLoadFailed = false;
   const showEditCityLoading = () => {
     editCitySuggestions.innerHTML = `<div class="city-suggestion-empty" role="status"><span aria-hidden="true" style="display:inline-block;margin-right:7px;font-size:16px">⟳</span>${escapeHtml(cityTranslation("Загрузка городов…"))}</div>`;
     editCitySuggestions.hidden = false;
@@ -3681,9 +3666,7 @@ async function editListing(item, labels) {
     showEditCityLoading();
     try {
       await loadCities();
-      editCityLoadFailed = !availableCities.length;
     } catch (error) {
-      editCityLoadFailed = true;
       console.error("Не удалось загрузить города для редактора:", error);
     }
     return availableCities.length > 0;
@@ -3919,10 +3902,6 @@ function renderHotListings(items) {
   const L = langPack[lang] || langPack.ru;
   if (!items.length) { host.innerHTML = `<div class="empty">${escapeHtml(L.empty)}</div>`; return; }
   host.innerHTML = `<div class="hot-listings-row">${items.map(item => {
-    const badges = [
-      item.is_hot ? `<span class="hot-listing-badge">${escapeHtml(L.hot)}</span>` : "",
-      item.is_urgent ? `<span class="urgent-listing-badge">${escapeHtml(L.urgent)}</span>` : ""
-    ].join("");
     return `<button type="button" class="hot-listing-card" data-hot-id="${escapeHtml(String(item.id))}">
       <span class="hot-card-media">${listingCover(item)}${item.is_hot ? `<span class="hot-listing-badge" aria-label="${escapeHtml(L.hot)}">${escapeHtml(L.hot)}</span>` : ""}</span>
       <span class="hot-card-badges">${item.is_urgent ? `<span class="urgent-listing-badge">${escapeHtml(L.urgent)}</span>` : ""}</span>
@@ -3989,7 +3968,6 @@ function propertyCardSpecs(item) {
   const d = item.property_details;
   const typeRaw = String(d.type || item.property_type || "");
   const isHouse = /дом|house|будин/i.test(typeRaw);
-  const isRoom = /комнат|room/i.test(typeRaw) && !/квартир|apartment/i.test(typeRaw);
 
   const nonEmpty = value => value !== null && value !== undefined && String(value).trim() !== "";
   const number = value => nonEmpty(value) && Number.isFinite(Number(value));
@@ -4414,7 +4392,6 @@ const categoryMenuBackdrop = document.getElementById("categoryMenuBackdrop");
 const categoryMenuTitle = document.getElementById("categoryMenuTitle");
 function resetCatalogFilters() {
   currentCategory = "";
-  selectedSearchCategory = "";
   selectedCatalogCityId = "";
   activeRegionCode = "";
   vehicleClientFilters = null;
@@ -4448,7 +4425,6 @@ const vehicleSearchBackdrop = document.getElementById("vehicleSearchBackdrop");
 const propertySearchMenu = document.getElementById("propertySearchMenu");
 const propertySearchBackdrop = document.getElementById("propertySearchBackdrop");
 const propertySearchContent = document.getElementById("propertySearchContent");
-let selectedSearchCategory = "";
 let vehicleModelsCache = [];
 let vehicleModelsPromise = null;
 function closeCategoryMenu() {
@@ -4937,7 +4913,6 @@ function preparePropertySearchMenu() {
       return;
     }
     currentCategory = "Недвижимость";
-    selectedSearchCategory = "Недвижимость";
     const numFilter = id => { const v = document.getElementById(id)?.value.trim() || ""; return v === "" ? null : Number(v); };
     propertySearchClientFilters = {
       type: typeTrigger?.dataset.value || "",
@@ -5176,7 +5151,6 @@ function openCategorySubmenu(category) {
     closeVehicleSearch();
   }
 
-  selectedSearchCategory = category;
   currentCategory = category;
 
   if (categorySelectLabel) {
@@ -5916,7 +5890,7 @@ categoryMenuOptions?.addEventListener("click", event => {
   // A category change starts a fresh catalog query; do not carry stale vehicle or city filters.
   resetCatalogFilters();
   if (category !== "Автомобили") { vehicleSearchTabs = []; activeVehicleSearchTabId = ""; }
-  selectedSearchCategory = category; currentCategory = category;
+  currentCategory = category;
   if (subcategory && searchInput) searchInput.value = subcategory;
   if (categorySelectLabel) categorySelectLabel.textContent = category ? t(category === "Готовый бизнес" ? "Бизнес и предпринимательство" : category) : t("Все категории");
   document.querySelectorAll(".category").forEach(b => b.classList.toggle("active", (b.dataset.category || "") === category));
@@ -5939,7 +5913,7 @@ document.querySelectorAll(".category").forEach(button => {
     document.querySelectorAll(".category").forEach(b => b.classList.remove("active")); button.classList.add("active");
     resetCatalogFilters();
     if (category !== "Автомобили") { vehicleSearchTabs = []; activeVehicleSearchTabId = ""; }
-    currentCategory = category; selectedSearchCategory = category;
+    currentCategory = category;
     if (categorySelectLabel) categorySelectLabel.textContent = category ? t(category) : t("Все категории");
     loadListings();
   });
@@ -6155,13 +6129,10 @@ addForm.addEventListener("submit", async e => {
     const priceFieldName = selectedCategory === "Автомобили" ? "vehicle_price" : selectedCategory === "Недвижимость" ? "property_price" : "price";
     const currencyFieldName = selectedCategory === "Автомобили" ? "vehicle_price_currency" : selectedCategory === "Недвижимость" ? "property_price_currency" : "price_currency";
     const description = String(form.get(descriptionFieldName) || "").trim();
-    const generatedRealEstateTitle = selectedCategory === "Недвижимость"
-      ? (description.split(/\r?\n/)[0].trim().slice(0, 100) || (translations["Недвижимость"]?.[lang] || "Недвижимость"))
-      : "";
 
     const payload = {
       category: selectedCategory,
-      title: selectedCategory === "Недвижимость" ? generatedRealEstateTitle : String(form.get("title") || "").trim(),
+      title: selectedCategory === "Недвижимость" ? "" : String(form.get("title") || "").trim(),
       city_id: Number(cityId),
       price: Number(form.get(priceFieldName)),
       currency: String(form.get(currencyFieldName) || "UAH"),
@@ -6313,7 +6284,7 @@ addForm.addEventListener("submit", async e => {
 
     }
 
-    const { data: insertedListings, error } = await db.from("listings").insert(payload).select("id");
+    const { error } = await db.from("listings").insert(payload).select("id");
     if (error) {
       console.error("[addForm] Supabase insert failed:", {
         message: error.message,

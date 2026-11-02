@@ -3566,7 +3566,7 @@ async function editListing(item, labels) {
   const editTitleField = isVehicle ? "" : `<label>${escapeHtml(L.title)}<input name="title" required maxlength="180" value="${escapeHtml(item.title || "")}"></label>`;
   dialog.innerHTML = `<form class="listing-edit-form"><header class="listing-edit-header"><p class="eyebrow">${escapeHtml(t("Редактирование объявления"))}</p></header>
     <input type="hidden" name="category" value="${categoryValue}">
-    ${isVehicle ? "" : (isPropertyListing ? editCityField : editTitleField)}
+    ${isVehicle ? "" : (isPropertyListing ? editCityField : editTitleField + editCityField)}
     ${vehicleBlock}
     ${isPropertyListing ? propertyLocationBlock : ""}
     ${isVehicle ? "" : (isPropertyListing ? editPropertyPriceField : editPriceField)}
@@ -4304,13 +4304,17 @@ async function loadListings() {
       };
       rows = rows.filter(item => {
         const landAreaM2 = propertyLandAreaM2(item.property_details);
+        const districtCode = item.property_details?.district_code;
+        const matchesDistrict = (!f.cityDistrictCode && !f.district) ||
+          (f.cityDistrictCode && districtCode
+            ? String(districtCode) === String(f.cityDistrictCode)
+            : Boolean(f.district) && String(item.property_details?.district || item.district || "").toLocaleLowerCase().includes(String(f.district).toLocaleLowerCase()));
         return (!f.type || String(item.property_details?.type || item.property_type || "") === f.type) &&
         (f.deal === "Все" || String(item.property_details?.operation || item.property_operation || "") === f.deal) &&
         (!f.cityId || String(item.city_id || "") === String(f.cityId)) &&
         (!f.regionCode || normalizeKatottgCode(item.cities?.region_katottg_code) === normalizeKatottgCode(f.regionCode)) &&
-        (!f.cityDistrictCode || String(item.property_details?.district_code || "") === String(f.cityDistrictCode)) &&
+        matchesDistrict &&
         (!f.oblastRaionCode || normalizeKatottgCode(item.cities?.raion_katottg_code) === normalizeKatottgCode(f.oblastRaionCode)) &&
-        (!f.district || String(item.property_details?.district || item.district || "").toLocaleLowerCase().includes(String(f.district).toLocaleLowerCase())) &&
         (!f.address || String(item.property_details?.address || item.property_address || "").toLocaleLowerCase().includes(String(f.address).toLocaleLowerCase())) &&
         within(item.price, f.priceFrom, f.priceTo) &&
         within(item.property_details?.area_m2 ?? item.property_area_sqm ?? item.property_area ?? item.property_total_area, f.areaFrom, f.areaTo) &&
@@ -4939,7 +4943,7 @@ function preparePropertySearchMenu() {
       type: typeTrigger?.dataset.value || "",
       deal: propertySearchMenu?.dataset.realEstateDeal || "Все",
       priceFrom: fromNumbers[0], priceTo: fromNumbers[1], areaFrom: fromNumbers[2], areaTo: fromNumbers[3],
-      district: cityDistrictSelect?.selectedOptions?.[0]?.textContent?.trim() || "",
+      district: cityDistrictSelect?.value ? (cityDistrictSelect.selectedOptions?.[0]?.textContent?.trim() || "") : "",
       cityDistrictCode: cityDistrictSelect?.value || "",
       oblastRaionCode: oblastRaionSelect?.value || "",
       regionCode: regionSelect?.value || activeRegionCode || "",
@@ -6023,18 +6027,23 @@ if (addModal) addModal.addEventListener("click", e => { if (e.target === addModa
 
 if (addForm) {
 addForm.addEventListener("submit", async e => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (publishing || validatingPhotos) {
-      if (formMessage) {
-        formMessage.textContent = validatingPhotos
-          ? "Дождитесь завершения обработки фотографий."
-          : "Публикация уже выполняется.";
-        formMessage.classList.add("error");
-        formMessage.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-      return;
+  if (publishing || validatingPhotos) {
+    if (formMessage) {
+      formMessage.textContent = validatingPhotos
+        ? "Дождитесь завершения обработки фотографий."
+        : "Публикация уже выполняется.";
+      formMessage.classList.add("error");
+      formMessage.scrollIntoView({ behavior: "smooth", block: "center" });
     }
+    return;
+  }
+  publishing = true;
+  let controls = [];
+  let publishButton = null;
+  let withPhotos = false;
+  try {
     if (formMessage) { formMessage.textContent = ""; formMessage.classList.remove("error"); }
     propertyListingLocationToggle?.classList.remove("has-error");
     citySearchInput?.classList.remove("has-error");
@@ -6189,9 +6198,9 @@ addForm.addEventListener("submit", async e => {
         property_details: {
           operation: propertyOperation,
           type: propertyType,
-          district: DISABLE_PROPERTY_DISTRICTS_FOR_CREATION ? null : (String(propertyCityDistrictSelect?.selectedOptions?.[0]?.textContent || "").trim() || null),
+          district: DISABLE_PROPERTY_DISTRICTS_FOR_CREATION || !propertyCityDistrictSelect?.value ? null : (String(propertyCityDistrictSelect.selectedOptions?.[0]?.textContent || "").trim() || null),
           district_code: DISABLE_PROPERTY_DISTRICTS_FOR_CREATION ? null : (String(form.get("property_district") || "").trim() || null),
-          oblast_raion: DISABLE_PROPERTY_DISTRICTS_FOR_CREATION ? null : (String(propertyOblastRaionSelect?.selectedOptions?.[0]?.textContent || "").trim() || null),
+          oblast_raion: DISABLE_PROPERTY_DISTRICTS_FOR_CREATION || !propertyOblastRaionSelect?.value ? null : (String(propertyOblastRaionSelect.selectedOptions?.[0]?.textContent || "").trim() || null),
           oblast_raion_code: DISABLE_PROPERTY_DISTRICTS_FOR_CREATION ? null : (String(form.get("property_oblast_raion") || "").trim() || null),
           address: String(form.get("property_address") || "").trim() || null,
           radius_km: optionalNumber("property_radius_km"),
@@ -6290,68 +6299,78 @@ addForm.addEventListener("submit", async e => {
     payload.user_id = authenticatedUser.id;
 
     const photosForThisListing = getPhotoBucket(selectedCategory);
-    const withPhotos = photosForThisListing.length > 0;
-    publishing = true;
-    const controls = [...addForm.elements].map(control => [control, control.disabled]);
-    const publishButton = addForm.querySelector('button[type="submit"]');
+    withPhotos = photosForThisListing.length > 0;
+    controls = [...addForm.elements].map(control => [control, control.disabled]);
+    publishButton = addForm.querySelector('button[type="submit"]');
     const publishLabel = t("Сохранение и публикация…");
     controls.forEach(([control]) => { if (control !== publishButton) control.disabled = true; });
     setButtonLoading(publishButton, true, publishLabel);
     if (formMessage) formMessage.textContent = withPhotos ? photoText("saving") : publishLabel;
-    try {
-      if (withPhotos) {
+    if (withPhotos) {
 
-        payload.image_urls = await uploadListingPhotos(photosForThisListing);
-        payload.image_url = payload.image_urls[0];
+      payload.image_urls = await uploadListingPhotos(photosForThisListing);
+      payload.image_url = payload.image_urls[0];
 
-      }
-
-      const { data: insertedListings, error } = await db.from("listings").insert(payload).select("id");
-      if (error) {
-        console.error("[addForm] Supabase insert failed:", {
-          message: error.message,
-          code: error.code,
-          details: error.details,
-          hint: error.hint,
-          category: payload.category,
-          city_id: payload.city_id
-        });
-        const raw = String(error.message || "");
-        if (/row-level security|permission denied|new row violates/i.test(raw)) {
-          throw new Error("Не удалось опубликовать объявление из-за ограничений доступа. Проверьте права публикации.");
-        }
-        if (/violates foreign key/i.test(raw)) {
-          throw new Error("Выбранный населённый пункт не найден. Выберите город заново.");
-        }
-        if (/null value in column [\"]city_id[\"]/i.test(raw)) {
-          throw new Error("Не выбран населённый пункт. Выберите город из списка.");
-        }
-        throw error;
-      }
-
-      e.target.reset();
-      resetPhotos(photosForThisListing);
-      renderPhotoPreview();
-      if (formMessage) formMessage.textContent = "Объявление опубликовано!";
-      await loadListings();
-      setTimeout(() => addModal?.classList.add("hidden"), 700);
-    } catch (error) {
-      if (formMessage) {
-        const errorText = error?.message || String(error);
-        formMessage.textContent = withPhotos
-          ? (errorText === photoText("setup") ? errorText : `${photoText("failed")} ${errorText}`)
-          : `Ошибка: ${errorText}`;
-        formMessage.classList.add("error");
-      }
-    } finally {
-      publishing = false;
-      setButtonLoading(publishButton, false);
-      controls.forEach(([control, disabled]) => {
-        if (control !== publishButton) control.disabled = disabled;
-      });
-      updatePhotoFields();
     }
-  });
+
+    const { data: insertedListings, error } = await db.from("listings").insert(payload).select("id");
+    if (error) {
+      console.error("[addForm] Supabase insert failed:", {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint,
+        category: payload.category,
+        city_id: payload.city_id
+      });
+      const raw = String(error.message || "");
+      if (/row-level security|permission denied|new row violates/i.test(raw)) {
+        throw new Error("Не удалось опубликовать объявление из-за ограничений доступа. Проверьте права публикации.");
+      }
+      if (/violates foreign key/i.test(raw)) {
+        throw new Error("Выбранный населённый пункт не найден. Выберите город заново.");
+      }
+      if (/null value in column [\"]city_id[\"]/i.test(raw)) {
+        throw new Error("Не выбран населённый пункт. Выберите город из списка.");
+      }
+      throw error;
+    }
+
+    e.target.reset();
+    resetPhotos(photosForThisListing);
+    renderPhotoPreview();
+    if (formMessage) {
+      formMessage.textContent = "Объявление опубликовано!";
+      formMessage.classList.remove("error");
+    }
+    try {
+      await loadListings();
+    } catch (error) {
+      console.error("[addForm] catalog refresh failed after publication:", error);
+      if (formMessage) {
+        formMessage.textContent = "Объявление опубликовано! Не удалось обновить каталог. Обновите страницу.";
+        formMessage.classList.remove("error");
+      }
+      return;
+    }
+    setTimeout(() => addModal?.classList.add("hidden"), 700);
+  } catch (error) {
+    if (formMessage) {
+      const errorText = error?.message || String(error);
+      formMessage.textContent = withPhotos
+        ? (errorText === photoText("setup") ? errorText : `${photoText("failed")} ${errorText}`)
+        : `Ошибка: ${errorText}`;
+      formMessage.classList.add("error");
+    }
+  } finally {
+    publishing = false;
+    setButtonLoading(publishButton, false);
+    controls.forEach(([control, disabled]) => {
+      if (control !== publishButton) control.disabled = disabled;
+    });
+    updatePhotoFields();
+  }
+});
 }
 
 function translateTextElement(element, original) {

@@ -5620,7 +5620,22 @@ function updatePropertyListingProgress() {
   lines.forEach((line, index) => line.classList.toggle("is-complete", ready && index === 0));
 }
 
+function getPropertyListingGeoControls() {
+  return [
+    cityRegionSelect,
+    citySearchInput,
+    ...(DISABLE_PROPERTY_DISTRICTS_FOR_CREATION ? [] : [propertyOblastRaionSelect, propertyCityDistrictSelect])
+  ].filter(Boolean);
+}
+
+function syncPropertyListingGeoControls() {
+  const unavailable = listingCategorySelect?.value !== "Недвижимость"
+    || propertyListingLocationFields?.getAttribute("aria-busy") === "true";
+  getPropertyListingGeoControls().forEach(control => { control.disabled = unavailable; });
+}
+
 function syncPropertyListingFields() {
+  syncPropertyListingGeoControls();
   if (!propertyListingFields) return;
   propertyListingFields.hidden = listingCategorySelect?.value !== "Недвижимость";
   propertyListingFields.disabled = listingCategorySelect?.value !== "Недвижимость";
@@ -5907,12 +5922,7 @@ async function openPropertyListingForm(propertyType = "", operation = "") {
   addModal?.classList.remove("hidden");
 
   {
-    const geoControls = [
-      cityRegionSelect,
-      citySearchInput,
-      ...(DISABLE_PROPERTY_DISTRICTS_FOR_CREATION ? [] : [propertyOblastRaionSelect, propertyCityDistrictSelect])
-    ].filter(Boolean);
-    const previousDisabledStates = geoControls.map(control => control.disabled);
+    const geoControls = getPropertyListingGeoControls();
     geoControls.forEach(control => { control.disabled = true; });
     propertyListingLocationFields?.setAttribute("aria-busy", "true");
 
@@ -5943,13 +5953,8 @@ async function openPropertyListingForm(propertyType = "", operation = "") {
         }
       })
       .finally(() => {
-        const propertyFormIsActive = listingCategorySelect?.value === "Недвижимость";
-        geoControls.forEach((control, index) => {
-          control.disabled = propertyFormIsActive
-            ? previousDisabledStates[index]
-            : true;
-        });
         propertyListingLocationFields?.removeAttribute("aria-busy");
+        syncPropertyListingGeoControls();
       });
   }
 }

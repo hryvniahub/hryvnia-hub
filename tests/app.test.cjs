@@ -18,9 +18,9 @@ const landHelper = section("function propertyLandAreaM2(", "function propertyCar
 const noop = () => {};
 const tick = () => new Promise(setImmediate);
 function deferred() {
-  let resolve;
-  const promise = new Promise(done => { resolve = done; });
-  return { promise, resolve };
+  let resolve, reject;
+  const promise = new Promise((done, fail) => { resolve = done; reject = fail; });
+  return { promise, resolve, reject };
 }
 function element(value = "") {
   const classes = new Set();
@@ -668,4 +668,92 @@ test("V5: reopening vehicle search preserves filters; changing category still re
   assert.equal(context.vehicleSearchTabs.length, 0);
   context.openCategorySubmenu("Автомобили");
   assert.equal(resets, 2);
+});
+
+test("P4: property location controls recover when category changes during geography load", async () => {
+  const formSource = section("async function openPropertyListingForm(", "\ncategoryMenuOptions?.addEventListener(");
+  const geoSync = section("function getPropertyListingGeoControls()", "\nfunction syncPropertyListingFields()");
+  const propertySync = section("function syncPropertyListingFields()", "\nfunction syncVehicleListingFields()");
+  const vehicleSync = section("function syncVehicleListingFields()", "\npropertyTypeSelect?.addEventListener");
+  const categoryChange = section('listingCategorySelect?.addEventListener("change", () => {', "\nsyncVehicleListingFields();");
+  let cityLoad = deferred();
+  let geoLoad = deferred();
+  const category = Object.assign(element("Недвижимость"), {
+    options: [{ value: "Недвижимость" }],
+    addEventListener(name, handler) { assert.equal(name, "change"); this.change = handler; }
+  });
+  const attrs = {};
+  const locationFields = Object.assign(element(), {
+    setAttribute(name, value) { attrs[name] = value; },
+    getAttribute(name) { return attrs[name] ?? null; },
+    removeAttribute(name) { delete attrs[name]; }
+  });
+  const formMessage = Object.assign(element(), { classList: element().classList });
+  const addModal = {
+    classList: {
+      remove() {},
+      contains: () => false
+    }
+  };
+  const context = vm.createContext({
+    listingCategorySelect: category,
+    addForm: { querySelector: () => category },
+    propertyTypeSelect: null, propertyOperationSelect: null,
+    refreshPropertyListingSelect: noop,
+    cityRegionSelect: element(), citySearchInput: element(),
+    propertyOblastRaionSelect: element(), propertyCityDistrictSelect: element(),
+    propertyListingLocationFields: locationFields, propertyListingLocationToggle: null,
+    propertyListingFields: { querySelectorAll: () => [] },
+    listingCurrencyField: null, propertyListingLocationAccordion: null,
+    propertyListingLocationSummaryText: null, propertyAddressField: null, propertyRadiusField: null,
+    genericListingLocationBlock: null, listingTitleField: null, vehicleListingMake: null,
+    vehicleListingMore: null, vehicleMarketPanel: null, vehicleAdvancedFields: null,
+    listingAdvancedCommonFields: null, vehicleListingFields: null,
+    updatePropertyListingProgress: noop, updatePropertyListingLocationSummary: noop,
+    syncPropertyListingFields: undefined,
+    ensureCitiesLoaded: () => cityLoad.promise, loadPropertyGeoCatalogs: () => geoLoad.promise,
+    updatePropertyOblastRaions: noop, updatePropertyCityDistricts: noop,
+    DISABLE_PROPERTY_DISTRICTS_FOR_CREATION: false,
+    availableCities: [{ id: 1 }], formRegionCode: "", citySelect: element("1"),
+    addModal, formMessage, closeCategoryMenu: noop, closeAddCategoryMenu: noop,
+    syncVehicleListingFields: undefined, renderPhotoPreview: noop,
+    setPropertyAdvancedFields: noop,
+    loadVehicleListingMakes: noop,
+    document: {
+      getElementById: () => null,
+      querySelector: () => null
+    },
+    console: { error: noop },
+    t: value => value
+  });
+  vm.runInContext(geoSync + propertySync + vehicleSync + formSource + categoryChange, context);
+
+  context.openPropertyListingForm();
+  assert.equal(context.cityRegionSelect.disabled, true);
+  assert.equal(context.propertyOblastRaionSelect.disabled, true);
+  category.value = "Автомобили";
+  category.change();
+  cityLoad.resolve([{ id: 1 }]);
+  await tick();
+  assert.equal(context.cityRegionSelect.disabled, true);
+  geoLoad.resolve(true);
+  await tick();
+  category.value = "Недвижимость";
+  category.change();
+  assert.equal(context.cityRegionSelect.disabled, false);
+  assert.equal(context.citySearchInput.disabled, false);
+  assert.equal(context.propertyOblastRaionSelect.disabled, false);
+  assert.equal(context.propertyCityDistrictSelect.disabled, false);
+
+  cityLoad = deferred();
+  geoLoad = deferred();
+  context.openPropertyListingForm();
+  assert.equal(context.cityRegionSelect.disabled, true);
+  cityLoad.reject(new Error("city catalog unavailable"));
+  await tick();
+  assert.equal(locationFields.getAttribute("aria-busy"), null);
+  assert.equal(context.cityRegionSelect.disabled, false);
+  assert.equal(context.propertyOblastRaionSelect.disabled, false);
+  assert.match(formMessage.textContent, /Не удалось загрузить список населённых пунктов/);
+  geoLoad.resolve(true);
 });

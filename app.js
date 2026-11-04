@@ -1085,9 +1085,9 @@ async function initAuth() {
   updateAuthTranslations();
   if (!db) { updateAccountButton(); return; }
   try {
-    const { data, error } = await db.auth.getSession();
-    if (error) throw error;
-    currentUser = data?.session?.user || null;
+    const { data, error } = await db.auth.getUser();
+    if (error && error.name !== "AuthSessionMissingError") throw error;
+    currentUser = error ? null : data?.user || null;
     updateAccountButton();
     const propertyMarketAuthPrompt = document.querySelector("#propertyMarketPanel .vehicle-market-auth");
     if (propertyMarketAuthPrompt) propertyMarketAuthPrompt.hidden = Boolean(currentUser);
@@ -1098,7 +1098,9 @@ async function initAuth() {
       subscribeToGlobalMessages();
     }
   } catch (error) {
-    console.error("getSession failed:", error);
+    currentUser = null;
+    updateAccountButton();
+    console.error("getUser failed:", error);
   }
   db.auth.onAuthStateChange(async (event, session) => {
     currentUser = session?.user || null;
@@ -1362,6 +1364,16 @@ async function compressPhoto(file) {
   return { blob, mime, width, height, compressed: true, undecodable: false };
 }
 
+function createPhotoUploadId() {
+  if (typeof globalThis.crypto?.randomUUID === "function") return globalThis.crypto.randomUUID();
+  if (typeof globalThis.crypto?.getRandomValues !== "function") throw new Error(photoText("failed"));
+  const bytes = globalThis.crypto.getRandomValues(new Uint8Array(16));
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, "0")).join("");
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
 async function uploadListingPhotos(photosToUpload = getPhotoBucket()) {
   const { error: schemaError } = await db.from("listings").select("image_urls").limit(0);
   if (schemaError) throw new Error(photoText("setup"));
@@ -1377,7 +1389,7 @@ async function uploadListingPhotos(photosToUpload = getPhotoBucket()) {
               : result.mime === "image/jpeg" ? "jpg"
               : result.mime === "image/png" ? "png"
               : "bin";
-    const path = `${crypto.randomUUID()}.${ext}`;
+    const path = `${createPhotoUploadId()}.${ext}`;
     const { error } = await bucket.upload(path, result.blob, { contentType: result.mime, upsert: false });
     if (error) throw new Error(photoText("failed"));
     photo.uploadedUrl = bucket.getPublicUrl(path).data.publicUrl;
@@ -3632,6 +3644,7 @@ async function editListing(item, labels) {
   let editPhotos = photos.map(url => ({ file: null, previewUrl: url, uploadedUrl: url, existing: true }));
   let editPhotosBusy = false;
   let editSaving = false;
+  let editClosed = false;
   const renderEditPhotos = () => {
     editPhotoPreview.innerHTML = editPhotos.map((photo, index) => `
       <div class="photo-item edit-photo-item">
@@ -3643,9 +3656,9 @@ async function editListing(item, labels) {
         </div>
       </div>`).join("");
   };
-  editPhotoPick.addEventListener("click", () => { if (!editPhotosBusy && !editSaving) editPhotoInput.click(); });
+  editPhotoPick.addEventListener("click", () => { if (!editClosed && !editPhotosBusy && !editSaving) editPhotoInput.click(); });
   editPhotoInput.addEventListener("change", async () => {
-    if (editPhotosBusy || editSaving) return;
+    if (editClosed || editPhotosBusy || editSaving) return;
     const files = [...editPhotoInput.files];
     editPhotoInput.value = "";
     editPhotoMessage.textContent = "";
@@ -3662,6 +3675,10 @@ async function editListing(item, labels) {
           const img = new Image(); img.onload = resolve; img.onerror = reject; img.src = previewUrl;
         });
       }
+      if (editClosed) {
+        additions.forEach(photo => URL.revokeObjectURL(photo.previewUrl));
+        return;
+      }
       editPhotos.push(...additions);
       renderEditPhotos();
     } catch {
@@ -3673,7 +3690,7 @@ async function editListing(item, labels) {
     }
   });
   editPhotoPreview.addEventListener("click", event => {
-    if (editPhotosBusy || editSaving) return;
+    if (editClosed || editPhotosBusy || editSaving) return;
     const button = event.target.closest("button");
     if (!button) return;
     if (button.dataset.editPhotoRemove !== undefined) {
@@ -3685,9 +3702,12 @@ async function editListing(item, labels) {
     editPhotoMessage.textContent = "";
     renderEditPhotos();
   });
-  dialog.addEventListener("close", () => editPhotos.forEach(photo => {
-    if (!photo.existing && photo.previewUrl) URL.revokeObjectURL(photo.previewUrl);
-  }), { once: true });
+  dialog.addEventListener("close", () => {
+    editClosed = true;
+    editPhotos.forEach(photo => {
+      if (!photo.existing && photo.previewUrl) URL.revokeObjectURL(photo.previewUrl);
+    });
+  }, { once: true });
   renderEditPhotos();
 
   // Reuse the same city index/ranking as the create-listing form, but keep the editor self-contained.
@@ -3790,7 +3810,7 @@ async function editListing(item, labels) {
   dialog.querySelector("form").addEventListener("submit", async event => {
     event.preventDefault();
     const form = event.currentTarget;
-    if (editSaving) return;
+    if (editClosed || editSaving) return;
     const message = form.querySelector("[data-edit-message]");
     if (!form.reportValidity()) return;
     const price = Number(form.elements.price.value);
@@ -3801,11 +3821,19 @@ async function editListing(item, labels) {
       message.textContent = labels.denied;
       return;
     }
-    const ownerId = currentUser.id;
     editSaving = true;
     const controls = [...form.elements].map(control => [control, control.disabled]);
     if (isVehicle) controls.forEach(([control]) => { control.disabled = true; });
     try {
+      const { data: authData, error: authError } = await db.auth.getUser();
+      if (authError && authError.name !== "AuthSessionMissingError") throw authError;
+      const authenticatedUser = authError ? null : authData?.user || null;
+      currentUser = authenticatedUser;
+      if (!authenticatedUser || String(authenticatedUser.id) !== String(item.user_id || "")) {
+        message.textContent = labels.denied;
+        return;
+      }
+      const ownerId = authenticatedUser.id;
       let urls = editPhotos.map(photo => photo.uploadedUrl).filter(Boolean).slice(0, MAX_PHOTOS);
 
       const cityIdValue = String(form.elements.city_id.value || "");
@@ -5714,9 +5742,9 @@ function syncVehicleListingFields() {
 
   if (vehicleListingFields) vehicleListingFields.hidden = !isVehicle;
   if (vehicleListingMore) vehicleListingMore.hidden = !isVehicle;
-  if (vehicleMarketPanel) vehicleMarketPanel.hidden = true;
-  if (vehicleAdvancedFields) vehicleAdvancedFields.hidden = true;
-  if (listingAdvancedCommonFields) listingAdvancedCommonFields.hidden = !(isProperty || isOther);
+  if (vehicleMarketPanel && !isVehicle) vehicleMarketPanel.hidden = true;
+  if (vehicleAdvancedFields && !isVehicle) vehicleAdvancedFields.hidden = true;
+  if (listingAdvancedCommonFields) listingAdvancedCommonFields.hidden = isVehicle && vehicleAdvancedFields?.hidden !== false;
 
   if (genericListingLocationBlock) {
     genericListingLocationBlock.hidden = !isOther;
@@ -5862,6 +5890,7 @@ async function estimateVehicleMarketPrice() {
 }
 vehicleListingMore?.addEventListener("click", async () => {
   await estimateVehicleMarketPrice();
+  if (listingCategorySelect?.value !== "Автомобили") return;
   if (currentUser) {
     if (vehicleMarketAuthPrompt) vehicleMarketAuthPrompt.hidden = true;
     setVehicleAdvancedFields(true);
@@ -6127,13 +6156,13 @@ addForm.addEventListener("submit", async e => {
 
       return;
     }
-    // Check the live Supabase session before any required-field or category validation.
+    // Verify identity with Supabase before any required-field or category validation.
     // This lets signed-out visitors reach the login/register modal even when the form is incomplete.
     let authenticatedUser = null;
     try {
       const { data: authData, error: authError } = await db.auth.getUser();
-      if (authError) throw authError;
-      authenticatedUser = authData?.user || null;
+      if (authError && authError.name !== "AuthSessionMissingError") throw authError;
+      authenticatedUser = authError ? null : authData?.user || null;
       currentUser = authenticatedUser;
     } catch (error) {
       console.error("[addForm] auth check failed:", error);

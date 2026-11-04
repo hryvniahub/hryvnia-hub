@@ -419,7 +419,7 @@ function editor(overrides = {}, category = "Автомобили") {
       return Array.from(photos, photo => photo.uploadedUrl);
     },
     loadListings: async () => {},
-    db: { from: table => {
+    db: { auth: { getUser: async () => ({ data: { user: { id: "owner" } } }) }, from: table => {
       assert.equal(table, "listings");
       const query = {
         update: payload => { updates.push(payload); return query; },
@@ -756,4 +756,288 @@ test("P4: property location controls recover when category changes during geogra
   assert.equal(context.propertyOblastRaionSelect.disabled, false);
   assert.match(formMessage.textContent, /Не удалось загрузить список населённых пунктов/);
   geoLoad.resolve(true);
+});
+
+for (const state of ["verified", "signed-out", "missing-session", "error", "rejection"]) {
+  test(`Auth: initAuth verifies the user and fails closed: ${state}`, async () => {
+    const logs = [], accounts = [], calls = [];
+    const prompt = { hidden: false };
+    const user = { id: "verified", email: "verified@example.test" };
+    const context = vm.createContext({
+      currentUser: { id: "untrusted-cache" }, authUserEmail: element(),
+      updateAuthTranslations: noop, updateAccountButton: () => accounts.push(context.currentUser),
+      document: { querySelector: () => prompt },
+      syncFavoritesOnLogin: async () => calls.push("favorites"),
+      updateUnreadMessageIndicators: async () => calls.push("unread"),
+      subscribeToGlobalMessages: () => calls.push("subscribe"),
+      console: { error: (...args) => logs.push(args) },
+      db: { auth: {
+        getUser: async () => {
+          if (state === "rejection") throw new Error("offline");
+          return {
+            data: { user: state === "verified" ? user : null },
+            error: state === "error" ? new Error("invalid token")
+              : state === "missing-session" ? { name: "AuthSessionMissingError" } : null
+          };
+        },
+        getSession: () => assert.fail("Cached session must not establish identity"),
+        onAuthStateChange: handler => { assert.equal(typeof handler, "function"); calls.push("listener"); }
+      } }
+    });
+    vm.runInContext(section("async function initAuth()", '\nconst PHOTO_BUCKET ='), context);
+    await context.initAuth();
+    assert.equal(context.currentUser, state === "verified" ? user : null);
+    assert.equal(accounts.length, 1);
+    assert.equal(logs.length, ["error", "rejection"].includes(state) ? 1 : 0);
+    assert.equal(calls.includes("favorites"), state === "verified");
+    assert.ok(calls.includes("listener"));
+    if (state === "verified") {
+      assert.equal(prompt.hidden, true);
+      assert.equal(context.authUserEmail.textContent, user.email);
+    }
+  });
+}
+
+for (const state of ["signed-out", "missing-session", "error", "rejection"]) {
+  test(`Auth: publication never trusts cached identity: ${state}`, async () => {
+    const p = publisher();
+    let opened = 0;
+    p.context.currentUser = { id: "cached-owner" };
+    p.context.openAuthModal = () => opened++;
+    p.context.db.auth.getUser = async () => {
+      if (state === "rejection") throw new Error("offline");
+      return { data: { user: null }, error: state === "error" ? new Error("invalid token")
+        : state === "missing-session" ? { name: "AuthSessionMissingError" } : null };
+    };
+    await p.send();
+    assert.equal(p.inserts.length, 0);
+    assert.equal(opened, ["signed-out", "missing-session"].includes(state) ? 1 : 0);
+    assert.equal(p.logs.length, ["error", "rejection"].includes(state) ? 1 : 0);
+    p.idle();
+  });
+}
+
+for (const state of ["signed-out", "missing-session", "other-owner", "error", "rejection"]) {
+  test(`Auth: editor verifies ownership before Storage or UPDATE: ${state}`, async () => {
+    const e = editor();
+    e.context.db.auth.getUser = async () => {
+      if (state === "rejection") throw new Error("offline");
+      return { data: { user: state === "other-owner" ? { id: "other" } : null },
+        error: state === "error" ? new Error("invalid token")
+          : state === "missing-session" ? { name: "AuthSessionMissingError" } : null };
+    };
+    await e.send();
+    assert.equal(e.updates.length, 0);
+    assert.equal(e.uploads.length, 0);
+    assert.equal(e.dialog.open, true);
+    assert.equal(e.message.textContent, state === "error" ? "invalid token"
+      : state === "rejection" ? "offline" : "denied");
+    assert.ok(e.form.elements.every(field => !field.disabled));
+  });
+}
+
+test("Auth: editor blocks duplicate submits and photo mutation while getUser is pending", async () => {
+  const e = editor();
+  const gate = deferred();
+  let checks = 0;
+  e.context.db.auth.getUser = () => { checks++; return gate.promise; };
+  const first = e.send();
+  await e.send();
+  e.photoAction({ editPhotoRemove: "0" });
+  assert.equal(checks, 1);
+  assert.equal(e.updates.length, 0);
+  gate.resolve({ data: { user: { id: "owner" } } });
+  await first;
+  assert.equal(e.updates.length, 1);
+  assert.equal(e.updates[0].image_urls.length, 2);
+});
+
+test("DOM: property editor template has no shared IDs or create-form ARIA targets", () => {
+  const template = propertyTemplate.match(/<template id="propertyEditorTemplate">([\s\S]*?)<\/template>/)[1];
+  assert.doesNotMatch(template, /\bid="/);
+  assert.doesNotMatch(template, /\baria-controls="/);
+  const ids = [...propertyTemplate.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
+  assert.equal(new Set(ids).size, ids.length, "Document IDs must be unique, including template contents");
+  assert.deepEqual([...editSource.matchAll(/document\.getElementById\(([^)]+)\)/g)].map(match => match[1]),
+    ["'propertyEditorTemplate'"], "Only the template lookup may be global; editor controls are container-scoped");
+  assert.match(editSource, /propertyFields\?\.querySelector\('select\[name="property_type"\]'\)/);
+});
+
+const photoUploadSource = section("function createPhotoUploadId()", '\nconst FAV_KEY =');
+test("Photos: upload ID uses native randomUUID when available", () => {
+  const context = vm.createContext({ crypto: { randomUUID: () => "native-uuid" } });
+  vm.runInContext(photoUploadSource, context);
+  assert.equal(context.createPhotoUploadId(), "native-uuid");
+});
+
+test("Photos: secure UUID fallback has v4 shape and unique Storage paths", async () => {
+  const paths = [];
+  const bucket = {
+    upload: async (path, blob, options) => {
+      paths.push(path);
+      assert.equal(options.upsert, false);
+      assert.equal(options.contentType, "image/jpeg");
+      return {};
+    },
+    getPublicUrl: path => ({ data: { publicUrl: `https://example.test/${path}` } })
+  };
+  const context = vm.createContext({
+    crypto: { getRandomValues: require("node:crypto").webcrypto.getRandomValues.bind(require("node:crypto").webcrypto) },
+    db: { from: () => ({ select: () => ({ limit: async () => ({}) }) }),
+      storage: { from: () => bucket } },
+    PHOTO_BUCKET: "mock", MAX_PHOTO_BYTES: 100, photoText: value => value,
+    compressPhoto: async file => ({ blob: file, mime: "image/jpeg" })
+  });
+  vm.runInContext(photoUploadSource, context);
+  const photos = [{ file: { size: 10 } }, { file: { size: 10 } }];
+  const urls = await context.uploadListingPhotos(photos);
+  assert.equal(paths.length, 2);
+  assert.notEqual(paths[0], paths[1]);
+  for (const path of paths) assert.match(path, /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.jpg$/);
+  assert.equal(urls[0], photos[0].uploadedUrl);
+  await context.uploadListingPhotos(photos);
+  assert.equal(paths.length, 2, "Retry reuses uploaded photos");
+});
+
+test("Photos: unavailable secure randomness fails explicitly", () => {
+  const context = vm.createContext({ photoText: value => value });
+  vm.runInContext(photoUploadSource, context);
+  assert.throws(() => context.createPhotoUploadId(), /failed/);
+});
+
+function photoEditor() {
+  const e = editor();
+  const created = [], revoked = [], images = [];
+  e.context.URL = {
+    createObjectURL: file => { const url = `blob:${file.name}`; created.push(url); return url; },
+    revokeObjectURL: url => revoked.push(url)
+  };
+  e.context.Image = class {
+    constructor() { images.push(this); }
+  };
+  const input = e.dialog.querySelector('input[name="edit_photo_input"]');
+  const select = (...names) => {
+    input.files = names.map(name => ({ name, type: "image/jpeg", size: 10 }));
+    return input.listeners.change();
+  };
+  return { ...e, created, revoked, images, select };
+}
+
+test("Photos: editor revokes only local previews on removal and close, not cover changes or public URLs", async () => {
+  const e = photoEditor();
+  const adding = e.select("first.jpg", "second.jpg");
+  e.images[0].onload();
+  await tick();
+  e.images[1].onload();
+  await adding;
+  assert.deepEqual(e.revoked, []);
+  e.photoAction({ editPhotoMain: "2" });
+  assert.deepEqual(e.revoked, []);
+  e.photoAction({ editPhotoRemove: "0" });
+  assert.deepEqual(e.revoked, ["blob:first.jpg"]);
+  e.photoAction({ editPhotoRemove: "0" });
+  assert.deepEqual(e.revoked, ["blob:first.jpg"], "Existing remote photo must not be revoked");
+  e.dialog.close();
+  assert.deepEqual(e.revoked, ["blob:first.jpg", "blob:second.jpg"]);
+});
+
+test("Photos: failed decoding releases the entire pending batch and keeps existing photos", async () => {
+  const e = photoEditor();
+  const adding = e.select("first.jpg", "broken.jpg");
+  e.images[0].onload();
+  await tick();
+  e.images[1].onerror();
+  await adding;
+  assert.deepEqual(e.revoked, ["blob:first.jpg", "blob:broken.jpg"]);
+  assert.equal(e.photoMessage.textContent, "unreadable");
+  assert.equal(vm.runInContext("editPhotos.length", e.context), 2);
+  e.dialog.close();
+  assert.equal(e.revoked.length, 2);
+});
+
+test("Photos: failed save retains local preview for retry; successful save releases it once", async () => {
+  const e = photoEditor();
+  const adding = e.select("retry.jpg");
+  e.images[0].onload();
+  await adding;
+  e.context.uploadListingPhotos = async photos => Array.from(photos, photo => {
+    photo.uploadedUrl ||= "https://example.test/retry.jpg";
+    return photo.uploadedUrl;
+  });
+  const originalFrom = e.context.db.from;
+  e.context.db.from = () => {
+    const query = { update: () => query, eq: () => query, select: () => query,
+      maybeSingle: async () => ({ error: { message: "retry needed" } }) };
+    return query;
+  };
+  await e.send();
+  assert.equal(e.dialog.open, true);
+  assert.deepEqual(e.revoked, []);
+  e.context.db.from = originalFrom;
+  await e.send();
+  assert.equal(e.dialog.open, false);
+  assert.deepEqual(e.revoked, ["blob:retry.jpg"]);
+  assert.equal(e.updates[0].image_urls[2], "https://example.test/retry.jpg");
+});
+
+for (const outcome of ["onload", "onerror"]) {
+  test(`Photos: closing during decoding releases late previews: ${outcome}`, async () => {
+    const e = photoEditor();
+    const adding = e.select("pending.jpg");
+    e.dialog.close();
+    e.images[0][outcome]();
+    await adding;
+    assert.deepEqual(e.revoked, ["blob:pending.jpg"]);
+    assert.equal(vm.runInContext("editPhotos.length", e.context), 2, "Closed editor must not retain additions");
+    assert.equal(e.picker.disabled, false);
+  });
+}
+
+test("Vehicle: field synchronization preserves an opened estimate and advanced fields in the same category", () => {
+  const category = { value: "Автомобили" };
+  const context = vm.createContext({
+    listingCategorySelect: category, document: { getElementById: () => null },
+    vehicleListingFields: null, vehicleListingMore: null,
+    vehicleMarketPanel: { hidden: false }, vehicleAdvancedFields: { hidden: false },
+    listingAdvancedCommonFields: { hidden: false },
+    propertyListingFields: null, syncPropertyListingFields: noop,
+    genericListingLocationBlock: null, propertyListingLocationAccordion: null,
+    propertyListingLocationToggle: null, propertyListingLocationFields: null,
+    propertyListingLocationSummaryText: null, setPropertyAdvancedFields: noop,
+    listingTitleField: null, loadVehicleListingMakes: noop
+  });
+  vm.runInContext(section("function syncVehicleListingFields()", "\npropertyTypeSelect?.addEventListener"), context);
+  context.syncVehicleListingFields();
+  assert.equal(context.vehicleMarketPanel.hidden, false);
+  assert.equal(context.vehicleAdvancedFields.hidden, false);
+  assert.equal(context.listingAdvancedCommonFields.hidden, false);
+  category.value = "Недвижимость";
+  context.syncVehicleListingFields();
+  assert.equal(context.vehicleMarketPanel.hidden, true);
+  assert.equal(context.vehicleAdvancedFields.hidden, true);
+  assert.equal(context.listingAdvancedCommonFields.hidden, false);
+  category.value = "Автомобили";
+  context.syncVehicleListingFields();
+  assert.equal(context.vehicleMarketPanel.hidden, true);
+  assert.equal(context.vehicleAdvancedFields.hidden, true);
+  assert.equal(context.listingAdvancedCommonFields.hidden, true);
+});
+
+test("Vehicle: late market estimate must not reveal vehicle fields after category change", async () => {
+  const gate = deferred();
+  const more = interactive();
+  let expanded = 0;
+  const context = vm.createContext({
+    vehicleListingMore: more, estimateVehicleMarketPrice: () => gate.promise,
+    listingCategorySelect: { value: "Автомобили" }, currentUser: { id: "owner" },
+    vehicleMarketAuthPrompt: { hidden: false },
+    setVehicleAdvancedFields: () => expanded++
+  });
+  vm.runInContext(section('vehicleListingMore?.addEventListener("click", async () => {',
+    '\ndocument.getElementById("vehicleMarketLogin")'), context);
+  const opening = more.listeners.click();
+  context.listingCategorySelect.value = "Недвижимость";
+  gate.resolve();
+  await opening;
+  assert.equal(expanded, 0);
 });

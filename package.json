@@ -1,0 +1,9 @@
+{
+  "name": "hryvnia-hub",
+  "private": true,
+  "scripts": {
+    "security:audit": "node security/cli.cjs audit",
+    "security:test": "node --test security/tests/*.test.cjs",
+    "security:report": "node security/cli.cjs report"
+  }
+}

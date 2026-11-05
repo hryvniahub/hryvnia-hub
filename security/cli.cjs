@@ -31,15 +31,19 @@ function run({
   const findings = [];
   const scannedFiles = [];
   const coverage = {};
+  const reviewedSinks = [];
+  const areaStatus = (items, fallback = "PASS") => items.some(item =>
+    item.status !== "not-run" && ["CRITICAL", "HIGH"].includes(item.severity)) ? "FAIL" : fallback;
 
   if (mode === "repository" || mode === "full") {
     const repository = scanRepository({ root, runNpmAudit });
     findings.push(...repository.findings);
     scannedFiles.push(...repository.scannedFiles);
-    coverage.repository = "PASS";
-    coverage.authentication = "PASS";
+    reviewedSinks.push(...repository.reviewedSinks);
+    coverage.repository = areaStatus(repository.findings.filter(item => item.category === "Repository Security"));
+    coverage.authentication = areaStatus(repository.findings.filter(item => item.category === "Authentication"));
     const dependencyNotRun = repository.findings.some(finding => finding.category === "Dependencies" && finding.status === "not-run");
-    coverage.dependencies = dependencyNotRun ? "NOT_RUN" : "PASS";
+    coverage.dependencies = areaStatus(repository.findings.filter(item => item.category === "Dependencies"), dependencyNotRun ? "NOT_RUN" : "PASS");
   }
 
   if (mode === "supabase" || mode === "full") {
@@ -52,7 +56,7 @@ function run({
       category: finding.category || (finding.object?.startsWith("storage.") || finding.object?.startsWith("storage/") ? "Storage Security" : "SQL/RLS")
     })));
     scannedFiles.push(...sqlSources.map(item => item.source));
-    coverage.staticSql = files.length ? "PASS" : "NOT_RUN";
+    coverage.staticSql = areaStatus(findings.filter(item => ["SQL/RLS", "Storage Security"].includes(item.category)), files.length ? "PASS" : "NOT_RUN");
     if (!files.length) {
       findings.push({
         id: "SCAN-001",
@@ -72,7 +76,8 @@ function run({
       : { status: "NOT_RUN", findings: [], reason: "Live database inspection was not requested." };
     findings.push(...database.findings);
     coverage.database = database.status;
-    coverage.storage = database.status === "PASS" ? "PASS" : files.length ? "PASS" : "NOT_RUN";
+    coverage.storage = areaStatus(findings.filter(item => item.category === "Storage Security"),
+      database.status === "PASS" ? "PASS" : files.length ? "PASS" : "NOT_RUN");
     coverage.reason = database.reason;
   }
 
@@ -80,7 +85,8 @@ function run({
     findings,
     scannedFiles: [...new Set(scannedFiles)].sort(),
     sourceAvailable: scannedFiles.length > 0,
-    coverage
+    coverage,
+    reviewedSinks
   });
   const written = writeReport(report, reportDir);
   return { report, written };
@@ -88,8 +94,10 @@ function run({
 
 function main(argv) {
   const command = argv[0] || "audit";
-  if (!["repository", "supabase", "audit", "report"].includes(command)) {
-    console.error("Usage: node security/cli.cjs [repository|supabase|audit|report] [--sql-dir=PATH] [--live-supabase]");
+  if (!["repository", "supabase", "audit", "report"].includes(command)
+    || argv.slice(1).some(argument => !["--live-supabase", "--require-complete"].includes(argument) && !/^--sql-dir=.+/.test(argument))
+    || (command === "repository" && argv.includes("--live-supabase"))) {
+    console.error("Usage: node security/cli.cjs [repository|supabase|audit|report] [--sql-dir=PATH] [--live-supabase] [--require-complete]");
     process.exitCode = 2;
     return;
   }
@@ -103,9 +111,8 @@ function main(argv) {
   console.log(`Files: ${report.scannedFiles.length}; findings: ${report.findings.length}`);
   console.log(`Reports: ${path.relative(process.cwd(), written.markdownPath)}, ${path.relative(process.cwd(), written.jsonPath)}`);
   console.log(report.coverage.reason);
-  if (command !== "report" && report.result === "FAIL") {
-    process.exitCode = 1;
-  }
+  if (report.result === "FAIL") process.exitCode = 1;
+  else if (argv.includes("--require-complete") && report.result === "NOT_RUN") process.exitCode = 2;
 }
 
 if (require.main === module) main(process.argv.slice(2));

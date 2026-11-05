@@ -183,6 +183,8 @@ function isPublicRole(roles) {
 
 function ownerRestricted(expression, relation) {
   if (!expression) return false;
+  // Seeing an ownership comparison anywhere is insufficient when OR can bypass it.
+  if (/\bOR\b/i.test(expression)) return false;
   if (relation === "storage.objects") {
     return /auth\.uid\s*\(\s*\)/i.test(expression)
       && (/\bowner\b/i.test(expression) || /storage\.foldername\s*\(/i.test(expression) || /\bname\b/i.test(expression));
@@ -269,10 +271,16 @@ function analyzeSqlFiles(sources) {
     const relation = normalizeRelation(match[1], match[2]);
     tables.set(relation, { relation, offset: match.index, rls: false });
   }
-  const rlsPattern = /\bALTER\s+TABLE\s+(?:ONLY\s+)?(?:(?:"?([\w$]+)"?)\s*\.\s*)?"?([\w$]+)"?[^;]*?\bENABLE\s+ROW\s+LEVEL\s+SECURITY\b/gi;
+  const rlsPattern = /\bALTER\s+TABLE\s+(?:ONLY\s+)?(?:(?:"?([\w$]+)"?)\s*\.\s*)?"?([\w$]+)"?[^;]*?\b(ENABLE|DISABLE)\s+ROW\s+LEVEL\s+SECURITY\b/gi;
   for (const match of scanSql.matchAll(rlsPattern)) {
     const relation = normalizeRelation(match[1], match[2]);
-    if (tables.has(relation)) tables.get(relation).rls = true;
+    if (tables.has(relation)) tables.get(relation).rls = match[3].toUpperCase() === "ENABLE";
+    if (match[3].toUpperCase() === "DISABLE") addFinding(
+      "RLS-004", "HIGH", relation, `Row-level security is explicitly disabled on ${relation}.`,
+      { offset: match.index, text: match[0] },
+      "Disabling RLS removes policy enforcement for API roles with table privileges.",
+      "Keep RLS enabled on exposed relations and verify effective grants and policy coverage."
+    );
   }
 
   const policyPattern = /\bCREATE\s+POLICY\b[\s\S]*?;/gi;
@@ -286,8 +294,19 @@ function analyzeSqlFiles(sources) {
     const roles = policyRoles(header[4]);
     const mode = /\bAS\s+RESTRICTIVE\b/i.test(header[4]) ? "RESTRICTIVE" : "PERMISSIVE";
     const expressions = policyExpressions(statement);
+    // PostgreSQL uses USING as WITH CHECK when the latter is omitted.
+    if (["UPDATE", "ALL"].includes(operation) && expressions.with_check === undefined) expressions.with_check = expressions.using;
     const policy = { name, relation, operation, roles, mode, expressions, offset: match.index, text: statement };
     policies.push(policy);
+
+    if (isPublicRole(roles) && Object.values(expressions).some(expression =>
+      expression && /\bOR\s*\(*\s*true\b|\btrue\s*\)*\s*OR\b/i.test(expression))) {
+      addFinding("POLICY-005", "HIGH", relation,
+        `Policy "${name}" has a trivially true OR branch.`,
+        { offset: match.index, text: `${name} ${operation}: OR true` },
+        "An ownership comparison in another branch does not constrain an unconditional OR.",
+        "Remove the unconditional branch and verify the combined permissive/restrictive policy semantics.");
+    }
 
     for (const [clause, expression] of Object.entries(expressions)) {
       if (!isBareTrue(expression)) continue;
@@ -393,7 +412,7 @@ function analyzeSqlFiles(sources) {
         } else if (role === "AUTHENTICATED" && privileges.some(privilege => ["ALL", "ALL PRIVILEGES", "TRUNCATE"].includes(privilege))) {
           addFinding(
             "GRANT-002",
-            "MEDIUM",
+            privileges.includes("TRUNCATE") || privileges.includes("ALL") || privileges.includes("ALL PRIVILEGES") ? "HIGH" : "MEDIUM",
             object,
             `Role authenticated is granted broad privileges (${privileges.join(", ")}) on ${object}.`,
             { offset: match.index, text: match[0] },
@@ -447,8 +466,10 @@ function analyzeSqlFiles(sources) {
     const definition = scanSql.slice(match.index, end);
     if (!/\bSECURITY\s+DEFINER\b/i.test(definition)) continue;
     const relation = `${(match[1] || "public").toLowerCase()}.${match[2].toLowerCase()}`;
-    const searchPath = (/\bSET\s+search_path\s*(?:=|TO)\s*([^;\n]+)/i.exec(definition)?.[1] || "").replace(/"/g, "");
-    if (!searchPath) {
+    const originalDefinition = clean.slice(match.index, end);
+    const pathMatch = /\bSET\s+search_path\s*(?:=|TO)\s*('(?:''|[^'])*'|[\w"$]+(?:\s*,\s*[\w"$]+)*)/i.exec(originalDefinition);
+    const searchPath = pathMatch?.[1].replace(/["']/g, "");
+    if (searchPath === undefined) {
       addFinding(
         "RPC-001",
         "HIGH",

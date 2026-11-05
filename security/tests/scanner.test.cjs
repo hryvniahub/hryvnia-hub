@@ -187,31 +187,153 @@ test("live scan is NOT_RUN without a read-only database URL and never prints cre
   assert.equal(scanLiveDatabase({ env: { SUPABASE_READONLY_DATABASE_URL: "https://service_role:secret@example.test" } }).status, "NOT_RUN");
   assert.match(READ_ONLY_QUERY, /^BEGIN READ ONLY;/);
   assert.match(READ_ONLY_QUERY, /pg_policies/);
-  assert.doesNotMatch(READ_ONLY_QUERY, /\b(?:INSERT|UPDATE|DELETE|TRUNCATE|ALTER|DROP)\b/i);
-  assert.doesNotMatch(READ_ONLY_QUERY, /SELECT\s+\*\s+FROM\s+public\./i);
+  function assertReadOnlySql(query) {
+    const metaCommands = [];
+    const sql = stripComments(query).replace(/^[ \t]*\\[^\r\n]*/gm, command => {
+      metaCommands.push(command.trim());
+      return command.trim() === "\\gset" ? ";" : "";
+    });
+    assert.deepEqual(metaCommands, ["\\gset", "\\if :audit_safe", "\\else",
+      "\\echo AUDIT_IDENTITY_REJECTED", "\\endif"]);
+    // Consume entire tokens so quoted privilege names and semicolons are not SQL commands.
+    const token = /\s+|'(?:''|\\.|[^'\\])*'|"(?:[^"]|"")*"|(\$[A-Za-z_0-9]*\$)[\s\S]*?\1|[A-Za-z_][A-Za-z_0-9$]*|[0-9]+|[^'"\s$]/gy;
+    const statements = [[]];
+    let offset = 0;
+    while (offset < sql.length) {
+      token.lastIndex = offset;
+      const match = token.exec(sql);
+      assert.ok(match, `Unrecognized SQL token at offset ${offset}`);
+      offset = token.lastIndex;
+      const value = match[0];
+      if (/^\s/.test(value)) continue;
+      if (value === ";") statements.push([]);
+      else statements.at(-1).push(/^['"$]/.test(value) ? "[QUOTED]" : value.toUpperCase());
+    }
+    const nonempty = statements.filter(statement => statement.length);
+    assert.deepEqual(nonempty[0], ["BEGIN", "READ", "ONLY"]);
+    assert.deepEqual(nonempty.at(-1), ["ROLLBACK"]);
+    for (const statement of nonempty.slice(1, -1)) {
+      if (statement[0] === "SET") {
+        assert.deepEqual(statement.slice(0, 2), ["SET", "LOCAL"]);
+        assert.ok(["STATEMENT_TIMEOUT", "LOCK_TIMEOUT", "IDLE_IN_TRANSACTION_SESSION_TIMEOUT",
+          "SEARCH_PATH"].includes(statement[2]));
+        assert.equal(statement[3], "=");
+        assert.equal(statement.length, 5);
+        assert.equal(statement[4], statement[2] === "SEARCH_PATH" ? "PG_CATALOG" : "[QUOTED]");
+      } else {
+        assert.equal(statement[0], "SELECT");
+        assert.ok(!statement.some(word => [
+          "INSERT", "UPDATE", "DELETE", "TRUNCATE", "ALTER", "DROP", "CREATE", "MERGE",
+          "COPY", "CALL", "DO", "GRANT", "REVOKE", "INTO", "COMMIT", "EXECUTE"
+        ].includes(word)), "Catalog SELECT must not contain executable mutation or SELECT INTO");
+        assert.ok(!statement.some((word, index) => ["FROM", "JOIN"].includes(word)
+          && ["PUBLIC", "STORAGE"].includes(statement[index + 1])
+          && statement[index + 2] === "."), "Read only catalogs, not application or bucket rows");
+      }
+    }
+  }
+  assertReadOnlySql(READ_ONLY_QUERY);
+  for (const mutation of [
+    "INSERT INTO public.messages DEFAULT VALUES;",
+    "UPDATE public.messages SET body = 'changed';",
+    "DELETE FROM public.messages;",
+    "TRUNCATE public.messages;",
+    "ALTER TABLE public.messages DISABLE ROW LEVEL SECURITY;",
+    "DROP TABLE public.messages;",
+    "WITH changed AS (DELETE FROM public.messages RETURNING *) SELECT * FROM changed;",
+    "SELECT 1 INTO public.audit_copy;",
+    "COPY public.messages TO STDOUT;",
+    "CALL public.mutate();",
+    "DO $$ BEGIN DELETE FROM public.messages; END $$;",
+    "SELECT * FROM storage.buckets;"
+  ]) {
+    assert.throws(() => assertReadOnlySql(READ_ONLY_QUERY.replace("ROLLBACK;", `${mutation}\nROLLBACK;`)),
+      assert.AssertionError, mutation);
+  }
+  assert.throws(() => assertReadOnlySql(READ_ONLY_QUERY.replace("BEGIN READ ONLY;", "BEGIN READ WRITE;")),
+    assert.AssertionError);
+  assert.throws(() => assertReadOnlySql(READ_ONLY_QUERY.replace("\\gset", "\\! echo forbidden")),
+    assert.AssertionError);
 });
 
 test("live catalog findings distinguish observed policy problems and reject service_role", () => {
-  const findings = inspectSnapshot({
-    identity: { name: "postgres", superuser: false, bypassRls: false },
-    tables: [{ name: "public.messages", rls: true }, { name: "storage.objects", rls: true }],
+  const tables = ["public.listings", "public.messages", "public.conversations", "public.favorites", "storage.objects"]
+    .map((name, index) => ({ name, oid: index + 1, rls: true, forceRls: false, owner: "schema_owner" }));
+  const roles = ["anon", "authenticated"].map(name => ({ name, superuser: false, bypassRls: false }));
+  const snapshot = {
+    version: 1,
+    identity: {
+      name: "catalog_audit", sessionUser: "catalog_audit", auditSafe: true,
+      superuser: false, bypassRls: false, createRole: false, createDb: false, replication: false
+    },
+    roles, memberships: [], tables,
     policies: [{
       name: "open_messages", table: "public.messages", command: "SELECT",
-      roles: ["authenticated"], permissive: "PERMISSIVE", unconditional: true
+      roles: ["authenticated"], permissive: "PERMISSIVE", unconditional: true,
+      usingPresent: true, checkPresent: false, ownerUsing: false, ownerCheck: false
+    }, {
+      name: "unverified_owner", table: "storage.objects", command: "UPDATE",
+      roles: ["authenticated"], permissive: "PERMISSIVE", unconditional: false,
+      usingPresent: true, checkPresent: true, ownerUsing: false, ownerCheck: false
     }],
-    functions: [{ name: "public.definer_fn", definer: true, searchPath: "" }],
-    grants: [{ grantee: "anon", table: "public.messages", privilege: "DELETE" }],
-    buckets: [{ name: "listing-photos", public: true }]
-  });
-  assert.ok(findings.some(item => item.id === "LIVE-POLICY-003" && item.status === "confirmed"));
-  assert.ok(findings.some(item => item.id === "LIVE-RPC-001"));
-  assert.ok(findings.some(item => item.id === "LIVE-GRANT-001"));
-  assert.ok(findings.some(item => item.id === "LIVE-STORAGE-001"));
+    functions: [{ name: "public.definer_fn()", oid: 100, definer: true, owner: "schema_owner", config: [] }],
+    functionGrants: [],
+    grants: [{ grantee: "anon", table: "public.messages", privilege: "TRUNCATE" }],
+    effectiveTablePrivileges: roles.flatMap(role => tables.flatMap(table =>
+      ["SELECT", "INSERT", "UPDATE", "DELETE", "TRUNCATE", "REFERENCES", "TRIGGER"].map(privilege => ({
+        role: role.name, table: table.name, privilege,
+        allowed: role.name === "anon" && table.name === "public.messages" && privilege === "TRUNCATE",
+        columnAllowed: false, owner: false
+      })))),
+    effectiveFunctionPrivileges: roles.map(role => ({ role: role.name, name: "public.definer_fn()", allowed: false })),
+    effectiveSchemaPrivileges: roles.flatMap(role => ["public", "storage"].map(schema => ({
+      role: role.name, schema, usage: true, create: false
+    })))
+  };
+  const findings = inspectSnapshot(snapshot);
+  const finding = prefix => {
+    const result = findings.find(item => item.id.startsWith(`${prefix}-`));
+    assert.ok(result, `Expected ${prefix} from a valid catalog snapshot`);
+    return result;
+  };
+  assert.equal(finding("LIVE-POLICY-003").severity, "HIGH");
+  assert.equal(finding("LIVE-POLICY-003").status, "potential");
+  assert.equal(finding("LIVE-POLICY-002").severity, "HIGH");
+  assert.equal(finding("LIVE-POLICY-002").status, "potential");
+  assert.equal(finding("LIVE-POLICY-002").category, "Storage Security");
+  assert.equal(finding("LIVE-RPC-001").severity, "HIGH");
+  assert.equal(finding("LIVE-GRANT-001").severity, "HIGH");
+  assert.equal(finding("LIVE-GRANT-001").status, "confirmed");
+  assert.equal(finding("LIVE-STORAGE-NOT-RUN").status, "not-run");
+  assert.equal(findings.some(item => item.id.startsWith("LIVE-CONNECTION-001-")), false);
 
-  const prohibited = inspectSnapshot({
-    identity: { name: "service_role" }, tables: [], policies: [], functions: [], grants: [], buckets: []
+  const rlsDisabled = structuredClone(snapshot);
+  rlsDisabled.tables.find(table => table.name === "public.messages").rls = false;
+  assert.ok(inspectSnapshot(rlsDisabled).some(item =>
+    item.id.startsWith("LIVE-RLS-001-") && item.severity === "CRITICAL" && item.status === "confirmed"));
+
+  const ownerMissingCheck = structuredClone(snapshot);
+  ownerMissingCheck.policies[1].ownerUsing = true;
+  assert.ok(inspectSnapshot(ownerMissingCheck).some(item =>
+    item.id.startsWith("LIVE-POLICY-002-") && item.severity === "HIGH"));
+  ownerMissingCheck.policies[1].ownerCheck = true;
+  assert.equal(inspectSnapshot(ownerMissingCheck).some(item => item.id.startsWith("LIVE-POLICY-002-")), false);
+
+  const prohibited = structuredClone(snapshot);
+  prohibited.identity.name = prohibited.identity.sessionUser = "service_role";
+  const rejected = inspectSnapshot(prohibited);
+  assert.equal(rejected.length, 1);
+  assert.ok(rejected[0].id.startsWith("LIVE-CONNECTION-001-"));
+  assert.equal(rejected[0].status, "not-run");
+  let commandInvoked = false;
+  const live = scanLiveDatabase({
+    env: { SUPABASE_READONLY_DATABASE_URL: "postgresql://service_role:synthetic@example.test/postgres",
+      SUPABASE_AUDIT_ENVIRONMENT: "test" },
+    commandRunner: () => { commandInvoked = true; return { status: 0, stdout: JSON.stringify(snapshot) }; }
   });
-  assert.ok(prohibited.some(item => item.id === "LIVE-CONNECTION-001"));
+  assert.equal(commandInvoked, false, "service_role must be rejected before starting psql");
+  assert.equal(live.status, "NOT_RUN");
+  assert.deepEqual(live.findings, []);
 });
 
 test("GitHub Actions retains existing checks and every npm run command is declared", () => {
@@ -277,7 +399,7 @@ test("CLI audit and report preserve exit codes and generate reports for SQL inpu
       const child = spawnSync(process.execPath, [cli, command, "--sql-dir=sql"], { cwd: root, encoding: "utf8" });
       assert.ifError(child.error);
       assert.equal(child.signal, null);
-      assert.equal(child.status, command === "audit" ? auditStatus : 0, child.stderr);
+      assert.equal(child.status, auditStatus, child.stderr);
       assert.equal(child.stderr, "");
       assert.match(child.stdout, new RegExp(`Security scan: ${result}`));
       const report = JSON.parse(fs.readFileSync(path.join(root, "security-report.json"), "utf8"));

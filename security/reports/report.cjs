@@ -18,9 +18,10 @@ function createReport({
   scannedFiles = [],
   sourceAvailable = scannedFiles.length > 0,
   coverage = {},
+  reviewedSinks = [],
   generatedAt = new Date().toISOString()
 }) {
-  const blocking = findings.some(finding =>
+  const blocking = Object.values(coverage).includes("FAIL") || findings.some(finding =>
     finding.status !== "not-run" && (finding.severity === "CRITICAL" || finding.severity === "HIGH")
   );
   const statuses = Object.values(coverage).filter(value => typeof value === "string" && ["PASS", "FAIL", "NOT_RUN"].includes(value));
@@ -53,6 +54,7 @@ function createReport({
       authentication: coverage.authentication || (sourceAvailable ? "PASS" : "NOT_RUN"),
       reason: coverage.reason || "Live database inspection is disabled unless an explicit read-only database URL is supplied."
     },
+    reviewedSinks,
     findings
   };
 }
@@ -104,6 +106,10 @@ function renderMarkdown(report) {
   if (!report.findings.length) {
     lines.push("No findings were generated. This is not evidence that deployed Supabase configuration is secure.", "");
   }
+  lines.push("## Statically verified DOM sinks", "",
+    "These are not suppressed findings: the AST established constant markup or the exact local HTML escaper in a supported context. Unknown flows remain HIGH.", "",
+    "| File | Line | Rule | Reason |", "|---|---:|---|---|",
+    ...(report.reviewedSinks || []).map(item => `| ${item.file} | ${item.line} | ${item.rule} | ${item.reason} |`), "");
   return `${lines.join("\n")}\n`;
 }
 

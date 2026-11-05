@@ -1,0 +1,67 @@
+name: Supabase Security Scanner
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 6 * * 1"
+  push:
+    paths:
+      - "supabase/**"
+      - "**/*.sql"
+      - "security/**"
+      - "package.json"
+      - ".github/workflows/security-audit.yml"
+  pull_request:
+    paths:
+      - "supabase/**"
+      - "**/*.sql"
+      - "security/**"
+      - "package.json"
+      - ".github/workflows/security-audit.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: Static Supabase security audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Check Supabase structure
+        id: structure
+        shell: bash
+        run: |
+          if [ -d supabase/migrations ] && find supabase/migrations -type f -name '*.sql' -print -quit | grep -q .; then
+            echo "SQL migration sources found."
+          else
+            echo "::warning::No Supabase SQL migrations found; database security checks will be NOT_RUN."
+          fi
+      - name: Run static security scanner tests
+        run: npm run security:test
+      - name: Generate security report
+        id: audit
+        if: always()
+        run: npm run security:audit
+      - name: Publish audit result
+        if: always() && steps.audit.outcome != 'skipped'
+        shell: bash
+        run: |
+          if [ -f security-report.md ]; then
+            cat security-report.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Upload security reports
+        if: always() && steps.audit.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-report
+          path: |
+            security-report.md
+            security-report.json
+          if-no-files-found: warn
+          retention-days: 30

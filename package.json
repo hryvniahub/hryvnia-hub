@@ -2,6 +2,10 @@
   "name": "hryvnia-hub",
   "private": true,
   "scripts": {
+    "test": "node --test tests/*.test.cjs security/tests/*.test.cjs",
+    "check:app": "node --check app.js",
+    "security:repository": "node security/cli.cjs repository",
+    "security:supabase": "node security/cli.cjs supabase",
     "security:audit": "node security/cli.cjs audit",
     "security:test": "node --test security/tests/*.test.cjs",
     "security:report": "node security/cli.cjs report"

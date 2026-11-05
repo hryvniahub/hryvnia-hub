@@ -188,7 +188,8 @@ function ownerRestricted(expression, relation) {
       && (/\bowner\b/i.test(expression) || /storage\.foldername\s*\(/i.test(expression) || /\bname\b/i.test(expression));
   }
   return /auth\.uid\s*\(\s*\)\s*(?:=|IS NOT DISTINCT FROM)\s*\(?\s*(?:[\w"]+\s*\.\s*)?["']?(?:user_id|owner_id|created_by)\b/i.test(expression)
-    || /\b(?:user_id|owner_id|created_by)\b["']?\s*(?:=|IS NOT DISTINCT FROM)\s*\(?\s*auth\.uid\s*\(\s*\)/i.test(expression);
+    || /\b(?:user_id|owner_id|created_by|sender_id|recipient_id|buyer_id|seller_id)\b["']?\s*(?:=|IS NOT DISTINCT FROM)\s*\(?\s*auth\.uid\s*\(\s*\)/i.test(expression)
+    || /auth\.uid\s*\(\s*\)\s*(?:=|IS NOT DISTINCT FROM)\s*\(?\s*(?:[\w"]+\s*\.\s*)?["']?(?:sender_id|recipient_id|buyer_id|seller_id)\b/i.test(expression);
 }
 
 function sanitizeEvidence(value) {
@@ -238,6 +239,7 @@ function analyzeSqlFiles(sources) {
     const idHash = createHash("sha1").update(`${rule}:${location.source}:${location.line}:${object}`).digest("hex").slice(0, 8);
     findings.push({
       id: `${rule}-${idHash}`,
+      category: object.startsWith("storage.") || object.startsWith("storage/") ? "Storage Security" : "SQL/RLS",
       severity,
       object,
       description,
@@ -303,21 +305,40 @@ function analyzeSqlFiles(sources) {
     }
 
     if (WRITES.has(operation) && HIGH_RISK_TABLES.has(relation) && isPublicRole(roles)) {
-      const ownerCondition = operation === "INSERT"
-        ? expressions.with_check
-        : [expressions.using, expressions.with_check].filter(Boolean).join(" ");
-      if (!ownerRestricted(ownerCondition, relation)) {
-        const missingCheck = operation === "UPDATE" && !expressions.with_check;
+      const ownerUsing = ownerRestricted(expressions.using, relation);
+      const ownerCheck = ownerRestricted(expressions.with_check, relation);
+      const ownerRestrictedForOperation = operation === "INSERT"
+        ? ownerCheck
+        : operation === "DELETE"
+          ? ownerUsing
+          : ownerUsing && ownerCheck;
+      if (!ownerRestrictedForOperation) {
+        const missingCheck = ["UPDATE", "ALL"].includes(operation) && !ownerCheck;
+        const ownerCondition = [expressions.using, expressions.with_check].filter(Boolean).join(" ")
+          || "(no owner predicate found)";
         addFinding(
           "POLICY-002",
           missingCheck ? "HIGH" : "MEDIUM",
           relation,
-          `Policy "${name}" permits ${operation} without a statically identifiable owner restriction.`,
-          { offset: match.index, text: `${name} ${operation} TO ${roles.join(",")} ${ownerCondition || "(no owner predicate found)"}` },
+          `Policy "${name}" permits ${operation} without the required statically identifiable owner restriction.`,
+          { offset: match.index, text: `${name} ${operation} TO ${roles.join(",")} ${ownerCondition}` },
           "Users may be able to modify rows that are not theirs, or change ownership fields. This is a static risk signal, not proof of exploitability.",
           "Verify ownership predicates in USING and WITH CHECK (for example auth.uid() against the immutable owner column), including all permissive policies."
         );
       }
+    }
+
+    if (operation === "SELECT" && ["public.messages", "public.conversations", "public.conversation_reads", "public.favorites"].includes(relation)
+      && isPublicRole(roles) && isBareTrue(expressions.using)) {
+      addFinding(
+        "POLICY-004",
+        "HIGH",
+        relation,
+        `Policy "${name}" permits unconditional SELECT access to private user data.`,
+        { offset: match.index, text: `${name} SELECT TO ${roles.join(",")} USING (${expressions.using})` },
+        "Users may be able to read messages, conversations, read states, or favorites belonging to other users.",
+        "Restrict the SELECT predicate to the owning user or authorized conversation participants."
+      );
     }
   }
 
@@ -354,7 +375,7 @@ function analyzeSqlFiles(sources) {
     for (const role of roles) {
       for (const object of objects) {
         const schemaName = object.match(/^([\w$]+)\./)?.[1]?.toLowerCase();
-        const dangerous = privileges.some(privilege => ["ALL", "ALL PRIVILEGES", "TRUNCATE", "DELETE", "UPDATE", "INSERT"].includes(privilege));
+        const dangerous = privileges.some(privilege => ["ALL", "ALL PRIVILEGES", "TRUNCATE", "DELETE", "UPDATE", "INSERT", "SELECT"].includes(privilege));
         const functionExecute = match[2]?.toUpperCase() === "FUNCTION" && privileges.includes("EXECUTE");
         if (match[2]?.toUpperCase() === "FUNCTION" && privileges.includes("EXECUTE")) {
           functionGrants.push({ relation: object.replace(/\s*\([^)]*\)\s*$/, "").replace(/"/g, "").toLowerCase(), role });
@@ -402,7 +423,7 @@ function analyzeSqlFiles(sources) {
     const roles = match[4].split(",").map(value => value.trim().replace(/"/g, "").toUpperCase());
     for (const role of roles) {
       const functionExecute = objectType === "FUNCTIONS" && privileges.includes("EXECUTE");
-      const dangerous = privileges.some(privilege => ["ALL", "ALL PRIVILEGES", "TRUNCATE", "DELETE", "UPDATE", "INSERT"].includes(privilege));
+      const dangerous = privileges.some(privilege => ["ALL", "ALL PRIVILEGES", "TRUNCATE", "DELETE", "UPDATE", "INSERT", "SELECT"].includes(privilege));
       if ((role === "ANON" || role === "PUBLIC") && (dangerous || functionExecute || ["auth", "storage", "extensions", "vault"].includes(schema.toLowerCase()))) {
         addFinding(
           "GRANT-004",

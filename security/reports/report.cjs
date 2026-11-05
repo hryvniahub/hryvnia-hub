@@ -4,30 +4,54 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const CATEGORIES = ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"];
+const SECTIONS = [
+  "Repository Security",
+  "Supabase Database Security",
+  "Storage Security",
+  "Dependencies",
+  "Authentication",
+  "SQL/RLS"
+];
 
-function createReport({ findings, scannedFiles, sourceAvailable, generatedAt = new Date().toISOString() }) {
-  const blocking = findings.some(finding => finding.severity === "CRITICAL" || finding.severity === "HIGH");
-  const result = blocking ? "FAIL" : sourceAvailable ? "PASS" : "INCOMPLETE";
+function createReport({
+  findings,
+  scannedFiles = [],
+  sourceAvailable = scannedFiles.length > 0,
+  coverage = {},
+  generatedAt = new Date().toISOString()
+}) {
+  const blocking = findings.some(finding =>
+    finding.status !== "not-run" && (finding.severity === "CRITICAL" || finding.severity === "HIGH")
+  );
+  const statuses = Object.values(coverage).filter(value => typeof value === "string" && ["PASS", "FAIL", "NOT_RUN"].includes(value));
+  const ran = statuses.some(value => value === "PASS" || value === "FAIL") || sourceAvailable;
+  const result = blocking ? "FAIL" : ran && statuses.includes("NOT_RUN") ? "NOT_RUN" : ran ? "PASS" : "NOT_RUN";
+  findings.sort((left, right) =>
+    CATEGORIES.indexOf(left.severity) - CATEGORIES.indexOf(right.severity) || left.id.localeCompare(right.id)
+  );
   const counts = Object.fromEntries(CATEGORIES.map(category => [
     category,
     findings.filter(finding => finding.severity === category).length
   ]));
+  const categoryCounts = Object.fromEntries(SECTIONS.map(section => [
+    section,
+    findings.filter(finding => finding.category === section).length
+  ]));
   return {
     generatedAt,
     result,
-    assessment: "Static repository analysis only; PASS does not establish that Supabase is secure.",
+    assessment: "Static findings are potential risks, not confirmed vulnerabilities. Live database findings are based on read-only catalog metadata; PASS is not a guarantee of security.",
     scannedFiles,
     counts,
+    categoryCounts,
     coverage: {
-      staticSql: sourceAvailable ? "PARTIAL" : "NOT_RUN",
-      rls: sourceAvailable ? "STATIC_ONLY" : "NOT_RUN",
-      grants: sourceAvailable ? "STATIC_ONLY" : "NOT_RUN",
-      rpc: sourceAvailable ? "STATIC_ONLY" : "NOT_RUN",
-      storage: sourceAvailable ? "STATIC_ONLY" : "NOT_RUN",
-      databaseScenarios: "NOT_RUN",
-      reason: sourceAvailable
-        ? "No database connection was made. Runtime roles, effective privileges, deployed policies, and live Storage configuration were not checked."
-        : "No SQL migration files were found in the configured source directory; database and schema checks were not run."
+      repository: coverage.repository || (sourceAvailable ? "PASS" : "NOT_RUN"),
+      dependencies: coverage.dependencies || "NOT_RUN",
+      staticSql: coverage.staticSql || "NOT_RUN",
+      database: coverage.database || "NOT_RUN",
+      storage: coverage.storage || "NOT_RUN",
+      authentication: coverage.authentication || (sourceAvailable ? "PASS" : "NOT_RUN"),
+      reason: coverage.reason || "Live database inspection is disabled unless an explicit read-only database URL is supplied."
     },
     findings
   };
@@ -40,7 +64,7 @@ function renderMarkdown(report) {
     `- **Result:** ${report.result}`,
     `- **Generated:** ${report.generatedAt}`,
     `- **Assessment:** ${report.assessment}`,
-    `- **SQL files scanned:** ${report.scannedFiles.length}`,
+    `- **Files scanned:** ${report.scannedFiles.length}`,
     "",
     "## Coverage",
     "",
@@ -56,22 +80,29 @@ function renderMarkdown(report) {
     ""
   ];
 
-  if (!report.findings.length) {
-    lines.push("No static findings were generated. This is not evidence that deployed Supabase configuration is secure.", "");
-  } else {
-    for (const finding of report.findings) {
+  for (const section of SECTIONS) {
+    const findings = report.findings.filter(finding => finding.category === section);
+    lines.push(`## ${section}`, "");
+    if (!findings.length) {
+      lines.push("No findings were generated for this section.", "");
+      continue;
+    }
+    for (const finding of findings) {
       lines.push(
         `### ${finding.id} — ${finding.severity}`,
         "",
-        `- **Database object:** ${finding.object}`,
-        `- **Status:** ${finding.status}`,
+        `- **Status:** ${finding.status === "confirmed" ? "CONFIRMED" : finding.status === "not-run" ? "NOT_RUN" : "POTENTIAL"}`,
+        `- **Object:** ${finding.object}`,
         `- **Description:** ${finding.description}`,
         `- **Evidence:** ${finding.evidence}`,
-        `- **Potential risk:** ${finding.risk}`,
+        `- **Risk:** ${finding.risk}`,
         `- **Recommendation:** ${finding.recommendation}`,
         ""
       );
     }
+  }
+  if (!report.findings.length) {
+    lines.push("No findings were generated. This is not evidence that deployed Supabase configuration is secure.", "");
   }
   return `${lines.join("\n")}\n`;
 }
@@ -84,4 +115,4 @@ function writeReport(report, directory) {
   return { markdownPath, jsonPath };
 }
 
-module.exports = { createReport, renderMarkdown, writeReport };
+module.exports = { CATEGORIES, SECTIONS, createReport, renderMarkdown, writeReport };

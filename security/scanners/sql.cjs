@@ -46,20 +46,6 @@ function stripComments(sql) {
       continue;
     }
 
-    const bypassPattern = /\b(?:CREATE|ALTER)\s+ROLE\s+("?[\w$]+"?)[^;]*\bBYPASSRLS\b[^;]*;/gi;
-    for (const match of scanSql.matchAll(bypassPattern)) {
-      const role = match[1].replace(/"/g, "");
-      addFinding(
-        "RLS-003",
-        ["anon", "authenticated"].includes(role.toLowerCase()) ? "CRITICAL" : "HIGH",
-        `role ${role}`,
-        `Role ${role} is configured with BYPASSRLS.`,
-        { offset: match.index, text: match[0] },
-        "The role can bypass row-level security policies, defeating row-isolation controls.",
-        "Remove BYPASSRLS from application roles; reserve this attribute for tightly controlled administrative roles."
-      );
-    }
-
     const dollarMatch = sql.slice(index).match(/^\$[A-Za-z_0-9]*\$/);
     if (dollarMatch) {
       dollarTag = dollarMatch[0];
@@ -261,6 +247,20 @@ function analyzeSqlFiles(sources) {
       status
     });
   };
+
+  const bypassPattern = /\b(?:CREATE|ALTER)\s+ROLE\s+("?[\w$]+"?)[^;]*\bBYPASSRLS\b[^;]*;/gi;
+  for (const match of scanSql.matchAll(bypassPattern)) {
+    const role = match[1].replace(/"/g, "");
+    addFinding(
+      "RLS-003",
+      ["anon", "authenticated"].includes(role.toLowerCase()) ? "CRITICAL" : "HIGH",
+      `role ${role}`,
+      `Role ${role} is configured with BYPASSRLS.`,
+      { offset: match.index, text: match[0] },
+      "The role can bypass row-level security policies, defeating row-isolation controls.",
+      "Remove BYPASSRLS from application roles; reserve this attribute for tightly controlled administrative roles."
+    );
+  }
 
   const tablePattern = /\bCREATE\s+(?:UNLOGGED\s+)?TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?(?:(?:"?([\w$]+)"?)\s*\.\s*)?"?([\w$]+)"?/gi;
   for (const match of scanSql.matchAll(tablePattern)) {

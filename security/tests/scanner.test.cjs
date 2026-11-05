@@ -31,6 +31,12 @@ test("flags anon grants of destructive privileges", () => {
   assert.equal(findings[0].object, "public.listings");
 });
 
+test("flags application roles configured to bypass row-level security", () => {
+  const { findings } = analyzeSql("CREATE ROLE anon BYPASSRLS;");
+  assert.equal(findings[0].id.startsWith("RLS-003"), true);
+  assert.equal(findings[0].severity, "CRITICAL");
+});
+
 test("detects definer functions without a fixed search_path", () => {
   const sql = `
     CREATE OR REPLACE FUNCTION public.read_secret()

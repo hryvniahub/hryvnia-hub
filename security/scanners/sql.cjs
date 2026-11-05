@@ -273,6 +273,20 @@ function analyzeSqlFiles(sources) {
     if (tables.has(relation)) tables.get(relation).rls = true;
   }
 
+  const bypassPattern = /\b(?:CREATE|ALTER)\s+ROLE\s+("?[\w$]+"?)[^;]*\bBYPASSRLS\b[^;]*;/gi;
+  for (const match of scanSql.matchAll(bypassPattern)) {
+    const role = match[1].replace(/"/g, "");
+    addFinding(
+      "RLS-003",
+      ["anon", "authenticated"].includes(role.toLowerCase()) ? "CRITICAL" : "HIGH",
+      `role ${role}`,
+      `Role ${role} is configured with BYPASSRLS.`,
+      { offset: match.index, text: match[0] },
+      "The role can bypass row-level security policies, defeating row-isolation controls.",
+      "Remove BYPASSRLS from application roles; reserve this attribute for tightly controlled administrative roles."
+    );
+  }
+
   const policyPattern = /\bCREATE\s+POLICY\b[\s\S]*?;/gi;
   for (const match of scanSql.matchAll(policyPattern)) {
     const statement = match[0];

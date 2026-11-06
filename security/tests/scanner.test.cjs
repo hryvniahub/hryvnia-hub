@@ -6,7 +6,7 @@ const os = require("node:os");
 const path = require("node:path");
 const { spawnSync } = require("node:child_process");
 const { test } = require("node:test");
-const { analyzeSql, analyzeSqlFiles, stripComments } = require("../scanners/sql.cjs");
+const { analyzeSql, analyzeSqlFiles, sanitizeEvidence, stripComments } = require("../scanners/sql.cjs");
 const { collectSqlFiles, run } = require("../cli.cjs");
 const { createReport, renderMarkdown } = require("../reports/report.cjs");
 
@@ -134,6 +134,62 @@ test("report differentiates incomplete coverage from a static pass", () => {
   assert.equal(report.result, "INCOMPLETE");
   assert.equal(report.coverage.databaseScenarios, "NOT_RUN");
   assert.match(renderMarkdown(report), /not evidence that deployed Supabase configuration is secure/i);
+});
+
+test("report escapes Markdown, table delimiters, backslashes, newlines, and HTML in input values", () => {
+  const punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
+  const report = createReport({
+    findings: [{
+      id: "finding|id\n### injected",
+      severity: "HIGH",
+      object: "table|name\\",
+      status: "potential",
+      description: `[link](javascript:alert(1)) <script>alert(1)</script> ${punctuation}`,
+      evidence: "first line\r\n| second line",
+      risk: "*bold* _italic_ `code`",
+      recommendation: "# heading\n- list item"
+    }],
+    scannedFiles: [],
+    sourceAvailable: true,
+    generatedAt: "date|\\\n# injected"
+  });
+  report.coverage.reason = "first|second\\third\r\n|<script>";
+
+  const markdown = renderMarkdown(report);
+  assert.ok(markdown.includes("| reason | first\\|second\\\\third<br>\\|\\<script\\> |"));
+  assert.match(markdown, /### finding\\\|id<br>\\#\\#\\# injected — HIGH/);
+  assert.ok(markdown.includes("- **Generated:** date\\|\\\\<br>\\# injected"));
+  assert.match(markdown, /table\\\|name\\\\/);
+  assert.ok(markdown.includes("\\[link\\]\\(javascript\\:alert\\(1\\)\\)"));
+  assert.match(markdown, /first line<br>\\\| second line/);
+  assert.ok(markdown.includes("\\<script\\>alert\\(1\\)\\<\\/script\\>"));
+  assert.ok(markdown.includes(punctuation.split("").map(character => `\\${character}`).join("")));
+  assert.equal((markdown.match(/^### /gm) || []).length, 1);
+  assert.doesNotMatch(markdown, /<script>/);
+  assert.doesNotMatch(markdown, /&lt;|&gt;/);
+});
+
+test("evidence sanitizer redacts ordinary SQL string and dollar-quoted literals", () => {
+  assert.equal(
+    sanitizeEvidence(`SELECT 'secret''value', "quoted""identifier", $tag$private text$tag$;`),
+    `SELECT '[REDACTED]', "[REDACTED]", $$[REDACTED]$$;`
+  );
+});
+
+test("evidence sanitizer handles long adversarial quote sequences without regex backtracking", () => {
+  for (const adversarial of [
+    `'${"''".repeat(40_000)}x`,
+    `"${'""'.repeat(40_000)}x`,
+    `'${"\\&".repeat(40_000)}x'`
+  ]) {
+    const sanitized = sanitizeEvidence(adversarial);
+    if (adversarial.endsWith("'")) {
+      assert.equal(sanitized, "'[REDACTED]'");
+    } else {
+      assert.equal(sanitized.length, 240);
+      assert.equal(sanitized[0], adversarial[0]);
+    }
+  }
 });
 
 test("CLI run scans nested SQL sources and writes matching reports", t => {

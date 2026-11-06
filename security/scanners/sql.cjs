@@ -192,10 +192,77 @@ function ownerRestricted(expression, relation) {
 }
 
 function sanitizeEvidence(value) {
-  return value
-    .replace(/\$[A-Za-z_0-9]*\$[\s\S]*?\$[A-Za-z_0-9]*\$/g, "$$[REDACTED]$$")
-    .replace(/'(?:''|\\.|[^'])*'/g, "'[REDACTED]'")
-    .replace(/"(?:[^"]|"")*"/g, '"[REDACTED]"')
+  const parts = [];
+  let copyFrom = 0;
+  let index = 0;
+  const isDollarTagCharacter = character => character !== undefined
+    && ((character >= "A" && character <= "Z")
+      || (character >= "a" && character <= "z")
+      || (character >= "0" && character <= "9")
+      || character === "_");
+
+  while (index < value.length) {
+    const character = value[index];
+    if (character === "'" || character === '"') {
+      let end = index + 1;
+      while (end < value.length) {
+        if (value[end] === character) {
+          if (value[end + 1] === character) {
+            end += 2;
+            continue;
+          }
+          break;
+        }
+        if (character === "'" && value[end] === "\\" && end + 1 < value.length && value[end + 1] !== "\n") {
+          end += 2;
+        } else {
+          end++;
+        }
+      }
+      if (end === value.length) {
+        index = value.length;
+        break;
+      }
+      parts.push(value.slice(copyFrom, index), character === "'" ? "'[REDACTED]'" : '"[REDACTED]"');
+      index = end + 1;
+      copyFrom = index;
+      continue;
+    }
+
+    if (character === "$") {
+      let delimiterEnd = index + 1;
+      while (isDollarTagCharacter(value[delimiterEnd])) delimiterEnd++;
+      if (value[delimiterEnd] === "$") {
+        let end = delimiterEnd + 1;
+        let closingEnd = -1;
+        while (end < value.length) {
+          if (value[end] === "$") {
+            let candidateEnd = end + 1;
+            while (isDollarTagCharacter(value[candidateEnd])) candidateEnd++;
+            if (value[candidateEnd] === "$") {
+              closingEnd = candidateEnd + 1;
+              break;
+            }
+            end = candidateEnd;
+          } else {
+            end++;
+          }
+        }
+        if (closingEnd >= 0) {
+          parts.push(value.slice(copyFrom, index), "$$[REDACTED]$$");
+          index = closingEnd;
+          copyFrom = index;
+          continue;
+        }
+        index = value.length;
+        break;
+      }
+    }
+    index++;
+  }
+
+  parts.push(value.slice(copyFrom));
+  return parts.join("")
     .replace(/\s+/g, " ")
     .trim()
     .slice(0, 240);
@@ -511,4 +578,4 @@ function analyzeSqlFiles(sources) {
   return { findings, tables: [...tables.keys()], policyCount: policies.length };
 }
 
-module.exports = { analyzeSql, analyzeSqlFiles, stripComments };
+module.exports = { analyzeSql, analyzeSqlFiles, sanitizeEvidence, stripComments };

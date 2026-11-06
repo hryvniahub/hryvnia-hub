@@ -5,6 +5,13 @@ const path = require("node:path");
 
 const CATEGORIES = ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"];
 
+function escapeMarkdown(value) {
+  return String(value)
+    .replace(/\r\n?|\n|\u2028|\u2029/g, "\n")
+    .replace(/[!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]/g, "\\$&")
+    .replace(/\n/g, "<br>");
+}
+
 function createReport({ findings, scannedFiles, sourceAvailable, generatedAt = new Date().toISOString() }) {
   const blocking = findings.some(finding => finding.severity === "CRITICAL" || finding.severity === "HIGH");
   const result = blocking ? "FAIL" : sourceAvailable ? "PASS" : "INCOMPLETE";
@@ -37,22 +44,22 @@ function renderMarkdown(report) {
   const lines = [
     "# Hryvnia Hub Security Report",
     "",
-    `- **Result:** ${report.result}`,
-    `- **Generated:** ${report.generatedAt}`,
-    `- **Assessment:** ${report.assessment}`,
-    `- **SQL files scanned:** ${report.scannedFiles.length}`,
+    `- **Result:** ${escapeMarkdown(report.result)}`,
+    `- **Generated:** ${escapeMarkdown(report.generatedAt)}`,
+    `- **Assessment:** ${escapeMarkdown(report.assessment)}`,
+    `- **SQL files scanned:** ${escapeMarkdown(report.scannedFiles.length)}`,
     "",
     "## Coverage",
     "",
     "| Check | Status |",
     "|---|---|",
-    ...Object.entries(report.coverage).map(([name, value]) => `| ${name} | ${String(value).replace(/\|/g, "\\|")} |`),
+    ...Object.entries(report.coverage).map(([name, value]) => `| ${escapeMarkdown(name)} | ${escapeMarkdown(value)} |`),
     "",
     "## Findings",
     "",
     "| Severity | Count |",
     "|---|---:|",
-    ...Object.entries(report.counts).map(([severity, count]) => `| ${severity} | ${count} |`),
+    ...Object.entries(report.counts).map(([severity, count]) => `| ${escapeMarkdown(severity)} | ${escapeMarkdown(count)} |`),
     ""
   ];
 
@@ -61,14 +68,14 @@ function renderMarkdown(report) {
   } else {
     for (const finding of report.findings) {
       lines.push(
-        `### ${finding.id} — ${finding.severity}`,
+        `### ${escapeMarkdown(finding.id)} — ${escapeMarkdown(finding.severity)}`,
         "",
-        `- **Database object:** ${finding.object}`,
-        `- **Status:** ${finding.status}`,
-        `- **Description:** ${finding.description}`,
-        `- **Evidence:** ${finding.evidence}`,
-        `- **Potential risk:** ${finding.risk}`,
-        `- **Recommendation:** ${finding.recommendation}`,
+        `- **Database object:** ${escapeMarkdown(finding.object)}`,
+        `- **Status:** ${escapeMarkdown(finding.status)}`,
+        `- **Description:** ${escapeMarkdown(finding.description)}`,
+        `- **Evidence:** ${escapeMarkdown(finding.evidence)}`,
+        `- **Potential risk:** ${escapeMarkdown(finding.risk)}`,
+        `- **Recommendation:** ${escapeMarkdown(finding.recommendation)}`,
         ""
       );
     }

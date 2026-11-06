@@ -45,10 +45,37 @@ function run({ root = process.cwd(), sourceDir = "supabase/migrations", reportDi
   return { report, written };
 }
 
-function main(argv) {
+async function runProduction({ config = process.env, confirmation, reportDir = process.cwd(), clientFactory } = {}) {
+  const { auditProduction } = require("./scanners/supabase-live.cjs");
+  const report = await auditProduction({ config, confirmation, clientFactory });
+  const jsonPath = path.join(reportDir, "supabase-production-report.json");
+  const markdownPath = path.join(reportDir, "supabase-production-report.md");
+  const lines = [
+    "# Sherlock Supabase Production Metadata Audit", "",
+    `**Result:** ${report.result}`, "", report.assessment, "",
+    "| Component | Coverage |", "|---|---|",
+    ...Object.entries(report.coverage).map(([name, status]) => `| ${name} | ${status} |`),
+    "", "## Errors", "",
+    ...report.errors.map(error => `- ${error.component}: ${error.reason}`), "",
+    "## Findings", "",
+    ...report.findings.map(finding => `- ${finding.id} (${finding.severity}): ${finding.description}`)
+  ];
+  fs.writeFileSync(jsonPath, `${JSON.stringify(report, null, 2)}\n`, { mode: 0o600 });
+  fs.writeFileSync(markdownPath, `${lines.join("\n")}\n`, { mode: 0o600 });
+  return { report, written: { jsonPath, markdownPath } };
+}
+
+async function main(argv) {
   const command = argv[0] || "audit";
+  if (command === "production-audit") {
+    const { report } = await runProduction({ confirmation: process.env.SHERLOCK_PRODUCTION_CONFIRMATION });
+    console.log(`Production metadata audit: ${report.result}; findings: ${report.findings.length}`);
+    for (const error of report.errors) console.error(`${error.component}: ${error.reason}`);
+    process.exitCode = report.result === "FAIL" ? 1 : report.result === "INCOMPLETE" ? 2 : 0;
+    return;
+  }
   if (!["audit", "report"].includes(command)) {
-    console.error("Usage: node security/cli.cjs [audit|report] [--sql-dir=PATH]");
+    console.error("Usage: node security/cli.cjs [audit|report] [--sql-dir=PATH] | production-audit");
     process.exitCode = 2;
     return;
   }
@@ -63,6 +90,11 @@ function main(argv) {
   }
 }
 
-if (require.main === module) main(process.argv.slice(2));
+if (require.main === module) {
+  main(process.argv.slice(2)).catch(() => {
+    console.error("Security scanner failed; no database error details or credentials are logged.");
+    process.exitCode = 2;
+  });
+}
 
-module.exports = { collectSqlFiles, run };
+module.exports = { collectSqlFiles, run, runProduction };

@@ -6,6 +6,7 @@ const { spawnSync } = require("node:child_process");
 const { createHash } = require("node:crypto");
 const YAML = require("yaml");
 const { scanJavaScript, scanHtml } = require("./javascript.cjs");
+const dispositions = require("./reviewed-dom-sinks.json");
 
 const SKIP_DIRECTORIES = new Set([".git", "node_modules", "dist", "coverage", ".next"]);
 const SOURCE_EXTENSIONS = new Set([".js", ".cjs", ".mjs", ".jsx", ".ts", ".tsx", ".mts", ".cts", ".html", ".yml", ".yaml", ".json", ".sql", ".env", ".pem", ".key", ".toml", ".ini", ".conf"]);
@@ -31,8 +32,17 @@ function collectFiles(root) {
 function scanRepository({ root, runNpmAudit = true, npmAuditTimeout = 90000 }) {
   const findings = [];
   const reviewedSinks = [];
+  const reviewedFindings = [];
   const files = collectFiles(root);
   const relative = file => path.relative(root, file).split(path.sep).join("/");
+  const sha256 = source => createHash("sha256").update(source).digest("hex");
+  // A changed helper, caller or template invalidates the entire manual review.
+  const reviewCurrent = Object.keys(dispositions.sourceHashes).length === 2
+    && ["app.js", "index.html"].every(name => /^[a-f0-9]{64}$/.test(dispositions.sourceHashes[name]))
+    && Object.entries(dispositions.sourceHashes).every(([name, hash]) => {
+    const file = files.find(file => relative(file) === name);
+    return file && sha256(fs.readFileSync(file)) === hash;
+  });
   const add = (file, line, rule, severity, category, description, risk, recommendation, status = "potential") => {
     findings.push({
       id: `${rule}-${createHash("sha1").update(`${rule}:${relative(file)}:${line}:${description}`).digest("hex").slice(0, 8)}`,
@@ -73,17 +83,23 @@ function scanRepository({ root, runNpmAudit = true, npmAuditTimeout = 90000 }) {
     }
 
     if (!jsExtensions.has(path.extname(file).toLowerCase())) continue;
-    if (/\b(?:createClient|window\.supabase\.createClient)\s*\(/.test(source)
-      && /\.(?:insert|update|delete|upsert)\s*\(/.test(source)
-      && !/\.auth\.getUser\s*\(/.test(source)) {
+    const scan = path.extname(file).toLowerCase() === ".html" ? scanHtml(source, relative(file)) : scanJavaScript(source, relative(file));
+    if (scan.authSignals.client && scan.authSignals.writes && !scan.authSignals.getUser) {
       add(file, 1, "AUTH-001", "MEDIUM", "Authentication",
         "Client-side Supabase writes exist without a visible auth.getUser() check in the same file.",
         "Client-side identity checks are not an authorization boundary; server-side RLS must enforce ownership.",
         "Verify write policies use auth.uid() and validate ownership in the database; treat this static signal as a review prompt.");
     }
-    const scan = path.extname(file).toLowerCase() === ".html" ? scanHtml(source, relative(file)) : scanJavaScript(source, relative(file));
     reviewedSinks.push(...scan.reviewedSinks.map(item => ({ file: relative(file), ...item })));
     for (const sink of scan.findings) {
+      const review = reviewCurrent && dispositions.findings.find(item =>
+        item.file === relative(file) && item.line === sink.line && item.rule === sink.rule
+        && item.contextHash === sink.contextHash && typeof item.reason === "string" && item.reason.trim()
+        && ["XSS-001", "XSS-002"].includes(sink.rule));
+      if (review) {
+        reviewedFindings.push({ ...review, status: "reviewed", sourceHashes: dispositions.sourceHashes });
+        continue;
+      }
       add(file, sink.line, sink.rule, sink.severity, "Repository Security", sink.description,
         "If untrusted data reaches this sink, it may enable cross-site scripting or code execution.",
         "Trace the data flow; prefer DOM construction, or verified context-appropriate sanitization. Unknown values remain blocking.");
@@ -175,7 +191,7 @@ function scanRepository({ root, runNpmAudit = true, npmAuditTimeout = 90000 }) {
       }
       if (audit.metadata.vulnerabilities.total === 0) {
         findings.push({
-          id: "DEPS-003", category: "Dependencies", severity: "INFO", status: "confirmed",
+          id: "DEPS-003", category: "Dependencies", severity: "INFO", status: "informational",
           object: "package-lock.json", description: "npm audit reported no known dependency vulnerabilities.",
           evidence: "npm audit JSON metadata reports zero vulnerabilities.",
           risk: "This does not cover unpublished or undisclosed vulnerabilities.",
@@ -196,7 +212,7 @@ function scanRepository({ root, runNpmAudit = true, npmAuditTimeout = 90000 }) {
   findings.sort((left, right) =>
     SEVERITY_ORDER.indexOf(left.severity) - SEVERITY_ORDER.indexOf(right.severity) || left.id.localeCompare(right.id)
   );
-  return { findings, reviewedSinks, scannedFiles: files.map(relative) };
+  return { findings, reviewedSinks, reviewedFindings, scannedFiles: files.map(relative) };
 }
 
 module.exports = { collectFiles, scanRepository };

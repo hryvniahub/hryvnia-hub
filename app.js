@@ -677,6 +677,7 @@ function listingCurrencyForLanguage() {
 function money(value, sourceCurrency = "UAH") {
   const localeMap = { uk: "uk-UA", ru: "ru-RU", en: "en-US", pl: "pl-PL" };
   const source = String(sourceCurrency || "UAH").toUpperCase();
+  const safeSource = ["UAH", "USD", "PLN"].includes(source) ? source : "UAH";
   const target = listingCurrencyForLanguage();
   const amount = Number(value);
   if (!Number.isFinite(amount)) return "—";
@@ -684,11 +685,11 @@ function money(value, sourceCurrency = "UAH") {
   if (source !== target && !listingRates) {
     try {
       return new Intl.NumberFormat(localeMap[lang] || "uk-UA", {
-        style: "currency", currency: ["UAH", "USD", "PLN"].includes(source) ? source : "UAH",
+        style: "currency", currency: safeSource,
         maximumFractionDigits: 0
       }).format(amount);
     } catch {
-      return `${amount} ${source}`;
+      return `${amount} ${safeSource}`;
     }
   }
 
@@ -703,11 +704,11 @@ function money(value, sourceCurrency = "UAH") {
   if (!Number.isFinite(sourceRate) || sourceRate <= 0 || !Number.isFinite(targetRate) || targetRate <= 0) {
     try {
       return new Intl.NumberFormat(localeMap[lang] || "uk-UA", {
-        style: "currency", currency: ["UAH", "USD", "PLN"].includes(source) ? source : "UAH",
+        style: "currency", currency: safeSource,
         maximumFractionDigits: 0
       }).format(amount);
     } catch {
-      return `${amount} ${source}`;
+      return `${amount} ${safeSource}`;
     }
   }
 

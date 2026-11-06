@@ -34,6 +34,7 @@ function run({
   const scannedFiles = [];
   const coverage = {};
   const reviewedSinks = [];
+  const reviewedFindings = [];
   let liveAudit;
   coverage.migrations = files.length ? "PASS" : "NOT_RUN";
   const areaStatus = (items, fallback = "PASS") => items.some(item =>
@@ -44,6 +45,7 @@ function run({
     findings.push(...repository.findings);
     scannedFiles.push(...repository.scannedFiles);
     reviewedSinks.push(...repository.reviewedSinks);
+    reviewedFindings.push(...repository.reviewedFindings);
     coverage.repository = areaStatus(repository.findings.filter(item => item.category === "Repository Security"));
     coverage.authentication = areaStatus(repository.findings.filter(item => item.category === "Authentication"));
     const dependencyNotRun = repository.findings.some(finding => finding.category === "Dependencies" && finding.status === "not-run");
@@ -96,6 +98,7 @@ function run({
     sourceAvailable: scannedFiles.length > 0,
     coverage,
     reviewedSinks,
+    reviewedFindings,
     liveAudit
   });
   const written = writeReport(report, reportDir);
@@ -129,6 +132,7 @@ function main(argv) {
   });
   console.log(`Security scan: ${report.result}`);
   console.log(`Files: ${report.scannedFiles.length}; findings: ${report.findings.length}`);
+  console.log(`Coverage: ${report.coverageStatus}; repository: ${report.coverage.repository}; informational outcomes: ${report.informationalResults.length}; manual DOM reviews: ${report.reviewedFindings.length}`);
   console.log(`Reports: ${path.relative(process.cwd(), written.markdownPath)}, ${path.relative(process.cwd(), written.jsonPath)}`);
   console.log(report.coverage.reason);
   process.exitCode = getExitCode(report, argv);

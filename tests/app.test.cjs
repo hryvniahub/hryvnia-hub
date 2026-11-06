@@ -16,6 +16,43 @@ const submit = section('addForm.addEventListener("submit", async e => {', '\n}\n
 const buttonHelper = section("function setButtonLoading(", "const listing =");
 const landHelper = section("function propertyLandAreaM2(", "function propertyCardSpecs(");
 const noop = () => {};
+test("money: hostile currencies cannot enter any Intl failure fallback", () => {
+  const helpers = section("function listingCurrencyForLanguage(", "function listingPhotos(");
+  for (const failure of ["constructor", "format"]) {
+    for (const rates of [null, { usdUah: NaN, plnUah: NaN }, { usdUah: 40, plnUah: 10 }]) {
+      for (const language of ["uk", "en", "pl"]) {
+        const context = vm.createContext({
+          lang: language, listingRates: rates,
+          Intl: { NumberFormat: function () {
+            if (failure === "constructor") throw new Error("unavailable");
+            return { format() { throw new Error("unavailable"); } };
+          } }
+        });
+        vm.runInContext(helpers, context);
+        for (const currency of ['<img src=x onerror=alert(1)>', 'USD"><svg onload=alert(1)>', "__proto__"]) {
+          const rendered = context.money(100, currency);
+          assert.match(rendered, /^\d+ (UAH|USD|PLN)$/);
+          assert.doesNotMatch(rendered, /[<>"']/);
+        }
+        for (const currency of ["UAH", "usd", "PLN"]) {
+          assert.match(context.money(100, currency), /^\d+ (UAH|USD|PLN)$/);
+        }
+        assert.equal(context.money(NaN, "USD"), "—");
+      }
+    }
+  }
+});
+
+test("money: supported currency conversion and source fallback are preserved", () => {
+  const context = vm.createContext({ lang: "en", listingRates: { usdUah: 40, plnUah: 10 } });
+  vm.runInContext(section("function listingCurrencyForLanguage(", "function listingPhotos("), context);
+  assert.equal(context.money(400, "UAH"), "$10");
+  assert.equal(context.money(100, "pln"), "$25");
+  assert.match(context.money(400, "unsupported"), /400/);
+  assert.match(context.money(400, "unsupported"), /UAH/);
+  context.listingRates = null;
+  assert.match(context.money(400, "UAH"), /400/);
+});
 const tick = () => new Promise(setImmediate);
 function deferred() {
   let resolve, reject;

@@ -147,7 +147,7 @@ test("live hardening: password/URL never enter argv or SQL, PG and PSQL environm
       ...env, PATH: "/usr/bin", PGHOST: "production", PGUSER: "postgres", PGDATABASE: "production",
       PGPASSWORD: "inherited", PGOPTIONS: "-c role=postgres", PGSERVICE: "production",
       PGSERVICEFILE: "evil", PGPASSFILE: "evil", PGSSLROOTCERT: "evil", PGTARGETSESSIONATTRS: "read-write",
-      PSQLRC: "evil", PSQL_ECHO: "all", PSQL_HISTORY: "evil", SUPABASE_SERVICE_ROLE_KEY: "private-service-secret"
+      PSQLRC: "evil", PSQL_ECHO: "all", PSQL_HISTORY: "evil", SUPABASE_SERVICE_ROLE_KEY: "dummy"
     },
     commandRunner(command, args, options) {
       calls++;

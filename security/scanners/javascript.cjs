@@ -1,6 +1,7 @@
 "use strict";
 
 const ts = require("typescript");
+const { createHash } = require("node:crypto");
 
 const ESCAPER = `function escapeHtml(value = "") {
   return String(value).replace(/[&<>"']/g, char => ({
@@ -27,6 +28,7 @@ function scanJavaScript(source, filename) {
   const bindings = new Map();
   const writes = new Set();
   let dynamicScope = false;
+  const authSignals = { client: false, writes: false, getUser: false };
   const property = node => ts.isPropertyAccessExpression(node) ? node.name.text
     : ts.isElementAccessExpression(node) && ts.isStringLiteralLike(node.argumentExpression) ? node.argumentExpression.text : null;
   const walk = (node, visit) => { visit(node); ts.forEachChild(node, child => walk(child, visit)); };
@@ -124,7 +126,8 @@ function scanJavaScript(source, filename) {
     const line = ast.getLineAndCharacterOfPosition(node.getStart(ast)).line + 1;
     if (canProveSafe && safe(expression)) {
       reviewedSinks.push({ line, rule, reason: "AST: constant markup or verified escaping in text/quoted non-executable attribute context." });
-    } else findings.push({ line, rule, severity: "HIGH", description });
+    } else findings.push({ line, rule, severity: "HIGH", description,
+      contextHash: createHash("sha256").update(node.getText(ast)).digest("hex") });
   }
   if (ast.parseDiagnostics.length) {
     findings.push({ line: 1, rule: "JS-PARSE-001", severity: "HIGH",
@@ -142,6 +145,11 @@ function scanJavaScript(source, filename) {
     }
     if (!ts.isCallExpression(node) && !ts.isNewExpression(node)) return;
     const name = property(node.expression);
+    if (ts.isCallExpression(node)) {
+      if (name === "createClient" || (ts.isIdentifier(node.expression) && node.expression.text === "createClient")) authSignals.client = true;
+      if (["insert", "update", "delete", "upsert"].includes(name)) authSignals.writes = true;
+      if (name === "getUser" && property(node.expression.expression) === "auth") authSignals.getUser = true;
+    }
     if (name === "insertAdjacentHTML") add(node, "XSS-002", "insertAdjacentHTML receives an unverified HTML value.", node.arguments?.[1], true);
     if (["write", "writeln"].includes(name) && node.expression.expression?.getText(ast) === "document") {
       for (const argument of node.arguments || []) add(node, "DOM-001", "document.write receives an unverified HTML value.", argument, true);
@@ -160,20 +168,22 @@ function scanJavaScript(source, filename) {
       if (/^(on[a-z]+|srcdoc)$/i.test(attribute)) add(node, "XSS-003", "Executable DOM attribute is assigned.");
     }
   });
-  return { findings, reviewedSinks };
+  return { findings, reviewedSinks, authSignals };
 }
 
 function scanHtml(source, filename) {
   const findings = [];
   const reviewedSinks = [];
+  const authSignals = { client: false, writes: false, getUser: false };
   for (const match of source.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)) {
     if (/\btype\s*=\s*["'](?:application\/(?:ld\+)?json|importmap)["']/i.test(match[1])) continue;
     const offset = source.slice(0, match.index + match[0].indexOf(">") + 1).split("\n").length - 1;
     const scan = scanJavaScript(match[2], `${filename}.js`);
+    for (const key of Object.keys(authSignals)) authSignals[key] ||= scan.authSignals[key];
     findings.push(...scan.findings.map(item => ({ ...item, line: item.line + offset })));
     reviewedSinks.push(...scan.reviewedSinks.map(item => ({ ...item, line: item.line + offset })));
   }
-  return { findings, reviewedSinks };
+  return { findings, reviewedSinks, authSignals };
 }
 
 module.exports = { scanJavaScript, scanHtml };

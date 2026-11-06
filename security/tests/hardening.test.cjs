@@ -9,7 +9,7 @@ const { test } = require("node:test");
 const YAML = require("yaml");
 const { scanJavaScript, scanHtml } = require("../scanners/javascript.cjs");
 const { scanRepository } = require("../scanners/repository.cjs");
-const { createReport } = require("../reports/report.cjs");
+const { createReport, renderMarkdown } = require("../reports/report.cjs");
 
 const app = fs.readFileSync(path.resolve(__dirname, "../../app.js"), "utf8");
 const escaper = app.slice(app.indexOf("function escapeHtml("), app.indexOf("\nconst LISTING_RATES_KEY"));
@@ -72,6 +72,104 @@ test("sanitizer names, shadowing, reassignment, contexts and split markup cannot
 test("HTML inline JS preserves offsets and string fixtures do not become script", () => {
   const result = scanHtml('<html>\n<script>\nconst s = "x.innerHTML = input";\nx.innerHTML = input;\n</script>', "index.html");
   assert.deepEqual(result.findings.map(item => [item.line, item.rule]), [[4, "XSS-001"]]);
+});
+
+function reviewedRepository(t) {
+  const root = fs.mkdtempSync(path.resolve(__dirname, "../../.security-review-"));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  fs.writeFileSync(path.join(root, "app.js"), app);
+  fs.copyFileSync(path.resolve(__dirname, "../../index.html"), path.join(root, "index.html"));
+  return root;
+}
+
+test("manual DOM dispositions bind exact finding identity and whole source/template content", t => {
+  const root = reviewedRepository(t);
+  const result = scanRepository({ root, runNpmAudit: false });
+  const unproven = scanJavaScript(app, "app.js").findings;
+  assert.equal(result.reviewedFindings.length, 36);
+  assert.equal(result.findings.filter(item => /^XSS-/.test(item.id)).length, 0);
+  for (const finding of unproven) {
+    const review = result.reviewedFindings.find(item =>
+      item.file === "app.js" && item.rule === finding.rule && item.line === finding.line
+      && item.contextHash === finding.contextHash);
+    assert.ok(review, `${finding.rule}:${finding.line}`);
+    assert.ok(review.reason.length > 50);
+    assert.deepEqual(Object.keys(review.sourceHashes).sort(), ["app.js", "index.html"]);
+  }
+  const report = createReport({ findings: result.findings, reviewedFindings: result.reviewedFindings });
+  assert.match(renderMarkdown(report), /Manually reviewed DOM findings/);
+  assert.match(renderMarkdown(report), /not AST proofs/);
+  assert.equal(report.reviewedFindings.length, 36);
+});
+
+test("new and changed genuine sinks and changed helpers/templates fail closed", t => {
+  const root = reviewedRepository(t);
+  for (const changed of [
+    app + "\nnode.innerHTML = location.hash;",
+    app.replace("button.innerHTML = button.dataset.originalHtml;", "button.innerHTML = location.hash;"),
+    app.replace(escaper, 'function escapeHtml(value = "") { return String(value); }\n')
+  ]) {
+    assert.notEqual(changed, app);
+    fs.writeFileSync(path.join(root, "app.js"), changed);
+    const result = scanRepository({ root, runNpmAudit: false });
+    assert.equal(result.reviewedFindings.length, 0);
+    assert.ok(result.findings.some(item => item.id.startsWith("XSS-001") && item.severity === "HIGH"));
+    assert.equal(createReport({ findings: result.findings }).result, "FAIL");
+  }
+  fs.writeFileSync(path.join(root, "app.js"), app);
+  fs.appendFileSync(path.join(root, "index.html"), "\n<!-- template changed -->");
+  const result = scanRepository({ root, runNpmAudit: false });
+  assert.equal(result.reviewedFindings.length, 0);
+  assert.equal(result.findings.filter(item => /^XSS-/.test(item.id)).length, 36);
+});
+
+test("reviewed application never suppresses executable test sinks or private assignments", t => {
+  const root = reviewedRepository(t);
+  fs.mkdirSync(path.join(root, "tests"));
+  fs.writeFileSync(path.join(root, "tests/check.cjs"),
+    'node.innerHTML = location.hash;\n' + "SUPABASE_SERVICE_ROLE_KEY" + ' = "' + "x".repeat(24) + '";');
+  const result = scanRepository({ root, runNpmAudit: false });
+  assert.equal(result.reviewedFindings.length, 36);
+  for (const rule of ["XSS-001", "SECRET-005"]) {
+    assert.ok(result.findings.some(item => item.object === "tests/check.cjs" && item.id.startsWith(rule) && item.severity === "HIGH"));
+  }
+});
+
+test("authentication signal ignores fixture strings/comments but retains executable test writes", t => {
+  const root = fs.mkdtempSync(path.resolve(__dirname, "../../.security-auth-"));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const calls = 'const db = window.supabase.createClient(url, key);\ndb.from("listings").update(payload);';
+  fs.writeFileSync(path.join(root, "test.cjs"), `const fixture = ${JSON.stringify(calls)};\n/* ${calls} */`);
+  assert.ok(!scanRepository({ root, runNpmAudit: false }).findings.some(item => item.id.startsWith("AUTH-001")));
+  fs.appendFileSync(path.join(root, "test.cjs"), "\n" + calls);
+  assert.ok(scanRepository({ root, runNpmAudit: false }).findings.some(item => item.id.startsWith("AUTH-001")));
+});
+
+test("successful INFO audit outcome stays visible without vulnerability counts or hiding coverage", () => {
+  const report = createReport({
+    findings: [
+      { id: "DEPS-003", severity: "INFO", category: "Dependencies", status: "informational",
+        description: "npm audit reported no known dependency vulnerabilities.", evidence: "zero vulnerabilities", risk: "Not a security guarantee." },
+      { id: "NPM-example", severity: "LOW", category: "Dependencies", status: "confirmed" }
+    ],
+    coverage: { repository: "PASS", dependencies: "PASS", migrations: "NOT_RUN", staticSql: "NOT_RUN" }
+  });
+  assert.equal(report.counts.INFO, 0);
+  assert.equal(report.counts.LOW, 1);
+  assert.equal(report.categoryCounts.Dependencies, 1);
+  assert.equal(report.informationalResults.length, 1);
+  assert.equal(report.findings.length, 1);
+  assert.equal(report.coverage.repository, "PASS");
+  assert.equal(report.coverageStatus, "INCOMPLETE");
+  assert.equal(report.result, "NOT_RUN");
+  assert.match(renderMarkdown(report), /npm audit reported no known dependency vulnerabilities/);
+  assert.match(renderMarkdown(report), /repository PASS does not establish database or Storage security/);
+  const blocking = createReport({
+    findings: [{ id: "DEPS-003", category: "Dependencies", severity: "HIGH", status: "informational" }]
+  });
+  assert.equal(blocking.result, "FAIL");
+  assert.equal(blocking.counts.HIGH, 1);
+  assert.equal(blocking.informationalResults.length, 0);
 });
 
 test("editing a test fixture cannot remove HIGH from executable code", t => {

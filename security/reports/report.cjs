@@ -26,9 +26,14 @@ function createReport({
   sourceAvailable = scannedFiles.length > 0,
   coverage = {},
   reviewedSinks = [],
+  reviewedFindings = [],
   liveAudit = null,
   generatedAt = new Date().toISOString()
 }) {
+  const isAuditSuccess = finding => finding.id === "DEPS-003" && finding.category === "Dependencies"
+    && finding.severity === "INFO" && finding.status === "informational";
+  const informationalResults = findings.filter(isAuditSuccess);
+  findings = findings.filter(finding => !isAuditSuccess(finding));
   const blocking = Object.values(coverage).includes("FAIL") || findings.some(finding =>
     finding.status !== "not-run" && (finding.severity === "CRITICAL" || finding.severity === "HIGH")
   );
@@ -46,7 +51,7 @@ function createReport({
     section,
     findings.filter(finding => finding.category === section).length
   ]));
-  return {
+  const report = {
     generatedAt,
     result,
     assessment: "Static findings are potential risks, not confirmed vulnerabilities. Live database findings are based on read-only catalog metadata; PASS is not a guarantee of security.",
@@ -66,9 +71,13 @@ function createReport({
       reason: coverage.reason || "Live database inspection is disabled unless an explicit read-only database URL is supplied."
     },
     reviewedSinks,
+    reviewedFindings,
+    informationalResults,
     liveAudit,
     findings
   };
+  report.coverageStatus = Object.values(report.coverage).includes("NOT_RUN") ? "INCOMPLETE" : "COMPLETE";
+  return report;
 }
 
 function renderMarkdown(report) {
@@ -76,6 +85,7 @@ function renderMarkdown(report) {
     "# Hryvnia Hub Security Report",
     "",
     `- **Result:** ${escapeMarkdown(report.result)}`,
+    `- **Coverage:** ${escapeMarkdown(report.coverageStatus || "INCOMPLETE")} — repository PASS does not establish database or Storage security.`,
     `- **Generated:** ${escapeMarkdown(report.generatedAt)}`,
     `- **Assessment:** ${escapeMarkdown(report.assessment)}`,
     `- **Files scanned:** ${escapeMarkdown(report.scannedFiles.length)}`,
@@ -93,6 +103,10 @@ function renderMarkdown(report) {
     ...Object.entries(report.counts).map(([severity, count]) => `| ${escapeMarkdown(severity)} | ${escapeMarkdown(count)} |`),
     ""
   ];
+  lines.push("## Informational audit outcomes", "",
+    "Successful audit observations are not vulnerability findings and are excluded from severity/category counts.", "",
+    ...(report.informationalResults || []).map(item =>
+      `- **${escapeMarkdown(item.id)} (${escapeMarkdown(item.severity)}):** ${escapeMarkdown(item.description)} ${escapeMarkdown(item.evidence)} ${escapeMarkdown(item.risk)}`), "");
 
   for (const section of SECTIONS) {
     const findings = report.findings.filter(finding => finding.category === section);
@@ -122,6 +136,13 @@ function renderMarkdown(report) {
     "These are not suppressed findings: the AST established constant markup or the exact local HTML escaper in a supported context. Unknown flows remain HIGH.", "",
     "| File | Line | Rule | Reason |", "|---|---:|---|---|",
     ...(report.reviewedSinks || []).map(item => `| ${escapeMarkdown(item.file)} | ${escapeMarkdown(item.line)} | ${escapeMarkdown(item.rule)} | ${escapeMarkdown(item.reason)} |`), "");
+  lines.push("## Manually reviewed DOM findings", "",
+    "These reviewed dispositions are not AST proofs. Each matches the exact file, line, rule and sink SHA-256, plus the complete source/template hashes below. Any source change invalidates all dispositions; unreviewed or changed sinks remain HIGH.", "",
+    "| File | Line | Rule | Sink SHA-256 | Review rationale |", "|---|---:|---|---|---|",
+    ...(report.reviewedFindings || []).map(item =>
+      `| ${escapeMarkdown(item.file)} | ${escapeMarkdown(item.line)} | ${escapeMarkdown(item.rule)} | ${escapeMarkdown(item.contextHash)} | ${escapeMarkdown(item.reason)} |`), "",
+    ...[...new Set((report.reviewedFindings || []).flatMap(item =>
+      Object.entries(item.sourceHashes || {}).map(([file, hash]) => `${file}: ${hash}`)))].map(value => `- ${escapeMarkdown(value)}`), "");
   if (report.liveAudit) {
     const audit = report.liveAudit;
     lines.push("## Live PostgreSQL metadata", "",

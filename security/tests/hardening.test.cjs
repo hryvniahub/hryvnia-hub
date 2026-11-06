@@ -5,11 +5,14 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 const { spawnSync } = require("node:child_process");
+const { createHash } = require("node:crypto");
 const { test } = require("node:test");
 const YAML = require("yaml");
 const { scanJavaScript, scanHtml } = require("../scanners/javascript.cjs");
 const { scanRepository } = require("../scanners/repository.cjs");
 const { createReport, renderMarkdown } = require("../reports/report.cjs");
+const { getExitCode, getRequiredCoverage, run } = require("../cli.cjs");
+const { analyzeSql } = require("../scanners/sql.cjs");
 
 const app = fs.readFileSync(path.resolve(__dirname, "../../app.js"), "utf8");
 const escaper = app.slice(app.indexOf("function escapeHtml("), app.indexOf("\nconst LISTING_RATES_KEY"));
@@ -76,6 +79,8 @@ test("HTML inline JS preserves offsets and string fixtures do not become script"
 
 test("HTML inline JS accepts browser script end tags without losing sinks or authentication signals", () => {
   for (const closing of [
+    "</SCRIPT>",
+    "</sCrIpT>",
     "</script\t\n bar>",
     "</ScRiPt bar>",
     "</SCRIPT/>",
@@ -291,6 +296,83 @@ test("NOT_RUN cannot be represented as PASS or a successful required CLI scan", 
   assert.equal(report.coverage.staticSql, "NOT_RUN");
   const liveChild = spawnSync(process.execPath, [cli, "supabase", "--require-live-complete"], { cwd: root, encoding: "utf8" });
   assert.equal(liveChild.status, 2);
+});
+
+test("required coverage is scoped to the selected mode without hiding global gaps", () => {
+  const coverage = {
+    repository: "PASS", authentication: "PASS", dependencies: "PASS",
+    staticSql: "NOT_RUN", migrations: "NOT_RUN", livePostgres: "NOT_RUN", liveStorage: "NOT_RUN"
+  };
+  const report = createReport({ findings: [], coverage });
+  assert.equal(report.result, "NOT_RUN");
+  assert.equal(report.coverageStatus, "INCOMPLETE");
+  assert.deepEqual(getRequiredCoverage(["repository"]), ["repository", "authentication", "dependencies"]);
+  assert.equal(getExitCode(report, ["repository", "--require-complete"]), 0);
+  for (const area of ["repository", "authentication", "dependencies"]) {
+    assert.equal(getExitCode({ ...report, coverage: { ...coverage, [area]: "NOT_RUN" } },
+      ["repository", "--require-complete"]), 2, area);
+  }
+  for (const command of ["supabase", "audit", "report"]) {
+    assert.equal(getExitCode(report, [command, "--require-complete"]), 2, command);
+    const staticReport = createReport({ findings: [], coverage: { ...coverage, staticSql: "PASS", migrations: "PASS" } });
+    assert.equal(staticReport.result, "NOT_RUN");
+    assert.equal(staticReport.coverageStatus, "INCOMPLETE");
+    assert.equal(getExitCode(staticReport, [command, "--require-complete"]), 0, command);
+    for (const area of getRequiredCoverage([command])) {
+      assert.equal(getExitCode({ ...staticReport, coverage: { ...staticReport.coverage, [area]: "NOT_RUN" } },
+        [command, "--require-complete"]), 2, `${command}: ${area}`);
+    }
+    assert.equal(getExitCode(staticReport, [command, "--live-supabase", "--require-complete"]), 2);
+    assert.equal(getExitCode(staticReport, [command, "--require-live-complete"]), 2);
+    const complete = createReport({ findings: [], coverage: {
+      ...staticReport.coverage, livePostgres: "PASS", liveStorage: "PASS"
+    } });
+    assert.equal(getExitCode(complete, [command, "--live-supabase", "--require-complete"]), 0);
+  }
+  for (const severity of ["HIGH", "CRITICAL"]) {
+    const blocking = createReport({ coverage, findings: [{ id: "blocker", severity, status: "potential" }] });
+    for (const command of ["repository", "supabase", "audit", "report"]) {
+      assert.equal(getExitCode(blocking, [command, "--require-complete"]), 1);
+    }
+  }
+  const failedCoverage = createReport({ findings: [], coverage: { ...coverage, repository: "FAIL" } });
+  assert.equal(getExitCode(failedCoverage, ["repository", "--require-complete"]), 1);
+});
+
+test("Supabase CLI requires real SQL sources but not unrequested live inspection", t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "security-scoped-sql-"));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const cli = path.resolve(__dirname, "../cli.cjs");
+  const invoke = () => spawnSync(process.execPath, [cli, "supabase", "--require-complete"],
+    { cwd: root, encoding: "utf8" });
+  assert.equal(invoke().status, 2);
+  const missing = JSON.parse(fs.readFileSync(path.join(root, "security-report.json")));
+  assert.ok(missing.findings.some(item => item.id === "SCAN-001" && item.status === "not-run"));
+  fs.mkdirSync(path.join(root, "supabase/migrations"), { recursive: true });
+  fs.writeFileSync(path.join(root, "supabase/migrations/001.sql"), "SELECT 1;");
+  const child = invoke();
+  assert.equal(child.status, 0, child.stderr);
+  assert.match(child.stdout, /Required coverage: staticSql: PASS; migrations: PASS/);
+  const report = JSON.parse(fs.readFileSync(path.join(root, "security-report.json")));
+  assert.equal(report.result, "NOT_RUN");
+  assert.equal(report.coverageStatus, "INCOMPLETE");
+  assert.equal(report.coverage.livePostgres, "NOT_RUN");
+  assert.equal(report.coverage.liveStorage, "NOT_RUN");
+  const repository = run({ root, mode: "repository", runNpmAudit: false }).report;
+  assert.equal(repository.coverage.dependencies, "NOT_RUN");
+  assert.equal(getExitCode(repository, ["repository", "--require-complete"]), 2);
+});
+
+test("repository and SQL finding identifiers use deterministic SHA-256 suffixes", t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "security-identifiers-"));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  fs.writeFileSync(path.join(root, "unsafe.js"), "node.innerHTML = location.hash;");
+  const finding = scanRepository({ root, runNpmAudit: false }).findings.find(item => item.id.startsWith("XSS-001-"));
+  const suffix = createHash("sha256").update(`XSS-001:unsafe.js:1:${finding.description}`).digest("hex").slice(0, 8);
+  assert.equal(finding.id, `XSS-001-${suffix}`);
+  const sqlFinding = analyzeSql("ALTER ROLE anon BYPASSRLS;").findings[0];
+  const sqlSuffix = createHash("sha256").update(`RLS-003:input.sql:1:${sqlFinding.object}`).digest("hex").slice(0, 8);
+  assert.equal(sqlFinding.id, `RLS-003-${sqlSuffix}`);
 });
 
 test("every CLI mode including report preserves HIGH as FAIL with nonzero exit", t => {

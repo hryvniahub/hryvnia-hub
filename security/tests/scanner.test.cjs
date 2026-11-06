@@ -153,6 +153,23 @@ test("report differentiates incomplete coverage from a static pass", () => {
 
 test("report escapes Markdown, table delimiters, backslashes, newlines, and HTML in input values", () => {
   const punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
+  const scriptFixtures = [
+    "<script>alert(1)</script>",
+    "<SCRIPT>alert(1)</SCRIPT>",
+    "<ScRiPt>alert(1)</sCrIpT>",
+    "</SCRIPT data-note=\"value\">",
+    "</sCrIpT \t>",
+    "</script\n data-note='value'>",
+    "</ScRiPt/>",
+    "<SCRIPT data-note=\"value\">",
+    "<sCrIpT \t>",
+    "<script\n data-note='value'>"
+  ];
+  const unescapedScriptTag =
+    /(?<!\\)<\/?script(?=[\t\n\f\r />])[^>]*>/i;
+  for (const fixture of scriptFixtures) {
+    assert.match(fixture, unescapedScriptTag);
+  }
   const report = createReport({
     findings: [{
       id: "finding|id\n### injected",
@@ -160,7 +177,7 @@ test("report escapes Markdown, table delimiters, backslashes, newlines, and HTML
       severity: "HIGH",
       object: "table|name\\",
       status: "potential",
-      description: `[link](javascript:alert(1)) <script>alert(1)</script> ${punctuation}`,
+      description: `[link](javascript:alert(1)) ${scriptFixtures.join(" ")} ${punctuation}`,
       evidence: "first line\r\n| second line",
       risk: "*bold* _italic_ `code`",
       recommendation: "# heading\n- list item"
@@ -183,8 +200,40 @@ test("report escapes Markdown, table delimiters, backslashes, newlines, and HTML
   assert.ok(markdown.includes(punctuation.split("").map(character => `\\${character}`).join("")));
   assert.ok(markdown.includes("| a\\|b | 1 | \\<script\\> | \\\\\\|inject<br>next |"));
   assert.equal((markdown.match(/^### /gm) || []).length, 1);
-  assert.doesNotMatch(markdown, /<script>/);
+  for (const fixture of scriptFixtures) {
+    const escaped = fixture.split("").map(character =>
+      punctuation.includes(character) ? `\\${character}` : character
+    ).join("").replace(/\n/g, "<br>");
+    assert.ok(markdown.includes(escaped));
+  }
+  assert.doesNotMatch(markdown, /<script>/i);
+  assert.doesNotMatch(markdown, unescapedScriptTag);
   assert.doesNotMatch(markdown, /&lt;|&gt;/);
+});
+
+test("report preserves literal backslashes and entities while escaping script-shaped input", () => {
+  for (const [input, expected] of [
+    [String.raw`\<script>`, String.raw`\\\<script\>`],
+    [String.raw`\\<script>`, String.raw`\\\\\<script\>`],
+    ["&lt;script&gt;", String.raw`\&lt\;script\&gt\;`]
+  ]) {
+    const report = createReport({
+      findings: [{
+        id: "escaping-regression", category: "Repository Security", severity: "INFO",
+        status: "potential", object: input, description: input,
+        evidence: input, risk: input, recommendation: input
+      }],
+      reviewedSinks: [{ file: input, line: 1, rule: input, reason: input }]
+    });
+    const markdown = renderMarkdown(report);
+    for (const field of ["Object", "Description", "Evidence", "Risk", "Recommendation"]) {
+      assert.ok(markdown.includes(`- **${field}:** ${expected}\n`), `${field}: ${input}`);
+    }
+    assert.ok(markdown.includes(`| ${expected} | 1 | ${expected} | ${expected} |`));
+    assert.doesNotMatch(markdown, /<script>/i);
+    assert.doesNotMatch(markdown, /(?<!\\)<\/?script(?=[\t\n\f\r />])[^>]*>/i);
+    assert.doesNotMatch(markdown, /&lt;|&gt;/);
+  }
 });
 
 test("evidence sanitizer redacts ordinary SQL string and dollar-quoted literals", () => {

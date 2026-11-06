@@ -45,7 +45,7 @@ function scanRepository({ root, runNpmAudit = true, npmAuditTimeout = 90000 }) {
   });
   const add = (file, line, rule, severity, category, description, risk, recommendation, status = "potential") => {
     findings.push({
-      id: `${rule}-${createHash("sha1").update(`${rule}:${relative(file)}:${line}:${description}`).digest("hex").slice(0, 8)}`,
+      id: `${rule}-${createHash("sha256").update(`${rule}:${relative(file)}:${line}:${description}`).digest("hex").slice(0, 8)}`,
       category,
       severity,
       status,

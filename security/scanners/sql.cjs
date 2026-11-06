@@ -305,7 +305,7 @@ function analyzeSqlFiles(sources) {
   const functionGrants = [];
   const addFinding = (rule, severity, object, description, evidence, risk, recommendation, status = "potential") => {
     const location = sourceLocation(evidence.offset);
-    const idHash = createHash("sha1").update(`${rule}:${location.source}:${location.line}:${object}`).digest("hex").slice(0, 8);
+    const idHash = createHash("sha256").update(`${rule}:${location.source}:${location.line}:${object}`).digest("hex").slice(0, 8);
     findings.push({
       id: `${rule}-${idHash}`,
       category: object.startsWith("storage.") || object.startsWith("storage/") ? "Storage Security" : "SQL/RLS",

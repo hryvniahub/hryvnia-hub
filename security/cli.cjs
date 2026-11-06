@@ -105,11 +105,25 @@ function run({
   return { report, written };
 }
 
+function getRequiredCoverage(argv) {
+  const command = argv[0] || "audit";
+  const required = command === "repository"
+    ? ["repository", "authentication", "dependencies"]
+    : command === "supabase"
+      ? ["staticSql", "migrations"]
+      : ["repository", "authentication", "dependencies", "staticSql", "migrations"];
+  if (argv.includes("--live-supabase") || argv.includes("--require-live-complete")) {
+    required.push("livePostgres", "liveStorage");
+  }
+  return required;
+}
+
 function getExitCode(report, argv) {
   if (report.result === "FAIL") return 1;
   if (argv.includes("--require-live-complete")
     && (report.coverage.livePostgres !== "PASS" || report.coverage.liveStorage !== "PASS")) return 2;
-  if (argv.includes("--require-complete") && report.result === "NOT_RUN") return 2;
+  if (argv.includes("--require-complete")
+    && getRequiredCoverage(argv).some(area => report.coverage[area] !== "PASS")) return 2;
   return 0;
 }
 
@@ -133,6 +147,7 @@ function main(argv) {
   console.log(`Security scan: ${report.result}`);
   console.log(`Files: ${report.scannedFiles.length}; findings: ${report.findings.length}`);
   console.log(`Coverage: ${report.coverageStatus}; repository: ${report.coverage.repository}; informational outcomes: ${report.informationalResults.length}; manual DOM reviews: ${report.reviewedFindings.length}`);
+  console.log(`Required coverage: ${getRequiredCoverage(argv).map(area => `${area}: ${report.coverage[area]}`).join("; ")}`);
   console.log(`Reports: ${path.relative(process.cwd(), written.markdownPath)}, ${path.relative(process.cwd(), written.jsonPath)}`);
   console.log(report.coverage.reason);
   process.exitCode = getExitCode(report, argv);
@@ -140,4 +155,4 @@ function main(argv) {
 
 if (require.main === module) main(process.argv.slice(2));
 
-module.exports = { collectSqlFiles, getExitCode, main, run };
+module.exports = { collectSqlFiles, getExitCode, getRequiredCoverage, main, run };

@@ -108,8 +108,7 @@ test("workflow actually schedules all mandatory jobs on push, PR and schedule wi
   }
   const expected = {
     "repository-scan": "repository-scan",
-    "supabase-scan": "supabase-scan",
-    "full-security-audit": "full-security-audit"
+    "supabase-scan": "supabase-scan"
   };
   for (const [id, mode] of Object.entries(expected)) {
     const job = workflow.jobs[id];
@@ -127,6 +126,22 @@ test("workflow actually schedules all mandatory jobs on push, PR and schedule wi
     for (const step of job.steps.filter(step => step.uses)) assert.match(step.uses, /@[a-f0-9]{40}$/);
     assert.ok(!JSON.stringify(job).includes("secrets."));
   }
+  const fullJob = workflow.jobs["full-security-audit"];
+  assert.equal(fullJob.if, "github.event_name != 'workflow_dispatch'");
+  assert.ok(fullJob.steps.some(step => step.run?.includes("security:audit -- --require-complete")));
+  const productionJob = workflow.jobs["production-audit"];
+  assert.equal(productionJob.if,
+    "github.event_name == 'workflow_dispatch' && inputs.mode == 'full-security-audit' && github.ref == 'refs/heads/security-scanner-full-audit'");
+  assert.equal(productionJob.environment.name, "supabase-production-audit");
+  assert.ok(!productionJob.needs);
+  const productionScan = productionJob.steps.find(step => step.name === "Run full audit with protected Production inspection");
+  assert.equal(productionScan.env.SUPABASE_AUDIT_ENVIRONMENT, "production");
+  assert.equal(productionScan.env.SUPABASE_READONLY_DATABASE_URL, "${{ secrets.SUPABASE_READONLY_DATABASE_URL }}");
+  assert.ok(productionScan.run.includes("--live-supabase --require-live-complete"));
+  assert.equal(productionJob.steps.filter(step => JSON.stringify(step).includes("SUPABASE_READONLY_DATABASE_URL")).length, 1);
+  assert.deepEqual(workflow.on.workflow_dispatch.inputs.production_confirmation.type, "string");
+  assert.ok(workflow.on.workflow_dispatch.inputs.production_confirmation.description.includes("PRODUCTION <expected-host>/<expected-database>"));
+  assert.ok(!JSON.stringify(Object.fromEntries(Object.entries(workflow.jobs).filter(([id]) => id !== "production-audit"))).includes("secrets."));
   assert.ok(!raw.includes("pull_request_target"));
 });
 
@@ -140,6 +155,8 @@ test("NOT_RUN cannot be represented as PASS or a successful required CLI scan", 
   assert.equal(report.result, "NOT_RUN");
   assert.equal(report.coverage.database, "NOT_RUN");
   assert.equal(report.coverage.staticSql, "NOT_RUN");
+  const liveChild = spawnSync(process.execPath, [cli, "supabase", "--require-live-complete"], { cwd: root, encoding: "utf8" });
+  assert.equal(liveChild.status, 2);
 });
 
 test("every CLI mode including report preserves HIGH as FAIL with nonzero exit", t => {

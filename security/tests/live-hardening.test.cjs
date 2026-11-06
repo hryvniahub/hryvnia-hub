@@ -1,28 +1,39 @@
 "use strict";
 
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const os = require("node:os");
+const path = require("node:path");
 const { test } = require("node:test");
 const { READ_ONLY_QUERY, inspectSnapshot, scanLiveDatabase } = require("../scanners/supabase-live.cjs");
+const { getExitCode, run: runCli } = require("../cli.cjs");
 
 const URL = "postgresql://catalog_audit:p%40ss%3Aword@db.example.test:5432/postgres?sslmode=verify-full";
 const env = { SUPABASE_READONLY_DATABASE_URL: URL, SUPABASE_AUDIT_ENVIRONMENT: "test" };
 const TABLE_PRIVILEGES = ["SELECT", "INSERT", "UPDATE", "DELETE", "TRUNCATE", "REFERENCES", "TRIGGER"];
 
 function snapshot() {
-  const tables = ["public.listings", "public.messages", "public.conversations", "public.favorites", "storage.objects"]
+  const tables = ["public.listings", "public.messages", "public.conversations", "public.favorites", "storage.objects", "storage.buckets"]
     .map((name, i) => ({ name, oid: 100 + i, rls: true, forceRls: false, owner: "schema_owner" }));
-  const roles = ["anon", "authenticated"].map(name => ({ name, superuser: false, bypassRls: false }));
+  const roles = ["anon", "authenticated"].map(name => ({
+    name, superuser: false, bypassRls: false, inherit: true, createRole: false, createDb: false, replication: false
+  }));
   return {
-    version: 1,
+    version: 2,
     identity: {
       name: "catalog_audit", sessionUser: "catalog_audit", auditSafe: true,
       superuser: false, bypassRls: false, createRole: false, createDb: false, replication: false
     },
-    roles, memberships: [], tables, policies: [], grants: [], functions: [], functionGrants: [],
+    roles, memberships: [], tables, policies: [], grants: [], columnGrants: [], sequenceGrants: [], sequences: [],
+    schemaGrants: [], defaultGrants: [], functions: [], functionGrants: [], storageBuckets: [{
+      id: "listing-photos", name: "listing-photos", public: false,
+      fileSizeLimit: 10485760, allowedMimeTypes: ["image/jpeg", "image/png"]
+    }],
     effectiveTablePrivileges: roles.flatMap(role => tables.flatMap(table => TABLE_PRIVILEGES.map(privilege => ({
       role: role.name, table: table.name, privilege, allowed: false, columnAllowed: false, owner: false
     })))),
     effectiveFunctionPrivileges: [],
+    effectiveSequencePrivileges: [],
     effectiveSchemaPrivileges: roles.flatMap(role => ["public", "storage"].map(schema => ({
       role: role.name, schema, usage: true, create: false
     })))
@@ -47,15 +58,43 @@ test("live hardening: absent URL never invokes a process", () => {
   assert.equal(calls, 0);
 });
 
-test("live hardening: non-production environment declaration is mandatory", () => {
-  for (const environment of [undefined, "", "production", "Production", "prod"]) {
+test("live hardening: environment declaration is mandatory", () => {
+  for (const environment of [undefined, "", "Production", "prod"]) {
     let calls = 0;
     const result = run(snapshot(), {
       env: { ...env, SUPABASE_AUDIT_ENVIRONMENT: environment }, commandRunner: () => { calls++; }
     });
     assert.equal(result.status, "NOT_RUN");
     assert.equal(calls, 0);
-    assert.match(result.reason, /production is prohibited/);
+    assert.match(result.reason, /explicitly declared/);
+  }
+});
+
+test("live hardening: Production requires exact endpoint, database, identity, inventory and typed confirmation", () => {
+  const productionEnv = {
+    SUPABASE_READONLY_DATABASE_URL: "postgresql://sherlock_audit:p%40ss%3Aword@prod.example.test:5432/postgres?sslmode=verify-full",
+    SUPABASE_AUDIT_ENVIRONMENT: "production",
+    SUPABASE_EXPECTED_PRODUCTION_HOST: "prod.example.test",
+    SUPABASE_EXPECTED_PRODUCTION_DATABASE: "postgres",
+    SUPABASE_EXPECTED_PRODUCTION_BUCKETS: "listing-photos",
+    SUPABASE_PRODUCTION_TARGET_CONFIRMATION: "PRODUCTION prod.example.test/postgres"
+  };
+  for (const patch of [
+    { SUPABASE_PRODUCTION_TARGET_CONFIRMATION: "PRODUCTION wrong.example.test/postgres" },
+    { SUPABASE_EXPECTED_PRODUCTION_HOST: "wrong.example.test" },
+    { SUPABASE_EXPECTED_PRODUCTION_DATABASE: "other" },
+    { SUPABASE_EXPECTED_PRODUCTION_BUCKETS: "" },
+    { SUPABASE_READONLY_DATABASE_URL: productionEnv.SUPABASE_READONLY_DATABASE_URL.replace("sherlock_audit", "service_role") },
+    { SUPABASE_READONLY_DATABASE_URL: productionEnv.SUPABASE_READONLY_DATABASE_URL.replace("sslmode=verify-full", "sslmode=disable") }
+  ]) {
+    let calls = 0;
+    const result = run(snapshot(), {
+      env: { ...productionEnv, ...patch },
+      commandRunner: () => { calls++; }
+    });
+    assert.equal(result.status, "NOT_RUN");
+    assert.equal(calls, 0);
+    assert.doesNotMatch(JSON.stringify(result), /p%40ss|wrong\.example/);
   }
 });
 
@@ -133,9 +172,9 @@ test("live hardening: password/URL never enter argv or SQL, PG and PSQL environm
     }
   });
   assert.equal(calls, 1);
-  assert.equal(result.status, "NOT_RUN"); // Bucket rows are deliberately not covered.
-  assert.equal(result.coverage.database, "PASS");
-  assert.equal(result.coverage.storageBuckets, "NOT_RUN");
+  assert.equal(result.status, "PASS");
+  assert.equal(result.coverage.livePostgres, "PASS");
+  assert.equal(result.coverage.liveStorage, "PASS");
 });
 
 test("live hardening: TLS defaults to verify-full and only literal loopback can disable it", () => {
@@ -164,14 +203,22 @@ test("live hardening: catalog snapshot is gated inside the same read-only sessio
     /current_user = session_user/, /rolsuper/, /rolbypassrls/, /rolcreaterole/, /rolcreatedb/, /rolreplication/,
     /pg_auth_members/, /pg_shdepend/, /has_database_privilege/, /has_schema_privilege/,
     /has_table_privilege/, /has_any_column_privilege/, /has_sequence_privilege/,
-    /p\.prosecdef/, /has_function_privilege/, /CREATE,TEMP/,
+    /p\.prosecdef/, /has_function_privilege/, /has_database_privilege\(r\.oid, current_database\(\), 'CREATE'\)/,
+    /has_database_privilege\(r\.oid, current_database\(\), 'TEMP'\)/,
+    /NOT \(n\.nspname = 'storage' AND c\.relname = 'buckets'\)/,
+    /has_table_privilege\(r\.oid, c\.oid, 'SELECT'\)/,
+    /has_any_column_privilege\(r\.oid, c\.oid, 'SELECT'\)/,
     /SET LOCAL statement_timeout/, /SET LOCAL lock_timeout/, /SET LOCAL search_path = pg_catalog/
   ]) assert.match(preflight, pattern);
   assert.equal((READ_ONLY_QUERY.match(/BEGIN READ ONLY/g) || []).length, 1);
   assert.match(READ_ONLY_QUERY, /\\else\n\\echo AUDIT_IDENTITY_REJECTED\n\\endif\nROLLBACK;/);
-  assert.doesNotMatch(READ_ONLY_QUERY, /\b(?:FROM|JOIN)\s+(?:public|storage)\./i);
+  assert.match(READ_ONLY_QUERY, /FROM storage\.buckets b/);
+  assert.match(READ_ONLY_QUERY, /has_column_privilege\(current_user, c\.oid, a\.attname, 'SELECT'\)/);
+  assert.doesNotMatch(READ_ONLY_QUERY, /\b(?:FROM|JOIN)\s+(?:public|storage)\.(?!buckets\b)/i);
+  assert.doesNotMatch(READ_ONLY_QUERY, /SELECT\s+\*\s+FROM\s+storage\.buckets/i);
   assert.doesNotMatch(READ_ONLY_QUERY, /^\s*(?:INSERT|UPDATE|DELETE|TRUNCATE|ALTER|DROP|CREATE|GRANT|REVOKE|CALL|DO|COPY)\b/im);
   assert.doesNotMatch(READ_ONLY_QUERY, /\\(?:connect|c |!|include|i |o |copy)/i);
+  assert.doesNotMatch(READ_ONLY_QUERY, /\b(?:CALL|DO)\b/i);
   assert.match(READ_ONLY_QUERY, /pg_get_function_identity_arguments/);
   assert.match(READ_ONLY_QUERY, /aclexplode/);
   assert.match(READ_ONLY_QUERY, /pg_has_role/);
@@ -205,8 +252,10 @@ test("live hardening: exceptions, command output, credentials and malformed JSON
 test("live hardening: malformed or incomplete snapshots cannot produce a pass", () => {
   const malformed = [null, [], {}, true, "data", { ...snapshot(), identity: null }, { ...snapshot(), version: 0 }];
   for (const key of [
-    "roles", "memberships", "tables", "policies", "grants", "functions", "functionGrants",
-    "effectiveTablePrivileges", "effectiveFunctionPrivileges", "effectiveSchemaPrivileges"
+    "roles", "memberships", "tables", "policies", "grants", "columnGrants", "sequenceGrants",
+    "sequences", "schemaGrants", "defaultGrants", "functions", "functionGrants",
+    "effectiveTablePrivileges", "effectiveFunctionPrivileges", "effectiveSchemaPrivileges",
+    "effectiveSequencePrivileges", "storageBuckets"
   ]) {
     const value = snapshot();
     delete value[key];
@@ -229,7 +278,7 @@ test("live hardening: malformed or incomplete snapshots cannot produce a pass", 
   malformed.push(missingSchema);
   for (const value of malformed) {
     assert.equal(run(value).status, "NOT_RUN");
-    assert.equal(run(value).coverage, undefined);
+    assert.deepEqual(run(value).coverage, { livePostgres: "NOT_RUN", liveStorage: "NOT_RUN" });
     assert.ok(inspectSnapshot(value).every(finding => finding.status === "not-run"));
   }
 });
@@ -267,8 +316,110 @@ test("live hardening: all catalog tables including Storage are evaluated and IDs
   assert.equal(rls.length, 3);
   assert.equal(new Set(result.findings.map(f => f.id)).size, result.findings.length);
   assert.ok(rls.some(f => f.object === "public.extra"));
-  assert.ok(result.findings.some(f => f.object === "storage.buckets" && f.status === "not-run"));
-  assert.equal(result.findings.some(f => /^LIVE-STORAGE-00/.test(f.id)), false);
+  assert.ok(result.findings.some(f => f.id.startsWith("LIVE-STORAGE-BUCKET-")));
+  assert.equal(result.coverage.liveStorage, "PASS");
+});
+
+test("live hardening: insufficient bucket SELECT and failed TLS remain NOT_RUN without exposing errors", () => {
+  const insufficient = run(snapshot(), {
+    commandRunner: () => ({ status: 0, stdout: "AUDIT_STORAGE_READ_REJECTED\n" })
+  });
+  assert.equal(insufficient.status, "NOT_RUN");
+  assert.deepEqual(insufficient.coverage, { livePostgres: "NOT_RUN", liveStorage: "NOT_RUN" });
+
+  const tlsFailure = scanLiveDatabase({
+    env: {
+      SUPABASE_READONLY_DATABASE_URL: "postgresql://sherlock_audit:secret@prod.example.test:5432/postgres?sslmode=verify-full",
+      SUPABASE_AUDIT_ENVIRONMENT: "production",
+      SUPABASE_EXPECTED_PRODUCTION_HOST: "prod.example.test",
+      SUPABASE_EXPECTED_PRODUCTION_DATABASE: "postgres",
+      SUPABASE_EXPECTED_PRODUCTION_BUCKETS: "listing-photos",
+      SUPABASE_PRODUCTION_TARGET_CONFIRMATION: "PRODUCTION prod.example.test/postgres"
+    },
+    commandRunner: () => ({ status: 1, stdout: "", stderr: "certificate verify failed: secret" })
+  });
+  assert.equal(tlsFailure.status, "NOT_RUN");
+  assert.doesNotMatch(JSON.stringify(tlsFailure), /secret|certificate/);
+});
+
+test("live hardening: Production storage inventory mismatch does not produce a Storage PASS", () => {
+  const productionEnv = {
+    SUPABASE_READONLY_DATABASE_URL: "postgresql://sherlock_audit:secret@prod.example.test:5432/postgres?sslmode=verify-full",
+    SUPABASE_AUDIT_ENVIRONMENT: "production",
+    SUPABASE_EXPECTED_PRODUCTION_HOST: "prod.example.test",
+    SUPABASE_EXPECTED_PRODUCTION_DATABASE: "postgres",
+    SUPABASE_EXPECTED_PRODUCTION_BUCKETS: "listing-photos,private-documents",
+    SUPABASE_PRODUCTION_TARGET_CONFIRMATION: "PRODUCTION prod.example.test/postgres"
+  };
+  const result = scanLiveDatabase({
+    env: productionEnv,
+    commandRunner: () => {
+      const live = snapshot();
+      live.identity.name = live.identity.sessionUser = "sherlock_audit";
+      return { status: 0, stdout: JSON.stringify(live) };
+    }
+  });
+  assert.equal(result.coverage.livePostgres, "PASS");
+  assert.equal(result.coverage.liveStorage, "NOT_RUN");
+  assert.equal(result.status, "NOT_RUN");
+  assert.ok(result.findings.some(item => item.id === "LIVE-STORAGE-INVENTORY-001"));
+});
+
+test("live hardening: Production bucket settings and full policy expressions are retained", () => {
+  const productionEnv = {
+    SUPABASE_READONLY_DATABASE_URL: "postgresql://sherlock_audit:secret@prod.example.test:5432/postgres?sslmode=verify-full",
+    SUPABASE_AUDIT_ENVIRONMENT: "production",
+    SUPABASE_EXPECTED_PRODUCTION_HOST: "prod.example.test",
+    SUPABASE_EXPECTED_PRODUCTION_DATABASE: "postgres",
+    SUPABASE_EXPECTED_PRODUCTION_BUCKETS: "listing-photos",
+    SUPABASE_PRODUCTION_TARGET_CONFIRMATION: "PRODUCTION prod.example.test/postgres"
+  };
+  const result = scanLiveDatabase({
+    env: productionEnv,
+    commandRunner: () => {
+      const live = snapshot();
+      live.identity.name = live.identity.sessionUser = "sherlock_audit";
+      live.policies.push({
+        name: "owner_insert", table: "storage.objects", command: "INSERT", roles: ["authenticated"],
+        permissive: "PERMISSIVE", usingExpression: null, checkExpression: "auth.uid() = owner_id",
+        usingPresent: false, checkPresent: true, ownerUsing: false, ownerCheck: true, unconditional: false
+      });
+      return { status: 0, stdout: JSON.stringify(live) };
+    }
+  });
+  assert.equal(result.status, "PASS");
+  assert.equal(result.coverage.livePostgres, "PASS");
+  assert.equal(result.coverage.liveStorage, "PASS");
+  assert.deepEqual(result.metadata.storageBuckets[0], snapshot().storageBuckets[0]);
+  assert.equal(result.metadata.policies[0].checkExpression, "auth.uid() = owner_id");
+});
+
+test("live hardening: successful Production audit remains separate from absent migrations", t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "security-live-no-migrations-"));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const productionEnv = {
+    SUPABASE_READONLY_DATABASE_URL: "postgresql://sherlock_audit:secret@prod.example.test:5432/postgres?sslmode=verify-full",
+    SUPABASE_AUDIT_ENVIRONMENT: "production",
+    SUPABASE_EXPECTED_PRODUCTION_HOST: "prod.example.test",
+    SUPABASE_EXPECTED_PRODUCTION_DATABASE: "postgres",
+    SUPABASE_EXPECTED_PRODUCTION_BUCKETS: "listing-photos",
+    SUPABASE_PRODUCTION_TARGET_CONFIRMATION: "PRODUCTION prod.example.test/postgres"
+  };
+  const liveSnapshot = snapshot();
+  liveSnapshot.identity.name = liveSnapshot.identity.sessionUser = "sherlock_audit";
+  const { report } = runCli({
+    root, mode: "supabase", live: true, env: productionEnv,
+    liveOptions: { commandRunner: () => ({ status: 0, stdout: JSON.stringify(liveSnapshot) }) }
+  });
+  assert.equal(report.coverage.migrations, "NOT_RUN");
+  assert.equal(report.coverage.livePostgres, "PASS");
+  assert.equal(report.coverage.liveStorage, "PASS");
+  assert.equal(report.result, "NOT_RUN");
+  assert.equal(report.liveAudit.role, "sherlock_audit");
+  assert.equal(getExitCode(report, ["--require-live-complete"]), 0);
+  assert.equal(getExitCode(report, ["--require-complete"]), 2);
+  assert.equal(getExitCode({ ...report, coverage: { ...report.coverage, liveStorage: "NOT_RUN" } },
+    ["--require-live-complete"]), 2);
 });
 
 test("live hardening: PUBLIC DML grants alone are not confirmed attacks when RLS is enabled", () => {
@@ -298,10 +449,12 @@ test("live hardening: policy text heuristics remain potential including restrict
   const value = snapshot();
   for (const name of ["first_policy", "second_policy"]) value.policies.push({
     name, table: "public.messages", command: "ALL", roles: ["authenticated"], permissive: "RESTRICTIVE",
+    usingExpression: "true", checkExpression: "true",
     usingPresent: true, checkPresent: true, ownerUsing: false, ownerCheck: false, unconditional: true
   });
   value.policies.push({
     name: "reads", table: "public.messages", command: "SELECT", roles: ["public"], permissive: "PERMISSIVE",
+    usingExpression: "true", checkExpression: null,
     usingPresent: true, checkPresent: false, ownerUsing: false, ownerCheck: false, unconditional: true
   });
   const policies = run(value).findings.filter(f => f.id.startsWith("LIVE-POLICY"));
@@ -315,7 +468,10 @@ test("live hardening: effective function grants distinguish overloads and honor 
   addFunction(value, "public.lookup(integer)");
   addFunction(value, "public.lookup(text)");
   value.memberships.push({ member: "anon", role: "rpc_group", inherit: true, admin: false });
-  value.functionGrants.push({ grantee: "rpc_group", name: "public.lookup(text)", privilege: "EXECUTE" });
+  value.functionGrants.push({
+    grantee: "rpc_group", name: "public.lookup(text)", privilege: "EXECUTE",
+    grantable: false, grantor: "owner"
+  });
   value.effectiveFunctionPrivileges.find(r => r.role === "anon" && r.name === "public.lookup(text)").allowed = true;
   const result = run(value);
   const executable = result.findings.filter(f => f.id.startsWith("LIVE-RPC-002-"));

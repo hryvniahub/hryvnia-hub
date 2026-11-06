@@ -252,8 +252,10 @@ test("live scan is NOT_RUN without a read-only database URL and never prints cre
       metaCommands.push(command.trim());
       return command.trim() === "\\gset" ? ";" : "";
     });
-    assert.deepEqual(metaCommands, ["\\gset", "\\if :audit_safe", "\\else",
-      "\\echo AUDIT_IDENTITY_REJECTED", "\\endif"]);
+    assert.deepEqual(metaCommands, [
+      "\\gset", "\\if :audit_safe", "\\gset", "\\if :storage_readable", "\\else",
+      "\\echo AUDIT_STORAGE_READ_REJECTED", "\\endif", "\\else", "\\echo AUDIT_IDENTITY_REJECTED", "\\endif"
+    ]);
     // Consume entire tokens so quoted privilege names and semicolons are not SQL commands.
     const token = /\s+|'(?:''|\\.|[^'\\])*'|"(?:[^"]|"")*"|(\$[A-Za-z_0-9]*\$)[\s\S]*?\1|[A-Za-z_][A-Za-z_0-9$]*|[0-9]+|[^'"\s$]/gy;
     const statements = [[]];
@@ -285,9 +287,13 @@ test("live scan is NOT_RUN without a read-only database URL and never prints cre
           "INSERT", "UPDATE", "DELETE", "TRUNCATE", "ALTER", "DROP", "CREATE", "MERGE",
           "COPY", "CALL", "DO", "GRANT", "REVOKE", "INTO", "COMMIT", "EXECUTE"
         ].includes(word)), "Catalog SELECT must not contain executable mutation or SELECT INTO");
-        assert.ok(!statement.some((word, index) => ["FROM", "JOIN"].includes(word)
-          && ["PUBLIC", "STORAGE"].includes(statement[index + 1])
-          && statement[index + 2] === "."), "Read only catalogs, not application or bucket rows");
+        for (let index = 0; index < statement.length; index++) {
+          if (["FROM", "JOIN"].includes(statement[index])
+            && ["PUBLIC", "STORAGE"].includes(statement[index + 1]) && statement[index + 2] === ".") {
+            assert.deepEqual(statement.slice(index, index + 4), ["FROM", "STORAGE", ".", "BUCKETS"],
+              "Read only catalogs and the whitelisted bucket metadata table");
+          }
+        }
       }
     }
   }
@@ -304,7 +310,7 @@ test("live scan is NOT_RUN without a read-only database URL and never prints cre
     "COPY public.messages TO STDOUT;",
     "CALL public.mutate();",
     "DO $$ BEGIN DELETE FROM public.messages; END $$;",
-    "SELECT * FROM storage.buckets;"
+    "SELECT * FROM storage.objects;"
   ]) {
     assert.throws(() => assertReadOnlySql(READ_ONLY_QUERY.replace("ROLLBACK;", `${mutation}\nROLLBACK;`)),
       assert.AssertionError, mutation);
@@ -316,28 +322,36 @@ test("live scan is NOT_RUN without a read-only database URL and never prints cre
 });
 
 test("live catalog findings distinguish observed policy problems and reject service_role", () => {
-  const tables = ["public.listings", "public.messages", "public.conversations", "public.favorites", "storage.objects"]
+  const tables = ["public.listings", "public.messages", "public.conversations", "public.favorites", "storage.objects", "storage.buckets"]
     .map((name, index) => ({ name, oid: index + 1, rls: true, forceRls: false, owner: "schema_owner" }));
-  const roles = ["anon", "authenticated"].map(name => ({ name, superuser: false, bypassRls: false }));
+  const roles = ["anon", "authenticated"].map(name => ({
+    name, superuser: false, bypassRls: false, inherit: true, createRole: false, createDb: false, replication: false
+  }));
   const snapshot = {
-    version: 1,
+    version: 2,
     identity: {
       name: "catalog_audit", sessionUser: "catalog_audit", auditSafe: true,
       superuser: false, bypassRls: false, createRole: false, createDb: false, replication: false
     },
     roles, memberships: [], tables,
+    storageBuckets: [{
+      id: "listing-photos", name: "listing-photos", public: false,
+      fileSizeLimit: 10485760, allowedMimeTypes: ["image/jpeg"]
+    }],
     policies: [{
       name: "open_messages", table: "public.messages", command: "SELECT",
       roles: ["authenticated"], permissive: "PERMISSIVE", unconditional: true,
+      usingExpression: "true", checkExpression: null,
       usingPresent: true, checkPresent: false, ownerUsing: false, ownerCheck: false
     }, {
       name: "unverified_owner", table: "storage.objects", command: "UPDATE",
       roles: ["authenticated"], permissive: "PERMISSIVE", unconditional: false,
+      usingExpression: "bucket_id = 'listing-photos'", checkExpression: "owner_id IS NOT NULL",
       usingPresent: true, checkPresent: true, ownerUsing: false, ownerCheck: false
     }],
     functions: [{ name: "public.definer_fn()", oid: 100, definer: true, owner: "schema_owner", config: [] }],
-    functionGrants: [],
-    grants: [{ grantee: "anon", table: "public.messages", privilege: "TRUNCATE" }],
+    functionGrants: [], columnGrants: [], sequenceGrants: [], sequences: [], schemaGrants: [], defaultGrants: [],
+    grants: [{ grantee: "anon", table: "public.messages", privilege: "TRUNCATE", grantable: false, grantor: "schema_owner" }],
     effectiveTablePrivileges: roles.flatMap(role => tables.flatMap(table =>
       ["SELECT", "INSERT", "UPDATE", "DELETE", "TRUNCATE", "REFERENCES", "TRIGGER"].map(privilege => ({
         role: role.name, table: table.name, privilege,
@@ -345,6 +359,7 @@ test("live catalog findings distinguish observed policy problems and reject serv
         columnAllowed: false, owner: false
       })))),
     effectiveFunctionPrivileges: roles.map(role => ({ role: role.name, name: "public.definer_fn()", allowed: false })),
+    effectiveSequencePrivileges: [],
     effectiveSchemaPrivileges: roles.flatMap(role => ["public", "storage"].map(schema => ({
       role: role.name, schema, usage: true, create: false
     })))
@@ -363,7 +378,8 @@ test("live catalog findings distinguish observed policy problems and reject serv
   assert.equal(finding("LIVE-RPC-001").severity, "HIGH");
   assert.equal(finding("LIVE-GRANT-001").severity, "HIGH");
   assert.equal(finding("LIVE-GRANT-001").status, "confirmed");
-  assert.equal(finding("LIVE-STORAGE-NOT-RUN").status, "not-run");
+  assert.equal(finding("LIVE-STORAGE-BUCKET").status, "confirmed");
+  assert.match(finding("LIVE-POLICY-003").evidence, /USING: true; WITH CHECK: \(none\)/);
   assert.equal(findings.some(item => item.id.startsWith("LIVE-CONNECTION-001-")), false);
 
   const rlsDisabled = structuredClone(snapshot);
@@ -401,15 +417,16 @@ test("GitHub Actions retains existing checks and every npm run command is declar
   const commands = [...workflow.matchAll(/^\s*run:\s*npm run ([A-Za-z0-9:_-]+)/gm)].map(match => match[1]);
   assert.ok(commands.length > 0);
   for (const command of commands) assert.ok(packageJson.scripts[command], `Missing package.json script: ${command}`);
-  assert.equal((workflow.match(/run: npm run security:test/g) || []).length, 3);
-  assert.equal((workflow.match(/run: npm test/g) || []).length, 3);
-  assert.equal((workflow.match(/run: npm run check:app/g) || []).length, 3);
+  assert.equal((workflow.match(/run: npm run security:test/g) || []).length, 4);
+  assert.equal((workflow.match(/run: npm test/g) || []).length, 4);
+  assert.equal((workflow.match(/run: npm run check:app/g) || []).length, 4);
   assert.match(workflow, /name: Repository Scan/);
   assert.match(workflow, /name: Supabase Scan/);
   assert.match(workflow, /name: Full Security Audit/);
   assert.match(workflow, /Check Supabase structure/);
   assert.match(workflow, /workflow_dispatch:/);
   assert.match(workflow, /schedule:/);
+  assert.match(workflow, /name: Protected Production Security Audit/);
   assert.doesNotMatch(workflow, /--no-audit/);
 });
 

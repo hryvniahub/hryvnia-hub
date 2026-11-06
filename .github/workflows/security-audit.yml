@@ -12,6 +12,10 @@ on:
           - repository-scan
           - supabase-scan
           - full-security-audit
+      production_confirmation:
+        description: For Full Security Audit, enter PRODUCTION <expected-host>/<expected-database>
+        type: string
+        required: false
   schedule:
     - cron: "23 6 * * 1"
   push:
@@ -23,7 +27,7 @@ permissions:
 jobs:
   repository-scan:
     name: Repository Scan
-    if: github.event_name != 'workflow_dispatch' || inputs.mode == 'repository-scan' || inputs.mode == 'full-security-audit'
+    if: github.event_name != 'workflow_dispatch' || inputs.mode == 'repository-scan'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -58,7 +62,7 @@ jobs:
 
   supabase-scan:
     name: Supabase Scan
-    if: github.event_name != 'workflow_dispatch' || inputs.mode == 'supabase-scan' || inputs.mode == 'full-security-audit'
+    if: github.event_name != 'workflow_dispatch' || inputs.mode == 'supabase-scan'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -101,7 +105,7 @@ jobs:
 
   full-security-audit:
     name: Full Security Audit
-    if: github.event_name != 'workflow_dispatch' || inputs.mode == 'full-security-audit'
+    if: github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -139,6 +143,51 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: full-security-report
+          path: security-report.*
+          if-no-files-found: error
+          retention-days: 30
+
+  production-audit:
+    name: Protected Production Security Audit
+    if: github.event_name == 'workflow_dispatch' && inputs.mode == 'full-security-audit' && github.ref == 'refs/heads/security-scanner-full-audit'
+    runs-on: ubuntu-latest
+    environment:
+      name: supabase-production-audit
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Run scanner tests
+        run: npm run security:test
+      - name: Run all application and scanner regression tests
+        run: npm test
+      - name: Check application JavaScript syntax
+        run: npm run check:app
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y postgresql-client
+      - name: Run full audit with protected Production inspection
+        if: success()
+        env:
+          SUPABASE_AUDIT_ENVIRONMENT: production
+          SUPABASE_READONLY_DATABASE_URL: ${{ secrets.SUPABASE_READONLY_DATABASE_URL }}
+          SUPABASE_EXPECTED_PRODUCTION_HOST: ${{ vars.SUPABASE_EXPECTED_PRODUCTION_HOST }}
+          SUPABASE_EXPECTED_PRODUCTION_DATABASE: ${{ vars.SUPABASE_EXPECTED_PRODUCTION_DATABASE }}
+          SUPABASE_EXPECTED_PRODUCTION_BUCKETS: ${{ vars.SUPABASE_EXPECTED_PRODUCTION_BUCKETS }}
+          SUPABASE_PRODUCTION_TARGET_CONFIRMATION: ${{ inputs.production_confirmation }}
+        run: node security/cli.cjs audit --live-supabase --require-live-complete
+      - name: Publish report
+        if: always()
+        run: if [ -f security-report.md ]; then cat security-report.md >> "$GITHUB_STEP_SUMMARY"; fi
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: production-security-report
           path: security-report.*
           if-no-files-found: error
           retention-days: 30

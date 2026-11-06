@@ -61,7 +61,7 @@ npm run security:report
 
 Отчёт группирует Repository Security, Supabase Database Security, Storage Security, Dependencies, Authentication и SQL/RLS; показывает Critical/High/Medium/Low/Info и статусы `PASS`/`FAIL`/`NOT_RUN`. Отсутствие источников или невозможность проверки не трактуется как успех. Для npm advisory нужен lockfile и доступ к npm registry; `npm audit` не отключается.
 
-Для live-проверки каталога требуется установленный `psql` и локальная переменная окружения с отдельным read-only PostgreSQL URL:
+Для live-проверки требуется установленный `psql` и отдельный PostgreSQL login. URL не передаётся в аргументах процесса и не сохраняется в отчёте:
 
 ```sh
 export SUPABASE_READONLY_DATABASE_URL='postgresql://<read-only-user>:<password>@<host>:5432/postgres'
@@ -70,6 +70,18 @@ node security/cli.cjs audit --live-supabase
 unset SUPABASE_READONLY_DATABASE_URL
 ```
 
-Live режим запускает только фиксированный запрос к системному каталогу внутри `BEGIN READ ONLY`; строки объявлений, сообщения, пользовательские данные и содержимое файлов не читаются. URL `service_role` отклоняется, DDL/DML отсутствует, ошибка подключения не раскрывает URL или вывод `psql`. Не коммитьте URL/пароли. Поскольку репозиторий не хранит production credentials, live-проверка здесь `NOT_RUN`, пока оператор явно не запустит CLI с допустимым URL. В этом репозитории нет SQL migrations; тестовые фикстуры валидируют правила, но не заменяют production-схему или тестовые аккаунты. Полноценные сценарии эффективных прав, ownership, RPC и Storage требуют проверенной развёрнутой схемы и отдельных безопасных тестовых аккаунтов.
+Live scanner читает каталоги PostgreSQL в `BEGIN READ ONLY` и только конфигурационные колонки `storage.buckets` (`id`, `name`, `public`, лимит размера и MIME-типы). Он не читает пользовательские таблицы/строки, `storage.objects` или тела функций и не исполняет RPC. Перед сканированием проверяется отдельный login: без memberships, владения объектами, повышенных атрибутов, эффективных DML/DDL или доступа к пользовательским таблицам. TLS вне loopback требует `sslmode=verify-full`; URL `service_role` отклоняется, а ошибки и credentials не попадают в отчёт. При недостаточных правах, неполном snapshot или неполном inventory Storage coverage остаётся `NOT_RUN`, а не `PASS`.
 
-GitHub Actions workflow `.github/workflows/security-audit.yml` сохраняет ручной запуск, еженедельный Full Security Audit и запуск при изменении исходников сканера/SQL. На Android: открыть репозиторий в GitHub → **Actions** → **Security Scanner** → **Run workflow** → выбрать Repository Scan, Supabase Scan или Full Security Audit. Загруженный артефакт содержит Markdown и JSON; live-проверка Production в Actions всегда `NOT_RUN`, поскольку workflow намеренно не получает database credentials. Запускайте live CLI только из доверенной локальной среды с read-only URL в переменной окружения. Workflow не применяет миграции и не исправляет конфигурацию.
+Для Production дополнительно обязательны `SUPABASE_AUDIT_ENVIRONMENT=production`, `SUPABASE_EXPECTED_PRODUCTION_HOST`, `SUPABASE_EXPECTED_PRODUCTION_DATABASE`, `SUPABASE_EXPECTED_PRODUCTION_BUCKETS` (список имён через запятую) и точное подтверждение `SUPABASE_PRODUCTION_TARGET_CONFIRMATION="PRODUCTION <host>/<database>"`. URL должен использовать login `sherlock_audit`, совпадающие host/database и `sslmode=verify-full`. Не запускайте Production audit без отдельного разрешения и защищённого окружения. Если для чтения bucket metadata не хватает прав, минимальная SQL-заявка на согласование (не выполнять автоматически) такова:
+
+```sql
+GRANT USAGE ON SCHEMA storage TO sherlock_audit;
+GRANT SELECT (id, name, public, file_size_limit, allowed_mime_types)
+  ON TABLE storage.buckets TO sherlock_audit;
+```
+
+Этот grant не обходит RLS: если policies скрывают часть bucket inventory, Storage coverage останется `NOT_RUN`; scanner не добавляет policies и не выдаёт права. Отсутствие локальных SQL migrations отдельно отражается в coverage и не мешает запустить live scan, но общий отчёт не выдаёт полный `PASS` при неполном покрытии.
+
+GitHub Actions workflow `.github/workflows/security-audit.yml` сохраняет существующие проверки на push/PR/schedule; они не подключаются к Production. Для единого ручного аудита выберите **Full Security Audit** через **Actions → Security Scanner → Run workflow** на ветке `security-scanner-full-audit` и введите точное подтверждение `PRODUCTION <host>/<database>`. Production job требует Environment approval и выполняет Repository, migration и live проверки в одном отчёте; при отсутствии migrations отчёт остаётся `NOT_RUN`, хотя успешная live-проверка выполняется и проверяется отдельно.
+
+Перед первым запуском настройте GitHub Environment `supabase-production-audit` с required reviewers, secret `SUPABASE_READONLY_DATABASE_URL` и variables `SUPABASE_EXPECTED_PRODUCTION_HOST`, `SUPABASE_EXPECTED_PRODUCTION_DATABASE`, `SUPABASE_EXPECTED_PRODUCTION_BUCKETS` (имена bucket через запятую). Secret доступен только защищённой Production job и передаётся только scanner step после approval. Не храните credentials в коде; workflow не применяет migrations и не изменяет Production.

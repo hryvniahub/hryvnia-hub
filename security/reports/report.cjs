@@ -26,6 +26,7 @@ function createReport({
   sourceAvailable = scannedFiles.length > 0,
   coverage = {},
   reviewedSinks = [],
+  liveAudit = null,
   generatedAt = new Date().toISOString()
 }) {
   const blocking = Object.values(coverage).includes("FAIL") || findings.some(finding =>
@@ -53,15 +54,19 @@ function createReport({
     counts,
     categoryCounts,
     coverage: {
-      repository: coverage.repository || (sourceAvailable ? "PASS" : "NOT_RUN"),
       dependencies: coverage.dependencies || "NOT_RUN",
       staticSql: coverage.staticSql || "NOT_RUN",
-      database: coverage.database || "NOT_RUN",
-      storage: coverage.storage || "NOT_RUN",
+      repository: coverage.repository || (sourceAvailable ? "PASS" : "NOT_RUN"),
+      livePostgres: coverage.livePostgres || coverage.database || "NOT_RUN",
+      liveStorage: coverage.liveStorage || coverage.storage || "NOT_RUN",
+      migrations: coverage.migrations || (sourceAvailable ? "PASS" : "NOT_RUN"),
+      database: coverage.livePostgres || coverage.database || "NOT_RUN",
+      storage: coverage.liveStorage || coverage.storage || "NOT_RUN",
       authentication: coverage.authentication || (sourceAvailable ? "PASS" : "NOT_RUN"),
       reason: coverage.reason || "Live database inspection is disabled unless an explicit read-only database URL is supplied."
     },
     reviewedSinks,
+    liveAudit,
     findings
   };
 }
@@ -117,6 +122,69 @@ function renderMarkdown(report) {
     "These are not suppressed findings: the AST established constant markup or the exact local HTML escaper in a supported context. Unknown flows remain HIGH.", "",
     "| File | Line | Rule | Reason |", "|---|---:|---|---|",
     ...(report.reviewedSinks || []).map(item => `| ${escapeMarkdown(item.file)} | ${escapeMarkdown(item.line)} | ${escapeMarkdown(item.rule)} | ${escapeMarkdown(item.reason)} |`), "");
+  if (report.liveAudit) {
+    const audit = report.liveAudit;
+    lines.push("## Live PostgreSQL metadata", "",
+      `- **Database:** ${escapeMarkdown(audit.database)}`,
+      `- **Audit role:** ${escapeMarkdown(audit.role)}`,
+      "",
+      "### Roles",
+      "",
+      ...(audit.roles || []).map(role => `- ${escapeMarkdown(role.name)}: superuser=${escapeMarkdown(role.superuser)}, bypassRls=${escapeMarkdown(role.bypassRls)}, inherit=${escapeMarkdown(role.inherit)}, createRole=${escapeMarkdown(role.createRole)}, createDb=${escapeMarkdown(role.createDb)}, replication=${escapeMarkdown(role.replication)}`),
+      "",
+      "### Role memberships",
+      "",
+      ...(audit.memberships || []).map(item => `- ${escapeMarkdown(item.member)} → ${escapeMarkdown(item.role)} (inherit=${escapeMarkdown(item.inherit)}, admin=${escapeMarkdown(item.admin)})`),
+      "",
+      "### Tables and RLS",
+      "",
+      ...(audit.tables || []).map(item => `- ${escapeMarkdown(item.name)}: RLS=${escapeMarkdown(item.rls)}, FORCE RLS=${escapeMarkdown(item.forceRls)}, owner=${escapeMarkdown(item.owner)}`),
+      "",
+      "### Policies",
+      "",
+      ...(audit.policies || []).map(item => `- **${escapeMarkdown(item.table)} / ${escapeMarkdown(item.name)}** (${escapeMarkdown(item.command)}, ${escapeMarkdown(item.permissive)}, roles=${escapeMarkdown((item.roles || []).join(", "))})<br>USING: ${escapeMarkdown(item.usingExpression ?? "(none)")}<br>WITH CHECK: ${escapeMarkdown(item.checkExpression ?? "(none)")}`),
+      "",
+      "### Table ACL",
+      "",
+      ...(audit.grants || []).map(item => `- ${escapeMarkdown(item.grantee)} → ${escapeMarkdown(item.table)}: ${escapeMarkdown(item.privilege)} (grantable=${escapeMarkdown(item.grantable)}, grantor=${escapeMarkdown(item.grantor)})`),
+      "",
+      "### Column ACL",
+      "",
+      ...(audit.columnGrants || []).map(item => `- ${escapeMarkdown(item.grantee)} → ${escapeMarkdown(item.table)}.${escapeMarkdown(item.column)}: ${escapeMarkdown(item.privilege)} (grantable=${escapeMarkdown(item.grantable)}, grantor=${escapeMarkdown(item.grantor)})`),
+      "",
+      "### Schema ACL",
+      "",
+      ...(audit.schemaGrants || []).map(item => `- ${escapeMarkdown(item.grantee)} → ${escapeMarkdown(item.name)}: ${escapeMarkdown(item.privilege)} (grantable=${escapeMarkdown(item.grantable)}, grantor=${escapeMarkdown(item.grantor)})`),
+      "",
+      "### Default ACL",
+      "",
+      ...(audit.defaultGrants || []).map(item => `- ${escapeMarkdown(item.owner)} (${escapeMarkdown(item.schema)}/${escapeMarkdown(item.objectType)}) → ${escapeMarkdown(item.grantee)}: ${escapeMarkdown(item.privilege)} (grantable=${escapeMarkdown(item.grantable)}, grantor=${escapeMarkdown(item.grantor)})`),
+      "",
+      "### Sequence ACL",
+      "",
+      ...(audit.sequenceGrants || []).map(item => `- ${escapeMarkdown(item.grantee)} → ${escapeMarkdown(item.name)}: ${escapeMarkdown(item.privilege)} (grantable=${escapeMarkdown(item.grantable)}, grantor=${escapeMarkdown(item.grantor)})`),
+      "",
+      "### Functions and function ACL",
+      "",
+      ...(audit.functions || []).map(item => `- ${escapeMarkdown(item.name)}: SECURITY DEFINER=${escapeMarkdown(item.definer)}, owner=${escapeMarkdown(item.owner)}, config=${escapeMarkdown((item.config || []).join(", ") || "(none)")}`),
+      ...(audit.functionGrants || []).map(item => `- ${escapeMarkdown(item.grantee)} → ${escapeMarkdown(item.name)}: EXECUTE (grantable=${escapeMarkdown(item.grantable)}, grantor=${escapeMarkdown(item.grantor)})`),
+      "",
+      "### Effective privileges",
+      "",
+      ...(audit.effectiveTablePrivileges || []).filter(item => item.allowed || item.columnAllowed || item.owner)
+        .map(item => `- ${escapeMarkdown(item.role)} → ${escapeMarkdown(item.table)}: ${escapeMarkdown(item.privilege)} (allowed=${escapeMarkdown(item.allowed)}, column=${escapeMarkdown(item.columnAllowed)}, owner=${escapeMarkdown(item.owner)})`),
+      ...(audit.effectiveFunctionPrivileges || []).filter(item => item.allowed)
+        .map(item => `- ${escapeMarkdown(item.role)} → ${escapeMarkdown(item.name)}: EXECUTE`),
+      ...(audit.effectiveSchemaPrivileges || []).filter(item => item.usage || item.create)
+        .map(item => `- ${escapeMarkdown(item.role)} → schema ${escapeMarkdown(item.schema)}: USAGE=${escapeMarkdown(item.usage)}, CREATE=${escapeMarkdown(item.create)}`),
+      ...(audit.effectiveSequencePrivileges || []).filter(item => item.usage || item.select || item.update)
+        .map(item => `- ${escapeMarkdown(item.role)} → ${escapeMarkdown(item.name)}: USAGE=${escapeMarkdown(item.usage)}, SELECT=${escapeMarkdown(item.select)}, UPDATE=${escapeMarkdown(item.update)}`),
+      "",
+      "### Storage buckets",
+      "",
+      ...(audit.storageBuckets || []).map(item => `- ${escapeMarkdown(item.name)} (${escapeMarkdown(item.id)}): public=${escapeMarkdown(item.public)}, fileSizeLimit=${escapeMarkdown(item.fileSizeLimit === null ? "unlimited" : item.fileSizeLimit)}, allowedMimeTypes=${escapeMarkdown(item.allowedMimeTypes === null ? "unrestricted" : (item.allowedMimeTypes || []).join(", ") || "empty")}`),
+      "");
+  }
   return `${lines.join("\n")}\n`;
 }
 

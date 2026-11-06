@@ -24,7 +24,9 @@ function run({
   reportDir = root,
   mode = "full",
   live = false,
-  runNpmAudit = true
+  runNpmAudit = true,
+  env = process.env,
+  liveOptions = {}
 } = {}) {
   const absoluteSource = path.resolve(root, sourceDir);
   const files = collectSqlFiles(absoluteSource);
@@ -32,6 +34,8 @@ function run({
   const scannedFiles = [];
   const coverage = {};
   const reviewedSinks = [];
+  let liveAudit;
+  coverage.migrations = files.length ? "PASS" : "NOT_RUN";
   const areaStatus = (items, fallback = "PASS") => items.some(item =>
     item.status !== "not-run" && ["CRITICAL", "HIGH"].includes(item.severity)) ? "FAIL" : fallback;
 
@@ -72,13 +76,18 @@ function run({
     }
 
     const database = live
-      ? scanLiveDatabase()
-      : { status: "NOT_RUN", findings: [], reason: "Live database inspection was not requested." };
+      ? scanLiveDatabase({ env, ...liveOptions })
+      : {
+          status: "NOT_RUN",
+          findings: [],
+          coverage: { livePostgres: "NOT_RUN", liveStorage: "NOT_RUN" },
+          reason: "Live database inspection was not requested."
+        };
     findings.push(...database.findings);
-    coverage.database = database.status;
-    coverage.storage = areaStatus(findings.filter(item => item.category === "Storage Security"),
-      database.status === "PASS" ? "PASS" : files.length ? "PASS" : "NOT_RUN");
+    coverage.livePostgres = database.coverage?.livePostgres || "NOT_RUN";
+    coverage.liveStorage = database.coverage?.liveStorage || "NOT_RUN";
     coverage.reason = database.reason;
+    liveAudit = database.metadata;
   }
 
   const report = createReport({
@@ -86,18 +95,29 @@ function run({
     scannedFiles: [...new Set(scannedFiles)].sort(),
     sourceAvailable: scannedFiles.length > 0,
     coverage,
-    reviewedSinks
+    reviewedSinks,
+    liveAudit
   });
   const written = writeReport(report, reportDir);
   return { report, written };
 }
 
+function getExitCode(report, argv) {
+  if (report.result === "FAIL") return 1;
+  if (argv.includes("--require-live-complete")
+    && (report.coverage.livePostgres !== "PASS" || report.coverage.liveStorage !== "PASS")) return 2;
+  if (argv.includes("--require-complete") && report.result === "NOT_RUN") return 2;
+  return 0;
+}
+
 function main(argv) {
   const command = argv[0] || "audit";
   if (!["repository", "supabase", "audit", "report"].includes(command)
-    || argv.slice(1).some(argument => !["--live-supabase", "--require-complete"].includes(argument) && !/^--sql-dir=.+/.test(argument))
+    || argv.slice(1).some(argument =>
+      !["--live-supabase", "--require-complete", "--require-live-complete"].includes(argument)
+      && !/^--sql-dir=.+/.test(argument))
     || (command === "repository" && argv.includes("--live-supabase"))) {
-    console.error("Usage: node security/cli.cjs [repository|supabase|audit|report] [--sql-dir=PATH] [--live-supabase] [--require-complete]");
+    console.error("Usage: node security/cli.cjs [repository|supabase|audit|report] [--sql-dir=PATH] [--live-supabase] [--require-complete] [--require-live-complete]");
     process.exitCode = 2;
     return;
   }
@@ -111,10 +131,9 @@ function main(argv) {
   console.log(`Files: ${report.scannedFiles.length}; findings: ${report.findings.length}`);
   console.log(`Reports: ${path.relative(process.cwd(), written.markdownPath)}, ${path.relative(process.cwd(), written.jsonPath)}`);
   console.log(report.coverage.reason);
-  if (report.result === "FAIL") process.exitCode = 1;
-  else if (argv.includes("--require-complete") && report.result === "NOT_RUN") process.exitCode = 2;
+  process.exitCode = getExitCode(report, argv);
 }
 
 if (require.main === module) main(process.argv.slice(2));
 
-module.exports = { collectSqlFiles, main, run };
+module.exports = { collectSqlFiles, getExitCode, main, run };

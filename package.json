@@ -4,6 +4,10 @@
   "scripts": {
     "security:audit": "node security/cli.cjs audit",
     "security:test": "node --test security/tests/*.test.cjs",
-    "security:report": "node security/cli.cjs report"
+    "security:report": "node security/cli.cjs report",
+    "security:production": "node security/cli.cjs production-audit"
+  },
+  "dependencies": {
+    "pg": "^8.16.3"
   }
 }

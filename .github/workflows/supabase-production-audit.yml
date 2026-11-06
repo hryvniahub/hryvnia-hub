@@ -1,0 +1,77 @@
+name: Supabase Production Metadata Audit
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: Type AUDIT SUPABASE PRODUCTION READ ONLY to authorize a live connection
+        required: true
+        type: string
+      target_host:
+        description: Type the expected Production hostname
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supabase-production-audit
+  cancel-in-progress: false
+
+jobs:
+  production:
+    name: Read-only Production metadata audit
+    if: github.ref == 'refs/heads/main' && inputs.confirmation == 'AUDIT SUPABASE PRODUCTION READ ONLY'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment:
+      name: supabase-production-audit
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+      - name: Confirm target
+        env:
+          CONFIRMED_HOST: ${{ inputs.target_host }}
+          EXPECTED_HOST: ${{ vars.SUPABASE_PRODUCTION_HOST }}
+        run: |
+          if [ -z "$EXPECTED_HOST" ] || [ "$CONFIRMED_HOST" != "$EXPECTED_HOST" ]; then
+            echo "::error::Production hostname confirmation does not match"
+            exit 1
+          fi
+      - name: Validate audit configuration without connecting
+        id: readiness
+        env:
+          SUPABASE_READONLY_DATABASE_URL: ${{ secrets.SUPABASE_READONLY_DATABASE_URL }}
+          SUPABASE_PRODUCTION_HOST: ${{ vars.SUPABASE_PRODUCTION_HOST }}
+          SUPABASE_PRODUCTION_DATABASE: ${{ vars.SUPABASE_PRODUCTION_DATABASE }}
+          SUPABASE_PRODUCTION_STORAGE_BUCKETS: ${{ vars.SUPABASE_PRODUCTION_STORAGE_BUCKETS }}
+        run: node security/production-readiness.cjs
+      - name: Audit Production metadata
+        id: audit
+        env:
+          SHERLOCK_PRODUCTION_CONFIRMATION: ${{ inputs.confirmation }}
+          SUPABASE_READONLY_DATABASE_URL: ${{ secrets.SUPABASE_READONLY_DATABASE_URL }}
+          SUPABASE_PRODUCTION_HOST: ${{ vars.SUPABASE_PRODUCTION_HOST }}
+          SUPABASE_PRODUCTION_DATABASE: ${{ vars.SUPABASE_PRODUCTION_DATABASE }}
+          SUPABASE_PRODUCTION_STORAGE_BUCKETS: ${{ vars.SUPABASE_PRODUCTION_STORAGE_BUCKETS }}
+        run: npm run security:production
+      - name: Upload metadata audit report
+        if: always() && steps.audit.outcome != 'skipped' && steps.readiness.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: supabase-production-metadata-audit
+          path: |
+            supabase-production-report.json
+            supabase-production-report.md
+          if-no-files-found: warn
+          retention-days: 7

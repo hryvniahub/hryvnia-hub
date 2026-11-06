@@ -46,20 +46,30 @@ Experimental branch test
 
 ## Security Scanner
 
-Локальный статический сканер читает SQL-файлы из `supabase/migrations/` и не подключается к Supabase:
+Security Scanner использует существующий модуль `security/`: репозиторный анализатор, SQL/RLS анализатор, отдельный read-only инспектор каталога Supabase, CLI и общий Markdown/JSON отчёт. Статические сигналы помечаются `POTENTIAL`; подтверждённые результаты npm advisory и непосредственно наблюдаемые настройки отделяются от предположений.
 
 ```sh
+npm test
+npm run check:app
+npm run security:repository
+npm run security:supabase
 npm run security:audit
-npm run security:test
 npm run security:report
 ```
 
-`security:audit` пишет `security-report.md` и `security-report.json` в корень репозитория и завершается с ошибкой при статических находках CRITICAL/HIGH. `security:report` создаёт те же отчёты без порогового кода завершения. Отчёты игнорируются Git; Workflow сохраняет их как Actions Artifact.
+`security:repository` проверяет JavaScript/HTML на опасные DOM/XSS sinks и динамическое исполнение, ищет private credentials без вывода значения, анализирует GitHub Actions и выполняет полноценный `npm audit` по `package-lock.json`. `security:supabase` проверяет SQL migrations, RLS/policies, ownership, GRANT, SECURITY DEFINER/RPC и Storage. `security:audit` объединяет обе области; команды пишут `security-report.md` и `security-report.json` в корень. `security:report` формирует тот же отчёт без ненулевого кода завершения по CRITICAL/HIGH.
 
-Сканер проверяет миграции на отсутствие RLS у созданных публичных таблиц, роли с `BYPASSRLS` (CRITICAL для `anon`/`authenticated`, HIGH для остальных), широкие/неограниченные политики и пересечения permissive-политик, опасные GRANT для `anon`/`authenticated`, SECURITY DEFINER без видимого фиксированного `search_path`, динамический SQL и некоторые признаки Storage-политик. Статические находки — потенциальные риски для проверки человеком, не подтверждённые уязвимости. Результат `PASS` относится только к пройденному статическому сканированию и не подтверждает безопасность развернутой базы. При отсутствии миграций результат `INCOMPLETE`; проверки схемы и БД указываются как `NOT_RUN`.
+Отчёт группирует Repository Security, Supabase Database Security, Storage Security, Dependencies, Authentication и SQL/RLS; показывает Critical/High/Medium/Low/Info и статусы `PASS`/`FAIL`/`NOT_RUN`. Отсутствие источников или невозможность проверки не трактуется как успех. Для npm advisory нужен lockfile и доступ к npm registry; `npm audit` не отключается.
 
-`security:test` проверяет SQL-анализатор и его экспортируемые функции, игнорирование комментариев и SQL-литералов, строки исходных миграций, а также интеграцию CLI: создание обоих отчётов и коды завершения `audit`/`report`. CLI-тесты используют временные локальные SQL-файлы без подключения к Supabase.
+Для live-проверки каталога требуется установленный `psql` и локальная переменная окружения с отдельным read-only PostgreSQL URL:
 
-Сейчас в репозитории нет миграций Supabase, тестовой схемы или конфигурации pgTAP. Поэтому проверка поведения anon/authenticated/service_role, владения объявлениями/избранным/перепиской/фотографиями и фактических RPC/Storage ограничений не выполняется; тестировать эти сценарии на выдуманной схеме было бы недостоверно. Сканер не изменяет SQL и не делает сетевых запросов.
+```sh
+export SUPABASE_READONLY_DATABASE_URL='postgresql://<read-only-user>:<password>@<host>:5432/postgres'
+node security/cli.cjs supabase --live-supabase
+node security/cli.cjs audit --live-supabase
+unset SUPABASE_READONLY_DATABASE_URL
+```
 
-GitHub Actions workflow `.github/workflows/security-audit.yml` запускается вручную, еженедельно и при изменениях `supabase/**`, `security/**`, `package.json` или самого workflow. Для статической проверки секреты и переменные Supabase не нужны. Workflow выполняет тесты сканера, формирует оба отчёта и загружает артефакт `security-report` на 30 дней. Он намеренно не использует `service_role`, не читает Production и не запускает миграции.
+Live режим запускает только фиксированный запрос к системному каталогу внутри `BEGIN READ ONLY`; строки объявлений, сообщения, пользовательские данные и содержимое файлов не читаются. URL `service_role` отклоняется, DDL/DML отсутствует, ошибка подключения не раскрывает URL или вывод `psql`. Не коммитьте URL/пароли. Поскольку репозиторий не хранит production credentials, live-проверка здесь `NOT_RUN`, пока оператор явно не запустит CLI с допустимым URL. В этом репозитории нет SQL migrations; тестовые фикстуры валидируют правила, но не заменяют production-схему или тестовые аккаунты. Полноценные сценарии эффективных прав, ownership, RPC и Storage требуют проверенной развёрнутой схемы и отдельных безопасных тестовых аккаунтов.
+
+GitHub Actions workflow `.github/workflows/security-audit.yml` сохраняет ручной запуск, еженедельный Full Security Audit и запуск при изменении исходников сканера/SQL. На Android: открыть репозиторий в GitHub → **Actions** → **Security Scanner** → **Run workflow** → выбрать Repository Scan, Supabase Scan или Full Security Audit. Загруженный артефакт содержит Markdown и JSON; live-проверка Production в Actions всегда `NOT_RUN`, поскольку workflow намеренно не получает database credentials. Запускайте live CLI только из доверенной локальной среды с read-only URL в переменной окружения. Workflow не применяет миграции и не исправляет конфигурацию.

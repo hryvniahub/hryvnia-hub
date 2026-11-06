@@ -183,19 +183,89 @@ function isPublicRole(roles) {
 
 function ownerRestricted(expression, relation) {
   if (!expression) return false;
+  // Seeing an ownership comparison anywhere is insufficient when OR can bypass it.
+  if (/\bOR\b/i.test(expression)) return false;
   if (relation === "storage.objects") {
     return /auth\.uid\s*\(\s*\)/i.test(expression)
       && (/\bowner\b/i.test(expression) || /storage\.foldername\s*\(/i.test(expression) || /\bname\b/i.test(expression));
   }
   return /auth\.uid\s*\(\s*\)\s*(?:=|IS NOT DISTINCT FROM)\s*\(?\s*(?:[\w"]+\s*\.\s*)?["']?(?:user_id|owner_id|created_by)\b/i.test(expression)
-    || /\b(?:user_id|owner_id|created_by)\b["']?\s*(?:=|IS NOT DISTINCT FROM)\s*\(?\s*auth\.uid\s*\(\s*\)/i.test(expression);
+    || /\b(?:user_id|owner_id|created_by|sender_id|recipient_id|buyer_id|seller_id)\b["']?\s*(?:=|IS NOT DISTINCT FROM)\s*\(?\s*auth\.uid\s*\(\s*\)/i.test(expression)
+    || /auth\.uid\s*\(\s*\)\s*(?:=|IS NOT DISTINCT FROM)\s*\(?\s*(?:[\w"]+\s*\.\s*)?["']?(?:sender_id|recipient_id|buyer_id|seller_id)\b/i.test(expression);
 }
 
 function sanitizeEvidence(value) {
-  return value
-    .replace(/\$[A-Za-z_0-9]*\$[\s\S]*?\$[A-Za-z_0-9]*\$/g, "$$[REDACTED]$$")
-    .replace(/'(?:''|\\.|[^'])*'/g, "'[REDACTED]'")
-    .replace(/"(?:[^"]|"")*"/g, '"[REDACTED]"')
+  const parts = [];
+  let copyFrom = 0;
+  let index = 0;
+  const isDollarTagCharacter = character => character !== undefined
+    && ((character >= "A" && character <= "Z")
+      || (character >= "a" && character <= "z")
+      || (character >= "0" && character <= "9")
+      || character === "_");
+
+  while (index < value.length) {
+    const character = value[index];
+    if (character === "'" || character === '"') {
+      let end = index + 1;
+      while (end < value.length) {
+        if (value[end] === character) {
+          if (value[end + 1] === character) {
+            end += 2;
+            continue;
+          }
+          break;
+        }
+        if (character === "'" && value[end] === "\\" && end + 1 < value.length && value[end + 1] !== "\n") {
+          end += 2;
+        } else {
+          end++;
+        }
+      }
+      if (end === value.length) {
+        index = value.length;
+        break;
+      }
+      parts.push(value.slice(copyFrom, index), character === "'" ? "'[REDACTED]'" : '"[REDACTED]"');
+      index = end + 1;
+      copyFrom = index;
+      continue;
+    }
+
+    if (character === "$") {
+      let delimiterEnd = index + 1;
+      while (isDollarTagCharacter(value[delimiterEnd])) delimiterEnd++;
+      if (value[delimiterEnd] === "$") {
+        let end = delimiterEnd + 1;
+        let closingEnd = -1;
+        while (end < value.length) {
+          if (value[end] === "$") {
+            let candidateEnd = end + 1;
+            while (isDollarTagCharacter(value[candidateEnd])) candidateEnd++;
+            if (value[candidateEnd] === "$") {
+              closingEnd = candidateEnd + 1;
+              break;
+            }
+            end = candidateEnd;
+          } else {
+            end++;
+          }
+        }
+        if (closingEnd >= 0) {
+          parts.push(value.slice(copyFrom, index), "$$[REDACTED]$$");
+          index = closingEnd;
+          copyFrom = index;
+          continue;
+        }
+        index = value.length;
+        break;
+      }
+    }
+    index++;
+  }
+
+  parts.push(value.slice(copyFrom));
+  return parts.join("")
     .replace(/\s+/g, " ")
     .trim()
     .slice(0, 240);
@@ -235,9 +305,10 @@ function analyzeSqlFiles(sources) {
   const functionGrants = [];
   const addFinding = (rule, severity, object, description, evidence, risk, recommendation, status = "potential") => {
     const location = sourceLocation(evidence.offset);
-    const idHash = createHash("sha1").update(`${rule}:${location.source}:${location.line}:${object}`).digest("hex").slice(0, 8);
+    const idHash = createHash("sha256").update(`${rule}:${location.source}:${location.line}:${object}`).digest("hex").slice(0, 8);
     findings.push({
       id: `${rule}-${idHash}`,
+      category: object.startsWith("storage.") || object.startsWith("storage/") ? "Storage Security" : "SQL/RLS",
       severity,
       object,
       description,
@@ -267,10 +338,16 @@ function analyzeSqlFiles(sources) {
     const relation = normalizeRelation(match[1], match[2]);
     tables.set(relation, { relation, offset: match.index, rls: false });
   }
-  const rlsPattern = /\bALTER\s+TABLE\s+(?:ONLY\s+)?(?:(?:"?([\w$]+)"?)\s*\.\s*)?"?([\w$]+)"?[^;]*?\bENABLE\s+ROW\s+LEVEL\s+SECURITY\b/gi;
+  const rlsPattern = /\bALTER\s+TABLE\s+(?:ONLY\s+)?(?:(?:"?([\w$]+)"?)\s*\.\s*)?"?([\w$]+)"?[^;]*?\b(ENABLE|DISABLE)\s+ROW\s+LEVEL\s+SECURITY\b/gi;
   for (const match of scanSql.matchAll(rlsPattern)) {
     const relation = normalizeRelation(match[1], match[2]);
-    if (tables.has(relation)) tables.get(relation).rls = true;
+    if (tables.has(relation)) tables.get(relation).rls = match[3].toUpperCase() === "ENABLE";
+    if (match[3].toUpperCase() === "DISABLE") addFinding(
+      "RLS-004", "HIGH", relation, `Row-level security is explicitly disabled on ${relation}.`,
+      { offset: match.index, text: match[0] },
+      "Disabling RLS removes policy enforcement for API roles with table privileges.",
+      "Keep RLS enabled on exposed relations and verify effective grants and policy coverage."
+    );
   }
 
   const policyPattern = /\bCREATE\s+POLICY\b[\s\S]*?;/gi;
@@ -284,8 +361,19 @@ function analyzeSqlFiles(sources) {
     const roles = policyRoles(header[4]);
     const mode = /\bAS\s+RESTRICTIVE\b/i.test(header[4]) ? "RESTRICTIVE" : "PERMISSIVE";
     const expressions = policyExpressions(statement);
+    // PostgreSQL uses USING as WITH CHECK when the latter is omitted.
+    if (["UPDATE", "ALL"].includes(operation) && expressions.with_check === undefined) expressions.with_check = expressions.using;
     const policy = { name, relation, operation, roles, mode, expressions, offset: match.index, text: statement };
     policies.push(policy);
+
+    if (isPublicRole(roles) && Object.values(expressions).some(expression =>
+      expression && /\bOR\s*\(*\s*true\b|\btrue\s*\)*\s*OR\b/i.test(expression))) {
+      addFinding("POLICY-005", "HIGH", relation,
+        `Policy "${name}" has a trivially true OR branch.`,
+        { offset: match.index, text: `${name} ${operation}: OR true` },
+        "An ownership comparison in another branch does not constrain an unconditional OR.",
+        "Remove the unconditional branch and verify the combined permissive/restrictive policy semantics.");
+    }
 
     for (const [clause, expression] of Object.entries(expressions)) {
       if (!isBareTrue(expression)) continue;
@@ -303,21 +391,40 @@ function analyzeSqlFiles(sources) {
     }
 
     if (WRITES.has(operation) && HIGH_RISK_TABLES.has(relation) && isPublicRole(roles)) {
-      const ownerCondition = operation === "INSERT"
-        ? expressions.with_check
-        : [expressions.using, expressions.with_check].filter(Boolean).join(" ");
-      if (!ownerRestricted(ownerCondition, relation)) {
-        const missingCheck = operation === "UPDATE" && !expressions.with_check;
+      const ownerUsing = ownerRestricted(expressions.using, relation);
+      const ownerCheck = ownerRestricted(expressions.with_check, relation);
+      const ownerRestrictedForOperation = operation === "INSERT"
+        ? ownerCheck
+        : operation === "DELETE"
+          ? ownerUsing
+          : ownerUsing && ownerCheck;
+      if (!ownerRestrictedForOperation) {
+        const missingCheck = ["UPDATE", "ALL"].includes(operation) && !ownerCheck;
+        const ownerCondition = [expressions.using, expressions.with_check].filter(Boolean).join(" ")
+          || "(no owner predicate found)";
         addFinding(
           "POLICY-002",
           missingCheck ? "HIGH" : "MEDIUM",
           relation,
-          `Policy "${name}" permits ${operation} without a statically identifiable owner restriction.`,
-          { offset: match.index, text: `${name} ${operation} TO ${roles.join(",")} ${ownerCondition || "(no owner predicate found)"}` },
+          `Policy "${name}" permits ${operation} without the required statically identifiable owner restriction.`,
+          { offset: match.index, text: `${name} ${operation} TO ${roles.join(",")} ${ownerCondition}` },
           "Users may be able to modify rows that are not theirs, or change ownership fields. This is a static risk signal, not proof of exploitability.",
           "Verify ownership predicates in USING and WITH CHECK (for example auth.uid() against the immutable owner column), including all permissive policies."
         );
       }
+    }
+
+    if (operation === "SELECT" && ["public.messages", "public.conversations", "public.conversation_reads", "public.favorites"].includes(relation)
+      && isPublicRole(roles) && isBareTrue(expressions.using)) {
+      addFinding(
+        "POLICY-004",
+        "HIGH",
+        relation,
+        `Policy "${name}" permits unconditional SELECT access to private user data.`,
+        { offset: match.index, text: `${name} SELECT TO ${roles.join(",")} USING (${expressions.using})` },
+        "Users may be able to read messages, conversations, read states, or favorites belonging to other users.",
+        "Restrict the SELECT predicate to the owning user or authorized conversation participants."
+      );
     }
   }
 
@@ -354,7 +461,7 @@ function analyzeSqlFiles(sources) {
     for (const role of roles) {
       for (const object of objects) {
         const schemaName = object.match(/^([\w$]+)\./)?.[1]?.toLowerCase();
-        const dangerous = privileges.some(privilege => ["ALL", "ALL PRIVILEGES", "TRUNCATE", "DELETE", "UPDATE", "INSERT"].includes(privilege));
+        const dangerous = privileges.some(privilege => ["ALL", "ALL PRIVILEGES", "TRUNCATE", "DELETE", "UPDATE", "INSERT", "SELECT"].includes(privilege));
         const functionExecute = match[2]?.toUpperCase() === "FUNCTION" && privileges.includes("EXECUTE");
         if (match[2]?.toUpperCase() === "FUNCTION" && privileges.includes("EXECUTE")) {
           functionGrants.push({ relation: object.replace(/\s*\([^)]*\)\s*$/, "").replace(/"/g, "").toLowerCase(), role });
@@ -372,7 +479,7 @@ function analyzeSqlFiles(sources) {
         } else if (role === "AUTHENTICATED" && privileges.some(privilege => ["ALL", "ALL PRIVILEGES", "TRUNCATE"].includes(privilege))) {
           addFinding(
             "GRANT-002",
-            "MEDIUM",
+            privileges.includes("TRUNCATE") || privileges.includes("ALL") || privileges.includes("ALL PRIVILEGES") ? "HIGH" : "MEDIUM",
             object,
             `Role authenticated is granted broad privileges (${privileges.join(", ")}) on ${object}.`,
             { offset: match.index, text: match[0] },
@@ -402,7 +509,7 @@ function analyzeSqlFiles(sources) {
     const roles = match[4].split(",").map(value => value.trim().replace(/"/g, "").toUpperCase());
     for (const role of roles) {
       const functionExecute = objectType === "FUNCTIONS" && privileges.includes("EXECUTE");
-      const dangerous = privileges.some(privilege => ["ALL", "ALL PRIVILEGES", "TRUNCATE", "DELETE", "UPDATE", "INSERT"].includes(privilege));
+      const dangerous = privileges.some(privilege => ["ALL", "ALL PRIVILEGES", "TRUNCATE", "DELETE", "UPDATE", "INSERT", "SELECT"].includes(privilege));
       if ((role === "ANON" || role === "PUBLIC") && (dangerous || functionExecute || ["auth", "storage", "extensions", "vault"].includes(schema.toLowerCase()))) {
         addFinding(
           "GRANT-004",
@@ -426,8 +533,10 @@ function analyzeSqlFiles(sources) {
     const definition = scanSql.slice(match.index, end);
     if (!/\bSECURITY\s+DEFINER\b/i.test(definition)) continue;
     const relation = `${(match[1] || "public").toLowerCase()}.${match[2].toLowerCase()}`;
-    const searchPath = (/\bSET\s+search_path\s*(?:=|TO)\s*([^;\n]+)/i.exec(definition)?.[1] || "").replace(/"/g, "");
-    if (!searchPath) {
+    const originalDefinition = clean.slice(match.index, end);
+    const pathMatch = /\bSET\s+search_path\s*(?:=|TO)\s*('(?:''|[^'])*'|[\w"$]+(?:\s*,\s*[\w"$]+)*)/i.exec(originalDefinition);
+    const searchPath = pathMatch?.[1].replace(/["']/g, "");
+    if (searchPath === undefined) {
       addFinding(
         "RPC-001",
         "HIGH",
@@ -511,4 +620,4 @@ function analyzeSqlFiles(sources) {
   return { findings, tables: [...tables.keys()], policyCount: policies.length };
 }
 
-module.exports = { analyzeSql, analyzeSqlFiles, stripComments };
+module.exports = { analyzeSql, analyzeSqlFiles, sanitizeEvidence, stripComments };

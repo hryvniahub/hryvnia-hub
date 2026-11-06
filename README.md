@@ -46,20 +46,50 @@ Experimental branch test
 
 ## Security Scanner
 
-Локальный статический сканер читает SQL-файлы из `supabase/migrations/` и не подключается к Supabase:
+Security Scanner использует существующий модуль `security/`: репозиторный анализатор, SQL/RLS анализатор, отдельный read-only инспектор каталога Supabase, CLI и общий Markdown/JSON отчёт. Статические сигналы помечаются `POTENTIAL`; подтверждённые результаты npm advisory и непосредственно наблюдаемые настройки отделяются от предположений.
 
 ```sh
+npm test
+npm run check:app
+npm run security:repository
+npm run security:supabase
 npm run security:audit
-npm run security:test
 npm run security:report
 ```
 
-`security:audit` пишет `security-report.md` и `security-report.json` в корень репозитория и завершается с ошибкой при статических находках CRITICAL/HIGH. `security:report` создаёт те же отчёты без порогового кода завершения. Отчёты игнорируются Git; Workflow сохраняет их как Actions Artifact.
+`security:repository` проверяет JavaScript/HTML на опасные DOM/XSS sinks и динамическое исполнение, ищет private credentials без вывода значения, анализирует GitHub Actions и выполняет полноценный `npm audit` по `package-lock.json`. `security:supabase` проверяет SQL migrations, RLS/policies, ownership, GRANT, SECURITY DEFINER/RPC и Storage. `security:audit` объединяет обе области; команды пишут `security-report.md` и `security-report.json` в корень. Все команды, включая `security:report`, возвращают код 1 при CRITICAL/HIGH; `--require-complete` возвращает код 2 при неполном **обязательном для выбранного режима** покрытии. Repository требует repository/authentication/dependencies; Supabase требует staticSql/migrations (при отсутствии SQL сохраняется SCAN-001); audit/report требуют обе группы. Live PostgreSQL/Storage дополнительно обязательны только при явном `--live-supabase` или `--require-live-complete`; последний всегда возвращает код 2, если live coverage не PASS.
 
-Сканер проверяет миграции на отсутствие RLS у созданных публичных таблиц, роли с `BYPASSRLS` (CRITICAL для `anon`/`authenticated`, HIGH для остальных), широкие/неограниченные политики и пересечения permissive-политик, опасные GRANT для `anon`/`authenticated`, SECURITY DEFINER без видимого фиксированного `search_path`, динамический SQL и некоторые признаки Storage-политик. Статические находки — потенциальные риски для проверки человеком, не подтверждённые уязвимости. Результат `PASS` относится только к пройденному статическому сканированию и не подтверждает безопасность развернутой базы. При отсутствии миграций результат `INCOMPLETE`; проверки схемы и БД указываются как `NOT_RUN`.
+Общий результат `NOT_RUN` и `coverageStatus: INCOMPLETE` сохраняются для непроверенных областей даже при exit 0 выбранного статического режима. CLI отдельно перечисляет Required coverage; exit 0 Repository Scan не означает полный аудит или безопасность Production. Finding identifiers используют SHA-256 с прежним восьмизначным суффиксом; идентификаторы прежних SHA-1 findings изменятся.
 
-`security:test` проверяет SQL-анализатор и его экспортируемые функции, игнорирование комментариев и SQL-литералов, строки исходных миграций, а также интеграцию CLI: создание обоих отчётов и коды завершения `audit`/`report`. CLI-тесты используют временные локальные SQL-файлы без подключения к Supabase.
+Отчёт группирует Repository Security, Supabase Database Security, Storage Security, Dependencies, Authentication и SQL/RLS; показывает Critical/High/Medium/Low/Info и статусы `PASS`/`FAIL`/`NOT_RUN`. Отсутствие источников или невозможность проверки не трактуется как успех. Для npm advisory нужен lockfile и доступ к npm registry; `npm audit` не отключается.
 
-Сейчас в репозитории нет миграций Supabase, тестовой схемы или конфигурации pgTAP. Поэтому проверка поведения anon/authenticated/service_role, владения объявлениями/избранным/перепиской/фотографиями и фактических RPC/Storage ограничений не выполняется; тестировать эти сценарии на выдуманной схеме было бы недостоверно. Сканер не изменяет SQL и не делает сетевых запросов.
+Успешный `npm audit` с нулём известных уязвимостей (`DEPS-003`, INFO) виден отдельно в `informationalResults` / «Informational audit outcomes», но не увеличивает число findings и severity/category counts. Ошибки/пропуски аудита остаются `NOT_RUN`, а реальные advisory остаются findings.
 
-GitHub Actions workflow `.github/workflows/security-audit.yml` запускается вручную, еженедельно и при изменениях `supabase/**`, `security/**`, `package.json` или самого workflow. Для статической проверки секреты и переменные Supabase не нужны. Workflow выполняет тесты сканера, формирует оба отчёта и загружает артефакт `security-report` на 30 дней. Он намеренно не использует `service_role`, не читает Production и не запускает миграции.
+Консервативный AST-анализ не доказывает безопасность сложных map/join и межпроцедурных потоков. 36 проверенных DOM findings из `app.js` отдельно перечислены в `security/scanners/reviewed-dom-sinks.json` с индивидуальными обоснованиями. Это ручные reviewed dispositions, не AST-доказательства и не отключение XSS-правил. Каждая запись привязана к файлу, строке, правилу и SHA-256 полного sink-выражения; SHA-256 **целых** `app.js` и `index.html` фиксируют helpers, callers и шаблон редактора. Любое изменение этих файлов аннулирует все dispositions: новые/изменённые sinks снова HIGH до повторного анализа и осознанного обновления записей после review. JSON/Markdown отчёты показывают rationale и hashes отдельно от автоматически проверенных sinks. Тестовые файлы сканируются; AUTH-001 учитывает исполняемые AST-вызовы, а не текстовые fixtures/комментарии. Dummy credential теста очистки environment не является private secret; настоящие private assignments по-прежнему проверяются.
+
+`coverage.repository: PASS` означает только отсутствие блокирующих репозиторных findings, **не** безопасность Production. `coverageStatus: INCOMPLETE` явно показывает оставшиеся `NOT_RUN` области, даже когда выполненная область прошла. В этом репозитории нет SQL migrations: staticSql/migrations остаются `NOT_RUN`; не следует выдумывать migrations ради зелёного результата. PostgreSQL/RLS/grants/RPC и Storage требуют отдельного защищённого read-only Production workflow ниже. Без его согласованного запуска livePostgres/liveStorage также `NOT_RUN`; полный аудит при недостающем покрытии не считается полным PASS.
+
+Для live-проверки требуется установленный `psql` и отдельный PostgreSQL login. URL не передаётся в аргументах процесса и не сохраняется в отчёте:
+
+```sh
+export SUPABASE_READONLY_DATABASE_URL='postgresql://<read-only-user>:<password>@<host>:5432/postgres'
+node security/cli.cjs supabase --live-supabase
+node security/cli.cjs audit --live-supabase
+unset SUPABASE_READONLY_DATABASE_URL
+```
+
+Live scanner читает каталоги PostgreSQL в `BEGIN READ ONLY` и только конфигурационные колонки `storage.buckets` (`id`, `name`, `public`, лимит размера и MIME-типы). Он не читает пользовательские таблицы/строки, `storage.objects` или тела функций и не исполняет RPC. Перед сканированием проверяется отдельный login: без memberships, владения объектами, повышенных атрибутов, эффективных DML/DDL или доступа к пользовательским таблицам. TLS вне loopback требует `sslmode=verify-full`; URL `service_role` отклоняется, а ошибки и credentials не попадают в отчёт. При недостаточных правах, неполном snapshot или неполном inventory Storage coverage остаётся `NOT_RUN`, а не `PASS`.
+
+Для Production дополнительно обязательны `SUPABASE_AUDIT_ENVIRONMENT=production`, `SUPABASE_EXPECTED_PRODUCTION_HOST`, `SUPABASE_EXPECTED_PRODUCTION_DATABASE`, `SUPABASE_EXPECTED_PRODUCTION_BUCKETS` (список имён через запятую) и точное подтверждение `SUPABASE_PRODUCTION_TARGET_CONFIRMATION="PRODUCTION <host>/<database>"`. URL должен использовать login `sherlock_audit`, совпадающие host/database и `sslmode=verify-full`. Не запускайте Production audit без отдельного разрешения и защищённого окружения. Если для чтения bucket metadata не хватает прав, минимальная SQL-заявка на согласование (не выполнять автоматически) такова:
+
+```sql
+GRANT USAGE ON SCHEMA storage TO sherlock_audit;
+GRANT SELECT (id, name, public, file_size_limit, allowed_mime_types)
+  ON TABLE storage.buckets TO sherlock_audit;
+```
+
+Этот grant не обходит RLS: если policies скрывают часть bucket inventory, Storage coverage останется `NOT_RUN`; scanner не добавляет policies и не выдаёт права. Отсутствие локальных SQL migrations отдельно отражается в coverage и не мешает запустить live scan, но общий отчёт не выдаёт полный `PASS` при неполном покрытии.
+
+GitHub Actions workflow `.github/workflows/security-audit.yml` сохраняет существующие проверки на push/PR/schedule; они не подключаются к Production. Для единого ручного аудита выберите **Full Security Audit** через **Actions → Security Scanner → Run workflow** на ветке `security-scanner-full-audit` и введите точное подтверждение `PRODUCTION <host>/<database>`. Production job требует Environment approval и выполняет Repository, migration и live проверки в одном отчёте; при отсутствии migrations отчёт остаётся `NOT_RUN`, хотя успешная live-проверка выполняется и проверяется отдельно.
+
+Перед первым запуском настройте GitHub Environment `supabase-production-audit` с required reviewers, secret `SUPABASE_READONLY_DATABASE_URL` и variables `SUPABASE_EXPECTED_PRODUCTION_HOST`, `SUPABASE_EXPECTED_PRODUCTION_DATABASE`, `SUPABASE_EXPECTED_PRODUCTION_BUCKETS` (имена bucket через запятую). Secret доступен только защищённой Production job и передаётся только scanner step после approval. Не храните credentials в коде; workflow не применяет migrations и не изменяет Production.

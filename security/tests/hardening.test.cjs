@@ -74,8 +74,44 @@ test("HTML inline JS preserves offsets and string fixtures do not become script"
   assert.deepEqual(result.findings.map(item => [item.line, item.rule]), [[4, "XSS-001"]]);
 });
 
+test("HTML inline JS accepts browser script end tags without losing sinks or authentication signals", () => {
+  for (const closing of [
+    "</script\t\n bar>",
+    "</ScRiPt bar>",
+    "</SCRIPT/>",
+    "</script\f\r bar=value>",
+    '</script data-note="quoted > value">',
+    "</script data-note='quoted > value'>",
+    '</script data-note = "quoted > value"other=value>',
+    '</script bare"quote>',
+    '</script bar=bare"quote>'
+  ]) {
+    const result = scanHtml(`<html>\n<ScRiPt>\nx.innerHTML = input;\nconst db = createClient(url, key);\ndb.update(payload);\n${closing}`, "index.html");
+    assert.deepEqual(result.findings.map(item => [item.line, item.rule]), [[3, "XSS-001"]], closing);
+    assert.deepEqual(result.authSignals, { client: true, writes: true, getUser: false }, closing);
+  }
+});
+
+test("HTML script end-tag attributes cannot inject scanned scripts or swallow following scripts", () => {
+  for (const closing of [
+    '</script data-note="> <script>db.auth.getUser();</script>">',
+    "</ScRiPt data-note='> <script>db.auth.getUser();</script>'>",
+    '</script bare"quote>'
+  ]) {
+    const html = `<script>const db = createClient(url, key); db.update(payload);${closing}\n<script>x.innerHTML = input;</script>`;
+    const result = scanHtml(html, "index.html");
+    assert.deepEqual(result.findings.map(item => [item.line, item.rule]), [[2, "XSS-001"]], closing);
+    assert.deepEqual(result.authSignals, { client: true, writes: true, getUser: false }, closing);
+  }
+  for (const closing of ["</scripture>", "</script\u00a0>", '</script data-note="unterminated >']) {
+    const result = scanHtml(`<script>x.innerHTML = input;${closing}`, "index.html");
+    assert.deepEqual(result.findings, [], closing);
+    assert.deepEqual(result.authSignals, { client: false, writes: false, getUser: false }, closing);
+  }
+});
+
 function reviewedRepository(t) {
-  const root = fs.mkdtempSync(path.resolve(__dirname, "../../.security-review-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "security-review-"));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   fs.writeFileSync(path.join(root, "app.js"), app);
   fs.copyFileSync(path.resolve(__dirname, "../../index.html"), path.join(root, "index.html"));
@@ -136,7 +172,7 @@ test("reviewed application never suppresses executable test sinks or private ass
 });
 
 test("authentication signal ignores fixture strings/comments but retains executable test writes", t => {
-  const root = fs.mkdtempSync(path.resolve(__dirname, "../../.security-auth-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "security-auth-"));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   const calls = 'const db = window.supabase.createClient(url, key);\ndb.from("listings").update(payload);';
   fs.writeFileSync(path.join(root, "test.cjs"), `const fixture = ${JSON.stringify(calls)};\n/* ${calls} */`);

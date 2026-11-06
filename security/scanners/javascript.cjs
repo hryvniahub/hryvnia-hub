@@ -171,11 +171,42 @@ function scanJavaScript(source, filename) {
   return { findings, reviewedSinks, authSignals };
 }
 
+function scriptEndTagEnd(source, start) {
+  let index = start;
+  while (index < source.length) {
+    if (source[index] === ">") return index;
+    if (/[\t\n\f\r /]/.test(source[index])) {
+      index++;
+      continue;
+    }
+    // Quotes in attribute names are literal; only quoted values can contain ">".
+    index++;
+    while (index < source.length && !/[\t\n\f\r /=>]/.test(source[index])) index++;
+    while (index < source.length && /[\t\n\f\r ]/.test(source[index])) index++;
+    if (source[index] !== "=") continue;
+    index++;
+    while (index < source.length && /[\t\n\f\r ]/.test(source[index])) index++;
+    if (source[index] === '"' || source[index] === "'") {
+      const end = source.indexOf(source[index], index + 1);
+      if (end === -1) return -1;
+      index = end + 1;
+    } else {
+      while (index < source.length && !/[\t\n\f\r >]/.test(source[index])) index++;
+    }
+  }
+  return -1;
+}
+
 function scanHtml(source, filename) {
   const findings = [];
   const reviewedSinks = [];
   const authSignals = { client: false, writes: false, getUser: false };
-  for (const match of source.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)) {
+  const scripts = /<script\b([^>]*)>([\s\S]*?)<\/script(?=[\t\n\f\r />])/gi;
+  let match;
+  while ((match = scripts.exec(source)) !== null) {
+    const end = scriptEndTagEnd(source, scripts.lastIndex);
+    if (end === -1) break;
+    scripts.lastIndex = end + 1;
     if (/\btype\s*=\s*["'](?:application\/(?:ld\+)?json|importmap)["']/i.test(match[1])) continue;
     const offset = source.slice(0, match.index + match[0].indexOf(">") + 1).split("\n").length - 1;
     const scan = scanJavaScript(match[2], `${filename}.js`);

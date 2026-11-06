@@ -290,12 +290,30 @@ test("NOT_RUN cannot be represented as PASS or a successful required CLI scan", 
   const cli = path.resolve(__dirname, "../cli.cjs");
   const child = spawnSync(process.execPath, [cli, "supabase", "--require-complete"], { cwd: root, encoding: "utf8" });
   assert.equal(child.status, 2);
+  assert.match(child.stderr, /Required coverage incomplete: staticSql: NOT_RUN; migrations: NOT_RUN/);
   const report = JSON.parse(fs.readFileSync(path.join(root, "security-report.json")));
   assert.equal(report.result, "NOT_RUN");
   assert.equal(report.coverage.database, "NOT_RUN");
   assert.equal(report.coverage.staticSql, "NOT_RUN");
   const liveChild = spawnSync(process.execPath, [cli, "supabase", "--require-live-complete"], { cwd: root, encoding: "utf8" });
   assert.equal(liveChild.status, 2);
+  assert.match(liveChild.stderr, /Required coverage incomplete: livePostgres: NOT_RUN; liveStorage: NOT_RUN/);
+});
+
+test("repository mode never inspects the SQL source directory or marks SQL coverage PASS", t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "security-repository-scope-"));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const sourceDir = "not-a-directory";
+  fs.writeFileSync(path.join(root, sourceDir), "");
+  const { report } = run({ root, mode: "repository", sourceDir, runNpmAudit: false });
+  for (const area of ["staticSql", "migrations", "livePostgres", "liveStorage"]) {
+    assert.equal(report.coverage[area], "NOT_RUN", area);
+  }
+  assert.equal(report.coverageStatus, "INCOMPLETE");
+  assert.equal(report.result, "NOT_RUN");
+  assert.ok(!report.findings.some(item => item.id === "SCAN-001"));
+  assert.equal(report.coverage.dependencies, "NOT_RUN");
+  assert.equal(getExitCode(report, ["repository", "--require-complete"]), 2);
 });
 
 test("required coverage is scoped to the selected mode without hiding global gaps", () => {
@@ -358,7 +376,11 @@ test("Supabase CLI requires real SQL sources but not unrequested live inspection
   assert.equal(report.coverageStatus, "INCOMPLETE");
   assert.equal(report.coverage.livePostgres, "NOT_RUN");
   assert.equal(report.coverage.liveStorage, "NOT_RUN");
+  assert.equal(report.coverage.repository, "NOT_RUN");
+  assert.equal(report.coverage.authentication, "NOT_RUN");
+  assert.equal(report.coverage.dependencies, "NOT_RUN");
   const repository = run({ root, mode: "repository", runNpmAudit: false }).report;
+  assert.equal(repository.coverage.migrations, "NOT_RUN", "SQL files present but not analyzed in repository mode");
   assert.equal(repository.coverage.dependencies, "NOT_RUN");
   assert.equal(getExitCode(repository, ["repository", "--require-complete"]), 2);
 });

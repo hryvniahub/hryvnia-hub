@@ -47,6 +47,7 @@ jobs:
       - name: Run repository security scan
         id: scan
         if: always()
+        # Require repository/authentication/dependencies only; SQL/live gaps stay visible.
         run: npm run security:repository -- --require-complete
       - name: Publish report
         if: always()
@@ -90,6 +91,7 @@ jobs:
       - name: Run Supabase scan
         if: always()
         id: static-scan
+        # Missing SQL sources must fail coverage, not become PASS or a skipped check.
         run: npm run security:supabase -- --require-complete
       - name: Publish report
         if: always()
@@ -134,6 +136,7 @@ jobs:
       - name: Run full security audit
         if: always()
         id: static-audit
+        # Require both repository and static SQL coverage; live inspection is separate.
         run: npm run security:audit -- --require-complete
       - name: Publish report
         if: always()

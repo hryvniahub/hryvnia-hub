@@ -28,15 +28,20 @@ function run({
   env = process.env,
   liveOptions = {}
 } = {}) {
-  const absoluteSource = path.resolve(root, sourceDir);
-  const files = collectSqlFiles(absoluteSource);
   const findings = [];
   const scannedFiles = [];
-  const coverage = {};
+  const coverage = {
+    repository: "NOT_RUN",
+    authentication: "NOT_RUN",
+    dependencies: "NOT_RUN",
+    staticSql: "NOT_RUN",
+    migrations: "NOT_RUN",
+    livePostgres: "NOT_RUN",
+    liveStorage: "NOT_RUN"
+  };
   const reviewedSinks = [];
   const reviewedFindings = [];
   let liveAudit;
-  coverage.migrations = files.length ? "PASS" : "NOT_RUN";
   const areaStatus = (items, fallback = "PASS") => items.some(item =>
     item.status !== "not-run" && ["CRITICAL", "HIGH"].includes(item.severity)) ? "FAIL" : fallback;
 
@@ -53,6 +58,8 @@ function run({
   }
 
   if (mode === "supabase" || mode === "full") {
+    const files = collectSqlFiles(path.resolve(root, sourceDir));
+    coverage.migrations = files.length ? "PASS" : "NOT_RUN";
     const sqlSources = files.map(file => ({
       sql: fs.readFileSync(file, "utf8"),
       source: path.relative(root, file).split(path.sep).join("/")
@@ -151,6 +158,12 @@ function main(argv) {
   console.log(`Reports: ${path.relative(process.cwd(), written.markdownPath)}, ${path.relative(process.cwd(), written.jsonPath)}`);
   console.log(report.coverage.reason);
   process.exitCode = getExitCode(report, argv);
+  if (process.exitCode === 2) {
+    const required = getRequiredCoverage(argv).filter(area =>
+      argv.includes("--require-complete") || (argv.includes("--require-live-complete") && area.startsWith("live")));
+    console.error(`Required coverage incomplete: ${required.filter(area =>
+      report.coverage[area] !== "PASS").map(area => `${area}: ${report.coverage[area]}`).join("; ")}`);
+  }
 }
 
 if (require.main === module) main(process.argv.slice(2));

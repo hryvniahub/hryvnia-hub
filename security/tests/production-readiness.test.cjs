@@ -2,7 +2,10 @@
 
 const assert = require("node:assert/strict");
 const { test } = require("node:test");
-const { validateConfiguration } = require("../production-readiness.cjs");
+const { spawnSync } = require("node:child_process");
+const path = require("node:path");
+const fs = require("node:fs");
+const { validateConfiguration, diagnoseEndpoint } = require("../production-readiness.cjs");
 
 const validConfig = {
   SUPABASE_PRODUCTION_HOST: "db.example.supabase.co",
@@ -149,4 +152,78 @@ test("rejects URL fragments and malformed percent encoding", () => {
       /fragment|percent encoding/
     );
   }
+});
+
+test("endpoint diagnostics report direct host, encoding, port and TLS without credentials", () => {
+  const result = diagnoseEndpoint(validConfig);
+  assert.equal(result.actualHostname, "db.example.supabase.co");
+  assert.equal(result.hostnameMatches, true);
+  assert.equal(result.endpoint, "direct");
+  assert.equal(result.directRoleMatches, true);
+  assert.equal(result.tlsVerifyFullOnly, true);
+  const encoded = diagnoseEndpoint({
+    ...validConfig,
+    SUPABASE_READONLY_DATABASE_URL: validConfig.SUPABASE_READONLY_DATABASE_URL.replace(
+      "db.example.supabase.co:5432", "%64B.EXAMPLE%2ESUPABASE.CO:6543"
+    )
+  });
+  assert.equal(encoded.hostnameMatches, true);
+  assert.equal(encoded.port, 6543);
+  assert.equal(encoded.sessionPort, false);
+  assert.doesNotMatch(JSON.stringify(result), /sherlock_audit|postgresql:|password/);
+});
+
+test("pooler diagnostics distinguish endpoint mismatch without authorizing a pooler role", () => {
+  const url = new URL(validConfig.SUPABASE_READONLY_DATABASE_URL);
+  url.hostname = "aws-0-eu-central-1.pooler.supabase.com";
+  url.username = "sherlock_audit.syntheticref";
+  const config = { ...validConfig, SUPABASE_READONLY_DATABASE_URL: url.href };
+  const result = diagnoseEndpoint(config);
+  assert.equal(result.endpoint, "pooler");
+  assert.equal(result.actualHostname, url.hostname);
+  assert.equal(result.hostnameMatches, false);
+  assert.equal(result.sessionPort, true);
+  assert.equal(result.poolerRoleAndProjectRefShapeMatches, true);
+  assert.equal(result.poolerProjectRefVerified, false);
+  assert.equal(result.directRoleMatches, false);
+  assert.throws(() => validateConfiguration(config), /must use the sherlock_audit role/);
+  assert.doesNotMatch(JSON.stringify(result), /sherlock_audit|syntheticref/);
+});
+
+test("diagnostics withhold unrecognized hosts and detect trailing dots and TLS mismatch", () => {
+  for (const host of ["db.example.supabase.co.", "sensitive-credential.invalid"]) {
+    const result = diagnoseEndpoint({
+      ...validConfig,
+      SUPABASE_READONLY_DATABASE_URL: validConfig.SUPABASE_READONLY_DATABASE_URL
+        .replace("db.example.supabase.co", host).replace("verify-full", "require")
+    });
+    assert.equal(result.hostnameMatches, false);
+    assert.equal(result.tlsVerifyFullOnly, false);
+    assert.equal(result.trailingDot, host.endsWith("."));
+    assert.doesNotMatch(JSON.stringify(result), /sensitive-credential/);
+  }
+});
+
+test("diagnostic CLI preserves failure and never prints malformed URLs or credentials", () => {
+  for (const input of ["not-a-url-sensitive", "postgresql://sensitive@%FF.example/postgres"]) {
+    const child = spawnSync(process.execPath, [
+      path.resolve(__dirname, "../production-readiness.cjs"), "--diagnose"
+    ], {
+      encoding: "utf8",
+      env: { ...process.env, ...validConfig, SUPABASE_READONLY_DATABASE_URL: input }
+    });
+    assert.equal(child.status, 1);
+    assert.equal(child.stdout, "");
+    assert.match(child.stderr, /valid PostgreSQL URL|invalid percent encoding/);
+    assert.doesNotMatch(child.stderr, /sensitive|postgresql:\/\//);
+  }
+});
+
+test("readiness-only workflow keeps target checks and skips the live audit", () => {
+  const workflow = fs.readFileSync(path.resolve(__dirname, "../../.github/workflows/supabase-production-audit.yml"), "utf8");
+  assert.match(workflow, /readiness_only:\s+description:[^\n]+\s+type: boolean\s+default: false/);
+  assert.match(workflow, /id: audit\s+if: success\(\) && !inputs\.readiness_only/);
+  assert.match(workflow, /node security\/production-readiness\.cjs --diagnose/);
+  assert.match(workflow, /github\.ref == 'refs\/heads\/main' && inputs\.confirmation == 'AUDIT SUPABASE PRODUCTION READ ONLY'/);
+  assert.match(workflow, /\[ "\$CONFIRMED_HOST" != "\$EXPECTED_HOST" \]/);
 });

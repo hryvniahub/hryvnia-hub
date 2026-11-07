@@ -11,6 +11,10 @@ on:
         description: Type the expected Production hostname
         required: true
         type: string
+      readiness_only:
+        description: Diagnose and validate configuration without connecting or auditing
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -55,9 +59,10 @@ jobs:
           SUPABASE_PRODUCTION_HOST: ${{ vars.SUPABASE_PRODUCTION_HOST }}
           SUPABASE_PRODUCTION_DATABASE: ${{ vars.SUPABASE_PRODUCTION_DATABASE }}
           SUPABASE_PRODUCTION_STORAGE_BUCKETS: ${{ vars.SUPABASE_PRODUCTION_STORAGE_BUCKETS }}
-        run: node security/production-readiness.cjs
+        run: node security/production-readiness.cjs --diagnose
       - name: Audit Production metadata
         id: audit
+        if: success() && !inputs.readiness_only
         env:
           SHERLOCK_PRODUCTION_CONFIRMATION: ${{ inputs.confirmation }}
           SUPABASE_READONLY_DATABASE_URL: ${{ secrets.SUPABASE_READONLY_DATABASE_URL }}

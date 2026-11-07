@@ -19,6 +19,16 @@ phrase, and a matching hostname. No connection is authorized by preparing or
 testing these files. Publish reviewed code through the normal approval process
 before dispatch. Never put the database URL in command arguments or output.
 
+For connection diagnosis, dispatch with `readiness_only: true`. This preserves
+target confirmation and all readiness checks but never runs the live auditor,
+even when readiness succeeds. `node security/production-readiness.cjs --diagnose`
+reports recognized Supabase endpoint hostnames, comparison, port, and boolean
+role/TLS checks without printing credentials or the URL. Unrecognized hostnames
+are withheld to avoid exposing credentials from malformed URLs. A pooler-shaped
+username does not verify its project reference or enable pooler support; the
+existing direct-role validation remains mandatory until endpoint configuration
+and any required pooler changes are separately reviewed.
+
 ## Database permissions
 
 Use a dedicated LOGIN role with CONNECT to the target database. It must have no

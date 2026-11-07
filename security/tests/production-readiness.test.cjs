@@ -19,6 +19,45 @@ test("accepts a matching TLS URL for the dedicated audit role", () => {
   });
 });
 
+test("normalizes ordinary and percent-encoded hostnames to lowercase", () => {
+  for (const host of ["DB.EXAMPLE.SUPABASE.CO", "%64B.EXAMPLE%2ESUPABASE.CO"]) {
+    const target = validateConfiguration({
+      ...validConfig,
+      SUPABASE_PRODUCTION_HOST: "DB.EXAMPLE.SUPABASE.CO",
+      SUPABASE_READONLY_DATABASE_URL: validConfig.SUPABASE_READONLY_DATABASE_URL.replace(
+        "db.example.supabase.co", host
+      )
+    });
+    assert.equal(target.host, "db.example.supabase.co");
+  }
+});
+
+test("rejects a percent-encoded hostname that decodes to a different host", () => {
+  assert.throws(
+    () => validateConfiguration({
+      ...validConfig,
+      SUPABASE_READONLY_DATABASE_URL: validConfig.SUPABASE_READONLY_DATABASE_URL.replace(
+        "db.example.supabase.co", "%77rong.example"
+      )
+    }),
+    { message: "Database URL host does not match SUPABASE_PRODUCTION_HOST" }
+  );
+});
+
+test("rejects malformed hostname encoding without exposing credentials or the URL", () => {
+  for (const host of ["%ZZ.example", "%.example", "%FF.example", "%C3%28.example"]) {
+    assert.throws(
+      () => validateConfiguration({
+        ...validConfig,
+        SUPABASE_READONLY_DATABASE_URL: validConfig.SUPABASE_READONLY_DATABASE_URL.replace(
+          "db.example.supabase.co", host
+        )
+      }),
+      { message: "SUPABASE_READONLY_DATABASE_URL contains invalid percent encoding" }
+    );
+  }
+});
+
 test("rejects missing configuration without exposing the URL", () => {
   assert.throws(
     () => validateConfiguration({ ...validConfig, SUPABASE_READONLY_DATABASE_URL: "" }),

@@ -84,7 +84,7 @@ function connectionOptions(config) {
   return {
     target,
     options: {
-      host: url.hostname, port: url.port ? Number(url.port) : 5432,
+      host: target.host, port: url.port ? Number(url.port) : 5432,
       database: target.database, user: "sherlock_audit", password: decodeURIComponent(url.password),
       ssl: { rejectUnauthorized: true, servername: target.host },
       connectionTimeoutMillis: 5000, query_timeout: 6000,

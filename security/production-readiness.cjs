@@ -34,10 +34,12 @@ function validateConfiguration(config) {
   let username;
   let password;
   let database;
+  let host;
   try {
     username = decodeURIComponent(url.username);
     password = decodeURIComponent(url.password);
     database = decodeURIComponent(url.pathname.replace(/^\/+/, ""));
+    host = decodeURIComponent(url.hostname).toLowerCase();
   } catch {
     throw new Error("SUPABASE_READONLY_DATABASE_URL contains invalid percent encoding");
   }
@@ -47,7 +49,7 @@ function validateConfiguration(config) {
   if (!password) {
     throw new Error("Database URL must include a password");
   }
-  if (url.hostname.toLowerCase() !== expectedHost) {
+  if (host !== expectedHost) {
     throw new Error("Database URL host does not match SUPABASE_PRODUCTION_HOST");
   }
   if (database !== expectedDatabase) {

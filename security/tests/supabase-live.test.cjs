@@ -88,6 +88,13 @@ test("production authorization and configuration fail closed before creating a c
     { config, confirmation: undefined },
     { config, confirmation: "true" },
     { config: { ...config, SUPABASE_PRODUCTION_HOST: "different.invalid" }, confirmation: CONFIRMATION },
+    ...["%77rong.invalid", "%ZZ.invalid", "%FF.invalid"].map(host => ({
+      config: {
+        ...config,
+        SUPABASE_READONLY_DATABASE_URL: config.SUPABASE_READONLY_DATABASE_URL.replace("production.invalid", host)
+      },
+      confirmation: CONFIRMATION
+    })),
     { config: { ...config, SUPABASE_READONLY_DATABASE_URL: config.SUPABASE_READONLY_DATABASE_URL.replace("verify-full", "disable") }, confirmation: CONFIRMATION }
   ]) {
     const report = await auditProduction({ ...options, clientFactory });
@@ -304,4 +311,16 @@ test("connection options never pass a raw URL or weaken TLS verification to the 
   assert.equal(options.connectionString, undefined);
   assert.equal(options.ssl.rejectUnauthorized, true);
   assert.equal(options.options.includes("search_path=pg_catalog"), true);
+});
+
+test("connection and TLS use the validated lowercase host for ordinary and encoded URLs", () => {
+  for (const host of ["PRODUCTION.INVALID", "%70RODUCTION%2EINVALID"]) {
+    const { target, options } = connectionOptions({
+      ...config,
+      SUPABASE_READONLY_DATABASE_URL: config.SUPABASE_READONLY_DATABASE_URL.replace("production.invalid", host)
+    });
+    assert.equal(target.host, "production.invalid");
+    assert.equal(options.host, target.host);
+    assert.deepEqual(options.ssl, { rejectUnauthorized: true, servername: target.host });
+  }
 });

@@ -42,8 +42,17 @@ function run({
   const reviewedSinks = [];
   const reviewedFindings = [];
   let liveAudit;
-  const areaStatus = (items, fallback = "PASS") => items.some(item =>
-    item.status !== "not-run" && ["CRITICAL", "HIGH"].includes(item.severity)) ? "FAIL" : fallback;
+  const areaStatus = (items, fallback = "PASS") => {
+  const blocking = items.some(item =>
+    item.status !== "not-run" && ["CRITICAL", "HIGH"].includes(item.severity)
+  );
+  if (blocking) return "FAIL";
+
+  const incomplete = items.some(item =>
+    item.status === "not-run" && ["CRITICAL", "HIGH"].includes(item.severity)
+  );
+  return incomplete ? "NOT_RUN" : fallback;
+};
 
   if (mode === "repository" || mode === "full") {
     const repository = scanRepository({ root, runNpmAudit });

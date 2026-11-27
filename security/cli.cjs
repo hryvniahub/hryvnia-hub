@@ -42,17 +42,18 @@ function run({
   const reviewedSinks = [];
   const reviewedFindings = [];
   let liveAudit;
-  const areaStatus = (items, fallback = "PASS") => {
-  const blocking = items.some(item =>
-    item.status !== "not-run" && ["CRITICAL", "HIGH"].includes(item.severity)
-  );
-  if (blocking) return "FAIL";
 
-  const incomplete = items.some(item =>
-    item.status === "not-run" && ["CRITICAL", "HIGH"].includes(item.severity)
-  );
-  return incomplete ? "NOT_RUN" : fallback;
-};
+  const areaStatus = (items, fallback = "PASS") => {
+    const blocking = items.some(item =>
+      item.status !== "not-run" && ["CRITICAL", "HIGH"].includes(item.severity)
+    );
+    if (blocking) return "FAIL";
+
+    const incomplete = items.some(item =>
+      item.status === "not-run" && ["CRITICAL", "HIGH"].includes(item.severity)
+    );
+    return incomplete ? "NOT_RUN" : fallback;
+  };
 
   if (mode === "repository" || mode === "full") {
     const repository = scanRepository({ root, runNpmAudit });
@@ -73,12 +74,15 @@ function run({
       sql: fs.readFileSync(file, "utf8"),
       source: path.relative(root, file).split(path.sep).join("/")
     }));
+
     findings.push(...analyzeSqlFiles(sqlSources).findings.map(finding => ({
       ...finding,
       category: finding.category || (finding.object?.startsWith("storage.") || finding.object?.startsWith("storage/") ? "Storage Security" : "SQL/RLS")
     })));
+
     scannedFiles.push(...sqlSources.map(item => item.source));
     coverage.staticSql = areaStatus(findings.filter(item => ["SQL/RLS", "Storage Security"].includes(item.category)), files.length ? "PASS" : "NOT_RUN");
+
     if (!files.length) {
       findings.push({
         id: "SCAN-001",
@@ -101,6 +105,7 @@ function run({
           coverage: { livePostgres: "NOT_RUN", liveStorage: "NOT_RUN" },
           reason: "Live database inspection was not requested."
         };
+
     findings.push(...database.findings);
     coverage.livePostgres = database.coverage?.livePostgres || "NOT_RUN";
     coverage.liveStorage = database.coverage?.liveStorage || "NOT_RUN";
@@ -117,6 +122,7 @@ function run({
     reviewedFindings,
     liveAudit
   });
+
   const written = writeReport(report, reportDir);
   return { report, written };
 }
@@ -128,23 +134,29 @@ function getRequiredCoverage(argv) {
     : command === "supabase"
       ? ["staticSql", "migrations"]
       : ["repository", "authentication", "dependencies", "staticSql", "migrations"];
+
   if (argv.includes("--live-supabase") || argv.includes("--require-live-complete")) {
     required.push("livePostgres", "liveStorage");
   }
+
   return required;
 }
 
 function getExitCode(report, argv) {
   if (report.result === "FAIL") return 1;
+
   if (argv.includes("--require-live-complete")
     && (report.coverage.livePostgres !== "PASS" || report.coverage.liveStorage !== "PASS")) return 2;
+
   if (argv.includes("--require-complete")
     && getRequiredCoverage(argv).some(area => report.coverage[area] !== "PASS")) return 2;
+
   return 0;
 }
 
-function main(argv) {
+async function main(argv) {
   const command = argv[0] || "audit";
+
   if (!["repository", "supabase", "audit", "report"].includes(command)
     || argv.slice(1).some(argument =>
       !["--live-supabase", "--require-complete", "--require-live-complete"].includes(argument)
@@ -154,19 +166,24 @@ function main(argv) {
     process.exitCode = 2;
     return;
   }
+
   const sqlDirArg = argv.find(argument => argument.startsWith("--sql-dir="));
+
   const { report, written } = run({
     sourceDir: sqlDirArg?.slice("--sql-dir=".length) || "supabase/migrations",
     mode: command === "repository" || command === "supabase" ? command : "full",
     live: argv.includes("--live-supabase")
   });
+
   console.log(`Security scan: ${report.result}`);
   console.log(`Files: ${report.scannedFiles.length}; findings: ${report.findings.length}`);
   console.log(`Coverage: ${report.coverageStatus}; repository: ${report.coverage.repository}; informational outcomes: ${report.informationalResults.length}; manual DOM reviews: ${report.reviewedFindings.length}`);
   console.log(`Required coverage: ${getRequiredCoverage(argv).map(area => `${area}: ${report.coverage[area]}`).join("; ")}`);
   console.log(`Reports: ${path.relative(process.cwd(), written.markdownPath)}, ${path.relative(process.cwd(), written.jsonPath)}`);
   console.log(report.coverage.reason);
+
   process.exitCode = getExitCode(report, argv);
+
   if (process.exitCode === 2) {
     const required = getRequiredCoverage(argv).filter(area =>
       argv.includes("--require-complete") || (argv.includes("--require-live-complete") && area.startsWith("live")));
@@ -175,6 +192,11 @@ function main(argv) {
   }
 }
 
-if (require.main === module) main(process.argv.slice(2));
+if (require.main === module) {
+  main(process.argv.slice(2)).catch(() => {
+    console.error("Security scanner failed; no database error details or credentials are logged.");
+    process.exitCode = 2;
+  });
+}
 
 module.exports = { collectSqlFiles, getExitCode, getRequiredCoverage, main, run };
